@@ -1,0 +1,121 @@
+/* 🌙 Complete Dark Mode Styling */
+body.dark-mode {
+  background-color: #121212;
+  color: #f5f5f5;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Navbar */
+body.dark-mode .navbar {
+  background-color: #1e1e1e !important;
+}
+
+/* Cards */
+body.dark-mode .card {
+  background-color: #242424;
+  color: #f5f5f5;
+  border-color: #333;
+}
+
+/* Headings and Titles */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6,
+body.dark-mode .fw-bold,
+body.dark-mode .fw-semibold,
+body.dark-mode .text-center,
+body.dark-mode .text-dark,
+body.dark-mode .text-secondary {
+  color: #ffffff !important;
+}
+
+/* Labels, Form Text, and Placeholders */
+body.dark-mode label,
+body.dark-mode .form-label,
+body.dark-mode .form-check-label,
+body.dark-mode .text-muted {
+  color: #e0e0e0 !important;
+}
+
+/* Inputs and Textareas */
+body.dark-mode .form-control {
+  background-color: #2a2a2a;
+  color: #f5f5f5;
+  border-color: #444;
+}
+
+body.dark-mode .form-control::placeholder {
+  color: #b0b0b0;
+}
+
+/* Buttons */
+body.dark-mode .btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+body.dark-mode .btn-primary:hover {
+  background-color: #0b5ed7;
+  border-color: #0b5ed7;
+}
+
+body.dark-mode .btn-outline-danger {
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+body.dark-mode .btn-outline-danger:hover {
+  background-color: #ff6b6b;
+  color: #fff;
+}
+
+/* Links and Navigation */
+body.dark-mode a,
+body.dark-mode .nav-link {
+  color: #f5f5f5 !important;
+}
+
+body.dark-mode a:hover,
+body.dark-mode .nav-link:hover {
+  color: #0d6efd !important;
+}
+
+/* Switches and Checkboxes */
+body.dark-mode .form-check-input {
+  background-color: #444;
+  border-color: #666;
+}
+
+body.dark-mode .form-check-input:checked {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+/* Dropdowns and Modals */
+body.dark-mode .dropdown-menu,
+body.dark-mode .modal-content {
+  background-color: #2a2a2a;
+  color: #f5f5f5;
+  border-color: #333;
+}
+
+/* Tables */
+body.dark-mode table {
+  color: #f5f5f5;
+}
+
+body.dark-mode thead {
+  background-color: #1f1f1f;
+}
+
+body.dark-mode tbody tr {
+  border-color: #333;
+}
+
+/* Divider or HR */
+body.dark-mode hr {
+  border-top: 1px solid #333;
+}

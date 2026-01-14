@@ -1,0 +1,118 @@
+/* Home Link */
+#nav-home {
+    position: relative;
+    text-decoration: none; /* Removes default underline */
+    color: #000; /* Default link color */
+    transition: color 0.3s ease; /* Smooth color transition */
+}
+
+#nav-home:hover {
+    color: #007bff; /* Change text color on hover */
+}
+
+#nav-home::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px; /* Position underline below text */
+    width: 0;
+    height: 2px; /* Thickness of underline */
+    background-color: #007bff; /* Color of underline */
+    transition: width 0.3s ease; /* Smooth underline animation */
+}
+
+#nav-home:hover::after {
+    width: 100%; /* Full-width underline on hover */
+}
+
+/* Repeat for About Us Link */
+#nav-about {
+    position: relative;
+    text-decoration: none;
+    color: #000;
+    transition: color 0.3s ease;
+}
+
+#nav-about:hover {
+    color: #007bff;
+}
+
+#nav-about::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 0;
+    height: 2px;
+    background-color: #007bff;
+    transition: width 0.3s ease;
+}
+
+#nav-about:hover::after {
+    width: 100%;
+}
+
+/* Repeat for Learn More Link */
+#nav-learn {
+    position: relative;
+    text-decoration: none;
+    color: #000;
+    transition: color 0.3s ease;
+}
+
+#nav-learn:hover {
+    color: #007bff;
+}
+
+#nav-learn::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 0;
+    height: 2px;
+    background-color: #007bff;
+    transition: width 0.3s ease;
+}
+
+#nav-learn:hover::after {
+    width: 100%;
+}
+/* Center logo and form section */
+.logo {
+    max-width: 70%; /* Adjust size as needed */
+    height: auto;
+    display: block;
+    margin: 0 auto; /* Center horizontally */
+}
+
+/* Responsive behavior: Hide logo on small devices */
+@media (max-width: 768px) {
+    .logo {
+        display: none; /* Hide logo for small screens */
+    }
+}
+
+/* Base button styling */
+#btnlogin {
+    background-color: #FFC107; /* Gold background */
+    color: #294C63; /* Deep blue text */
+    border: none; /* Removes default border */
+    font-weight: bold; /* Makes text bold */
+    padding: 10px 20px; /* Adjusts padding for better proportions */
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+}
+
+/* Hover effect */
+#btnlogin:hover {
+    background-color: #E0A800; /* Darker gold for hover effect */
+    transform: scale(1.05); /* Slight enlargement on hover */
+}
+
+/* Optional focus effect */
+#btnlogin:focus {
+    outline: none; /* Removes default focus outline */
+    box-shadow: 0 0 5px 2px rgba(255, 193, 7, 0.6); /* Subtle glow effect */
+}
+

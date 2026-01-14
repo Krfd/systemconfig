@@ -1,0 +1,22 @@
+{
+    "draft_id": "menu_draft_694f7c1c34d285.98689163",
+    "type": "menu",
+    "user_id": 1,
+    "created_at": "2025-12-27 07:26:36",
+    "menu": {
+        "category": "Coffee",
+        "name": "Sample",
+        "code": "",
+        "prep_time": "5",
+        "serving": "22ml",
+        "calories": "4",
+        "notes": "Hot",
+        "price": "",
+        "status": "Inactive",
+        "dine_in": "1",
+        "takeout": "1",
+        "delivery": "1",
+        "description": "asdas",
+        "image": null
+    }
+}
