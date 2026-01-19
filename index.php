@@ -83,13 +83,19 @@ try {
             <div class="sidebar">
                 <nav id="main-menu" class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <p class="text-muted">Menus</p>
-                        </li>
-                        <li class="nav-item">
+                        </li> -->
+                        <!-- <li class="nav-item">
                             <a href="#" class="nav-link active" name="menu" menucode="dashboard" data-bs-toggle="tooltip" data-bs-title="Dashboard" data-bs-placement="right">
                                 <i class="nav-icon bi bi-grid"></i>
                                 <p>Dashboard</p>
+                            </a>
+                        </li> -->
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" name="menu" menucode="outgoing">
+                                <i class="nav-icon bi bi-box-arrow-in-left"></i>
+                                <p>Outgoing</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -99,9 +105,9 @@ try {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="outgoing">
-                                <i class="nav-icon bi bi-box-arrow-in-left"></i>
-                                <p>Outgoing</p>
+                            <a href="#" class="nav-link" name="menu" menucode="holiday">
+                                <i class="nav-icon bi bi-truck"></i>
+                                <p>Delivery</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -111,9 +117,15 @@ try {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="holiday">
-                                <i class="nav-icon bi bi-truck"></i>
-                                <p>Delivery</p>
+                            <a href="#" class="nav-link" name="menu" menucode="outgoing">
+                                <i class="nav-icon bi bi-tv"></i>
+                                <p>Monitoring</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" name="menu" menucode="outgoing">
+                                <i class="nav-icon bi bi-tv"></i>
+                                <p>Stock Transfer</p>
                             </a>
                         </li>
                         <!-- <li class="nav-item">
