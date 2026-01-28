@@ -93,7 +93,7 @@ try {
                             </a>
                         </li> -->
                         <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="outgoing">
+                            <a href="#" class="nav-link active" name="menu" menucode="outgoing">
                                 <i class="nav-icon bi bi-box-arrow-in-left"></i>
                                 <p>Outgoing</p>
                             </a>
@@ -175,7 +175,6 @@ try {
         </div>
     </footer>
     </div>
-
 
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/plugins/sweetalert2/sweetalert2.min.js"></script>

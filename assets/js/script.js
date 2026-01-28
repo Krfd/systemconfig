@@ -38,9 +38,9 @@ $("#main-menu")
         $file = "dirs/add_employee/add_employee.php";
         break;
       case "outgoing":
-        $maintitle = "Outgoing";
+        $maintitle = "";
         $mainbreadcrumb = `<li class="breadcrumb-item active">Outgoing</li>`;
-        $file = "dirs/outgoing/outgoing.php";
+        $file = "dirs/outgoing/dashboard/outgoing.php";
         break;
       case "stock_transfer":
         $maintitle = "Stock Transfer";
@@ -80,7 +80,7 @@ $("#main-menu")
   });
 
 document.getElementById("current-year").textContent = ` © ${moment().format(
-  "YYYY"
+  "YYYY",
 )}`;
 function loadsettings() {
   $.post("dirs/settings/settings.php", {}, function (data) {
@@ -89,10 +89,10 @@ function loadsettings() {
 }
 
 var tooltipTriggerList = document.querySelectorAll(
-  '[data-bs-toggle="tooltip"]'
+  '[data-bs-toggle="tooltip"]',
 );
 var tooltipList = [...tooltipTriggerList].map(
-  (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
+  (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
 );
 
 function logout() {
@@ -190,7 +190,7 @@ function loadTheme() {
       } else {
         console.log(data);
       }
-    }
+    },
   );
 }
 
