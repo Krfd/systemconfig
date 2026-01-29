@@ -1,4 +1,4 @@
-<div class="card shadow-sm" style="height: 75vh;" id="dashboard-display">
+<div class="card shadow-sm" id="dashboard-display">
     <div class="card-body">
         <section class="content">
             <div class="container-fluid">
@@ -7,8 +7,8 @@
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="d-flex flex-column gap-1 col-3">
                                 <div class="form-floating">
-                                    <input type="text" name="stsNo" id="stsNo" placeholder="STS No." class="form-control" style="background: #FFFBDF" required>
-                                    <label for="stsNo" class="form-label">SRN</label>
+                                    <input type="text" name="srn" id="srn" placeholder="SRN" class="form-control" style="background: #FFFBDF" required>
+                                    <label for="srn" class="form-label">SRN</label>
                                 </div>
                                 <div class="form-floating">
                                     <input type="date" name="date" id="date" placeholder="Date" class="form-control" style="background: #FFFBDF" required>
@@ -23,15 +23,16 @@
                                     <label for="typeOfReq">Type of Request</label>
                                 </div>
                             </div>
-                            <div class="d-flex flex-column gap-1 col-3">
+                            <div class="d-flex flex-column gap-1">
                                 <div class="input-group">
                                     <div class="form-floating">
-                                        <select name="branchName" id="branchName" class="form-select" style="background: #FFFBDF" required>
+                                        <select name="branchName" id="branchName" class="form-select" style="background: #FFFBDF;" required>
                                             <option value="showroom" selected>SHOWROOM</option>
                                             <option value="galleria">GALLERIA</option>
                                             <option value="plaza">PLAZA</option>
                                             <option value="viac">VIAC</option>
                                         </select>
+                                        <label for="branchName" class="form-label">Destination</label>
                                     </div>
                                     <div class="form-floating">
                                         <select name="branchWhCode" id="branchWhCode" class="form-select" style="background: #FFFBDF" required>
@@ -40,6 +41,7 @@
                                             <option value="plzawh">PLZAWH</option>
                                             <option value="viacwh">VIACWH</option>
                                         </select>
+                                        <label for="branchWhCode" class="form-label">WHCode</label>
                                     </div>
                                 </div>
                                 <div class="input-group">
@@ -68,7 +70,7 @@
                         </div>
                         <div class="float-end">
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUnit">Add</button>
-                            <button type="button" class="btn btn-danger clearTable" data-bs-toggle="modal">Clear</button>
+                            <button type="reset" class="btn btn-danger clearTable">Clear</button>
                         </div>
                         <div class="table-responsive mt-5">
                             <table class="table table-hover" id="outgoingTable">
@@ -83,7 +85,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr style="height: 40px; min-height: 40px">
+                                    <tr style="height: 30px; min-height: 30px">
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
@@ -91,7 +93,7 @@
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                     </tr>
-                                    <tr style="height: 40px; min-height: 40px">
+                                    <tr style="height: 30px; min-height: 30px">
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
@@ -99,7 +101,7 @@
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                     </tr>
-                                    <tr style="height: 40px; min-height: 40px">
+                                    <tr style="height: 30px; min-height: 30px">
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
@@ -107,7 +109,7 @@
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                     </tr>
-                                    <tr style="height: 40px; min-height: 40px">
+                                    <tr style="height: 30px; min-height: 30px">
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
@@ -115,7 +117,7 @@
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                     </tr>
-                                    <tr style="height: 40px; min-height: 40px">
+                                    <tr style="height: 30px; min-height: 30px">
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
@@ -123,7 +125,7 @@
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                     </tr>
-                                    <tr style="height: 40px; min-height: 40px">
+                                    <tr style="height: 30px; min-height: 30px">
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
@@ -131,7 +133,7 @@
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                     </tr>
-                                    <tr style="height: 40px; min-height: 40px">
+                                    <tr style="height: 30px; min-height: 30px">
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
@@ -139,7 +141,7 @@
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                     </tr>
-                                    <tr style="height: 40px; min-height: 40px">
+                                    <tr style="height: 30px; min-height: 30px">
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
@@ -149,6 +151,25 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-end mt-5">
+                            <div class="d-flex flex-column gap-1">
+                                <div class="form-floating">
+                                    <input type="text" name="type" id="type" class="form-control" style="background: #FFFBDF" placeholder="Purpose of Request" required>
+                                    <label for="type" class="form-label">Purpose of Request</label>
+                                </div>
+                                <div class="form-floating">
+                                    <input type="text" name="reqBy" id="reqBy" class="form-control" style="background: #FFFBDF" placeholder="Requested by" readonly required>
+                                    <label for="reqBy" class="form-label">Requested by</label>
+                                </div>
+                                <div class="form-floating">
+                                    <textarea name="remarks" id="remarks" class="form-control" rows="3" style="background: #FFFBDF; height: auto" placeholder="Remarks"></textarea>
+                                    <label for="remarks" class="form-label">Remarks</label>
+                                </div>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
                         </div>
                     </form>
                 </div>

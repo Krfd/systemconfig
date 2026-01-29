@@ -13,13 +13,13 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
-  $.post("dirs/outgoing/form/components/main.php", {}, function (data) {
+  $.post("dirs/incoming/form/components/main.php", {}, function (data) {
     $("#form-content").html(data);
   });
 }
 
 function loadReturn() {
-  $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
+  $.post("dirs/incoming/dashboard/incoming.php", {}, function (data) {
     $("#main-content").html(data);
   });
 }

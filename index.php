@@ -49,7 +49,6 @@ try {
     <link rel="stylesheet" href="node_modules/uikit/dist/css/uikit.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="icon" href="assets/image/logo/logo.png">
-
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -99,32 +98,32 @@ try {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="department">
+                            <a href="#" class="nav-link" name="menu" menucode="incoming">
                                 <i class="nav-icon bi bi-box-arrow-in-right"></i>
                                 <p>Incoming</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="holiday">
+                            <a href="#" class="nav-link" name="menu" menucode="delivery">
                                 <i class="nav-icon bi bi-truck"></i>
                                 <p>Delivery</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="leave">
+                            <a href="#" class="nav-link" name="menu" menucode="receiving">
                                 <i class="nav-icon bi bi-box"></i>
                                 <p>Receiving</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="outgoing">
+                            <a href="#" class="nav-link" name="menu" menucode="monitoring">
                                 <i class="nav-icon bi bi-tv"></i>
                                 <p>Monitoring</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="outgoing">
-                                <i class="nav-icon bi bi-tv"></i>
+                            <a href="#" class="nav-link" name="menu" menucode="stocktransfer">
+                                <i class="nav-icon bi bi-boxes"></i>
                                 <p>Stock Transfer</p>
                             </a>
                         </li>
@@ -196,6 +195,16 @@ try {
     <script src="node_modules/xlsx/dist/xlsx.full.min.js"></script>
     <script src="assets/js/script.js"></script>
     <?php include 'modal.php'; ?>
+    <script>
+        $(document).ready(function() {
+            $("#outgoingTable").DataTable({
+                "pageLength": 50,
+                order: [
+                    [0, "desc"]
+                ]
+            });
+        })
+    </script>
 </body>
 
 </html>

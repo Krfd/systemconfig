@@ -27,31 +27,41 @@ $("#main-menu")
     let $mainbreadcrumb = "";
 
     switch (menucode) {
-      case "dashboard":
-        $maintitle = "Dashboard";
-        $mainbreadcrumb = `<li class="breadcrumb-item active">Dashboard</li>`;
-        $file = "dirs/dashboard/dashboard.php";
-        break;
-      case "addemployee":
-        $maintitle = "Register Employee";
-        $mainbreadcrumb = `<li class="breadcrumb-item active">Add Member</li>`;
-        $file = "dirs/add_employee/add_employee.php";
-        break;
       case "outgoing":
         $maintitle = "";
         $mainbreadcrumb = `<li class="breadcrumb-item active">Outgoing</li>`;
         $file = "dirs/outgoing/dashboard/outgoing.php";
+        break;
+      case "incoming":
+        $maintitle = "";
+        $mainbreadcrumb = `<li class="breadcrumb-item active">Incoming</li>`;
+        $file = "dirs/incoming/dashboard/incoming.php";
+        break;
+      case "delivery":
+        $maintitle = "";
+        $mainbreadcrumb = `<li class="breadcrumb-item active">Delivery</li>`;
+        $file = "dirs/delivery/dashboard/delivery.php";
+        break;
+      case "receiving":
+        $maintitle = "";
+        $mainbreadcrumb = `<li class="breadcrumb-item active">Receiving</li>`;
+        $file = "dirs/receiving/dashboard/receiving.php";
+        break;
+      case "monitoring":
+        $maintitle = "";
+        $mainbreadcrumb = `<li class="breadcrumb-item active">Monitoring</li>`;
+        $file = "dirs/monitoring/dashboard/monitoring.php";
         break;
       case "stock_transfer":
         $maintitle = "Stock Transfer";
         $mainbreadcrumb = `<li class="breadcrumb-item active">Add Member</li>`;
         $file = "dirs/stock_transfer/stock_transfer.php";
         break;
-      case "settings":
-        $maintitle = "Account Settings";
-        $mainbreadcrumb = `<li class="breadcrumb-item active">Settings</li>`;
-        $file = "dirs/settings/settings.php";
-        break;
+      // case "settings":
+      //   $maintitle = "Account Settings";
+      //   $mainbreadcrumb = `<li class="breadcrumb-item active">Settings</li>`;
+      //   $file = "dirs/settings/settings.php";
+      //   break;
       default:
         return;
     }
