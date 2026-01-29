@@ -37,3 +37,10 @@ function picklistBasket() {
     $("#main-content").html(data);
   });
 }
+
+function openIncoming() {
+  // $.post("dirs/incoming/picklistbasket/basket.php", {}, function (data) {
+  //   $("#main-content").html(data);
+  // });
+  alert("Incoming details page is under construction.");
+}
