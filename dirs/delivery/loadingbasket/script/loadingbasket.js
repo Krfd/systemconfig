@@ -13,9 +13,13 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
-  $.post("dirs/outgoing/dashboard/components/main.php", {}, function (data) {
-    $("#loadingbasket_content").html(data);
-  });
+  $.post(
+    "dirs/delivery/loadingbasket/components/main.php",
+    {},
+    function (data) {
+      $("#loadingbasket_content").html(data);
+    },
+  );
 }
 
 function loadReturn() {

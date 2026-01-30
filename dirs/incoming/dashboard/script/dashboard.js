@@ -39,8 +39,7 @@ function picklistBasket() {
 }
 
 function openIncoming() {
-  // $.post("dirs/incoming/picklistbasket/basket.php", {}, function (data) {
-  //   $("#main-content").html(data);
-  // });
-  alert("Incoming details page is under construction.");
+  $.post("dirs/incoming/form/form.php", {}, function (data) {
+    $("#main-content").html(data);
+  });
 }

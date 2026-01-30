@@ -8,11 +8,6 @@
                 <h3 class="fw-bold text-primary">LOADING ITEM PL10001</h3>
             </div>
         </div>
-        <div class="d-flex gap-1">
-            <button class="btn btn-primary" type="button">
-                <i class="bi bi-printer"></i>
-            </button>
-        </div>
     </div>
     <div class="table-responsive">
         <table class="table datatables table-hover" id="outgoingTable">
@@ -27,12 +22,12 @@
             </thead>
             <tbody>
                 <tr style="height: 30px; min-height:30px">
-                    <td class="text-primary" style="cursor: pointer">PL10001</td>
+                    <td class="text-primary" style="cursor: pointer" onclick="openIncoming1()">SRNGALL0001</td>
                     <td class="text-secondary">01/29/2026</td>
                     <td class="text-secondary">PLAZA</td>
-                    <td class="text-secondary">10</td>
+                    <td class="text-secondary">50</td>
                     <td class="d-flex gap-1">
-                        <button type="button" class="btn btn-primary btn-sm">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="openIncoming1()">
                             <i class="bi bi-box-arrow-in-up-right"></i>
                         </button>
                         <button type="button" class="btn btn-danger btn-sm">
@@ -45,4 +40,4 @@
     </div>
 </div>
 <div id="item_content"></div>
-<script src="dirs/delivery/loadingitems/script/loadloadingbasket.js"></script>
+<script src="dirs/delivery/loadingitems/script/loadloadingitems.js"></script>

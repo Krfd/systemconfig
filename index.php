@@ -49,6 +49,12 @@ try {
     <link rel="stylesheet" href="node_modules/uikit/dist/css/uikit.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="icon" href="assets/image/logo/logo.png">
+
+    <style>
+        .checkbox {
+            display: none;
+        }
+    </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">

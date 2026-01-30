@@ -8,8 +8,8 @@ $(document).ready(function () {
   });
 });
 
-function loadloadingbasket() {
-  $.post("dirs/delivery/loadingbasket/loadingbasket.php", {}, function (data) {
+function delivery() {
+  $.post("dirs/delivery/dashboard/delivery.php", {}, function (data) {
     $("#main-content").html(data);
   });
 }
