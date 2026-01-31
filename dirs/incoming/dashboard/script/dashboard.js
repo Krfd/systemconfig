@@ -18,6 +18,10 @@ function loadDashboard() {
   });
 }
 
+function handleAddToPicklist() {
+  alert("Items added to picklist!");
+}
+
 function toggleCheckboxes() {
   const createPicklistBtn = document.getElementById("createPicklistBtn");
   const areCheckboxesVisible = $(".checkbox").is(":visible");
@@ -28,6 +32,7 @@ function toggleCheckboxes() {
     $(".checkbox").prop("checked", false);
     createPicklistBtn.textContent = "Create Picklist";
     createPicklistBtn.type = "button";
+    createPicklistBtn.replaceWith(createPicklistBtn.cloneNode(true));
   } else {
     createPicklistBtn.textContent = "Add to Picklist";
     createPicklistBtn.type = "submit";
