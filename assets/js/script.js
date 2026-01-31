@@ -52,10 +52,10 @@ $("#main-menu")
         $mainbreadcrumb = `<li class="breadcrumb-item active">Monitoring</li>`;
         $file = "dirs/monitoring/dashboard/monitoring.php";
         break;
-      case "stock_transfer":
-        $maintitle = "Stock Transfer";
-        $mainbreadcrumb = `<li class="breadcrumb-item active">Add Member</li>`;
-        $file = "dirs/stock_transfer/stock_transfer.php";
+      case "stocktransfer":
+        // $maintitle = "Stock Transfer";
+        $mainbreadcrumb = `<li class="breadcrumb-item active">Stock Transfer</li>`;
+        $file = "dirs/stock_transfer/dashboard/dashboard.php";
         break;
       // case "settings":
       //   $maintitle = "Account Settings";

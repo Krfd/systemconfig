@@ -3,7 +3,7 @@
         <div class="d-flex justify-content-start align-items-start gap-3">
             <h3 class="fw-bold text-primary">Receiving</h3>
         </div>
-        <button class="btn btn-primary" type="button" onclick="test()">New</button>
+        <button class="btn btn-primary" type="button" onclick="receivingForm()">New</button>
     </div>
     <div class="table-responsive">
         <table class="table datatables table-hover" id="receivingTable">

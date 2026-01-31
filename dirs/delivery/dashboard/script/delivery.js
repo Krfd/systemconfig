@@ -1,3 +1,7 @@
+// $(document).ready(function () {
+//   loadDashboard();
+// });
+
 $(document).ready(function () {
   OverlayScrollbars(document.getElementById("dashboard-display"), {
     className: "os-theme-dark",
@@ -7,6 +11,18 @@ $(document).ready(function () {
     },
   });
 });
+
+// function loadDashboard() {
+//   $.post("dirs/delivery/dashboard/components/main.php", {}, function (data) {
+//     $("#delivery_content").html(data);
+//   });
+// }
+
+function loadingBasket() {
+  $.post("dirs/delivery/loadingbasket/loadingbasket.php", {}, function (data) {
+    $("#main-content").html(data);
+  });
+}
 
 function openDR1() {
   $.post("dirs/delivery/deliveries/delivery1.php", {}, function (data) {

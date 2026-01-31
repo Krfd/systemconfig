@@ -27,8 +27,14 @@ function toggleCheckboxes() {
   if (areCheckboxesVisible) {
     $(".checkbox").prop("checked", false);
     createPicklistBtn.textContent = "Create Picklist";
+    createPicklistBtn.type = "button";
   } else {
     createPicklistBtn.textContent = "Add to Picklist";
+    createPicklistBtn.type = "submit";
+
+    createPicklistBtn.addEventListener("click", function () {
+      alert("Items added to picklist!");
+    });
   }
 }
 

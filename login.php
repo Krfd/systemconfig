@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,6 +18,7 @@
   <link rel="stylesheet" href="assets/plugins/datepicker/jquery-ui.structure.min.css">
   <link rel="icon" href="assets/image/logo/logo.png">
 </head>
+
 <body>
 
   <form id="frm-login">
@@ -51,62 +53,58 @@
     </div>
   </form>
 
-<script src="assets/js/jquery.min.js"></script>
-<script src="assets/plugins/sweetalert2/sweetalert2.min.js"></script>
-<script src="assets/plugins/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="assets/plugins/toastr/toastr.min.js"></script>
-<script src="assets/plugins/chart.js/Chart.min.js"></script>
-<script src="assets/plugins/moment/moment.min.js"></script>
-<script src="assets/plugins/daterangepicker/daterangepicker.js"></script>
-<script src="assets/plugins/daterangepicker/daterangepicker.js"></script>
-<script src="assets/plugins/summernote/summernote-lite.min.js"></script>
-<script src="assets/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
-<script src="assets/plugins/elevatezoom-plus-master/src/jquery.ez-plus.js"></script>
-<script src="assets/plugins/datepicker/jquery-ui.min.js"></script>
+  <script src="assets/js/jquery.min.js"></script>
+  <script src="assets/plugins/sweetalert2/sweetalert2.min.js"></script>
+  <script src="assets/plugins/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="assets/plugins/toastr/toastr.min.js"></script>
+  <script src="assets/plugins/chart.js/Chart.min.js"></script>
+  <script src="assets/plugins/moment/moment.min.js"></script>
+  <script src="assets/plugins/daterangepicker/daterangepicker.js"></script>
+  <script src="assets/plugins/daterangepicker/daterangepicker.js"></script>
+  <script src="assets/plugins/summernote/summernote-lite.min.js"></script>
+  <script src="assets/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+  <script src="assets/plugins/elevatezoom-plus-master/src/jquery.ez-plus.js"></script>
+  <script src="assets/plugins/datepicker/jquery-ui.min.js"></script>
+  <script src="assets/js/global-scripts.js"></script>
 </body>
+
 </html>
 
 
 <script>
   function togglePassword() {
-      const passwordField = document.getElementById('user-password');
-      const checkbox = document.getElementById('toggle-show-password');
-      passwordField.type = checkbox.checked ? 'text' : 'password';
+    const passwordField = document.getElementById('user-password');
+    const checkbox = document.getElementById('toggle-show-password');
+    passwordField.type = checkbox.checked ? 'text' : 'password';
   }
 
 
-  $("#frm-login").on("submit", function (event) {
-      event.preventDefault();
+  $("#frm-login").on("submit", function(event) {
+    event.preventDefault();
 
-      var $frm = $(this);
-      var Username = $frm.find("#user-username").val();
-      var Password = $frm.find("#user-password").val();
+    var $frm = $(this);
+    var Username = $frm.find("#user-username").val();
+    var Password = $frm.find("#user-password").val();
 
-      $.post("actions/login.php", {
-          Username: Username,
-          Password: Password
-      }, function (data) {
+    $.post("actions/login.php", {
+      Username: Username,
+      Password: Password
+    }, function(data) {
 
-          var response = JSON.parse(data);
-          if (response.isSuccess === "OK") {
-              var sysRole = response.Data.SysRole;
-              if (sysRole === "cashier") {
-                  window.location.assign("index.php");
-              } 
-              else if (sysRole === "Admin") {
-                  window.location.assign("admin/index.php");
-              } 
-              else {
-                  window.location.assign("index.php");
-              }
+      var response = JSON.parse(data);
+      if (response.isSuccess === "OK") {
+        var sysRole = response.Data.SysRole;
+        if (sysRole === "cashier") {
+          window.location.assign("index.php");
+        } else if (sysRole === "Admin") {
+          window.location.assign("admin/index.php");
+        } else {
+          window.location.assign("index.php");
+        }
 
-          } else {
-              console.log("Login failed:", response.Message);
-          }
-      });
+      } else {
+        console.log("Login failed:", response.Message);
+      }
+    });
   });
-
 </script>
-
-
-

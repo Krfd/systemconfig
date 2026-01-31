@@ -11,23 +11,15 @@ $(document).ready(function () {
     },
   });
 });
+
 function loadDashboard() {
   $.post("dirs/receiving/dashboard/components/main.php", {}, function (data) {
     $("#received_content").html(data);
   });
 }
-function openRec1() {
-  $.post("dirs/received/received/received1.php", {}, function (data) {
-    $("#received_content").html(data);
-  });
-}
-function openRec2() {
-  $.post("dirs/received/received/received2.php", {}, function (data) {
-    $("#received_content").html(data);
-  });
-}
-function openRec3() {
-  $.post("dirs/received/received/received3.php", {}, function (data) {
-    $("#received_content").html(data);
+
+function returnToDashboard() {
+  $.post("dirs/receiving/dashboard/receiving.php", {}, function (data) {
+    $("#main-content").html(data);
   });
 }

@@ -23,3 +23,21 @@ function test() {
     $("#main-content").html(data);
   });
 }
+
+function openOutgoing1() {
+  $.post("dirs/outgoing/requests/request1.php", {}, function (data) {
+    $("#main-content").html(data);
+  });
+}
+
+function openOutgoing2() {
+  $.post("dirs/outgoing/requests/request2.php", {}, function (data) {
+    $("#main-content").html(data);
+  });
+}
+
+function openOutgoing3() {
+  $.post("dirs/outgoing/requests/request3.php", {}, function (data) {
+    $("#main-content").html(data);
+  });
+}

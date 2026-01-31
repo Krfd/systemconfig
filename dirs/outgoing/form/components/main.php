@@ -69,7 +69,7 @@
                             </div>
                         </div>
                         <div class="float-end">
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUnit">Add</button>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRequestUnit">Add</button>
                             <button type="reset" class="btn btn-danger clearTable">Clear</button>
                         </div>
                         <div class="table-responsive mt-5">

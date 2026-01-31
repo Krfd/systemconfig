@@ -19,7 +19,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr style="height: 30px; min-height:30px; cursor: pointer">
+                <tr style="height: 30px; min-height:30px; cursor: pointer" onclick="openOutgoing1()">
                     <td class="text-secondary" style="background: #FFFBDF">1</td>
                     <td class="text-secondary" style="background: #FFFBDF">SRNSHOW0001</td>
                     <td class="text-secondary" style="background: #FFFBDF">NEWSWH</td>
@@ -38,7 +38,7 @@
                         </ul>
                     </td>
                 </tr>
-                <tr style="height: 30px; min-height:30px; cursor: pointer">
+                <tr style="height: 30px; min-height:30px; cursor: pointer" onclick="openOutgoing2()">
                     <td class="text-secondary" style="background: #FFFBDF">2</td>
                     <td class="text-secondary" style="background: #FFFBDF">SRNSHOW0002</td>
                     <td class="text-secondary" style="background: #FFFBDF">VIACWH</td>
@@ -57,7 +57,7 @@
                         </ul>
                     </td>
                 </tr>
-                <tr style="height: 30px; min-height:30px; cursor: pointer">
+                <tr style="height: 30px; min-height:30px; cursor: pointer" onclick="openOutgoing3()">
                     <td class="text-secondary" style="background: #FFFBDF">3</td>
                     <td class="text-secondary" style="background: #FFFBDF">SRNSHOW0003</td>
                     <td class="text-secondary" style="background: #FFFBDF">VIACWH</td>

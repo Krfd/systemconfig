@@ -10,8 +10,8 @@ try {
     $stmt->execute([$Username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($user && password_verify($Password, $user['Password'])) {
-        $_SESSION['Uid']   = $user['Uid'];
-        $_SESSION['Role']       = $user['Role'];
+        $_SESSION['Uid'] = $user['Uid'];
+        $_SESSION['Role'] = $user['Role'];
         echo json_encode([
             "isSuccess" => "OK",
             "Data" => $user
@@ -28,4 +28,3 @@ try {
         "Message" => $e->getMessage()
     ]);
 }
-?>

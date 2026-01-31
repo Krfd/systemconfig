@@ -48,6 +48,7 @@ try {
     <link rel="stylesheet" href="assets/plugins/datepicker/jquery-ui.structure.min.css">
     <link rel="stylesheet" href="node_modules/uikit/dist/css/uikit.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/custom.css">
     <link rel="icon" href="assets/image/logo/logo.png">
 
     <style>
@@ -180,6 +181,8 @@ try {
         </div>
     </footer>
     </div>
+
+
 
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/plugins/sweetalert2/sweetalert2.min.js"></script>
