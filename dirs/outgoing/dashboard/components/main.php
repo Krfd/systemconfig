@@ -19,13 +19,13 @@
                 </tr>
             </thead>
             <tbody>
-                <tr style="height: 30px; min-height:30px; cursor: pointer" onclick="openOutgoing1()">
-                    <td class="text-secondary" style="background: #FFFBDF">1</td>
-                    <td class="text-secondary" style="background: #FFFBDF">SRNSHOW0001</td>
-                    <td class="text-secondary" style="background: #FFFBDF">NEWSWH</td>
-                    <td class="text-secondary" style="background: #FFFBDF">Vjay Endoma</td>
-                    <td class="text-secondary" style="background: #FFFBDF">NEW</td>
-                    <td class="text-secondary" style="background: #FFFBDF">01/10/2026</td>
+                <tr style="height: 30px; min-height:30px; cursor: pointer">
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing1()">1</td>
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing1()">SRNSHOW0001</td>
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing1()">NEWSWH</td>
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing1()">Vjay Endoma</td>
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing1()">NEW</td>
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing1()">01/10/2026</td>
                     <td class="text-secondary" style="background: #FFFBDF" class="dropdown">
                         <button class="btn" type="button" data-bs-toggle="dropdown">
                             <i class="bi bi-three-dots text-secondary"></i>
@@ -38,13 +38,13 @@
                         </ul>
                     </td>
                 </tr>
-                <tr style="height: 30px; min-height:30px; cursor: pointer" onclick="openOutgoing2()">
-                    <td class="text-secondary" style="background: #FFFBDF">2</td>
-                    <td class="text-secondary" style="background: #FFFBDF">SRNSHOW0002</td>
-                    <td class="text-secondary" style="background: #FFFBDF">VIACWH</td>
-                    <td class="text-secondary" style="background: #FFFBDF">Vjay Endoma</td>
-                    <td class="text-secondary" style="background: #FFFBDF">IN TRANSIT</td>
-                    <td class="text-secondary" style="background: #FFFBDF">01/10/2026</td>
+                <tr style="height: 30px; min-height:30px; cursor: pointer">
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing2()">2</td>
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing2()">SRNSHOW0002</td>
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing2()">VIACWH</td>
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing2()">Vjay Endoma</td>
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing2()">IN TRANSIT</td>
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing2()">01/10/2026</td>
                     <td class="text-secondary" style="background: #FFFBDF" class="dropdown">
                         <button class="btn" type="button" data-bs-toggle="dropdown">
                             <i class="bi bi-three-dots text-secondary"></i>
@@ -57,13 +57,13 @@
                         </ul>
                     </td>
                 </tr>
-                <tr style="height: 30px; min-height:30px; cursor: pointer" onclick="openOutgoing3()">
-                    <td class="text-secondary" style="background: #FFFBDF">3</td>
-                    <td class="text-secondary" style="background: #FFFBDF">SRNSHOW0003</td>
-                    <td class="text-secondary" style="background: #FFFBDF">VIACWH</td>
-                    <td class="text-secondary" style="background: #FFFBDF">Vjay Endoma</td>
-                    <td class="text-secondary" style="background: #FFFBDF">ON PROCESS</td>
-                    <td class="text-secondary" style="background: #FFFBDF">01/10/2026</td>
+                <tr style="height: 30px; min-height:30px; cursor: pointer">
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing3()">3</td>
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing3()">SRNSHOW0003</td>
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing3()">VIACWH</td>
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing3()">Vjay Endoma</td>
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing3()">ON PROCESS</td>
+                    <td class="text-secondary" style="background: #FFFBDF" onclick="openOutgoing3()">01/10/2026</td>
                     <td class="text-secondary" style="background: #FFFBDF" class="dropdown">
                         <button class="btn" type="button" data-bs-toggle="dropdown">
                             <i class="bi bi-three-dots text-secondary"></i>

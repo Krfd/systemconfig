@@ -19,6 +19,10 @@
                                         <input type="text" name="drno" id="drno" placeholder="DR No." class="form-control" style="background: #FFFBDF" value="DR-10003" readonly>
                                         <label for="drno" class="form-label">DR No.</label>
                                     </div>
+                                    <div class="form-floating">
+                                        <input type="text" name="pcklstno" id="pcklstno" placeholder="Picklist No." class="form-control" style="background: #FFFBDF" value="PL10003" readonly>
+                                        <label for="pcklstno" class="form-label">Picklist No.</label>
+                                    </div>
                                     <div class="input-group">
                                         <div class="form-floating">
                                             <select name="origin" id="origin" class="form-select" style="background: #FFFBDF" readonly>
@@ -81,7 +85,6 @@
                                         <tr>
                                             <th class="text-secondary">Brand</th>
                                             <th class="text-secondary">Model</th>
-                                            <th class="text-secondary">Destination</th>
                                             <th class="text-secondary">Category</th>
                                             <th class="text-secondary">Quantity</th>
                                         </tr>
@@ -90,28 +93,24 @@
                                         <tr style="height: 30px; min-height: 30px; cursor: pointer">
                                             <td class="text-secondary" style="background: #FFFBDF">SAMSUNG</td>
                                             <td class="text-secondary" style="background: #FFFBDF">EF-DX211-GALAXY A+ KEYBOARD SLIM</td>
-                                            <td class="text-secondary" style="background: #FFFBDF">PLAZA</td>
                                             <td class="text-secondary" style="background: #FFFBDF">PHONE ACCESSORIES</td>
                                             <td class="text-secondary" style="background: #FFFBDF">5</td>
                                         </tr>
                                         <tr style="height: 30px; min-height: 30px; cursor: pointer">
                                             <td class="text-secondary" style="background: #FFFBDF">SAMSUNG</td>
                                             <td class="text-secondary" style="background: #FFFBDF">SAM166-GALAXY A16 5G 4+128GB GOLD</td>
-                                            <td class="text-secondary" style="background: #FFFBDF">PLAZA</td>
                                             <td class="text-secondary" style="background: #FFFBDF">PHONE</td>
                                             <td class="text-secondary" style="background: #FFFBDF">5</td>
                                         </tr>
                                         <tr style="height: 30px; min-height: 30px; cursor: pointer">
                                             <td class="text-secondary" style="background: #FFFBDF">SAMSUNG</td>
                                             <td class="text-secondary" style="background: #FFFBDF">SAMSUNG 25W POWER ADAPTER</td>
-                                            <td class="text-secondary" style="background: #FFFBDF">PLAZA</td>
                                             <td class="text-secondary" style="background: #FFFBDF">PHONE ACCESSORIES</td>
                                             <td class="text-secondary" style="background: #FFFBDF">30</td>
                                         </tr>
                                         <tr style="height: 30px; min-height: 30px; cursor: pointer">
                                             <td class="text-secondary" style="background: #FFFBDF">SAMSUNG</td>
                                             <td class="text-secondary" style="background: #FFFBDF">EF-DX211-GALAXY A+ KEYBOARD SLIM</td>
-                                            <td class="text-secondary" style="background: #FFFBDF">PLAZA</td>
                                             <td class="text-secondary" style="background: #FFFBDF">PHONE ACCESSORIES</td>
                                             <td class="text-secondary" style="background: #FFFBDF">10</td>
                                         </tr>
@@ -120,6 +119,11 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr style="height: 30px; min-height: 30px; cursor: pointer">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
                                         <tr style="height: 30px; min-height: 30px; cursor: pointer">
@@ -127,17 +131,8 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
                                         </tr>
                                         <tr style="height: 30px; min-height: 30px; cursor: pointer">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr style="height: 30px; min-height: 30px; cursor: pointer">
-                                            <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>

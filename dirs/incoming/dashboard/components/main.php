@@ -18,7 +18,7 @@
                     <th class="text-secondary">#</th>
                     <th class="text-secondary">SRN</th>
                     <th class="text-secondary">Type of Request</th>
-                    <th class="text-secondary">Requested Branch</th>
+                    <th class="text-secondary">Requesting Branch</th>
                     <th class="text-secondary">Status</th>
                     <th class="text-secondary">Date</th>
                     <th class="text-secondary">Picklist No.</th>
