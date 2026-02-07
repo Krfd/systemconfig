@@ -52,6 +52,38 @@
                     <td class="text-secondary" style="background: #FFFBDF; cursor: pointer">TERMINATED</td>
                     <td class="text-secondary" style="background: #FFFBDF; cursor: pointer">01/18/2026</td>
                 </tr>
+                <tr style="height: 50px; min-height: 50px">
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                </tr>
+                <tr style="height: 50px; min-height: 50px">
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                </tr>
+                <tr style="height: 50px; min-height: 50px">
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                </tr>
+                <tr style="height: 50px; min-height: 50px">
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                </tr>
             </tbody>
         </table>
     </div>

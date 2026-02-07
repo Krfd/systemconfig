@@ -15,53 +15,54 @@
                         <form method="POST">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="d-flex flex-column gap-1 col-3">
-                                    <div class="form-floating">
-                                        <input type="text" name="srn" id="srn" placeholder="SRN" value="SRNPLZA0004" class="form-control" style="background: #FFFBDF" disabled required readonly>
-                                        <label for="srn" class="form-label">SRN</label>
+                                    <div>
+                                        <label for="srn" class="form-label text-dark-emphasis"><small>SRN:</small></label>
+                                        <input type="text" name="srn" id="srn" value="SRNPLZA0004" class="form-control form-control-sm" style="background: #FFFBDF" disabled required readonly>
                                     </div>
-                                    <div class="form-floating">
-                                        <select name="typeOfReq" id="typeOfReq" class="form-select" style="background: #FFFBDF" required disabled readonly>
+                                    <div>
+                                        <label for="typeOfReq" class="form-label text-dark-emphasis"><small>Type of Request:</small></label>
+                                        <select name="typeOfReq" id="typeOfReq" class="form-select form-select-sm" style="background: #FFFBDF" required disabled readonly>
                                             <option value="STS">STS</option>
                                         </select>
-                                        <label for="typeOfReq">Type of Request</label>
                                     </div>
                                     <div class="input-group">
-                                        <div class="form-floating">
-                                            <select name="destination" id="destination" class="form-select" placeholder="Destination" style="background: #FFFBDF" required disabled readonly>
+                                        <div>
+                                            <label for="destination" class="form-label text-dark-emphasis"><small>Destination:</small></label>
+                                            <select name="destination" id="destination" class="form-select form-select-sm" style="background: #FFFBDF" required disabled readonly>
                                                 <option value="galleria">GALLERIA</option>
                                             </select>
-                                            <label for="destination" class="form-label">Destination</label>
                                         </div>
-                                        <div class="form-floating">
-                                            <select name="branchWhCode" id="branchWhCode" class="form-select" placeholder="WHCode" style="background: #FFFBDF" required disabled readonly>
+                                        <div>
+                                            <label for="branchWhCode" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
+                                            <select name="branchWhCode" id="branchWhCode" class="form-select form-select-sm" style="background: #FFFBDF" required disabled readonly>
                                                 <option value="gallwh">GALLWH</option>
                                             </select>
-                                            <label for="branchWhCode" class="form-label">WHCode</label>
                                         </div>
                                     </div>
                                     <div class="input-group">
-                                        <div class="form-floating">
-                                            <select name="origin" id="origin" class="form-select" placeholder="Origin" style="background: #FFFBDF" required disabled readonly>
+                                        <div>
+                                            <label for="origin" class="form-label text-dark-emphasis"><small>Origin:</small></label>
+                                            <select name="origin" id="origin" class="form-select form-select-sm" style="background: #FFFBDF" required disabled readonly>
                                                 <option value="showroom">SHOWROOM</option>
                                             </select>
-                                            <label for="origin" class="form-label">Origin</label>
                                         </div>
-                                        <div class="form-floating">
-                                            <select name="whcode" id="whcode" class="form-select" placeholder="WHCode" style="background: #FFFBDF" required disabled readonly>
+                                        <div>
+                                            <label for="whcode" class="form-label text-dark-emphasis">WHS Code:</label>
+                                            <select name="whcode" id="whcode" class="form-select form-select-sm" style="background: #FFFBDF" required disabled readonly>
                                                 <option value="showwh">SHOWWH</option>
                                             </select>
-                                            <label for="whcode" class="form-label">WHCode</label>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="d-flex flex-column gap-1">
-                                    <div class="form-floating">
-                                        <input type="text" name="date" id="date" placeholder="Date" class="form-control" style="background: #FFFBDF" value="01/30/2026" required disabled readonly>
-                                        <label for="date" class="form-label">Date</label>
+                                    <div>
+                                        <label for="date" class="form-label text-dark-emphasis"><small>Date:</small></label>
+                                        <input type="text" name="date" id="date" class="form-control form-control-sm" style="background: #FFFBDF" value="01/30/2026" required disabled readonly>
+
                                     </div>
-                                    <div class="form-floating">
-                                        <input type="text" name="status" id="status" placeholder="Status" value="NEW" class="form-control" style="background: #FFFBDF" required disabled readonly>
-                                        <label for="status" class="form-label">Status</label>
+                                    <div>
+                                        <label for="status" class="form-label text-dark-emphasis"><small>Status:</small></label>
+                                        <input type="text" name="status" id="status" value="NEW" class="form-control form-control-sm" style="background: #FFFBDF" required disabled readonly>
                                     </div>
                                 </div>
                             </div>
@@ -138,17 +139,17 @@
                             </div>
                             <div class="d-flex justify-content-between align-items-end mt-5">
                                 <div class="d-flex flex-column gap-1">
-                                    <div class="form-floating">
-                                        <input type="text" name="type" id="type" class="form-control" style="background: #FFFBDF" placeholder="Purpose of Request" value="Transfer" disabled required>
-                                        <label for="type" class="form-label">Purpose of Request</label>
+                                    <div>
+                                        <label for="purpose" class="form-label text-dark-emphasis"><small>Purpose of Request:</small></label>
+                                        <input type="text" name="purpose" id="purpose" class="form-control form-control-sm" style="background: #FFFBDF" value="Transfer" disabled required>
                                     </div>
-                                    <div class="form-floating">
-                                        <input type="text" name="reqBy" id="reqBy" class="form-control" style="background: #FFFBDF" placeholder="Requested by" value="Carmelo Arroyo" disabled readonly required>
-                                        <label for="reqBy" class="form-label">Requested by</label>
+                                    <div>
+                                        <label for="reqBy" class="form-label text-dark-emphasis"><small>Requested by:</small></label>
+                                        <input type="text" name="reqBy" id="reqBy" class="form-control form-control-sm" style="background: #FFFBDF" value="Carmelo Arroyo" disabled readonly required>
                                     </div>
-                                    <div class="form-floating">
-                                        <textarea name="remarks" id="remarks" class="form-control" rows="3" style="background: #FFFBDF; height: auto" placeholder="Remarks" disabled>Please transfer the following unit, ASAP.</textarea>
-                                        <label for="remarks" class="form-label">Remarks</label>
+                                    <div>
+                                        <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
+                                        <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto" disabled>Please transfer the following unit, ASAP.</textarea>
                                     </div>
                                 </div>
                             </div>

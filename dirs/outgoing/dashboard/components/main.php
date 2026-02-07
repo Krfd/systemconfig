@@ -5,9 +5,9 @@
         </div>
         <button class="btn btn-primary" type="button" onclick="test()">New</button>
     </div>
-    <div class="table-responsive">
+    <div class="table-responsive overflow-auto" style="max-height: 450px">
         <table class="table datatables table-hover" id="outgoingTable">
-            <thead>
+            <thead class="sticky-top">
                 <tr>
                     <th class="text-secondary">#</th>
                     <th class="text-secondary">SRN</th>
@@ -76,7 +76,7 @@
                         </ul>
                     </td>
                 </tr>
-                <tr style="height: 30px; min-height:30px">
+                <tr style="height: 50px; min-height: 50px">
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
@@ -85,7 +85,7 @@
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                 </tr>
-                <tr style="height: 30px; min-height:30px">
+                <tr style="height: 50px; min-height:50px">
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
@@ -94,7 +94,7 @@
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                 </tr>
-                <tr style="height: 30px; min-height:30px">
+                <tr style="height: 50px; min-height:50px">
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
@@ -103,7 +103,7 @@
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                 </tr>
-                <tr style="height: 30px; min-height:30px">
+                <tr style="height: 50px; min-height:50px">
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
@@ -112,7 +112,7 @@
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                 </tr>
-                <tr style="height: 30px; min-height:30px">
+                <tr style="height: 50px; min-height:50px">
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>

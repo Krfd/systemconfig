@@ -3,74 +3,74 @@
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
-                    <form method="POST" id="request">
+                    <form method="POST" id="receivingForm">
                         <div class="d-flex justify-content-between align-items-start">
-                            <div class="d-flex flex-column gap-1 col-3">
-                                <div class="form-floating">
-                                    <input type="text" name="rrno" id="rrno" placeholder="RR No." class="form-control" style="background: #FFFBDF" required>
-                                    <label for="rrno" class="form-label">RR No.</label>
+                            <div class="d-flex flex-column gap-1 col-2">
+                                <div>
+                                    <label for="rrNoRec" class="form-label text-dark-emphasis"><small>RR No:</small></label>
+                                    <input type="text" name="rrNoRec" id="rrNoRec" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                 </div>
-                                <div class="form-floating">
-                                    <input type="text" name="srn" id="srn" placeholder="SRN" class="form-control" style="background: #FFFBDF" required>
-                                    <label for="srn" class="form-label">SRN</label>
+                                <div>
+                                    <label for="srnRec" class="form-label text-dark-emphasis"><small>SRN:</small></label>
+                                    <input type="text" name="srnRec" id="srnRec" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                 </div>
                                 <div class="d-flex flex-column gap-1">
-                                    <div class="input-group">
-                                        <div class="form-floating">
-                                            <select name="origin" id="origin" class="form-select" style="background: #FFFBDF" required>
+                                    <div class="input-group col p-0">
+                                        <div class="col p-0">
+                                            <label for="originRec" class="form-label text-dark-emphasis"><small>Origin:</small></label>
+                                            <select name="originRec" id="originRec" class="form-select form-select-sm" style="background: #FFFBDF" required>
                                                 <option value="" selected></option>
                                                 <option value="showroom">SHOWROOM</option>
                                                 <option value="galleria">GALLERIA</option>
                                                 <option value="plaza">PLAZA</option>
                                                 <option value="viac">VIAC</option>
                                             </select>
-                                            <label for="origin">Origin</label>
                                         </div>
-                                        <div class="form-floating">
-                                            <select name="whcode" id="whcode" class="form-select" style="background: #FFFBDF" required>
+                                        <div class="col p-0">
+                                            <label for="origCodeRec" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
+                                            <select name="origCodeRec" id="origCodeRec" class="form-select form-select-sm" style="background: #FFFBDF" required>
                                                 <option value="" selected></option>
                                                 <option value="SHOWWH">SHOWWH</option>
                                                 <option value="GALLWH">GALLWH</option>
                                                 <option value="PLZAWH">PLZAWH</option>
                                                 <option value="VIACWH">VIACWH</option>
                                             </select>
-                                            <label for="whcode" class="form-label">WHCode</label>
                                         </div>
                                     </div>
-                                    <div class="input-group">
-                                        <div class="form-floating">
-                                            <select name="destination" id="destination" class="form-select" style="background: #FFFBDF;" required>
+                                    <div class="input-group col p-0">
+                                        <div class="col p-0">
+                                            <label for="desRec" class="form-label text-dark-emphasis"><small>Destination:</small></label>
+                                            <select name="desRec" id="desRec" class="form-select form-select-sm" style="background: #FFFBDF;" required>
                                                 <option value="showroom" selected>SHOWROOM</option>
                                                 <option value="galleria">GALLERIA</option>
                                                 <option value="plaza">PLAZA</option>
                                                 <option value="viac">VIAC</option>
                                             </select>
-                                            <label for="destination" class="form-label">Destination</label>
                                         </div>
-                                        <div class="form-floating">
-                                            <select name="branchWhCode" id="branchWhCode" class="form-select" style="background: #FFFBDF" required>
+                                        <div class="col p-0">
+                                            <label for="desCodeRec" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
+                                            <select name="desCodeRec" id="desCodeRec" class="form-select form-select-sm" style="background: #FFFBDF" required>
                                                 <option value="showwh" selected>SHOWWH</option>
                                                 <option value="gallwh">GALLWH</option>
                                                 <option value="plzawh">PLZAWH</option>
                                                 <option value="viacwh">VIACWH</option>
                                             </select>
-                                            <label for="branchWhCode" class="form-label">WHCode</label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="d-flex flex-column gap-1">
-                                <div class="form-floating">
-                                    <input type="text" name="dr" id="dr" placeholder="DR No." class="form-control" style="background: #FFFBDF" required>
-                                    <label for="dr" class="form-label">DR No.</label>
+                                <div>
+                                    <label for="drNoRec" class="form-label text-dark-emphasis"><small>DR No:</small></label>
+                                    <input type="text" name="drNoRec" id="drNoRec" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                 </div>
-                                <div class="form-floating">
-                                    <input type="date" name="docdate" id="docdate" placeholder="Document Date" class="form-control" style="background: #FFFBDF" required>
-                                    <label for="docdate" class="form-label">Document Date</label>
+                                <div>
+                                    <label for="docDateRec" class="form-label text-dark-emphasis"><small>Document Date:</small></label>
+                                    <input type="date" name="docDateRec" id="docDateRec" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                 </div>
-                                <div class="form-floating">
-                                    <input type="text" name="status" id="status" placeholder="Status" class="form-control" style="background: #FFFBDF" required>
-                                    <label for="status" class="form-label">Status</label>
+                                <div>
+                                    <label for="statusRec" class="form-label text-dark-emphasis"><small>Status:</small></label>
+                                    <input type="text" name="statusRec" id="statusRec" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                 </div>
                             </div>
                         </div>
@@ -87,7 +87,7 @@
                             </div>
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addReceivingUnit">Add</button>
                         </div>
-                        <div class="table-responsive mt-5 d-flex gap-1">
+                        <div class="table-responsive mt-5 d-flex gap-1 overflow-auto" style="max-height: 450px">
                             <table class="table table-hover col-2" id="receiving-serial-table">
                                 <thead>
                                     <tr>
@@ -181,21 +181,21 @@
                         </div>
                         <div class="d-flex justify-content-between align-items-end mt-5">
                             <div class="d-flex flex-column gap-1">
-                                <div class="form-floating">
-                                    <input type="text" name="recby" id="recby" class="form-control" style="background: #FFFBDF" placeholder="Received by" required>
-                                    <label for="recby" class="form-label">Received by</label>
+                                <div>
+                                    <label for="receiveByRec" class="form-label text-dark-emphasis"><small>Received by:</small></label>
+                                    <input type="text" name="receiveByRec" id="receiveByRec" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                 </div>
-                                <div class="form-floating">
-                                    <input type="text" name="plate" id="plate" class="form-control" style="background: #FFFBDF" placeholder="Truck Plate No." readonly required>
-                                    <label for="plate" class="form-label">Truck Plate No.</label>
+                                <div>
+                                    <label for="plateRec" class="form-label text-dark-emphasis"><small>Truck Plate No:</small></label>
+                                    <input type="text" name="plateRec" id="plateRec" class="form-control form-control-sm" style="background: #FFFBDF" readonly required>
                                 </div>
-                                <div class="form-floating">
-                                    <input type="text" name="driver" id="driver" class="form-control" style="background: #FFFBDF" placeholder="Driver" readonly required>
-                                    <label for="driver" class="form-label">Driver</label>
+                                <div>
+                                    <label for="driverRec" class="form-label text-dark-emphasis"><small>Driver:</small></label>
+                                    <input type="text" name="driverRec" id="driverRec" class="form-control form-control-sm" style="background: #FFFBDF" readonly required>
                                 </div>
-                                <div class="form-floating">
-                                    <textarea name="remarks" id="remarks" class="form-control" rows="3" style="background: #FFFBDF; height: auto;" placeholder="Remarks"></textarea>
-                                    <label for="remarks" class="form-label">Remarks</label>
+                                <div>
+                                    <label for="remarksRec" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
+                                    <textarea name="remarksRec" id="remarksRec" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto;"></textarea>
                                 </div>
                             </div>
                             <div>

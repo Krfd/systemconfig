@@ -8,17 +8,17 @@
             <div class="modal-body">
                 <form id="newReceivingUnit" method="POST">
                     <div class="d-flex flex-column gap-3">
-                        <div class="form-floating">
-                            <input type="text" name="newSerial" id="newSerial" class="form-control" style="background: #FFFBDF" placeholder="Serial No." required>
-                            <label for="newSerial" class="form-label">Serial No.</label>
+                        <div>
+                            <label for="newSerial" class="form-label text-dark-emphasis"><small>Serial No:</small></label>
+                            <input type="text" name="newSerial" id="newSerial" class="form-control form-control-sm" style="background: #FFFBDF" required>
                         </div>
-                        <div class="form-floating">
-                            <input type="text" name="newModel" id="newModel" class="form-control" style="background: #FFFBDF" placeholder="Model" required>
-                            <label for="newModel" class="form-label">Model</label>
+                        <div>
+                            <label for="newModel" class="form-label text-dark-emphasis"><small>Model:</small></label>
+                            <input type="text" name="newModel" id="newModel" class="form-control form-control-sm" style="background: #FFFBDF" required>
                         </div>
-                        <div class="form-floating">
-                            <input type="text" name="newQuantity" id="newQuantity" class="form-control" style="background: #FFFBDF" placeholder="Quantity" required>
-                            <label for="newQuantity" class="form-label">Quantity</label>
+                        <div>
+                            <label for="newQuantity" class="form-label text-dark-emphasis"><small>Quantity:</small></label>
+                            <input type="number" name="newQuantity" id="newQuantity" class="form-control form-control-sm" style="background: #FFFBDF" required>
                         </div>
                     </div>
                     <div class="mt-3 float-end">

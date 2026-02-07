@@ -5,66 +5,66 @@
                 <div class="row">
                     <form method="POST" id="request">
                         <div class="d-flex justify-content-between align-items-start">
-                            <div class="d-flex flex-column gap-1 col-3">
+                            <div class="d-flex flex-column gap-1 col-2">
                                 <div class="d-flex flex-column gap-1">
-                                    <div class="input-group">
-                                        <div class="form-floating">
-                                            <select name="origin" id="origin" class="form-select" style="background: #FFFBDF" required>
+                                    <div class="input-group col p-0">
+                                        <div class="col p-0">
+                                            <label for="origin" class="form-label text-dark-emphasis"><small>Origin:</small></label>
+                                            <select name="origin" id="origin" class="form-select form-select-sm" style="background: #FFFBDF" required>
                                                 <option value="showroom" selected>SHOWROOM</option>
                                             </select>
-                                            <label for="origin">Origin</label>
                                         </div>
-                                        <div class="form-floating">
-                                            <select name="whcode" id="whcode" class="form-select" style="background: #FFFBDF" required>
+                                        <div class="col p-0">
+                                            <label for="whcode" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
+                                            <select name="whcode" id="whcode" class="form-select form-select-sm" style="background: #FFFBDF" required>
                                                 <option value="SHOWRW" selected>SHOWRW</option>
                                             </select>
-                                            <label for="whcode" class="form-label">WHCode</label>
                                         </div>
                                     </div>
-                                    <div class="input-group">
-                                        <div class="form-floating">
-                                            <select name="branchName" id="branchName" class="form-select" style="background: #FFFBDF;" required>
+                                    <div class="input-group col p-0">
+                                        <div class="col p-0">
+                                            <label for="branchName" class="form-label text-dark-emphasis"><small>Destination:</small></label>
+                                            <select name="branchName" id="branchName" class="form-select form-select-sm" style="background: #FFFBDF;" required>
                                                 <option value="" selected></option>
                                                 <option value="showroom">SHOWROOM</option>
                                                 <option value="galleria">GALLERIA</option>
                                                 <option value="plaza">PLAZA</option>
                                                 <option value="viac">VIAC</option>
                                             </select>
-                                            <label for="branchName" class="form-label">Destination</label>
                                         </div>
-                                        <div class="form-floating">
-                                            <select name="branchWhCode" id="branchWhCode" class="form-select" style="background: #FFFBDF" required>
+                                        <div class="col p-0">
+                                            <label for="branchWhCode" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
+                                            <select name="branchWhCode" id="branchWhCode" class="form-select form-select-sm" style="background: #FFFBDF" required>
                                                 <option value="" selected></option>
                                                 <option value="showwh">SHOWWH</option>
                                                 <option value="gallwh">GALLWH</option>
                                                 <option value="plzawh">PLZAWH</option>
                                                 <option value="viacwh">VIACWH</option>
                                             </select>
-                                            <label for="branchWhCode" class="form-label">WHCode</label>
                                         </div>
                                     </div>
-                                    <div class="form-floating">
-                                        <input type="text" name="center" id="center" placeholder="Service Center" class="form-control" style="background: #FFFBDF" required>
-                                        <label for="center" class="form-label">Service Center</label>
+                                    <div>
+                                        <label for="center" class="form-label text-dark-emphasis"><small>Service Center:</small></label>
+                                        <input type="text" name="center" id="center" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                     </div>
-                                    <div class="form-floating">
-                                        <input type="text" name="appcode" id="appcode" placeholder="Approval Code" class="form-control" style="background: #FFFBDF" required>
-                                        <label for="appcode" class="form-label">Approval Code</label>
+                                    <div>
+                                        <label for="appcode" class="form-label text-dark-emphasis"><small>Approval Code:</small></label>
+                                        <input type="text" name="appcode" id="appcode" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                     </div>
                                 </div>
                             </div>
                             <div class="d-flex flex-column gap-1">
-                                <div class="form-floating">
-                                    <input type="text" name="strno" id="strno" placeholder="STR No." class="form-control" style="background: #FFFBDF" required>
-                                    <label for="strno" class="form-label">STR No.</label>
+                                <div>
+                                    <label for="strno" class="form-label text-dark-emphasis"><small>STR No:</small></label>
+                                    <input type="text" name="strno" id="strno" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                 </div>
-                                <div class="form-floating">
-                                    <input type="date" name="date" id="date" placeholder="Date" class="form-control" style="background: #FFFBDF" required>
-                                    <label for="date" class="form-label">Date</label>
+                                <div>
+                                    <label for="date" class="form-label text-dark-emphasis"><small>Date:</small></label>
+                                    <input type="date" name="date" id="date" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                 </div>
-                                <div class="form-floating">
-                                    <input type="text" name="status" id="status" placeholder="Status" class="form-control" style="background: #FFFBDF" required>
-                                    <label for="status" class="form-label">Status</label>
+                                <div>
+                                    <label for="status" class="form-label text-dark-emphasis"><small>Status:</small></label>
+                                    <input type="text" name="status" id="status" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                 </div>
                             </div>
                         </div>
@@ -81,7 +81,7 @@
                             </div>
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockTransferUnit">Add</button>
                         </div>
-                        <div class="table-responsive mt-5 d-flex gap-1">
+                        <div class="table-responsive mt-5 d-flex gap-1 overflow-auto" style="height: 450px">
                             <table class="table table-hover col-2" id="stock-transfer-serial-table">
                                 <thead>
                                     <tr>
@@ -166,13 +166,13 @@
                         </div>
                         <div class="d-flex justify-content-between align-items-end mt-5">
                             <div class="d-flex flex-column gap-1">
-                                <div class="form-floating">
-                                    <textarea name="remarks" id="remarks" class="form-control" rows="3" style="background: #FFFBDF; height: auto" placeholder="Remarks"></textarea>
-                                    <label for="remarks" class="form-label">Remarks</label>
+                                <div>
+                                    <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
+                                    <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto"></textarea>
                                 </div>
-                                <div class="form-floating">
-                                    <input type="text" name="prepby" id="prepby" class="form-control" style="background: #FFFBDF" placeholder="Prepared by" readonly required>
-                                    <label for="prepby" class="form-label">Prepared by</label>
+                                <div>
+                                    <label for="prepby" class="form-label text-dark-emphasis"><small>Prepared by:</small></label>
+                                    <input type="text" name="prepby" id="prepby" class="form-control form-control-sm" style="background: #FFFBDF" readonly required>
                                 </div>
                             </div>
                             <div>

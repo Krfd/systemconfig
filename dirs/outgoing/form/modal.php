@@ -8,21 +8,21 @@
             <div class="modal-body">
                 <form id="newUnit" method="POST">
                     <div class="d-flex flex-column gap-3">
-                        <div class="form-floating">
-                            <input type="text" name="newBrand" id="newBrand" class="form-control" style="background: #FFFBDF" placeholder="Brand" required>
-                            <label for="newBrand" class="form-label">Brand</label>
+                        <div>
+                            <label for="newBrand" class="form-label text-dark-emphasis"><small>Brand:</small></label>
+                            <input type="text" name="newBrand" id="newBrand" class="form-control form-control-sm" style="background: #FFFBDF" required>
                         </div>
-                        <div class="form-floating">
-                            <input type="text" name="newModel" id="newModel" class="form-control" style="background: #FFFBDF" placeholder="Model" required>
-                            <label for="newModel" class="form-label">Model</label>
+                        <div>
+                            <label for="newModel" class="form-label text-dark-emphasis"><small>Model:</small></label>
+                            <input type="text" name="newModel" id="newModel" class="form-control form-control-sm" style="background: #FFFBDF" required>
                         </div>
-                        <div class="form-floating">
-                            <input type="text" name="newCategory" id="newCategory" class="form-control" style="background: #FFFBDF" placeholder="Category" required>
-                            <label for="newCategory" class="form-label">Category</label>
+                        <div>
+                            <label for="newCategory" class="form-label text-dark-emphasis"><small>Category:</small></label>
+                            <input type="text" name="newCategory" id="newCategory" class="form-control form-control-sm" style="background: #FFFBDF" required>
                         </div>
-                        <div class="form-floating">
-                            <input type="text" name="newQuantity" id="newQuantity" class="form-control" style="background: #FFFBDF" placeholder="Quantity" required>
-                            <label for="newQuantity" class="form-label">Quantity</label>
+                        <div>
+                            <label for="newQuantity" class="form-label text-dark-emphasis"><small>Quantity:</small></label>
+                            <input type="text" name="newQuantity" id="newQuantity" class="form-control form-control-sm" style="background: #FFFBDF" required>
                         </div>
                     </div>
                     <div class="mt-3 float-end">

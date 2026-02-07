@@ -1,73 +1,73 @@
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-start align-items-baseline gap-3">
-        <button class="btn btn-primary rounded-5" style="height: 40px" type="button" onclick="delivery()">
+        <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="delivery()">
             <i class="bi bi-arrow-left"></i>
         </button>
         <div class="d-flex justify-content-start align-items-start gap-3">
             <h3 class="fw-bold text-primary">Delivery</h3>
         </div>
     </div>
-    <div class="card shadow-sm" id="dashboard-display">
+    <div class="card shadow-sm overflow-auto" id="dashboard-display" style="max-height: 75vh">
         <div class="card-body">
             <section class="content">
                 <div class="container-fluid">
                     <div class="row">
-                        <form method="POST" id="request">
+                        <form method="POST" id="delivery">
                             <div class="d-flex justify-content-between align-items-start">
-                                <div class="d-flex flex-column gap-1 col-3">
-                                    <div class="form-floating">
-                                        <input type="text" name="drno" id="drno" placeholder="DR No." class="form-control" style="background: #FFFBDF" value="DR-10003" readonly>
-                                        <label for="drno" class="form-label">DR No.</label>
+                                <div class="d-flex flex-column gap-1 col-2">
+                                    <div>
+                                        <label for="drno" class="form-label text-dark-emphasis"><small>DR No:</small></label>
+                                        <input type="text" name="drno" id="drno" class="form-control form-control-sm" style="background: #FFFBDF" value="DR-10003" readonly>
                                     </div>
-                                    <div class="form-floating">
-                                        <input type="text" name="pcklstno" id="pcklstno" placeholder="Picklist No." class="form-control" style="background: #FFFBDF" value="PL10003" readonly>
-                                        <label for="pcklstno" class="form-label">Picklist No.</label>
+                                    <div>
+                                        <label for="pcklstno" class="form-label text-dark-emphasis"><small>Picklist No:</small></label>
+                                        <input type="text" name="pcklstno" id="pcklstno" class="form-control form-control-sm" style="background: #FFFBDF" value="PL10003" readonly>
                                     </div>
-                                    <div class="input-group">
-                                        <div class="form-floating">
-                                            <select name="origin" id="origin" class="form-select" style="background: #FFFBDF" readonly>
+                                    <div class="input-group col p-0">
+                                        <div class="col p-0">
+                                            <label for="origin" class="form-label"><small>Origin:</small></label>
+                                            <select name="origin" id="origin" class="form-select form-control-sm" style="background: #FFFBDF" readonly>
                                                 <option value="showroom" selected>SHOWROOM</option>
                                             </select>
-                                            <label for="origin">Origin</label>
                                         </div>
-                                        <div class="form-floating">
-                                            <select name="whcode" id="whcode" class="form-select" style="background: #FFFBDF" readonly>
+                                        <div class="col p-0">
+                                            <label for="whcode" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
+                                            <select name="whcode" id="whcode" class="form-select form-control-sm" style="background: #FFFBDF" readonly>
                                                 <option value="SHOWWH" selected>SHOWWH</option>
                                             </select>
-                                            <label for="whcode" class="form-label">WHCode</label>
                                         </div>
                                     </div>
-                                    <div class="input-group">
-                                        <div class="form-floating">
-                                            <select name="branchName" id="branchName" class="form-select" style="background: #FFFBDF;" readonly>
+                                    <div class="input-group col p-0">
+                                        <div class="col p-0">
+                                            <label for="branchName" class="form-label text-dark-emphasis"><small>Destination:</small></label>
+                                            <select name="branchName" id="branchName" class="form-select form-select-sm" style="background: #FFFBDF;" readonly>
                                                 <option value="plaza" selected>PLAZA</option>
                                             </select>
-                                            <label for="branchName" class="form-label">Destination</label>
                                         </div>
-                                        <div class="form-floating">
-                                            <select name="branchWhCode" id="branchWhCode" class="form-select" style="background: #FFFBDF" readonly>
+                                        <div class="col p-0">
+                                            <label for="branchWhCode" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
+                                            <select name="branchWhCode" id="branchWhCode" class="form-select form-select-sm" style="background: #FFFBDF" readonly>
                                                 <option value="plzawh" selected>PLZAWH</option>
                                             </select>
-                                            <label for="branchWhCode" class="form-label">WHCode</label>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="d-flex flex-column gap-1">
-                                    <div class="form-floating">
-                                        <input type="text" name="deldate" id="deldate" placeholder="Delivery Date" class="form-control" style="background: #FFFBDF" value="01/30/2026" readonly>
-                                        <label for="deldate" class="form-label">Delivery Date</label>
+                                    <div>
+                                        <label for="deldate" class="form-label text-dark-emphasis"><small>Delivery Date:</small></label>
+                                        <input type="text" name="deldate" id="deldate" class="form-control form-control-sm" style="background: #FFFBDF" value="01/30/2026" readonly>
                                     </div>
-                                    <div class="form-floating">
-                                        <input type="text" name="docdate" id="docdate" placeholder="Document Date" class="form-control" style="background: #FFFBDF" value="01/30/2026" readonly>
-                                        <label for="docdate" class="form-label">Document Date</label>
+                                    <div>
+                                        <label for="docdate" class="form-label text-dark-emphasis"><small>Document Date:</small></label>
+                                        <input type="text" name="docdate" id="docdate" class="form-control form-control-sm" style="background: #FFFBDF" value="01/30/2026" readonly>
                                     </div>
-                                    <div class="form-floating">
-                                        <input type="text" name="status" id="status" placeholder="Status" class="form-control" style="background: #FFFBDF" value="PARTIAL" readonly>
-                                        <label for="status" class="form-label">Status</label>
+                                    <div>
+                                        <label for="status" class="form-label text-dark-emphasis"><small>Status:</small></label>
+                                        <input type="text" name="status" id="status" class="form-control form-control-sm" style="background: #FFFBDF" value="PARTIAL" readonly>
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive mt-5 d-flex gap-1">
+                            <div class="table-responsive mt-5 d-flex gap-1 overflow-auto" style="max-height: 450px">
                                 <table class="table table-hover col-2" id="serialTable">
                                     <thead>
                                         <tr>
@@ -114,25 +114,25 @@
                                             <td class="text-secondary" style="background: #FFFBDF">PHONE ACCESSORIES</td>
                                             <td class="text-secondary" style="background: #FFFBDF">10</td>
                                         </tr>
-                                        <tr style="height: 30px; min-height: 30px; cursor: pointer">
+                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 30px; min-height: 30px; cursor: pointer">
+                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 30px; min-height: 30px; cursor: pointer">
+                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 30px; min-height: 30px; cursor: pointer">
+                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
@@ -143,24 +143,24 @@
                             </div>
                             <div class="d-flex justify-content-start align-items-start mt-5 gap-1">
                                 <div class="d-flex flex-column gap-1">
-                                    <div class="form-floating">
-                                        <input type="text" name="prepby" id="prepby" class="form-control" style="background: #FFFBDF" placeholder="Prepared by" value="Vjay Endoma" readonly>
-                                        <label for="prepby" class="form-label">Prepared by</label>
+                                    <div>
+                                        <label for="prepby" class="form-label text-dark-emphasis"><small>Prepared by:</small></label>
+                                        <input type="text" name="prepby" id="prepby" class="form-control form-control-sm" style="background: #FFFBDF" value="Vjay Endoma" readonly>
                                     </div>
-                                    <div class="form-floating">
-                                        <input type="text" name="plate" id="plate" class="form-control" style="background: #FFFBDF" placeholder="Truck Plate No." value="KGH-345" readonly>
-                                        <label for="plate" class="form-label">Truck Plate No.</label>
+                                    <div>
+                                        <label for="plate" class="form-label text-dark-emphasis"><small>Truck Plate No:</small></label>
+                                        <input type="text" name="plate" id="plate" class="form-control form-control-sm" style="background: #FFFBDF" value="KGH-345" readonly>
                                     </div>
-                                    <div class="form-floating">
-                                        <input type="text" name="driver" id="driver" class="form-control" style="background: #FFFBDF" placeholder="Driver" value="Roger Amaguin" readonly>
-                                        <label for="driver" class="form-label">Driver</label>
+                                    <div>
+                                        <label for="driver" class="form-label text-dark-emphasis"><small>Driver:</small></label>
+                                        <input type="text" name="driver" id="driver" class="form-control form-control-sm" style="background: #FFFBDF" value="Roger Amaguin" readonly>
                                     </div>
                                 </div>
-                                <div class="form-floating">
-                                    <textarea name="remarks" id="remarks" class="form-control" rows="7" style="background: #FFFBDF; height: auto; resize: horizontal" placeholder="Remarks" readonly>
+                                <div>
+                                    <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
+                                    <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="7" style="background: #FFFBDF; height: auto; resize: horizontal" readonly>
                                         Please transfer the following units, ASAP.
                                     </textarea>
-                                    <label for="remarks" class="form-label">Remarks</label>
                                 </div>
                             </div>
                         </form>

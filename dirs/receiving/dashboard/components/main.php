@@ -42,7 +42,7 @@
                     <td class="text-secondary" style="background: #FFFBDF">01/16/2026</td>
                     <td class="text-secondary" style="background: #FFFBDF">COMPLETED</td>
                 </tr>
-                <tr style="height: 30px; min-height:30px">
+                <tr style="height: 50px; min-height:50px">
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
@@ -50,7 +50,7 @@
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                 </tr>
-                <tr style="height: 30px; min-height:30px">
+                <tr style="height: 50px; min-height:50px">
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
@@ -58,7 +58,7 @@
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                 </tr>
-                <tr style="height: 30px; min-height:30px">
+                <tr style="height: 50px; min-height:50px">
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
@@ -66,7 +66,7 @@
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                 </tr>
-                <tr style="height: 30px; min-height:30px">
+                <tr style="height: 50px; min-height:50px">
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
@@ -74,7 +74,7 @@
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                 </tr>
-                <tr style="height: 30px; min-height:30px">
+                <tr style="height: 50px; min-height:50px">
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
