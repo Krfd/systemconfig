@@ -9,22 +9,22 @@
                                 <div class="d-flex flex-column gap-1">
                                     <div class="input-group col p-0">
                                         <div class="col p-0">
-                                            <label for="origin" class="form-label text-dark-emphasis"><small>Origin:</small></label>
-                                            <select name="origin" id="origin" class="form-select form-select-sm" style="background: #FFFBDF" required>
+                                            <label for="originStockForm" class="form-label text-dark-emphasis"><small>Origin:</small></label>
+                                            <select name="originStockForm" id="originStockForm" class="form-select form-select-sm" style="background: #FFFBDF" required>
                                                 <option value="showroom" selected>SHOWROOM</option>
                                             </select>
                                         </div>
                                         <div class="col p-0">
-                                            <label for="whcode" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
-                                            <select name="whcode" id="whcode" class="form-select form-select-sm" style="background: #FFFBDF" required>
+                                            <label for="originCodeStockForm" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
+                                            <select name="originCodeStockForm" id="originCodeStockForm" class="form-select form-select-sm" style="background: #FFFBDF" required>
                                                 <option value="SHOWRW" selected>SHOWRW</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="input-group col p-0">
                                         <div class="col p-0">
-                                            <label for="branchName" class="form-label text-dark-emphasis"><small>Destination:</small></label>
-                                            <select name="branchName" id="branchName" class="form-select form-select-sm" style="background: #FFFBDF;" required>
+                                            <label for="desStockForm" class="form-label text-dark-emphasis"><small>Destination:</small></label>
+                                            <select name="desStockForm" id="desStockForm" class="form-select form-select-sm" style="background: #FFFBDF;" required>
                                                 <option value="" selected></option>
                                                 <option value="showroom">SHOWROOM</option>
                                                 <option value="galleria">GALLERIA</option>
@@ -33,8 +33,8 @@
                                             </select>
                                         </div>
                                         <div class="col p-0">
-                                            <label for="branchWhCode" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
-                                            <select name="branchWhCode" id="branchWhCode" class="form-select form-select-sm" style="background: #FFFBDF" required>
+                                            <label for="desCodeStockForm" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
+                                            <select name="desCodeStockForm" id="desCodeStockForm" class="form-select form-select-sm" style="background: #FFFBDF" required>
                                                 <option value="" selected></option>
                                                 <option value="showwh">SHOWWH</option>
                                                 <option value="gallwh">GALLWH</option>
@@ -44,27 +44,27 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <label for="center" class="form-label text-dark-emphasis"><small>Service Center:</small></label>
-                                        <input type="text" name="center" id="center" class="form-control form-control-sm" style="background: #FFFBDF" required>
+                                        <label for="serviceCenterStockForm" class="form-label text-dark-emphasis"><small>Service Center:</small></label>
+                                        <input type="text" name="serviceCenterStockForm" id="serviceCenterStockForm" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                     </div>
                                     <div>
-                                        <label for="appcode" class="form-label text-dark-emphasis"><small>Approval Code:</small></label>
-                                        <input type="text" name="appcode" id="appcode" class="form-control form-control-sm" style="background: #FFFBDF" required>
+                                        <label for="appcodeStockForm" class="form-label text-dark-emphasis"><small>Approval Code:</small></label>
+                                        <input type="text" name="appcodeStockForm" id="appcodeStockForm" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                     </div>
                                 </div>
                             </div>
                             <div class="d-flex flex-column gap-1">
                                 <div>
-                                    <label for="strno" class="form-label text-dark-emphasis"><small>STR No:</small></label>
-                                    <input type="text" name="strno" id="strno" class="form-control form-control-sm" style="background: #FFFBDF" required>
+                                    <label for="strNoStockForm" class="form-label text-dark-emphasis"><small>STR No:</small></label>
+                                    <input type="text" name="strNoStockForm" id="strNoStockForm" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                 </div>
                                 <div>
-                                    <label for="date" class="form-label text-dark-emphasis"><small>Date:</small></label>
-                                    <input type="date" name="date" id="date" class="form-control form-control-sm" style="background: #FFFBDF" required>
+                                    <label for="dateStockForm" class="form-label text-dark-emphasis"><small>Date:</small></label>
+                                    <input type="date" name="dateStockForm" id="dateStockForm" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                 </div>
                                 <div>
-                                    <label for="status" class="form-label text-dark-emphasis"><small>Status:</small></label>
-                                    <input type="text" name="status" id="status" class="form-control form-control-sm" style="background: #FFFBDF" required>
+                                    <label for="statusStockForm" class="form-label text-dark-emphasis"><small>Status:</small></label>
+                                    <input type="text" name="statusStockForm" id="statusStockForm" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                 </div>
                             </div>
                         </div>
@@ -79,10 +79,10 @@
                                     </label>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockTransferUnit">Add</button>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockFormTransferUnit">Add</button>
                         </div>
                         <div class="table-responsive mt-5 d-flex gap-1 overflow-auto" style="height: 450px">
-                            <table class="table table-hover col-2" id="stock-transfer-serial-table">
+                            <table class="table table-hover col-2" id="stockForm-transfer-serial-table">
                                 <thead>
                                     <tr>
                                         <th class="text-secondary" colspan="2">Serial No.</th>
@@ -94,7 +94,7 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            <table class="table table-hover col" id="stock-transfer-form-table">
+                            <table class="table table-hover col" id="stockForm-transfer-form-table">
                                 <thead>
                                     <tr>
                                         <th class="text-secondary">#</th>
@@ -167,16 +167,16 @@
                         <div class="d-flex justify-content-between align-items-end mt-5">
                             <div class="d-flex flex-column gap-1">
                                 <div>
-                                    <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
-                                    <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto"></textarea>
+                                    <label for="remarksStockForm" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
+                                    <textarea name="remarksStockForm" id="remarksStockForm" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto"></textarea>
                                 </div>
                                 <div>
-                                    <label for="prepby" class="form-label text-dark-emphasis"><small>Prepared by:</small></label>
-                                    <input type="text" name="prepby" id="prepby" class="form-control form-control-sm" style="background: #FFFBDF" readonly required>
+                                    <label for="prepByStockForm" class="form-label text-dark-emphasis"><small>Prepared by:</small></label>
+                                    <input type="text" name="prepByStockForm" id="prepByStockForm" class="form-control form-control-sm" style="background: #FFFBDF" readonly required>
                                 </div>
                             </div>
                             <div>
-                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <button type="submit" class="btn btn-primary" id="submitStockFormBtn">Submit</button>
                             </div>
                         </div>
                     </form>
