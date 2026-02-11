@@ -3,7 +3,7 @@
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
-                    <form method="POST" id="frm-request-sts">
+                    <form method="POST" id="requestForm">
                         <div class="d-flex justify-content-between align-items-start">
                             <div class="d-flex flex-column gap-1 col-2">
                                 <div>
@@ -22,23 +22,41 @@
                                     <div class="col p-0">
                                         <label for="desForm" class="form-label text-dark-emphasis"><small>Destination:</small></label>
                                         <select name="desForm" id="desForm" class="form-select form-select-sm" style="background: #FFFBDF;" required>
+                                            <option value="showroom" selected>SHOWROOM</option>
+                                            <option value="galleria">GALLERIA</option>
+                                            <option value="plaza">PLAZA</option>
+                                            <option value="viac">VIAC</option>
                                         </select>
                                     </div>
                                     <div class="col p-0">
                                         <label for="desCodeForm" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
                                         <select name="desCodeForm" id="desCodeForm" class="form-select form-select-sm" style="background: #FFFBDF;" required>
+                                            <option value="showwh" selected>SHOWWH</option>
+                                            <option value="gallwh">GALLWH</option>
+                                            <option value="plzawh">PLZAWH</option>
+                                            <option value="viacwh">VIACWH</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="input-group col p-0">
                                     <div class="col p-0">
-                                        <label for="user-origin" class="form-label text-dark-emphasis"><small>Origin:</small></label>
-                                        <input type="text" name="user-origin" id="user-origin" class="form-control form-control-sm" readonly>
+                                        <label for="originForm" class="form-label text-dark-emphasis"><small>Origin:</small></label>
+                                        <select name="originForm" id="originForm" class="form-select form-select-sm" style="background: #FFFBDF" required>
+                                            <option value="" selected></option>
+                                            <option value="showroom">SHOWROOM</option>
+                                            <option value="galleria">GALLERIA</option>
+                                            <option value="plaza">PLAZA</option>
+                                            <option value="viac">VIAC</option>
+                                        </select>
                                     </div>
                                     <div class="col p-0">
                                         <label for="originCodeForm" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
                                         <select name="originCodeForm" id="originCodeForm" class="form-select form-select-sm" style="background: #FFFBDF" required>
-                                            <option value="" selected0>Select Warehouse</option>
+                                            <option value="" selected></option>
+                                            <option value="SHOWWH">SHOWWH</option>
+                                            <option value="GALLWH">GALLWH</option>
+                                            <option value="PLZAWH">PLZAWH</option>
+                                            <option value="VIACWH">VIACWH</option>
                                         </select>
                                     </div>
                                 </div>
@@ -71,25 +89,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr style="height: 50px; min-height: 50px" class="item-row">
-                                        <td>1</td>
-                                        <td class="item-brand">CONDURA</td>
-                                        <td class="item-model">WCONX-019ED1 (2HP)</td>
-                                        <td class="item-category">AIRCON</td>
-                                        <td class="item-quantity">1</td>
-                                        <td class="t-action"></td>
-                                        <td class="item-number d-none">CONACU00000000000013</td>
+                                    <tr style="height: 50px; min-height: 50px">
+                                        <td style="background: #FFFBDF"></td>
+                                        <td style="background: #FFFBDF"></td>
+                                        <td style="background: #FFFBDF"></td>
+                                        <td style="background: #FFFBDF"></td>
+                                        <td style="background: #FFFBDF"></td>
+                                        <td style="background: #FFFBDF"></td>
                                     </tr>
-                                    <tr style="height: 50px; min-height: 50px" class="item-row">
-                                        <td>1</td>
-                                        <td class="item-brand">CONDURA</td>
-                                        <td class="item-model">WCONX-019ED1 (2HP)</td>
-                                        <td class="item-category">AIRCON</td>
-                                        <td class="item-quantity">5</td>
-                                        <td class="t-action"></td>
-                                        <td class="item-number d-none">CONACU00000000000013</td>
-                                    </tr>
-
                                     <tr style="height: 50px; min-height: 50px">
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
@@ -165,7 +172,7 @@
                                 </div>
                             </div>
                             <div>
-                                <button type="submit" class="btn btn-primary" id="submitFormBtn">Submit</button>
+                                <button type="submit" class="btn btn-primary">Submit</button>
                             </div>
                         </div>
                     </form>
@@ -173,9 +180,3 @@
         </section>
     </div>
 </div>
-
-<script>
-    $("#desForm").on("change", function() {
-        loadDestinationWhscodes();
-    });
-</script>
