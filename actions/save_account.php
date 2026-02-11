@@ -20,7 +20,7 @@
 
 	}catch(PDOException $e){
 		$conn->rollback();
-		echo "<b>Warning. Please Contact System Developer.<br/></b>".$e;getMessage();
+		echo "<b>Warning. Please Contact System Developer.<br/></b>".$e->getMessage();
 	}
 
 

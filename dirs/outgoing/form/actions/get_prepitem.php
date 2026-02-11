@@ -2,7 +2,9 @@
   require_once "../../../../config/connection.php";
   session_start();
 
-  $Userid     = $_POST['Uid'];
+  // $Userid     = $_POST['Uid'];
+  $Userid     = $_SESSION['Uid'];
+// Append user ID to file
   $SRN     = $_POST['SRN'];
 
 try {

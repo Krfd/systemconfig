@@ -71,7 +71,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr style="height: 50px; min-height: 50px" class="item-row">
+                                    <!-- <tr style="height: 50px; min-height: 50px" class="item-row">
                                         <td>1</td>
                                         <td class="item-brand">CONDURA</td>
                                         <td class="item-model">WCONX-019ED1 (2HP)</td>
@@ -88,9 +88,9 @@
                                         <td class="item-quantity">5</td>
                                         <td class="t-action"></td>
                                         <td class="item-number d-none">CONACU00000000000013</td>
-                                    </tr>
+                                    </tr> -->
 
-                                    <tr style="height: 50px; min-height: 50px">
+                                    <!-- <tr style="height: 50px; min-height: 50px">
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
@@ -145,7 +145,15 @@
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
                                         <td style="background: #FFFBDF"></td>
-                                    </tr>
+                                    </tr> -->
+                                    <!-- <tr style="height: 50px; min-height: 50px">
+                                        <td style="background: #FFFBDF"></td>
+                                        <td style="background: #FFFBDF"></td>
+                                        <td style="background: #FFFBDF"></td>
+                                        <td style="background: #FFFBDF"></td>
+                                        <td style="background: #FFFBDF"></td>
+                                        <td style="background: #FFFBDF"></td>
+                                    </tr> -->
                                 </tbody>
                             </table>
                         </div>

@@ -44,14 +44,12 @@ function get_SRN(){
                 newSRN = "SRN-" + String(num).padStart(8,'0');
             }
             $("#srnForm").val(newSRN);
+            loadItems()
         } else {
             alert($.trim(response.Data));
         }
     });
 }
-
-
-
 
 /*load Imperial Brands*/
 function loadImperialBrands() {
@@ -73,7 +71,6 @@ function loadImperialBrands() {
     }
   });
 }
-
 
 /*Load User Branch Information*/
 function get_userinfo(){
@@ -136,7 +133,6 @@ async function loadIAPBranchlist() {
   });
 }
 
-
 /*Function Distination Whscode*/
 async function loadDestinationWhscodes() {
   var Branch = $("#desForm").val();
@@ -169,9 +165,6 @@ $("#newBrand").on("change", function () {
   $("#itemcode").val('');
   loadImperialModel();
 });
-
-
-
 
 /*load Imperial Model and category*/
 async function loadImperialModel() {
@@ -225,13 +218,75 @@ async function loadImperialModel() {
   });
 }
 
-
 /*Script for selecting model and category*/
 $("#newModel").on("change", function () {
   const selected = $(this).find(":selected");
   $("#newCategory").val(selected.data("category") || "");
   $("#itemcode").val(selected.data("itemcode") || "");
-
 });
 
+function loadItems() {
 
+    // let Uid = $("#Uid").val();   // make sure this exists
+    let SRN = $("#srnForm").val();
+
+    $.ajax({
+        url: "dirs/outgoing/form/actions/get_prepitem.php", // your API file
+        type: "POST",
+        data: {
+            // Uid: Uid,
+            SRN: SRN
+        },
+        dataType: "json",
+        success: function (response) {
+            let tbody = $("#outgoingTable tbody");
+            tbody.empty(); // remove yellow placeholder row
+            if (response.isSuccess === "success" && response.Data.length > 0) {
+                $.each(response.Data, function (index, item) {
+
+                    let row = `
+                        <tr class="item-row">
+                            <td style="background: #FFFBDF">${item.DisplayRowNumber}</td>
+                            <td class="item-brand" style="background: #FFFBDF">${item.ItemBrand}</td>
+                            <td class="item-model" style="background: #FFFBDF">${item.ItemName}</td>
+                            <td class="item-category" style="background: #FFFBDF">${item.ItemGroup}</td>
+                            <td class="item-quantity" style="background: #FFFBDF">${item.Quantity}</td>
+                            <td class="t-action" style="background: #FFFBDF">
+                              <button class="btn btn-sm btn-danger">
+                                <i class="bi bi-dash"></i>
+                              </button>
+                            </td>
+                        </tr>
+                    `;
+
+                    // <td>${index + 1}</td>
+                    // <td class="item-number d-none">${item.ItemNumber}</td>
+
+                    tbody.append(row);
+                });
+
+            } else {
+                // If no data, show empty yellow row again
+                tbody.html(`
+                    <tr style="height:50px; min-height:50px">
+                        <td style="background:#FFFBDF" colspan="5">Loading...</td>
+                    </tr>
+                `);
+
+                // <td style="background:#FFFBDF"></td>
+                //         <td style="background:#FFFBDF"></td>
+                //         <td style="background:#FFFBDF"></td>
+                //         <td style="background:#FFFBDF"></td>
+                //         <td style="background:#FFFBDF"></td>
+            }
+        },
+        error: function (xhr, status, error) {
+            console.log(error);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Failed to load items."
+            });
+        }
+    });
+}
