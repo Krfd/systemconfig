@@ -276,7 +276,7 @@ function attachOnlineSafeSubmit(formId, options = {}) {
       } else {
         console.error(`Form ${formId} submission failed: `, error);
         onError?.(error, form);
-        alert("Something went wrong: " + error.message);
+        // alert("Something went wrong: " + error.message);
       }
     } finally {
       window.removeEventListener("offline", handleOffline);

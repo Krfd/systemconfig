@@ -46,7 +46,7 @@
                             <div class="d-flex flex-column gap-1">
                                 <div class="gap-3">
                                     <label for="date" class="form-label text-dark-emphasis"><small>Date:</small></label>
-                                    <input type="date" name="date" id="date" class="form-control form-control-sm" style="background: #FFFBDF" required>
+                                    <input type="date" name="date" id="formattedDate" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                 </div>
                                 <div class="gap-3">
                                     <label for="statusForm" class="form-label text-dark-emphasis"><small>Status:</small></label>
@@ -56,7 +56,7 @@
                         </div>
                         <div class="float-end my-3">
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRequestUnit">Add</button>
-                            <button type="reset" class="btn btn-danger clearTable">Clear</button>
+                            <button type="button" class="btn btn-danger" onclick="clearTable()">Clear</button>
                         </div>
                         <div class="table-responsive overflow-auto" style="max-height: 450px">
                             <table class="table table-hover" id="outgoingTable">
@@ -71,91 +71,17 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- <tr style="height: 50px; min-height: 50px" class="item-row">
-                                        <td>1</td>
-                                        <td class="item-brand">CONDURA</td>
-                                        <td class="item-model">WCONX-019ED1 (2HP)</td>
-                                        <td class="item-category">AIRCON</td>
-                                        <td class="item-quantity">1</td>
-                                        <td class="t-action"></td>
-                                        <td class="item-number d-none">CONACU00000000000013</td>
-                                    </tr>
-                                    <tr style="height: 50px; min-height: 50px" class="item-row">
-                                        <td>1</td>
-                                        <td class="item-brand">CONDURA</td>
-                                        <td class="item-model">WCONX-019ED1 (2HP)</td>
-                                        <td class="item-category">AIRCON</td>
-                                        <td class="item-quantity">5</td>
-                                        <td class="t-action"></td>
-                                        <td class="item-number d-none">CONACU00000000000013</td>
-                                    </tr> -->
-
-                                    <!-- <tr style="height: 50px; min-height: 50px">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr>
-                                    <tr style="height: 50px; min-height: 50px">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr>
-                                    <tr style="height: 50px; min-height: 50px">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr>
-                                    <tr style="height: 50px; min-height: 50px">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr>
-                                    <tr style="height: 50px; min-height: 50px">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr>
-                                    <tr style="height: 50px; min-height: 50px">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr>
-                                    <tr style="height: 50px; min-height: 50px">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr> -->
-                                    <!-- <tr style="height: 50px; min-height: 50px">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr> -->
                                 </tbody>
                             </table>
+                        </div>
+                        <div id="totalRowOutside" class="d-flex border-top fw-bold"
+                            style="background:#FFF7BC;">
+                            <div class="p-2 flex-grow-1 text-end">
+                                Total Quantity:
+                            </div>
+                            <div class="p-2" style="width:120px;" id="totalQuantity">
+                                0
+                            </div>
                         </div>
                         <div class="d-flex justify-content-between align-items-end mt-5">
                             <div class="d-flex flex-column gap-1">

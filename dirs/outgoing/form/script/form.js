@@ -21,6 +21,8 @@ function loadDashboard() {
     loadIAPBranchlist();
     loadDestinationWhscodes();
     get_SRN();
+    formattedDate();
+    removeItem()
   });
 }
 
@@ -227,57 +229,141 @@ $("#newModel").on("change", function () {
 
 function loadItems() {
 
-    // let Uid = $("#Uid").val();   // make sure this exists
     let SRN = $("#srnForm").val();
 
     $.ajax({
         url: "dirs/outgoing/form/actions/get_prepitem.php", // your API file
         type: "POST",
         data: {
-            // Uid: Uid,
             SRN: SRN
         },
         dataType: "json",
+        beforeSend: function () {
+        let tbody = $("#outgoingTable tbody");
+
+        tbody.html(`
+            <tr>
+                <td colspan="6" class="text-center" style="background:#FFFBDF;">
+                    <span class="spinner-border spinner-border-sm text-secondary me-2"></span>
+                    Loading items...
+                </td>
+            </tr>
+        `);
+        },
         success: function (response) {
             let tbody = $("#outgoingTable tbody");
             tbody.empty(); // remove yellow placeholder row
             if (response.isSuccess === "success" && response.Data.length > 0) {
-                $.each(response.Data, function (index, item) {
+              let rowCount = response.Data.length;  
+              let totalQty = 0
+              $.each(response.Data, function (index, item) {
 
-                    let row = `
-                        <tr class="item-row">
+                    let quantity = parseFloat(item.Quantity) || 0;  // ensure number
+                    totalQty += quantity;
+
+                    let row = `<tr class="item-row">
                             <td style="background: #FFFBDF">${item.DisplayRowNumber}</td>
                             <td class="item-brand" style="background: #FFFBDF">${item.ItemBrand}</td>
                             <td class="item-model" style="background: #FFFBDF">${item.ItemName}</td>
                             <td class="item-category" style="background: #FFFBDF">${item.ItemGroup}</td>
                             <td class="item-quantity" style="background: #FFFBDF">${item.Quantity}</td>
                             <td class="t-action" style="background: #FFFBDF">
-                              <button class="btn btn-sm btn-danger">
+                              <button type="button" class="btn btn-sm btn-danger remove-item-button" id="${item.ItemNum}">
                                 <i class="bi bi-dash"></i>
                               </button>
                             </td>
                         </tr>
                     `;
 
-                    // <td>${index + 1}</td>
-                    // <td class="item-number d-none">${item.ItemNumber}</td>
-
                     tbody.append(row);
                 });
 
+                if (rowCount < 8) {
+                let emptyRowsNeeded = 8 - rowCount;
+
+                for (let i = 0; i < emptyRowsNeeded; i++) {
+                    let emptyRow = `
+                        <tr class="item-row empty-row">
+                            <td style="background: #FFFBDF">&nbsp;</td>
+                            <td style="background: #FFFBDF"></td>
+                            <td style="background: #FFFBDF"></td>
+                            <td style="background: #FFFBDF"></td>
+                            <td style="background: #FFFBDF"></td>
+                            <td style="background: #FFFBDF"></td>
+                        </tr>
+                    `;
+                    tbody.append(emptyRow);
+                }
+                    $("#totalQuantity").text(totalQty);
+              }
             } else {
                 // If no data, show empty yellow row again
                 tbody.html(`
                     <tr style="height:50px; min-height:50px">
-                        <td style="background:#FFFBDF" colspan="5">Loading...</td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                    </tr>
+                    <tr style="height:50px; min-height:50px">
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                    </tr>
+                    <tr style="height:50px; min-height:50px">
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                    </tr>
+                    <tr style="height:50px; min-height:50px">
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                    </tr>
+                    <tr style="height:50px; min-height:50px">
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                    </tr>
+                    <tr style="height:50px; min-height:50px">
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                    </tr>
+                    <tr style="height:50px; min-height:50px">
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                    </tr>
+                    <tr style="height:50px; min-height:50px">
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
+                        <td style="background:#FFFBDF"></td>
                     </tr>
                 `);
-
-                // <td style="background:#FFFBDF"></td>
-                //         <td style="background:#FFFBDF"></td>
-                //         <td style="background:#FFFBDF"></td>
-                //         <td style="background:#FFFBDF"></td>
-                //         <td style="background:#FFFBDF"></td>
             }
         },
         error: function (xhr, status, error) {
@@ -289,4 +375,94 @@ function loadItems() {
             });
         }
     });
+}
+
+function removeItem() {
+  console.log("Remove item initialized")
+  $(document).on("click" , ".remove-item-button", function () {
+    const ItemNum = $(this).attr("id");
+    const button = $(this);
+    console.log("Remove button was clicked!")
+    removeItemAPI(ItemNum, button);
+  })
+
+  loadItems();
+}
+
+function removeItemAPI(ItemNum, button) {
+  console.log(`ITEM NUM: ${ItemNum}`)
+  $.ajax({
+    url: "dirs/outgoing/form/actions/remove_unit.php",
+    type: "POST",
+    data: {ItemNum: ItemNum},
+    dataType: "json",
+    success: function(response) {
+      if(response.isSuccess === "success") {
+        loadItems();
+        console.log("Item Removed")
+      } else {
+        console.error(`Failed to remove item`)
+      }
+    },
+    error: function () {
+      alert("Request failed.")
+    }
+  })
+}
+
+function formattedDate() {
+  const today = new Date();
+const yyyy = today.getFullYear();
+const mm = String(today.getMonth() + 1).padStart(2, "0");
+const dd = String(today.getDate()).padStart(2, "0");
+
+document.getElementById("formattedDate").value = `${yyyy}-${mm}-${dd}`;
+}
+
+function clearTable() {
+    let SRN = document.getElementById("srnForm").value
+
+    Swal.fire({
+      icon: "warning",
+      text: "Are your sure to clear this table?",
+      confirmButtonText: "Clear",
+      showCancelButton: true,
+      cancelButtonColor: "#d33"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        console.log(`SRN VALUE: ${SRN}`)
+        $.post("dirs/outgoing/form/actions/clear_formTable.php", {
+          SRN: SRN
+        }, function (data) {
+          let res;
+          try{ 
+            res = JSON.parse(data)
+
+            console.log(res)
+
+              if (res.Data === "ok") {
+                Swal.fire({
+                  icon: "success",
+                  title: "Table has been cleared",
+                  confirmButtonText: "OKAY"
+                })
+                loadItems();
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "Something went wrong!",
+                  text: "Please contact the developer",
+                  confirmButtonText: "OKAY"
+                })
+              }
+          } catch(e) {
+            console.error("");
+            return;
+          }
+        }
+      )
+
+      }
+    })
+  // })
 }
