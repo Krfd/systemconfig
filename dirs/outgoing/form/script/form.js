@@ -23,6 +23,7 @@ function loadDashboard() {
     get_SRN();
     formattedDate();
     removeItem()
+    numberInput()
   });
 }
 
@@ -441,6 +442,7 @@ function clearTable() {
             console.log(res)
 
               if (res.Data === "ok") {
+                document.getElementById("totalQuantity").text = '0';
                 Swal.fire({
                   icon: "success",
                   title: "Table has been cleared",
@@ -465,4 +467,14 @@ function clearTable() {
       }
     })
   // })
+}
+
+function numberInput() {
+  document.getElementById("newQuantity").addEventListener("input", function () {
+    // Remove anything that is not a digit
+    this.value = this.value.replace(/[^0-9]/g, '');
+
+    // Remove leading zeros
+    this.value = this.value.replace(/^0+/, '');
+});
 }

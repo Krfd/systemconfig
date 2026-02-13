@@ -5,14 +5,6 @@ session_start();
 $UserId = $_SESSION['Uid'];
 $SRN = $_POST['SRN'];
 
-$data = "UserId: " . $UserId . PHP_EOL .
-    "SRN: " . $SRN . PHP_EOL .
-    "Date: " . date("Y-m-d H:i:s") . PHP_EOL .
-    "------------------------" . PHP_EOL;
-
-// Save to file (append mode)
-file_put_contents("log.txt", $data, FILE_APPEND);
-
 try {
     $conn->beginTransaction();
 

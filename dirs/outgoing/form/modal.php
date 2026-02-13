@@ -23,14 +23,13 @@
                         <label for="newCategory" class="form-label text-dark-emphasis"><small>Category:</small></label>
                         <input type="text" name="newCategory" id="newCategory" class="form-control" readonly>
                     </div>
-
                     <div class="form-input">
                         <label for="newQuantity" class="form-label text-dark-emphasis"><small>Quantity:</small></label>
-                        <input type="int" name="newQuantity" id="newQuantity" class="form-control" style="background: #FFFBDF" required>
+                        <input type="number" name="newQuantity" id="newQuantity" class="form-control" style="background: #FFFBDF" min="1" inputmode="numeric"
+                            pattern="[1-9][0-9]*"
+                            required>
                     </div>
-
                     <input type="hidden" name="itemcode" id="itemcode"><!-- Selected Item code -->
-
                     <div class="modal-footer">
                         <button class="btn btn-success" type="submit">Add</button>
                         <button class="btn btn-danger" type="reset">Clear</button>
