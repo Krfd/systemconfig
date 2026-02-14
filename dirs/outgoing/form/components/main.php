@@ -8,7 +8,7 @@
                             <div class="d-flex flex-column gap-1 col-2">
                                 <div>
                                     <label for="srnForm" class="form-label text-dark-emphasis"><small>SRN:</small></label>
-                                    <input type="text" name="srnForm" id="srnForm" class="form-control form-control-sm" style="background: #FFFBDF" required>
+                                    <input type="text" name="srnForm" id="srnForm" class="form-control form-control-sm" style="background: #FFFBDF" readonly required>
                                 </div>
                                 <div>
                                     <label for="typeForm" class="form-label text-dark-emphasis"><small>Type of Request:</small></label>
@@ -91,7 +91,7 @@
                                 </div>
                                 <div class="gap-3">
                                     <label for="reqByForm" class="form-label text-dark-emphasis"><small>Requested by:</small></label>
-                                    <input type="text" name="reqByForm" id="reqByForm" class="form-control form-control-sm" style="background: #FFFBDF" readonly required>
+                                    <input type="text" name="reqByForm" id="reqByForm" class="form-control form-control-sm" style="background: #FFFBDF" required>
                                 </div>
                                 <div class="gap-3">
                                     <label for="remarksForm" class="form-label text-dark-emphasis"><small>Remarks:</small></label>

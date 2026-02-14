@@ -24,6 +24,7 @@ function loadDashboard() {
     formattedDate();
     removeItem()
     numberInput()
+    submitReq();
   });
 }
 
@@ -267,6 +268,7 @@ function loadItems() {
                             <td class="item-brand" style="background: #FFFBDF">${item.ItemBrand}</td>
                             <td class="item-model" style="background: #FFFBDF">${item.ItemName}</td>
                             <td class="item-category" style="background: #FFFBDF">${item.ItemGroup}</td>
+                            <td class="item-code" hidden>${item.ItemCode}</td>
                             <td class="item-quantity" style="background: #FFFBDF">${item.Quantity}</td>
                             <td class="t-action" style="background: #FFFBDF">
                               <button type="button" class="btn btn-sm btn-danger remove-item-button" id="${item.ItemNum}">
@@ -390,7 +392,7 @@ function removeItem() {
   loadItems();
 }
 
-function removeItemAPI(ItemNum, button) {
+function removeItemAPI(ItemNum) {
   console.log(`ITEM NUM: ${ItemNum}`)
   $.ajax({
     url: "dirs/outgoing/form/actions/remove_unit.php",
@@ -413,11 +415,11 @@ function removeItemAPI(ItemNum, button) {
 
 function formattedDate() {
   const today = new Date();
-const yyyy = today.getFullYear();
-const mm = String(today.getMonth() + 1).padStart(2, "0");
-const dd = String(today.getDate()).padStart(2, "0");
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
 
-document.getElementById("formattedDate").value = `${yyyy}-${mm}-${dd}`;
+  document.getElementById("formattedDate").value = `${yyyy}-${mm}-${dd}`;
 }
 
 function clearTable() {
@@ -477,4 +479,92 @@ function numberInput() {
     // Remove leading zeros
     this.value = this.value.replace(/^0+/, '');
 });
+}
+
+function submitReq() {
+$("#frm-request-sts").on("submit", function (e) {
+  console.log("Submit triggered!")
+
+  let items = [];
+  $("#outgoingTable tbody tr.item-row").not(".empty-row").each(function () {
+
+        let brand = $(this).find(".item-brand").text().trim();
+        let model = $(this).find(".item-model").text().trim();
+        let code = $(this).find(".item-code").text().trim();
+        let category = $(this).find(".item-category").text().trim();
+        let quantity = $(this).find(".item-quantity").text().trim();
+
+        // Only push if row is not empty
+        if (brand !== "") {
+            items.push({
+                brand: brand,
+                code: code,
+                model: model,
+                category: category,
+                quantity: quantity
+            });
+        }
+    });
+
+    // ❗ Prevent submit if no real items
+    if (items.length === 0) {
+        e.preventDefault();
+        Swal.fire({
+            icon: "warning",
+            title: "No Items",
+            text: "Please add at least one item before submitting."
+          });
+        return;
+    }
+
+    let formData = new FormData(document.getElementById("frm-request-sts"));
+    formData.append("items", JSON.stringify(items));
+
+        console.log(formData);
+
+        $.ajax({
+            url: "dirs/outgoing/form/actions/save_stockrequest.php",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+
+                if (response === "OK") {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Success",
+                        text: "Request submitted successfully!"
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: response
+                    });
+                }
+            },
+            error: function () {
+                Swal.fire({
+                    icon: "error",
+                    title: "Server Error"
+                });
+            }
+        });
+
+    console.log(`ITEMS : ${items.length}`)
+
+    // Remove old hidden input if exists
+    $("#tableData").remove();
+
+    // Append hidden JSON field
+    $("<input>")
+        .attr("type", "hidden")
+        .attr("name", "tableData")
+        .attr("id", "tableData")
+        .val(JSON.stringify(items))
+        .appendTo("#frm-request-sts");
+})
 }

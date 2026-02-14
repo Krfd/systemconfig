@@ -3,18 +3,18 @@ require_once "../../../../config/connection.php";
 session_start();
 
 $Userid          = $_SESSION['Uid'];
-$SRN             = $_POST['SRN'];
-$TypeofRequest   = $_POST['TypeofRequest'];
-$Destination     = $_POST['Destination'];
-$Destiwhscode    = $_POST['Destiwhscode'];
-$Origin          = $_POST['Origin'];
-$Originwhscode   = $_POST['Originwhscode'];
-$DocDate         = $_POST['DocDate'];
-$DocStatus       = $_POST['DocStatus'];
-$ReqPurpose      = $_POST['ReqPurpose'] ?? '';
-$ReqBy           = $_POST['ReqBy'];
-$Remarks         = $_POST['Remarks'] ?? '';
-$items           = $_POST['items'];
+$SRN             = $_POST['srnForm'];
+$TypeofRequest   = $_POST['typeForm'];
+$Destination     = $_POST['desForm'];
+$Destiwhscode    = $_POST['desCodeForm'];
+$Origin          = $_POST['user-origin'];
+$Originwhscode   = $_POST['originCodeForm'];
+$DocDate         = $_POST['date'];
+$DocStatus       = $_POST['statusForm'];
+$items           = json_decode($_POST['items'], true);
+$ReqPurpose      = $_POST['purposeForm'] ?? '';
+$ReqBy           = $_POST['reqByForm'];
+$Remarks         = $_POST['remarksForm'] ?? '';
 
 try {
     $conn->beginTransaction();
@@ -24,7 +24,7 @@ try {
     $ins_stsrequest->execute([
         $Userid,
         $SRN,
-        $TypeofRequest,	
+        $TypeofRequest,
         $Destination,
         $Destiwhscode,
         $Origin,
@@ -32,7 +32,8 @@ try {
         $DocDate,
         $DocStatus,
         $ReqPurpose,
-        $Remarks
+        $Remarks,
+        $ReqBy
     ]);
 
     // 2️⃣ Insert each item
@@ -41,21 +42,19 @@ try {
         $ins_item->execute([
             $SRN,
             $item['brand'],      // ItemBrand
-            $item['name'],       // Model
-            $item['itemnumber'], // Item number / ItemName
-            $item['group'],      // ItemGroup / Category
-            $item['qty'],        // Quantity
+            $item['code'],       // Model
+            $item['model'], // Item number / ItemName
+            $item['category'],      // ItemGroup / Category
+            $item['quantity'],        // Quantity
             $Userid
         ]);
     }
 
     $conn->commit();
     echo "OK";
-
 } catch (PDOException $e) {
     if ($conn->inTransaction()) {
         $conn->rollback();
     }
     echo "<b>Warning. Please Contact System Developer.<br/></b>" . $e->getMessage();
 }
-?>
