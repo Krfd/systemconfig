@@ -33,7 +33,7 @@
                                 <div class="input-group col p-0">
                                     <div class="col p-0">
                                         <label for="user-origin" class="form-label text-dark-emphasis"><small>Origin:</small></label>
-                                        <input type="text" name="user-origin" id="user-origin" class="form-control form-control-sm" readonly>
+                                        <input type="text" name="user-origin" id="user-origin" class="form-control form-control-sm" style="background: #FFFBDF" readonly>
                                     </div>
                                     <div class="col p-0">
                                         <label for="originCodeForm" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
@@ -91,7 +91,7 @@
                                 </div>
                                 <div class="gap-3">
                                     <label for="reqByForm" class="form-label text-dark-emphasis"><small>Requested by:</small></label>
-                                    <input type="text" name="reqByForm" id="reqByForm" class="form-control form-control-sm" style="background: #FFFBDF" required>
+                                    <input type="text" name="reqByForm" id="reqByForm" class="form-control form-control-sm" style="background: #FFFBDF" readonly required>
                                 </div>
                                 <div class="gap-3">
                                     <label for="remarksForm" class="form-label text-dark-emphasis"><small>Remarks:</small></label>

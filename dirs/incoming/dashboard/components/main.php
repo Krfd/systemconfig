@@ -27,7 +27,7 @@
             <tbody>
                 <tr>
                     <td style="height: 50px" class="d-flex justify-content-center">
-                        <input type="checkbox" name="checkbox" id="checkbox" class="form-check-input align-self-center mx-auto checkbox border border-primary">
+                        <input type="checkbox" name="checkbox" id="checkbox1" class="form-check-input align-self-center mx-auto checkbox border border-primary">
                     </td>
                     <td class="text-secondary" style="background: #FFFBDF; cursor: pointer" onclick="openIncoming()">1</td>
                     <td class="text-secondary" style="background: #FFFBDF; cursor: pointer" onclick="openIncoming()">SRNGALL0001</td>
@@ -40,7 +40,7 @@
                 </tr>
                 <tr style="height: 50px;">
                     <td style="height: inherit" class="d-flex justify-content-center">
-                        <input type="checkbox" name="checkbox" id="checkbox" class="form-check-input align-self-center mx-auto checkbox border border-primary">
+                        <input type="checkbox" name="checkbox" id="checkbox2" class="form-check-input align-self-center mx-auto checkbox border border-primary">
                     </td>
                     <td class="text-secondary" style="background: #FFFBDF; cursor: pointer" onclick="openIncoming()">2</td>
                     <td class="text-secondary" style=" background: #FFFBDF; cursor: pointer" onclick="openIncoming()">SRNVIAC0001</td>
@@ -53,7 +53,7 @@
                 </tr>
                 <tr style="height: 50px;">
                     <td style="height: inherit" class="d-flex justify-content-center">
-                        <input type="checkbox" name="checkbox" id="checkbox" class="form-check-input align-self-center mx-auto checkbox border border-primary">
+                        <input type="checkbox" name="checkbox" id="checkbox3" class="form-check-input align-self-center mx-auto checkbox border border-primary">
                     </td>
                     <td class="text-secondary" style="background: #FFFBDF; cursor: pointer" onclick="openIncoming()">3</td>
                     <td class="text-secondary" style="background: #FFFBDF; cursor: pointer" onclick="openIncoming()">SRNPLZA0001</td>
@@ -66,7 +66,7 @@
                 </tr>
                 <tr style="height: 50px;">
                     <td style="height: inherit" class="d-flex justify-content-center">
-                        <input type="checkbox" name="checkbox" id="checkbox" class="form-check-input align-self-center mx-auto checkbox border border-primary">
+                        <input type="checkbox" name="checkbox" class="form-check-input align-self-center mx-auto checkbox border border-primary">
                     </td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
@@ -79,7 +79,7 @@
                 </tr>
                 <tr style="height: 50px;">
                     <td style="height: inherit" class="d-flex justify-content-center">
-                        <input type="checkbox" name="checkbox" id="checkbox" class="form-check-input align-self-center mx-auto checkbox border border-primary">
+                        <input type="checkbox" name="checkbox" class="form-check-input align-self-center mx-auto checkbox border border-primary">
                     </td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
@@ -92,7 +92,7 @@
                 </tr>
                 <tr style="height: 50px;">
                     <td style="height: inherit" class="d-flex justify-content-center">
-                        <input type="checkbox" name="checkbox" id="checkbox" class="form-check-input align-self-center mx-auto checkbox border border-primary">
+                        <input type="checkbox" name="checkbox" class="form-check-input align-self-center mx-auto checkbox border border-primary">
                     </td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
@@ -105,7 +105,7 @@
                 </tr>
                 <tr style="height: 50px;">
                     <td style="height: inherit" class="d-flex justify-content-center">
-                        <input type="checkbox" name="checkbox" id="checkbox" class="form-check-input align-self-center mx-auto checkbox border border-primary">
+                        <input type="checkbox" name="checkbox" class="form-check-input align-self-center mx-auto checkbox border border-primary">
                     </td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
@@ -118,7 +118,7 @@
                 </tr>
                 <tr style="height: 50px;">
                     <td style="height: inherit" class="d-flex justify-content-center">
-                        <input type="checkbox" name="checkbox" id="checkbox" class="form-check-input align-self-center mx-auto checkbox border border-primary">
+                        <input type="checkbox" name="checkbox" class="form-check-input align-self-center mx-auto checkbox border border-primary">
                     </td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>

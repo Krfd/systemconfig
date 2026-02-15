@@ -24,23 +24,57 @@ function handleAddToPicklist() {
 
 function toggleCheckboxes() {
   const createPicklistBtn = document.getElementById("createPicklistBtn");
-  const areCheckboxesVisible = $(".checkbox").is(":visible");
+  let anyVisible = false;
+  const checkedIds = []
 
-  $(".checkbox").toggle();
+  $("#outgoingTable tbody .checkbox:checked").each(function () {
+      checkedIds.push(this.id);
+  });
 
-  if (areCheckboxesVisible) {
-    $(".checkbox").prop("checked", false);
-    createPicklistBtn.textContent = "Create Picklist";
-    createPicklistBtn.type = "button";
-    createPicklistBtn.replaceWith(createPicklistBtn.cloneNode(true));
-  } else {
-    createPicklistBtn.textContent = "Add to Picklist";
-    createPicklistBtn.type = "submit";
+  console.log("Checked IDs:", checkedIds);
 
-    createPicklistBtn.addEventListener("click", function () {
-      alert("Items added to picklist!");
-    });
-  }
+  $("#outgoingTable tbody tr").each(function () {
+    const row = $(this);
+    const checkbox = row.find(".checkbox");
+    const srnText = row.find("td:eq(2)").text().trim(); // SRN column
+
+    // Only rows with SRN starting with 'SRN' are valid
+    if (srnText.startsWith("SRN")) {
+      checkbox.toggle();
+
+      if (checkbox.is(":visible")) {
+        anyVisible = true;
+      } else {
+        checkbox.prop("checked", false);
+      }
+    } else {
+      checkbox.hide();
+      checkbox.prop("checked", false);
+    }
+  });
+
+  createPicklistBtn.textContent = anyVisible
+    ? "Add to Picklist"
+    : "Create Picklist";
+
+    if (anyVisible) {
+        createPicklistBtn.type = "submit";
+        console.log(`BUTTON TYPE : ${createPicklistBtn.type}`)
+        console.log(`CREATED THE PICKLIST`);
+        console.log(`NOW CHANGING THE TYPE TO BUTTON`)
+    } else {
+      createPicklistBtn.type = "button"
+      console.log(`BUTTON TYPE : ${createPicklistBtn.type} `);
+      
+      const params = {
+        selectedIds: checkedIds,
+        action: "create"
+      };
+
+      $.post("dirs/incoming/picklistbasket/basket.php", params, function (data) {
+        $("#main-content").html(data);
+      });
+    }
 }
 
 function picklistBasket() {
