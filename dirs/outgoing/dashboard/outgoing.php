@@ -4,7 +4,6 @@
             <h3 class="fw-bold text-primary">Outgoing</h3>
         </div>
         <div class="d-flex gap-1">
-            <input type="search" class="form-control" id="searchInput" placeholder="Search here..." style="background: #FFFBDF">
             <button class="btn btn-primary" type="button" onclick="test()">New</button>
         </div>
     </div>

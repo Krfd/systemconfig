@@ -297,7 +297,7 @@ function loadItems() {
                     `;
                     tbody.append(emptyRow);
                 }
-                    $("#totalQuantity").text(totalQty);
+                $("#totalQuantity").text(totalQty);
               }
             } else {
                 // If no data, show empty yellow row again
@@ -382,13 +382,11 @@ function loadItems() {
 
 function removeItem() {
   console.log("Remove item initialized")
+  $(document).off("click", ".remove-item-button");
   $(document).on("click" , ".remove-item-button", function () {
     const ItemNum = $(this).attr("id");
-    const button = $(this);
-    console.log("Remove button was clicked!")
-    removeItemAPI(ItemNum, button);
+    removeItemAPI(ItemNum);
   })
-
   loadItems();
 }
 
@@ -465,7 +463,6 @@ function clearTable() {
           }
         }
       )
-
       }
     })
   // })

@@ -15,19 +15,15 @@ try {
     /*For SRN ITEMS*/
     $stmt->nextRowset();
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     echo json_encode([
         "isSuccess" => "success",
         "Data" => $header,
         "Items" => $items
     ]);
-
 } catch (PDOException $e) {
     echo json_encode([
         "isSuccess" => "Failed",
         "Data" => "<b>Error. Please Contact System Developer.<br/></b>" . $e->getMessage()
     ]);
 }
-?>
-
-?>

@@ -59,7 +59,7 @@
                         <div class="table-responsive mt-5 overflow-auto" style="max-height: 450px">
                             <table class="table datatables table-hover" id="openIncomingTable">
                                 <thead>
-                                    <tr>
+                                    <tr class="sticky-top">
                                         <th class="text-secondary">#</th>
                                         <th class="text-secondary">Brand</th>
                                         <th class="text-secondary">Model</th>
@@ -126,6 +126,15 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <div id="totalRowOutside" class="d-flex border-top fw-bold"
+                            style="background:#FFF7BC;">
+                            <div class="p-2 flex-grow-1 text-end">
+                                Total Quantity:
+                            </div>
+                            <div class="p-2" style="width:120px;" id="totalIncomingQty">
+                                0
+                            </div>
                         </div>
                         <div class="d-flex justify-content-between align-items-end mt-5">
                             <div class="d-flex flex-column gap-1">
