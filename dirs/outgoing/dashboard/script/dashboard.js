@@ -61,7 +61,7 @@ function loadOutgoing(search = "") {
       if (response.isSuccess === "success") {
         let rows = '';
         let rowCount = response.Data.length;
-        console.log(`ROW COUNTER: ${rowCount}`)
+        // console.log(`ROW COUNTER: ${rowCount}`)
 
         response.Data.forEach(function (item) {
           rows += `
@@ -80,7 +80,7 @@ function loadOutgoing(search = "") {
                   <li><a class="dropdown-item open-item" href="#">Open</a></li>
                   <li><a class="dropdown-item" href="#">Print</a></li>
                   ${item.RequestStatus?.toUpperCase() === "NEW" 
-                  ? `<li><a class="dropdown-item" href="#">Cancel</a></li>` 
+                  ? `<li><a class="dropdown-item cancel-outgoing" data-srn="${item.BaseNum_SRN}" href="#">Cancel</a></li>` 
                   : ``}
                   ${item.RequestStatus !== "NEW" 
                   ? `<li><a class="dropdown-item" href="#">Terminate</a></li>` 
@@ -152,5 +152,50 @@ function openOutgoingForm(rowNum) {
 // FOR PICKLIST TABLE MODAL
 function picklistTableModal() {
   
+}
+
+// $(document).on("click", ".cancel-outgoing", function(e) {
+
+//   e.preventDefault();       
+//   e.stopPropagation();
+
+//   let RowNumber = $(this).find("td:first").text().trim();
+//   cancelOutgoingForm(RowNumber)
+// })
+
+$(document).on("click", ".cancel-outgoing", function(e) {
+
+  e.preventDefault();       
+  e.stopPropagation();
+
+  let RowNumber = $(this).data("srn");   
+  let rowElement = $(this).closest("tr");
+
+  cancelOutgoingForm(RowNumber, rowElement);
+});
+
+function cancelOutgoingForm(RowNumber, rowElement) {
+  if (!RowNumber) {
+    Swal.fire({
+      icon: "error",
+      title: "Missing SRN",
+      text: "Make sure that the SRN exists!",
+      confirmButtonText: "OKAY"
+    })
+    return;
+  }
+
+  Swal.fire({
+      icon: "question",
+      title: "Cancel this request?",
+      text: "This action cannot be change.",
+      confirmButtonText: "Yes, Cancel",
+      showCancelButton: true,
+      cancelButtonText: "Cancel"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // CANCEL THE SRN VIA API
+      }
+    })
 }
 

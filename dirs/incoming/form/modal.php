@@ -15,15 +15,15 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="text-primary" style="cursor: pointer">PL10001</td>
+                            <td class="text-primary picklist-num" data-picklist-num="PL10001" style="cursor: pointer">PL10001</td>
                             <td class="text-secondary">180</td>
                         </tr>
                         <tr>
-                            <td class="text-primary" style="cursor: pointer">PL10002</td>
+                            <td class="text-primary picklist-num" data-picklist-num="PL10002" style="cursor: pointer">PL10002</td>
                             <td class="text-secondary">143</td>
                         </tr>
                         <tr>
-                            <td class="text-primary" style="cursor: pointer">PL10003</td>
+                            <td class="text-primary picklist-num" data-picklist-num="PL10003" style="cursor: pointer">PL10003</td>
                             <td class="text-secondary">285</td>
                         </tr>
                     </tbody>

@@ -9,7 +9,7 @@ $(document).ready(function () {
     },
   });
   $(".checkbox").hide();
-  console.log(`CHECKBOXES ARE HIDDEN`)
+  // console.log(`CHECKBOXES ARE HIDDEN`)
 });
 
 function loadDashboard() {
@@ -20,7 +20,7 @@ function loadDashboard() {
 }
 
 function loadIncoming(search = "") {
-  console.log("Incoming Data")
+  // console.log("Incoming Data")
   $.ajax({
     url: "dirs/outgoing/dashboard/actions/get_outgoing.php",
     type: "POST",
@@ -35,23 +35,19 @@ function loadIncoming(search = "") {
         let rows = '';
         let rowCount = response.Data.length;
 
-        // console.log(`ROW COUNT: ${rowCount}`)
-
-        console.log(`RESPONSE DATA: `,response.Data)
-
         response.Data.forEach(function(unit) {
-          console.log(unit.RowNum)
+
           rows += `
           <tr>
             <td style="height: 50px" class="d-flex justify-content-center">
               <input type="checkbox" name="checkbox" id="checkbox_${unit.RowNum}" class="form-check-input align-self-center mx-auto checkbox border border-primary">
             </td>
-            <td style="background: #FFFBDF" data-rownum="${unit.RowNum}">${unit.RowNum}</td>
-            <td style="background: #FFFBDF" data-rownum="${unit.RowNum}">${unit.BaseNum_SRN}</td>
-            <td style="background: #FFFBDF" data-rownum="${unit.RowNum}">${unit.RequestType}</td>
-            <td style="background: #FFFBDF" data-rownum="${unit.RowNum}">${unit.Orgin_Dstnation}</td>
-            <td style="background: #FFFBDF" data-rownum="${unit.RowNum}">${unit.RequestStatus}</td>
-            <td style="background: #FFFBDF" data-rownum="${unit.RowNum}">${unit.DocDate}</td>
+            <td style="background: #FFFBDF; cursor: pointer" data-rownum="${unit.RowNum}">${unit.RowNum}</td>
+            <td style="background: #FFFBDF; cursor: pointer" data-rownum="${unit.RowNum}">${unit.BaseNum_SRN}</td>
+            <td style="background: #FFFBDF; cursor: pointer" data-rownum="${unit.RowNum}">${unit.RequestType}</td>
+            <td style="background: #FFFBDF; cursor: pointer" data-rownum="${unit.RowNum}">${unit.Orgin_Dstnation}</td>
+            <td style="background: #FFFBDF; cursor: pointer" data-rownum="${unit.RowNum}">${unit.RequestStatus}</td>
+            <td style="background: #FFFBDF; cursor: pointer" data-rownum="${unit.RowNum}">${unit.DocDate}</td>
             <td style="background: #FFFBDF"></td>
           </tr>`
         })
@@ -128,7 +124,11 @@ function toggleCheckboxes() {
   // VALIDATE SELECTION
   // ==========================
   if (checkedIds.length === 0) {
-    alert("Please select at least one item to create a picklist.");
+    Swal.fire({
+      icon: "warning",
+      title: "Please select at least one item to create a picklist",
+      confirmButtonText: "OKAY"
+    })
     $("#incomingTableDisplay tbody .checkbox")
     .hide()
     .prop("checked", false);
@@ -161,9 +161,9 @@ function picklistBasket() {
   });
 }
 
-$(document).on("dblclick", "incomingTableDisplay tbody tr" , function (e) {
+$(document).on("dblclick", "#incomingTableDisplay tbody tr" , function (e) {
   if ($(e.target).closest(".dropdown").length) return;
-  let RowNum = $(this).find("td:first").text().trim();
+  let RowNum = $(this).find("td:nth-child(2)").text().trim();
   openIncoming(RowNum)
 })
 

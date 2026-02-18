@@ -34,7 +34,7 @@ function loadOutgoingDetails(RowNum) {
         let rowCount = response.Items.length;
         let totalQty = 0;
 
-        console.log(`ROW COUNT: ${rowCount}`)
+        // console.log(`ROW COUNT: ${rowCount}`)
 
         let header = response.Data;
         let items  = response.Items;
@@ -48,7 +48,6 @@ function loadOutgoingDetails(RowNum) {
         selectedValue("#branchWhCode", header.DestinationWhs)
         selectedValue("#origin", header.Origin)
         selectedValue("#whcode", header.OriginWhs)
-
 
         // ================= HEADER =================
         $("#srn").val(header.BaseNum_SRN);
