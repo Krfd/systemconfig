@@ -35,7 +35,7 @@
                                         <label for="user-origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
                                         <input type="text" name="user-origin" id="user-origin" class="form-control form-control-sm col ms-3" style="background: #FFFBDF" readonly>
                                     </div>
-                                    <div class="col p-0 d-flex align-items-baseline col">
+                                    <div class="col p-0 d-flex align-items-baseline">
                                         <label for="originCodeForm" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
                                         <select name="originCodeForm" id="originCodeForm" class="form-select form-select-sm col" style="background: #FFFBDF" required>
                                             <option value="" selected0>Select Warehouse</option>

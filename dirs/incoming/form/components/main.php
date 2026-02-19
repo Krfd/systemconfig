@@ -56,10 +56,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="table-responsive mt-5 overflow-auto" style="max-height: 450px">
+                        <div class="table-responsive overflow-auto" style="max-height: 450px">
                             <table class="table datatables table-hover" id="openIncomingTable">
-                                <thead>
-                                    <tr class="sticky-top">
+                                <thead class="sticky-top">
+                                    <tr>
                                         <th class="text-secondary">#</th>
                                         <th class="text-secondary">Brand</th>
                                         <th class="text-secondary">Model</th>
@@ -136,24 +136,21 @@
                                 0
                             </div>
                         </div>
-                        <div class="d-flex justify-content-between align-items-end mt-5">
-                            <div class="d-flex flex-column gap-1">
-                                <div>
-                                    <label for="type" class="form-label text-dark-emphasis"><small>Purpose of Request:</small></label>
-                                    <input type="text" name="type" id="type" class="form-control form-control-sm" style="background: #FFFBDF" value="Transfer" disabled required>
+                        <div class="d-flex justify-content-between align-items-end mt-3">
+                            <div class="d-flex flex-column gap-1 col-4">
+                                <div class="d-flex align-items-baseline gap-3">
+                                    <label for="type" class="form-label text-dark-emphasis col-4"><small>Purpose of Request:</small></label>
+                                    <input type="text" name="type" id="type" class="form-control form-control-sm col" style="background: #FFFBDF" value="Transfer" disabled required>
                                 </div>
-                                <div>
-                                    <label for="reqBy" class="form-label text-dark-emphasis"><small>Requested by:</small></label>
-                                    <input type="text" name="reqBy" id="reqBy" class="form-control form-control-sm" style="background: #FFFBDF" value="Carmelo Arroyo" disabled readonly required>
+                                <div class="d-flex align-items-baseline gap-3">
+                                    <label for="reqBy" class="form-label text-dark-emphasis col-4"><small>Requested by:</small></label>
+                                    <input type="text" name="reqBy" id="reqBy" class="form-control form-control-sm col" style="background: #FFFBDF" value="Carmelo Arroyo" disabled readonly required>
                                 </div>
-                                <div>
-                                    <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
-                                    <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto" disabled>Please transfer the following unit, ASAP.</textarea>
+                                <div class="d-flex align-items-baseline gap-3">
+                                    <label for="remarks" class="form-label text-dark-emphasis col-4"><small>Remarks:</small></label>
+                                    <textarea name="remarks" id="remarks" class="form-control form-control-sm col" rows="3" style="background: #FFFBDF; height: auto" disabled>Please transfer the following unit, ASAP.</textarea>
                                 </div>
                             </div>
-                            <!-- <div>
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#openPicklistTable">Add to Picklist</button>
-                            </div> -->
                         </div>
                     </form>
                 </div>
