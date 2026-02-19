@@ -10,6 +10,7 @@ $(document).ready(function () {
 });
 
 function loadBasket() {
+  // console.log("Should be in picklist basket")
   $.post("dirs/incoming/picklistbasket/basket.php", {}, function (data) {
     $("#main-content").html(data);
   });

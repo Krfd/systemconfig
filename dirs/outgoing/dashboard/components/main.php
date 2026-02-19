@@ -12,77 +12,77 @@
             </tr>
         </thead>
         <tbody>
-            <tr style="height: 50px; min-height: 50px">
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
+            <tr style="height: 40px; min-height: 40px">
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
             </tr>
-            <tr style="height: 50px; min-height:50px">
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
+            <tr style="height: 40px; min-height:40px">
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
             </tr>
-            <tr style="height: 50px; min-height:50px">
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
+            <tr style="height: 40px; min-height:40px">
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
             </tr>
-            <tr style="height: 50px; min-height:50px">
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
+            <tr style="height: 40px; min-height:40px">
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
             </tr>
-            <tr style="height: 50px; min-height:50px">
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
+            <tr style="height: 40px; min-height:40px">
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
             </tr>
-            <tr style="height: 50px; min-height:50px">
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
+            <tr style="height: 40px; min-height:40px">
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
             </tr>
-            <tr style="height: 50px; min-height:50px">
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
+            <tr style="height: 40px; min-height:40px">
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
             </tr>
-            <tr style="height: 50px; min-height:50px">
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
+            <tr style="height: 40px; min-height:40px">
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
             </tr>
         </tbody>
     </table>

@@ -4,15 +4,17 @@ require_once "../../../../config/connection.php";
 session_start();
 header('Content-Type: application/json');
 $Userid       = $_SESSION['Uid'];
-$Search       = $_POST['Search'] ?? '';
-$CurrentPage  = $_POST['CurrentPage'] ?? 1;
-$PageSize     = $_POST['PageSize'] ?? 100;
+// $Search       = $_POST['Search'] ?? '';
+// $CurrentPage  = $_POST['CurrentPage'] ?? 1;
+// $PageSize     = $_POST['PageSize'] ?? 100;
 
 try {
   $conn->beginTransaction();
 
-  $fetch_ongoing = $conn->prepare("EXEC dbo.[OUTGOING] ?,?,?,?");
-  $fetch_ongoing->execute([$Userid, $Search, $CurrentPage, $PageSize]);
+  // $fetch_ongoing = $conn->prepare("EXEC dbo.[OUTGOING] ?,?,?,?");
+  // $fetch_ongoing->execute([$Userid, $Search, $CurrentPage, $PageSize]);
+  $fetch_ongoing = $conn->prepare("EXEC dbo.[OUTGOING] ?");
+  $fetch_ongoing->execute([$Userid]);
   $get_ongoing = $fetch_ongoing->fetchAll(PDO::FETCH_ASSOC);
 
   $conn->commit();

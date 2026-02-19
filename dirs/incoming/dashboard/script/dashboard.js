@@ -39,15 +39,15 @@ function loadIncoming(search = "") {
 
           rows += `
           <tr>
-            <td style="height: 50px" class="d-flex justify-content-center">
-              <input type="checkbox" name="checkbox" id="checkbox_${unit.RowNum}" class="form-check-input align-self-center mx-auto checkbox border border-primary">
+            <td style="height: 40px" class="d-flex justify-content-center">
+              <input type="checkbox" name="checkbox" id="checkbox_${unit.RowNum}" class="form-check-input align-self-center mx-auto checkbox border border-primary" style="cursor: pointer;">
             </td>
-            <td style="background: #FFFBDF; cursor: pointer" data-rownum="${unit.RowNum}">${unit.RowNum}</td>
-            <td style="background: #FFFBDF; cursor: pointer" data-rownum="${unit.RowNum}">${unit.BaseNum_SRN}</td>
-            <td style="background: #FFFBDF; cursor: pointer" data-rownum="${unit.RowNum}">${unit.RequestType}</td>
-            <td style="background: #FFFBDF; cursor: pointer" data-rownum="${unit.RowNum}">${unit.Orgin_Dstnation}</td>
-            <td style="background: #FFFBDF; cursor: pointer" data-rownum="${unit.RowNum}">${unit.RequestStatus}</td>
-            <td style="background: #FFFBDF; cursor: pointer" data-rownum="${unit.RowNum}">${unit.DocDate}</td>
+            <td class="align-middle" style="background: #FFFBDF; cursor: pointer; padding: 3px" data-rownum="${unit.RowNum}">${unit.RowNum}</td>
+            <td class="align-middle" style="background: #FFFBDF; cursor: pointer; padding: 3px" data-rownum="${unit.RowNum}">${unit.BaseNum_SRN}</td>
+            <td class="align-middle" style="background: #FFFBDF; cursor: pointer; padding: 3px" data-rownum="${unit.RowNum}">${unit.RequestType}</td>
+            <td class="align-middle" style="background: #FFFBDF; cursor: pointer; padding: 3px" data-rownum="${unit.RowNum}">${unit.Orgin_Dstnation}</td>
+            <td class="align-middle" style="background: #FFFBDF; cursor: pointer; padding: 3px" data-rownum="${unit.RowNum}">${unit.RequestStatus}</td>
+            <td class="align-middle" style="background: #FFFBDF; cursor: pointer; padding: 3px" data-rownum="${unit.RowNum}">${unit.DocDate}</td>
             <td style="background: #FFFBDF"></td>
           </tr>`
         })
@@ -58,7 +58,7 @@ function loadIncoming(search = "") {
 
           for (let i = 0; i < emptyRowsNeeded; i++) {
             let emptyRow = `
-              <tr class="item-row empty-row" style="height: 50px; min-height: 50px">
+              <tr class="item-row empty-row" style="height: 40px; min-height: 40px">
                 <td></td>
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
@@ -140,14 +140,26 @@ function toggleCheckboxes() {
   // ==========================
   // SUBMIT PICKLIST
   // ==========================
-  const params = {  
+  const params = {
     selectedIds: checkedIds,
     action: "create"
   };
 
-  $.post("dirs/incoming/picklistbasket/basket.php", params, function (data) {
-    $("#main-content").html(data);
-  });
+  // $.post("dirs/incoming/picklistbasket/basket.php", params, function (data) {
+  //   $("#main-content").html(data);
+  // });
+  Swal.fire({
+    icon: "question",
+    title: "Add this item(s) to picklist #?",
+    text: "This action cannot be change",
+    confirmButtonText: "Save",
+    showCancelButton: true,
+    cancelButtonText: "Back"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      
+    }
+  })
 
   // OPTIONAL: Exit selection mode after submit
   $("#incomingTableDisplay tbody .checkbox").hide().prop("checked", false);

@@ -68,56 +68,56 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    <tr style="height: 40px; min-height: 40px">
                                         <td class="text-secondary" style="background: #FFFBDF;">1</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">SAMSUNG</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">EF-DX211-GALAXY A+ KEYBOARD SLIM</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">PHONE ACCESSORIES</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">5</td>
                                     </tr>
-                                    <tr>
+                                    <tr style="height: 40px; min-height: 40px">
                                         <td class="text-secondary" style="background: #FFFBDF;">2</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">SAMSUNG</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">SAM166-GALAXY A16 5G 4+128GB GOLD</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">PHONE</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">5</td>
                                     </tr>
-                                    <tr>
+                                    <tr style="height: 40px; min-height: 40px">
                                         <td class="text-secondary" style="background: #FFFBDF;">3</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">SAMSUNG</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">SAMSUNG 25W POWER ADAPTER</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">PHONE ACCESSORIES</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">30</td>
                                     </tr>
-                                    <tr>
+                                    <tr style="height: 40px; min-height: 40px">
                                         <td class="text-secondary" style="background: #FFFBDF;">4</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">SAMSUNG</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">EF-DX211-GALAXY A+ KEYBOARD SLIM</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">PHONE ACCESSORIES</td>
                                         <td class="text-secondary" style="background: #FFFBDF;">10</td>
                                     </tr>
-                                    <tr style="height: 50px;">
+                                    <tr style="height: 40px; min-height: 40px">
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                     </tr>
-                                    <tr style="height: 50px;">
+                                    <tr style="height: 40px; min-height: 40px">
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                     </tr>
-                                    <tr style="height: 50px;">
+                                    <tr style="height: 40px; min-height: 40px">
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                     </tr>
-                                    <tr style="height: 50px;">
+                                    <tr style="height: 40px; min-height: 40px">
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
                                         <td class="text-secondary" style="background: #FFFBDF;"></td>
@@ -151,9 +151,9 @@
                                     <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto" disabled>Please transfer the following unit, ASAP.</textarea>
                                 </div>
                             </div>
-                            <div>
+                            <!-- <div>
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#openPicklistTable">Add to Picklist</button>
-                            </div>
+                            </div> -->
                         </div>
                     </form>
                 </div>

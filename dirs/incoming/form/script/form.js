@@ -23,10 +23,16 @@ function loadDashboard() {
 }
 
 function loadReturn() {
-  $.post("dirs/incoming/dashboard/incoming.php", {}, function (data) {
+  $.post("dirs/incoming/picklistitems/picklistitem.php", {}, function (data) {
     $("#main-content").html(data);
   });
 }
+
+// function loadReturnToPicklistItem() {
+//   $.post("dirs/incoming/picklistitems/picklistitem.php", {}, function (data) {
+//     $("#main-content").html(data);
+//   });
+// }
 
 window.addEventListener("DOMContentLoaded", function () {
   // Get today's date
@@ -85,12 +91,12 @@ function loadIncomingDetails(RowNum) {
           let quantity = parseFloat(item.Quantity) || 0;
           totalQty += quantity
           rows += `
-            <tr>
-              <td style="background:#FFFBDF">${index + 1}</td>
-              <td style="background:#FFFBDF">${item.Brand}</td>
-              <td style="background:#FFFBDF">${item.Model}</td>
-              <td style="background:#FFFBDF">${item.Category}</td>
-              <td style="background:#FFFBDF">${item.Quantity}</td>
+            <tr style="height: 40px; min-height: 40px">
+              <td class="align-middle" style="background:#FFFBDF; padding: 3px">${index + 1}</td>
+              <td class="align-middle" style="background:#FFFBDF; padding: 3px">${item.Brand}</td>
+              <td class="align-middle" style="background:#FFFBDF; padding: 3px">${item.Model}</td>
+              <td class="align-middle" style="background:#FFFBDF; padding: 3px">${item.Category}</td>
+              <td class="align-middle" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
             </tr>
           `;
         });
@@ -103,7 +109,7 @@ function loadIncomingDetails(RowNum) {
 
           for (let i = 0; i < emptyRowsNeeded; i++) {
             let emptyRow = `
-              <tr class="item-row empty-row" style="height: 50px; min-height: 50px;">
+              <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
@@ -143,28 +149,28 @@ function addToPicklist () {
 
         // API CALL TO CREATE PICKLIST
 
-        $.ajax({
-          url: "dirs/incoming/form/actions/create_picklist.php",
-          type: "POST",
-          data: {Picklist: Picklist},
-          dataType: "json",
-          success: function(response) {
-            if (response.isSuccess === "success") {
+        // $.ajax({
+        //   url: "dirs/incoming/form/actions/create_picklist.php",
+        //   type: "POST",
+        //   data: {Picklist: Picklist},
+        //   dataType: "json",
+        //   success: function(response) {
+        //     if (response.isSuccess === "success") {
               Swal.fire({
                 icon: "success",
                 title: "Items added to picklist",
                 confirmButtonText: "OKAY",
               })
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Something went wrong",
-                text: "Please contact the developer",
-                confirmButtonText: "OKAY"
-              })
-            }
-          }
-        })
+        //     } else {
+        //       Swal.fire({
+        //         icon: "error",
+        //         title: "Something went wrong",
+        //         text: "Please contact the developer",
+        //         confirmButtonText: "OKAY"
+        //       })
+        //     }
+        //   }
+        // })
       }
     })
   })

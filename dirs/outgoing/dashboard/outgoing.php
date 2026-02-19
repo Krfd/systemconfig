@@ -4,7 +4,7 @@
             <h3 class="fw-bold text-primary">Outgoing</h3>
         </div>
         <div class="d-flex gap-1">
-            <button class="btn btn-primary" type="button" onclick="test()">New</button>
+            <button class="btn btn-primary" type="button" onclick="newRequest()">New</button>
         </div>
     </div>
     <div id="dashboard_content"></div>

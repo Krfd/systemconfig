@@ -264,13 +264,13 @@ function loadItems() {
                     totalQty += quantity;
 
                     let row = `<tr class="item-row">
-                            <td style="background: #FFFBDF">${item.DisplayRowNumber}</td>
-                            <td class="item-brand" style="background: #FFFBDF">${item.ItemBrand}</td>
-                            <td class="item-model" style="background: #FFFBDF">${item.ItemName}</td>
-                            <td class="item-category" style="background: #FFFBDF">${item.ItemGroup}</td>
-                            <td class="item-code" hidden>${item.ItemCode}</td>
-                            <td class="item-quantity" style="background: #FFFBDF">${item.Quantity}</td>
-                            <td class="t-action" style="background: #FFFBDF">
+                            <td class="align-middle" style="background: #FFFBDF; padding: 3px">${item.DisplayRowNumber}</td>
+                            <td class="align-middle item-brand" style="background: #FFFBDF; padding: 3px">${item.ItemBrand}</td>
+                            <td class="align-middle item-model" style="background: #FFFBDF; padding: 3px">${item.ItemName}</td>
+                            <td class="align-middle item-category" style="background: #FFFBDF; padding: 3px">${item.ItemGroup}</td>
+                            <td class="align-middle item-code" hidden>${item.ItemCode}</td>
+                            <td class="align-middle item-quantity" style="background: #FFFBDF; padding: 3px">${item.Quantity}</td>
+                            <td class="align-middle t-action" style="background: #FFFBDF; padding: 3px">
                               <button type="button" class="btn btn-sm btn-danger remove-item-button" id="${item.ItemNum}">
                                 <i class="bi bi-dash"></i>
                               </button>
@@ -286,13 +286,13 @@ function loadItems() {
 
                 for (let i = 0; i < emptyRowsNeeded; i++) {
                     let emptyRow = `
-                        <tr class="item-row empty-row">
-                            <td style="background: #FFFBDF">&nbsp;</td>
-                            <td style="background: #FFFBDF"></td>
-                            <td style="background: #FFFBDF"></td>
-                            <td style="background: #FFFBDF"></td>
-                            <td style="background: #FFFBDF"></td>
-                            <td style="background: #FFFBDF"></td>
+                        <tr class="item-row empty-row" style="height: 40px; max-height: 40px">
+                            <td style="background: #FFFBDF; padding: 0">&nbsp;</td>
+                            <td style="background: #FFFBDF; padding: 0"></td>
+                            <td style="background: #FFFBDF; padding: 0"></td>
+                            <td style="background: #FFFBDF; padding: 0"></td>
+                            <td style="background: #FFFBDF; padding: 0"></td>
+                            <td style="background: #FFFBDF; padding: 0"></td>
                         </tr>
                     `;
                     tbody.append(emptyRow);
@@ -302,7 +302,7 @@ function loadItems() {
             } else {
                 // If no data, show empty yellow row again
                 tbody.html(`
-                    <tr style="height:50px; min-height:50px">
+                    <tr style="height:40px; min-height:40px">
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
@@ -310,7 +310,7 @@ function loadItems() {
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
                     </tr>
-                    <tr style="height:50px; min-height:50px">
+                    <tr style="height:40px; min-height:40px">
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
@@ -318,7 +318,7 @@ function loadItems() {
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
                     </tr>
-                    <tr style="height:50px; min-height:50px">
+                    <tr style="height:40px; min-height:40px">
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
@@ -326,7 +326,7 @@ function loadItems() {
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
                     </tr>
-                    <tr style="height:50px; min-height:50px">
+                    <tr style="height:40px; min-height:40px">
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
@@ -334,7 +334,7 @@ function loadItems() {
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
                     </tr>
-                    <tr style="height:50px; min-height:50px">
+                    <tr style="height:40px; min-height:40px">
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
@@ -342,7 +342,7 @@ function loadItems() {
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
                     </tr>
-                    <tr style="height:50px; min-height:50px">
+                    <tr style="height:40px; min-height:40px">
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
@@ -350,7 +350,7 @@ function loadItems() {
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
                     </tr>
-                    <tr style="height:50px; min-height:50px">
+                    <tr style="height:40px; min-height:40px">
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
@@ -358,7 +358,7 @@ function loadItems() {
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
                     </tr>
-                    <tr style="height:50px; min-height:50px">
+                    <tr style="height:40px; min-height:40px">
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
                         <td style="background:#FFFBDF"></td>
