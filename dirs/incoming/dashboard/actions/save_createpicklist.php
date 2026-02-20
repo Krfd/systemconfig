@@ -1,6 +1,7 @@
 <?php
 require_once "../../../../config/connection.php";
 session_start();
+header('Content-Type: application/json');
 
 // Get user ID and RowNumbers
 $Userid    = $_SESSION['Uid'];
@@ -52,12 +53,19 @@ try {
     $pklist_parent->execute([$PKNumber, $Userid]);
 
     $conn->commit();
-    echo "OK";
-
-} catch(PDOException $e) {
+    // echo "OK";
+    echo json_encode([
+        "status" => "success",
+        "message" => "Picklist created successfully.",
+        "pkNumber" => $PKNumber
+    ]);
+} catch (PDOException $e) {
     if ($conn->inTransaction()) {
         $conn->rollback();
     }
-    echo "<b>Warning. Please Contact System Developer.<br/></b>" . $e->getMessage();
+    echo json_encode([
+        "status" => "error",
+        "message" => $e->getMessage()
+    ]);
+    // echo "<b>Warning. Please Contact System Developer.<br/></b>" . $e->getMessage();
 }
-?>

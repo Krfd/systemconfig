@@ -5,58 +5,58 @@
                 <div class="row">
                     <form method="POST" id="openincoming">
                         <div class="d-flex justify-content-between align-items-start">
-                            <div class="d-flex flex-column gap-1 col-2">
-                                <div>
-                                    <label for="srn" class="form-label text-dark-emphasis"><small>SRN:</small></label>
-                                    <input type="text" name="srn" id="srn" value="SRNGALL0001" class="form-control form-control-sm" style="background: #FFFBDF" disabled required readonly>
+                            <div class="d-flex flex-column gap-1 col-4">
+                                <div class="d-flex align-items-baseline gap-3">
+                                    <label for="srn" class="form-label text-dark-emphasis col-3"><small>SRN:</small></label>
+                                    <input type="text" name="srn" id="srn" value="SRNGALL0001" class="form-control form-control-sm col" style="background: #FFFBDF" disabled required readonly>
                                 </div>
-                                <div>
-                                    <label for="typeOfReq" class="form-label text-dark-emphasis"><small>Type of Request:</small></label>
-                                    <select name="typeOfReq" id="typeOfReq" class="form-select form-select-sm" style="background: #FFFBDF" required disabled readonly>
+                                <div class="d-flex align-items-baseline gap-3">
+                                    <label for="typeOfReq" class="form-label text-dark-emphasis col-3"><small>Type of Request:</small></label>
+                                    <select name="typeOfReq" id="typeOfReq" class="form-select form-select-sm col" style="background: #FFFBDF" required disabled readonly>
                                         <option value="STS">STS</option>
                                     </select>
                                 </div>
-                                <div class="input-group col p-0">
-                                    <div class="col p-0">
-                                        <label for="destination" class="form-label text-dark-emphasis"><small>Destination:</small></label>
-                                        <select name="destination" id="destination" class="form-select form-select-sm" placeholder="Destination" style="background: #FFFBDF" required disabled readonly>
+                                <div class="input-group col p-0 d-flex gap-1">
+                                    <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
+                                        <label for="destination" class="form-label text-dark-emphasis col-5"><small>Destination:</small></label>
+                                        <select name="destination" id="destination" class="form-select form-select-sm col ms-3" placeholder="Destination" style="background: #FFFBDF" required disabled readonly>
                                             <option value="galleria">GALLERIA</option>
                                         </select>
                                     </div>
-                                    <div class="col p-0">
-                                        <label for="branchWhCode" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
-                                        <select name="branchWhCode" id="branchWhCode" class="form-select form-select-sm" placeholder="WHCode" style="background: #FFFBDF" required disabled readonly>
+                                    <div class="col p-0 d-flex align-items-baseline col">
+                                        <label for="branchWhCode" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
+                                        <select name="branchWhCode" id="branchWhCode" class="form-select form-select-sm col" placeholder="WHCode" style="background: #FFFBDF" required disabled readonly>
                                             <option value="gallwh">GALLWH</option>
                                         </select>
                                     </div>
                                 </div>
-                                <div class="input-group col p-0">
-                                    <div class="col p-0">
-                                        <label for="origin" class="form-label text-dark-emphasis"><small>Origin:</small></label>
-                                        <select name="origin" id="origin" class="form-select form-select-sm" style="background: #FFFBDF" required disabled readonly>
+                                <div class="input-group col p-0 d-flex align-items-baseline gap-1">
+                                    <div class="col p-0 d-flex align-baseline gap-1 col-7">
+                                        <label for="origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
+                                        <select name="origin" id="origin" class="form-select form-select-sm col ms-3" style="background: #FFFBDF" required disabled readonly>
                                             <option value="showroom">SHOWROOM</option>
                                         </select>
                                     </div>
-                                    <div class="col p-0">
-                                        <label for="whcode" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
-                                        <select name="whcode" id="whcode" class="form-select form-select-sm" placeholder="WHCode" style="background: #FFFBDF" required disabled readonly>
+                                    <div class="col p-0 d-flex align-items-baseline">
+                                        <label for="whcode" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
+                                        <select name="whcode" id="whcode" class="form-select form-select-sm col" placeholder="WHCode" style="background: #FFFBDF" required disabled readonly>
                                             <option value="showwh">SHOWWH</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
-                            <div class="d-flex flex-column gap-1">
-                                <div>
-                                    <label for="date" class="form-label text-dark-emphasis"><small>Date:</small></label>
-                                    <input type="text" name="date" id="date" class="form-control form-control-sm" style="background: #FFFBDF" value="01/30/2026" required disabled readonly>
+                            <div class="d-flex flex-column gap-1 col-2">
+                                <div class="d-flex align-items-baseline gap-3">
+                                    <label for="date" class="form-label text-dark-emphasis col-4"><small>Date:</small></label>
+                                    <input type="text" name="date" id="date" class="form-control form-control-sm col" style="background: #FFFBDF" value="01/30/2026" required disabled readonly>
                                 </div>
-                                <div>
-                                    <label for="status" class="form-label text-dark-emphasis"><small>Status:</small></label>
-                                    <input type="text" name="status" id="status" value="NEW" class="form-control form-control-sm" style="background: #FFFBDF" required disabled readonly>
+                                <div class="d-flex align-items-baseline gap-3">
+                                    <label for="status" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>
+                                    <input type="text" name="status" id="status" value="NEW" class="form-control form-control-sm col" style="background: #FFFBDF" required disabled readonly>
                                 </div>
                             </div>
                         </div>
-                        <div class="table-responsive overflow-auto" style="max-height: 450px">
+                        <div class="table-responsive overflow-auto mt-5" style="max-height: 450px">
                             <table class="table datatables table-hover" id="openIncomingTable">
                                 <thead class="sticky-top">
                                     <tr>

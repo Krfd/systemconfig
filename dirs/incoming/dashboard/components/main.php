@@ -13,7 +13,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr style="height: 50px; min-height: 50px">
+            <tr style="height: 40px; min-height: 40px">
                 <td></td>
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
@@ -23,7 +23,7 @@
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
             </tr>
-            <tr style="height: 50px; min-height:50px">
+            <tr style="height: 40px; min-height:40px">
                 <td></td>
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
@@ -33,7 +33,7 @@
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
             </tr>
-            <tr style="height: 50px; min-height:50px">
+            <tr style="height: 40px; min-height:40px">
                 <td></td>
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
@@ -43,7 +43,7 @@
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
             </tr>
-            <tr style="height: 50px; min-height:50px">
+            <tr style="height: 40px; min-height:40px">
                 <td></td>
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
@@ -53,7 +53,7 @@
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
             </tr>
-            <tr style="height: 50px; min-height:50px">
+            <tr style="height: 40px; min-height:40px">
                 <td></td>
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
@@ -63,7 +63,7 @@
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
             </tr>
-            <tr style="height: 50px; min-height:50px">
+            <tr style="height: 40px; min-height:40px">
                 <td></td>
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
@@ -73,7 +73,7 @@
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
             </tr>
-            <tr style="height: 50px; min-height:50px">
+            <tr style="height: 40px; min-height:40px">
                 <td></td>
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
@@ -83,7 +83,7 @@
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
             </tr>
-            <tr style="height: 50px; min-height:50px">
+            <tr style="height: 40px; min-height:40px">
                 <td></td>
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>

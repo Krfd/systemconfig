@@ -13,24 +13,21 @@ $(document).ready(function () {
   });
 });
 
-let outgoingTable = $('#outgoingTableDisplay').DataTable({
+let outgoingTable = $("#outgoingTableDisplay").DataTable({
   paging: true,
   searching: true,
   info: true,
-  destroy: true
+  destroy: true,
 });
-
 
 function loadDashboard() {
   $.post("dirs/outgoing/dashboard/components/main.php", {}, function (data) {
     $("#dashboard_content").html(data);
     loadOutgoing();
     $("#outgoingTableDisplay").DataTable({
-      "pageLength" : 50,
-      order : [
-        0, "desc"
-      ]
-    })
+      pageLength: 50,
+      order: [0, "desc"],
+    });
   });
 }
 
@@ -40,34 +37,14 @@ function newRequest() {
   });
 }
 
-// function searchData() {
-//   let typingTimer;
-//   let delay = 300;
-
-//   $("#searchInput").on("input", function() {
-
-//     clearTimeout(typingTimer);
-//     let searchValue = $(this).val();
-
-//     typingTimer = setTimeout(() => {
-//       loadOutgoing(searchValue)
-//     }, delay);
-//   })
-// }
-
 function loadOutgoing() {
   $.ajax({
     url: "dirs/outgoing/dashboard/actions/get_outgoing.php",
     type: "POST",
-    // data: {
-    //   Search: search, 
-    //   CurrentPage: 1,
-    //   PageSize: 10
-    // },
     dataType: "json",
     success: function (response) {
       if (response.isSuccess === "success") {
-        let rows = '';
+        let rows = "";
         let rowCount = response.Data.length;
 
         outgoingTable.clear();
@@ -87,17 +64,21 @@ function loadOutgoing() {
                 </button>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item open-item" href="#">Open</a></li>
-                  ${item.RequestStatus?.toUpperCase() === "NEW" 
-                  ? `<li><a class="dropdown-item cancel-outgoing" data-srn="${item.BaseNum_SRN}" href="#">Cancel</a></li>` 
-                  : ``}
-                  ${item.RequestStatus !== "NEW" 
-                  ? `<li><a class="dropdown-item" href="#">Terminate</a></li>` 
-                  : ``}
+                  ${
+                    item.RequestStatus?.toUpperCase() === "NEW"
+                      ? `<li><a class="dropdown-item cancel-outgoing" data-srn="${item.BaseNum_SRN}" href="#">Cancel</a></li>`
+                      : ``
+                  }
+                  ${
+                    item.RequestStatus !== "NEW"
+                      ? `<li><a class="dropdown-item" href="#">Terminate</a></li>`
+                      : ``
+                  }
                   <li><a class="dropdown-item" href="#">Print</a></li>
                 </ul>
               </td>
-            </tr>`
-        })
+            </tr>`;
+        });
         $("#outgoingTableDisplay tbody").html(rows);
 
         outgoingTable.clear();
@@ -117,19 +98,22 @@ function loadOutgoing() {
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item open-item" href="#">Open</a></li>
                 <li><a class="dropdown-item" href="#">Print</a></li>
-                ${item.RequestStatus?.toUpperCase() === "NEW"
-                  ? `<li><a class="dropdown-item cancel-outgoing" data-srn="${item.BaseNum_SRN}" href="#">Cancel</a></li>`
-                  : ``}
-                ${item.RequestStatus !== "NEW"
-                  ? `<li><a class="dropdown-item" href="#">Terminate</a></li>`
-                  : ``}
+                ${
+                  item.RequestStatus?.toUpperCase() === "NEW"
+                    ? `<li><a class="dropdown-item cancel-outgoing" data-srn="${item.BaseNum_SRN}" href="#">Cancel</a></li>`
+                    : ``
+                }
+                ${
+                  item.RequestStatus !== "NEW"
+                    ? `<li><a class="dropdown-item" href="#">Terminate</a></li>`
+                    : ``
+                }
               </ul>
-            </div>`
+            </div>`,
           ]);
         });
 
         outgoingTable.draw();
-
 
         if (rowCount < 8) {
           let emptyRowsNeeded = 8 - rowCount;
@@ -144,7 +128,7 @@ function loadOutgoing() {
                 <td style="background: #FFFBDF; padding: 0"></td>
                 <td style="background: #FFFBDF; padding: 0"></td>
                 <td style="background: #FFFBDF; padding: 0"></td>
-              </tr>`
+              </tr>`;
             $("#outgoingTableDisplay tbody").append(emptyRow);
           }
         }
@@ -153,9 +137,9 @@ function loadOutgoing() {
       }
     },
     error: function (xhr, status, error) {
-      console.error("Error loading outgoing data: ", error)
-    }
-  })
+      console.error("Error loading outgoing data: ", error);
+    },
+  });
 }
 
 $(document).on("dblclick", "#outgoingTableDisplay tbody tr", function (e) {
@@ -165,14 +149,10 @@ $(document).on("dblclick", "#outgoingTableDisplay tbody tr", function (e) {
 });
 
 $(document).on("click", ".open-item", function (e) {
-  e.preventDefault();        // prevent # jump
-  e.stopPropagation();       // stop row click behavior
+  e.preventDefault(); // prevent # jump
+  e.stopPropagation(); // stop row click behavior
 
-  let RowNum = $(this)
-    .closest("tr")
-    .find("td:first")
-    .text()
-    .trim();
+  let RowNum = $(this).closest("tr").find("td:first").text().trim();
 
   openOutgoingForm(RowNum);
 });
@@ -180,19 +160,18 @@ $(document).on("click", ".open-item", function (e) {
 function openOutgoingForm(rowNum) {
   $.post(
     "dirs/outgoing/requests/components/main.php",
-    { RowNum: rowNum },  // send RowNum to view
+    { RowNum: rowNum }, // send RowNum to view
     function (html) {
       $("#main-content").html(html);
-    }
+    },
   );
 }
 
-$(document).on("click", ".cancel-outgoing", function(e) {
-
-  e.preventDefault();       
+$(document).on("click", ".cancel-outgoing", function (e) {
+  e.preventDefault();
   e.stopPropagation();
 
-  let RowNumber = $(this).data("srn");   
+  let RowNumber = $(this).data("srn");
   let rowElement = $(this).closest("tr");
 
   cancelOutgoingForm(RowNumber, rowElement);
@@ -204,22 +183,21 @@ function cancelOutgoingForm(RowNumber, rowElement) {
       icon: "error",
       title: "Missing SRN",
       text: "Make sure that the SRN exists!",
-      confirmButtonText: "OKAY"
-    })
+      confirmButtonText: "OKAY",
+    });
     return;
   }
 
   Swal.fire({
-      icon: "question",
-      title: "Cancel this request?",
-      text: "This action cannot be change.",
-      confirmButtonText: "Yes, Cancel",
-      showCancelButton: true,
-      cancelButtonText: "Cancel"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // CANCEL THE SRN VIA API
-      }
-    })
+    icon: "question",
+    title: "Cancel this request?",
+    text: "This action cannot be change.",
+    confirmButtonText: "Yes, Cancel",
+    showCancelButton: true,
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // CANCEL THE SRN VIA API
+    }
+  });
 }
-
