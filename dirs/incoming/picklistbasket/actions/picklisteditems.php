@@ -8,7 +8,7 @@ $Userid       = $_SESSION['Uid'];
 try {
     $conn->beginTransaction();
 
-    $fetch_picklisted = $conn->prepare("EXEC dbo.[PKLISTED_REQUESTS], ?");
+    $fetch_picklisted = $conn->prepare("EXEC dbo.[PKLISTED_REQUESTS] ?");
     $fetch_picklisted->execute([$Userid]);
     $get_picklist = $fetch_picklisted->fetchAll(PDO::FETCH_ASSOC);
 

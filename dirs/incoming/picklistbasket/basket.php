@@ -8,14 +8,6 @@
                 <h3 class="fw-bold text-primary">PICKLIST BASKET</h3>
             </div>
         </div>
-        <!-- <div class="d-flex gap-1">
-            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#generatePicklistTable">
-                <i class="bi bi-plus"></i>
-            </button>
-            <button class="btn btn-primary" type="button">
-                <i class="bi bi-printer"></i>
-            </button>
-        </div> -->
     </div>
     <div id="basket_content"></div>
 </div>

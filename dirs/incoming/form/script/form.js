@@ -1,13 +1,13 @@
 $(document).ready(function () {
   loadDashboard();
   if (typeof CURRENT_ROWNUM !== "undefined" && CURRENT_ROWNUM !== "") {
-    loadIncomingDetails(CURRENT_ROWNUM)
+    loadIncomingDetails(CURRENT_ROWNUM);
   }
 });
 
 $(document).ready(function () {
   OverlayScrollbars(document.getElementById("dashboard-display"), {
-    className: "os-theme-dark", 
+    className: "os-theme-dark",
     scrollbars: {
       autoHide: "leave",
       clickScrolling: true,
@@ -23,7 +23,7 @@ function loadDashboard() {
 }
 
 function loadReturn() {
-  $.post("dirs/incoming/picklistitems/picklistitem.php", {}, function (data) {
+  $.post("dirs/incoming/dashboard/incoming.php", {}, function (data) {
     $("#main-content").html(data);
   });
 }
@@ -57,24 +57,24 @@ function loadIncomingDetails(RowNum) {
     data: { RowNum: RowNum },
     dataType: "json",
     success: function (response) {
-
       if (response.isSuccess === "success") {
-
         let rowCount = response.Items.length;
         let totalQty = 0;
 
         let header = response.Data;
-        let items  = response.Items;
+        let items = response.Items;
 
         function selectedValue(selector, value) {
-          $(selector).empty().append(`<option value="${value}">${value}</option>`)
+          $(selector)
+            .empty()
+            .append(`<option value="${value}">${value}</option>`);
         }
 
-        selectedValue("#typeOfReq", header.RequestType)
-        selectedValue("#destination", header.Destination)
-        selectedValue("#branchWhCode", header.DestinationWhs)
-        selectedValue("#origin", header.Origin)
-        selectedValue("#whcode", header.OriginWhs)
+        selectedValue("#typeOfReq", header.RequestType);
+        selectedValue("#destination", header.Destination);
+        selectedValue("#branchWhCode", header.DestinationWhs);
+        selectedValue("#origin", header.Origin);
+        selectedValue("#whcode", header.OriginWhs);
 
         // ================= HEADER =================
         $("#srn").val(header.BaseNum_SRN);
@@ -89,7 +89,7 @@ function loadIncomingDetails(RowNum) {
 
         items.forEach(function (item, index) {
           let quantity = parseFloat(item.Quantity) || 0;
-          totalQty += quantity
+          totalQty += quantity;
           rows += `
             <tr style="height: 40px; min-height: 40px">
               <td class="align-middle" style="background:#FFFBDF; padding: 3px">${index + 1}</td>
@@ -101,7 +101,7 @@ function loadIncomingDetails(RowNum) {
           `;
         });
 
-        $("#totalIncomingQty").text(totalQty)
+        $("#totalIncomingQty").text(totalQty);
         $("#openIncomingTable tbody").html(rows);
 
         if (rowCount < 8) {
@@ -116,25 +116,23 @@ function loadIncomingDetails(RowNum) {
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
               </tr>
-            `
+            `;
             $("#openIncomingTable tbody").append(emptyRow);
           }
           $("#totalQuantity").text(totalQty);
         }
-
       } else {
         alert(response.Data);
       }
     },
     error: function (xhr) {
       console.error(xhr.responseText);
-    }
-  })
+    },
+  });
 }
 
-function addToPicklist () {
-  $(document).on("click", ".picklist-num", function() {
-
+function addToPicklist() {
+  $(document).on("click", ".picklist-num", function () {
     const picklistNum = $(this).data("picklist-num");
 
     Swal.fire({
@@ -146,7 +144,6 @@ function addToPicklist () {
       cancelButtonText: "Not sure",
     }).then((result) => {
       if (result.isConfirmed) {
-
         // API CALL TO CREATE PICKLIST
 
         // $.ajax({
@@ -156,11 +153,11 @@ function addToPicklist () {
         //   dataType: "json",
         //   success: function(response) {
         //     if (response.isSuccess === "success") {
-              Swal.fire({
-                icon: "success",
-                title: "Items added to picklist",
-                confirmButtonText: "OKAY",
-              })
+        Swal.fire({
+          icon: "success",
+          title: "Items added to picklist",
+          confirmButtonText: "OKAY",
+        });
         //     } else {
         //       Swal.fire({
         //         icon: "error",
@@ -172,6 +169,6 @@ function addToPicklist () {
         //   }
         // })
       }
-    })
-  })
+    });
+  });
 }

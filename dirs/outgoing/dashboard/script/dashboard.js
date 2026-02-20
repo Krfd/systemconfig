@@ -1,6 +1,5 @@
 $(document).ready(function () {
   loadDashboard();
-  // searchData();
 });
 
 $(document).ready(function () {
@@ -11,13 +10,6 @@ $(document).ready(function () {
       clickScrolling: true,
     },
   });
-});
-
-let outgoingTable = $("#outgoingTableDisplay").DataTable({
-  paging: true,
-  searching: true,
-  info: true,
-  destroy: true,
 });
 
 function loadDashboard() {
@@ -37,104 +29,127 @@ function newRequest() {
   });
 }
 
+var outgoingTable;
+
+$.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
+  return this.api()
+    .column(col, { order: "index" })
+    .nodes()
+    .map(function (td) {
+      if ($(td).text().trim() === "") return Infinity; // push empty rows to bottom
+      return $(td).text();
+    });
+};
+
 function loadOutgoing() {
   $.ajax({
     url: "dirs/outgoing/dashboard/actions/get_outgoing.php",
     type: "POST",
     dataType: "json",
     success: function (response) {
-      if (response.isSuccess === "success") {
-        let rows = "";
-        let rowCount = response.Data.length;
+      let rows = [];
 
-        outgoingTable.clear();
+      if (response.isSuccess === "success" && Array.isArray(response.Data)) {
+        let sortedData = response.Data.sort(
+          (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
+        );
 
-        response.Data.forEach(function (item) {
-          rows += `
-            <tr style="height: 40px; min-height: 40px; cursor: pointer">
-              <td class="align-middle" style="background: #FFFBDF; padding: 3px" data-rownum="${item.RowNum}">${item.RowNum}</td>
-              <td class="align-middle" style="background: #FFFBDF; padding: 3px" data-rownum="${item.RowNum}">${item.BaseNum_SRN}</td>
-              <td class="align-middle" style="background: #FFFBDF; padding: 3px" data-rownum="${item.RowNum}">${item.Orgin_Dstnation}</td>
-              <td class="align-middle" style="background: #FFFBDF; padding: 3px" data-rownum="${item.RowNum}">${item.PrepBy}</td>
-              <td class="align-middle" style="background: #FFFBDF; padding: 3px" data-rownum="${item.RowNum}">${item.RequestStatus}</td>
-              <td class="align-middle" style="background: #FFFBDF; padding: 3px" data-rownum="${item.RowNum}">${item.DocDate}</td>
-              <td class="align-middle" style="background: #FFFBDF; padding: 3px" class="dropdown">
-                <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="bi bi-three-dots"></i>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item open-item" href="#">Open</a></li>
-                  ${
-                    item.RequestStatus?.toUpperCase() === "NEW"
-                      ? `<li><a class="dropdown-item cancel-outgoing" data-srn="${item.BaseNum_SRN}" href="#">Cancel</a></li>`
-                      : ``
-                  }
-                  ${
-                    item.RequestStatus !== "NEW"
-                      ? `<li><a class="dropdown-item" href="#">Terminate</a></li>`
-                      : ``
-                  }
-                  <li><a class="dropdown-item" href="#">Print</a></li>
-                </ul>
-              </td>
-            </tr>`;
-        });
-        $("#outgoingTableDisplay tbody").html(rows);
-
-        outgoingTable.clear();
-
-        response.Data.forEach(function (item) {
-          outgoingTable.row.add([
-            item.RowNum,
-            item.BaseNum_SRN,
-            item.Orgin_Dstnation,
-            item.PrepBy,
-            item.RequestStatus,
-            item.DocDate,
-            `<div class="dropdown">
-              <button class="btn" type="button" data-bs-toggle="dropdown">
-                <i class="bi bi-three-dots"></i>
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item open-item" href="#">Open</a></li>
-                <li><a class="dropdown-item" href="#">Print</a></li>
-                ${
-                  item.RequestStatus?.toUpperCase() === "NEW"
-                    ? `<li><a class="dropdown-item cancel-outgoing" data-srn="${item.BaseNum_SRN}" href="#">Cancel</a></li>`
-                    : ``
-                }
-                ${
-                  item.RequestStatus !== "NEW"
-                    ? `<li><a class="dropdown-item" href="#">Terminate</a></li>`
-                    : ``
-                }
-              </ul>
-            </div>`,
+        sortedData.forEach((item) => {
+          rows.push([
+            item.RowNum !== undefined ? item.RowNum.toString() : "",
+            item.BaseNum_SRN || "",
+            item.Brnch_Dstnation || "",
+            item.BrnchOrgn_Bcode || "",
+            item.RequestStatus || "",
+            item.DocDate || "N/A",
+            '<div class="dropdown">' +
+              '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
+              '<i class="bi bi-three-dots"></i></button>' +
+              '<ul class="dropdown-menu">' +
+              '<li><a class="dropdown-item open-item" href="#">Open</a></li>' +
+              (item.RequestStatus?.toUpperCase() === "NEW"
+                ? '<li><a class="dropdown-item cancel-outgoing" data-srn="' +
+                  item.BaseNum_SRN +
+                  '" href="#">Cancel</a></li>'
+                : "") +
+              (item.RequestStatus && item.RequestStatus.toUpperCase() !== "NEW"
+                ? '<li><a class="dropdown-item" href="#">Terminate</a></li>'
+                : "") +
+              '<li><a class="dropdown-item" href="#">Print</a></li>' +
+              "</ul></div>",
           ]);
         });
-
-        outgoingTable.draw();
-
-        if (rowCount < 8) {
-          let emptyRowsNeeded = 8 - rowCount;
-
-          for (let i = 0; i < emptyRowsNeeded; i++) {
-            let emptyRow = `
-              <tr class="item-row empty-row" style="height: 40px; min-height: 40px">
-                <td style="background: #FFFBDF; padding: 0"></td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-              </tr>`;
-            $("#outgoingTableDisplay tbody").append(emptyRow);
-          }
-        }
-      } else {
-        console.error(response.Data);
       }
+
+      $("#outgoingTableDisplay").DataTable().clear().destroy();
+
+      $("#outgoingTableDisplay").DataTable({
+        data: rows,
+        columns: [
+          { title: "#", className: "text-center" },
+          { title: "SRN" },
+          { title: "Stock Origin" },
+          { title: "Requested by" },
+          { title: "Status" },
+          { title: "Date", className: "text-start" },
+          { title: "Actions", orderable: false },
+        ],
+        paging: true,
+        searching: true,
+        info: true,
+        processing: false,
+        autoWidth: false,
+        order: [[0, "desc"]],
+        rowCallback: function (row, data) {
+          $("td", row).css({
+            background: "#FFFBDF",
+            padding: "3px",
+            height: "40px",
+            "min-height": "40px",
+            cursor: "pointer",
+          });
+          $("td:eq(0)", row).css("text-align", "center");
+          $("td:eq(1)", row).addClass("text-primary");
+          $("td:eq(5)", row).css("text-align", "start");
+
+          // Add hover effect to empty rows too
+          $(row).hover(
+            function () {
+              $(this).css("background", "#FFF4C2");
+            },
+            function () {
+              $(this).css("background", "#FFFBDF");
+            },
+          );
+        },
+        drawCallback: function () {
+          let tableBody = $("#outgoingTableDisplay tbody");
+          let currentRows = tableBody.find("tr").length;
+
+          for (let i = currentRows; i < 8; i++) {
+            let $emptyRow = $(`
+              <tr class="empty-row" style="background: #FFFBDF">
+                <td colspan="7" style="background: #FFFBDF">&nbsp;</td>
+              </tr>
+            `);
+            $emptyRow.css({
+              background: "#FFFBDF",
+              height: "40px",
+              "min-height": "40px",
+              cursor: "pointer",
+            });
+            $emptyRow.hover(
+              function () {
+                $(this).css("background", "#FFF4C2");
+              },
+              function () {
+                $(this).css("background", "#FFFBDF");
+              },
+            );
+            tableBody.append($emptyRow);
+          }
+        },
+      });
     },
     error: function (xhr, status, error) {
       console.error("Error loading outgoing data: ", error);
@@ -165,6 +180,15 @@ function openOutgoingForm(rowNum) {
       $("#main-content").html(html);
     },
   );
+
+  // $.post("dirs/outgoing/requests/components/main.php", function (html) {
+  //   $("#main-content").html(html);
+
+  //   // After loading the view, initialize it with rowNum
+  //   if (typeof initOutgoingRequest === "function") {
+  //     initOutgoingRequest(rowNum);
+  //   }
+  // });
 }
 
 $(document).on("click", ".cancel-outgoing", function (e) {

@@ -1,7 +1,14 @@
 $(document).ready(function () {
-   if (typeof CURRENT_ROWNUM !== "undefined" && CURRENT_ROWNUM !== "") {
+  // loadDashboard();
+  if (typeof CURRENT_ROWNUM !== "undefined" && CURRENT_ROWNUM !== "") {
     loadOutgoingDetails(CURRENT_ROWNUM);
   }
+  // function initOutgoingRequest(rowNum) {
+  //   if (!rowNum) return;
+
+  //   loadOutgoingDetails(rowNum);
+  //   console.log(`ROWNUM: ${rowNum}`);
+  // }
 });
 
 $(document).ready(function () {
@@ -13,6 +20,12 @@ $(document).ready(function () {
     },
   });
 });
+
+// function loadDashboard() {
+//   $.post("dirs/outgoing/requests/request.php", {}, function (data) {
+//     $("#request_content").html(data);
+//   });
+// }
 
 function returnOutgoing() {
   $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
@@ -28,26 +41,24 @@ function loadOutgoingDetails(RowNum) {
     data: { RowNum: RowNum },
     dataType: "json",
     success: function (response) {
-
       if (response.isSuccess === "success") {
-
         let rowCount = response.Items.length;
         let totalQty = 0;
 
-        // console.log(`ROW COUNT: ${rowCount}`)
-
         let header = response.Data;
-        let items  = response.Items;
+        let items = response.Items;
 
         function selectedValue(selector, value) {
-          $(selector).empty().append(`<option value="${value}">${value}</option>`)
+          $(selector)
+            .empty()
+            .append(`<option value="${value}">${value}</option>`);
         }
 
-        selectedValue("#typeOfReq", header.RequestType)
-        selectedValue("#destination", header.Destination)
-        selectedValue("#branchWhCode", header.DestinationWhs)
-        selectedValue("#origin", header.Origin)
-        selectedValue("#whcode", header.OriginWhs)
+        selectedValue("#typeOfReq", header.RequestType);
+        selectedValue("#destination", header.Destination);
+        selectedValue("#branchWhCode", header.DestinationWhs);
+        selectedValue("#origin", header.Origin);
+        selectedValue("#whcode", header.OriginWhs);
 
         // ================= HEADER =================
         $("#srn").val(header.BaseNum_SRN);
@@ -62,7 +73,7 @@ function loadOutgoingDetails(RowNum) {
 
         items.forEach(function (item, index) {
           let quantity = parseFloat(item.Quantity) || 0;
-          totalQty += quantity
+          totalQty += quantity;
           rows += `
             <tr>
               <td style="background:#FFFBDF">${index + 1}</td>
@@ -74,8 +85,8 @@ function loadOutgoingDetails(RowNum) {
           `;
         });
 
-        console.log(`TOTAL QUANTITY: ${totalQty}`)
-        $("#totalReqQuantity").text(totalQty)
+        // console.log(`TOTAL QUANTITY: ${totalQty}`);
+        $("#totalReqQuantity").text(totalQty);
         $("#openIncomingTable tbody").html(rows);
 
         if (rowCount < 8) {
@@ -90,18 +101,52 @@ function loadOutgoingDetails(RowNum) {
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
               </tr>
-            `
+            `;
             $("#openIncomingTable tbody").append(emptyRow);
           }
           $("#totalQuantity").text(totalQty);
         }
-
       } else {
         alert(response.Data);
       }
+
+      // populateForm(response);
     },
     error: function (xhr) {
       console.error(xhr.responseText);
-    }
+    },
   });
 }
+
+// function populateForm(data) {
+//   console.log(data);
+//   console.log(`BASE NUM: ${data.BaseNum_SRN}`);
+//   $("#srn").val(data.BaseNum_SRN);
+//   $("#date").val(data.DocDate);
+//   $("#status").val(data.RequestStatus);
+//   $("#purpose").val(data.RequestPurpose);
+//   $("#reqBy").val(data.PrepBy);
+//   $("#remarks").val(data.Remarks);
+
+//   // populate table
+//   let tbody = $("#openIncomingTable tbody");
+//   tbody.empty();
+
+//   let totalQty = 0;
+
+//   data.items.forEach((item, index) => {
+//     totalQty += parseInt(item.quantity);
+
+//     tbody.append(`
+//       <tr>
+//         <td>${index + 1}</td>
+//         <td>${item.Brand}</td>
+//         <td>${item.Model}</td>
+//         <td>${item.Category}</td>
+//         <td>${item.Quantity}</td>
+//       </tr>
+//     `);
+//   });
+
+//   $("#totalReqQuantity").text(totalQty);
+// }

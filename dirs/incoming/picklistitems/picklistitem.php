@@ -1,7 +1,11 @@
+<?php
+$RowNum = $_POST['RowNum'] ?? '';
+$PicklistNum = $_POST['PicklistNum'] ?? '';
+?>
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-start">
         <div class="d-flex justify-content-start align-items-baseline gap-3">
-            <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadBasket()">
+            <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadBasketContent()">
                 <i class="bi bi-arrow-left"></i>
             </button>
             <div>
@@ -16,4 +20,7 @@
     </div>
     <div id="item_content"></div>
 </div>
+<script>
+    const CURRENT_ROWNUM = "<?php echo $RowNum ?? ''; ?>"
+</script>
 <script src="dirs/incoming/picklistitems/script/picklistitems.js"></script>

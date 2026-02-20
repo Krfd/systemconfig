@@ -53,7 +53,6 @@ try {
     $pklist_parent->execute([$PKNumber, $Userid]);
 
     $conn->commit();
-    // echo "OK";
     echo json_encode([
         "status" => "success",
         "message" => "Picklist created successfully.",
