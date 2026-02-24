@@ -180,15 +180,6 @@ function openOutgoingForm(rowNum) {
       $("#main-content").html(html);
     },
   );
-
-  // $.post("dirs/outgoing/requests/components/main.php", function (html) {
-  //   $("#main-content").html(html);
-
-  //   // After loading the view, initialize it with rowNum
-  //   if (typeof initOutgoingRequest === "function") {
-  //     initOutgoingRequest(rowNum);
-  //   }
-  // });
 }
 
 $(document).on("click", ".cancel-outgoing", function (e) {
@@ -222,6 +213,43 @@ function cancelOutgoingForm(RowNumber, rowElement) {
   }).then((result) => {
     if (result.isConfirmed) {
       // CANCEL THE SRN VIA API
+    }
+  });
+}
+
+// TRUNCATE TABLES
+function clearTables() {
+  Swal.fire({
+    icon: "question",
+    title: "Truncate tables?",
+    showConfirmButton: true,
+    confirmButtonText: "Yes, Clear",
+    showCancelButton: true,
+    cancelButtonText: "Back",
+  }).then((result) => {
+    if (response.isConfirmed) {
+      console.log("Tables has been reset");
+
+      $.post(
+        "dirs/outgoing/dashboard/actions/update_truncatetable.php",
+        {},
+        function (data) {
+          let res;
+          try {
+            res = JSON.parse(data);
+            if (res.isSuccess === "success") {
+              Swal.fire({
+                icon: "success",
+                title: "Tables has been reset",
+              }).then(() => {
+                location.reload();
+              });
+            }
+          } catch (e) {
+            console.error("Error parsing response: ", e);
+          }
+        },
+      );
     }
   });
 }
