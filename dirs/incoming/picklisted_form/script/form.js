@@ -5,21 +5,14 @@ $(document).ready(function () {
   }
 });
 
-$(document).ready(function () {
-  OverlayScrollbars(document.getElementById("dashboard-display"), {
-    className: "os-theme-dark",
-    scrollbars: {
-      autoHide: "leave",
-      clickScrolling: true,
-    },
-  });
-});
-
 function loadDashboard() {
-  $.post("dirs/incoming/form/components/main.php", {}, function (data) {
-    $("#form-content").html(data);
-  });
-  addToPicklist();
+  $.post(
+    "dirs/incoming/picklisted_form/components/main.php",
+    {},
+    function (data) {
+      $("#incoming-form-content").html(data);
+    },
+  );
 }
 
 function loadReturn() {
@@ -96,7 +89,7 @@ function loadIncomingDetails(RowNum) {
         });
 
         $("#totalIncomingQty").text(totalQty);
-        $("#openIncomingTable tbody").html(rows);
+        $("#incoming-table-content tbody").html(rows);
 
         if (rowCount < 8) {
           let emptyRowsNeeded = 8 - rowCount;
@@ -111,7 +104,7 @@ function loadIncomingDetails(RowNum) {
                 <td style="background: #FFFBDF"></td>
               </tr>
             `;
-            $("#openIncomingTable tbody").append(emptyRow);
+            $("#incoming-table-content tbody").append(emptyRow);
           }
           $("#totalQuantity").text(totalQty);
         }
@@ -122,47 +115,5 @@ function loadIncomingDetails(RowNum) {
     error: function (xhr) {
       console.error(xhr.responseText);
     },
-  });
-}
-
-function addToPicklist() {
-  $(document).on("click", ".picklist-num", function () {
-    const picklistNum = $(this).data("picklist-num");
-
-    Swal.fire({
-      icon: "question",
-      title: `Save this item to picklist ${picklistNum}?`,
-      text: "This action cannot be change.",
-      confirmButtonText: "Yes, save it",
-      showCancelButton: true,
-      cancelButtonText: "Not sure",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // API CALL TO CREATE PICKLIST
-
-        // $.ajax({
-        //   url: "dirs/incoming/form/actions/create_picklist.php",
-        //   type: "POST",
-        //   data: {Picklist: Picklist},
-        //   dataType: "json",
-        //   success: function(response) {
-        //     if (response.isSuccess === "success") {
-        Swal.fire({
-          icon: "success",
-          title: "Items added to picklist",
-          confirmButtonText: "OKAY",
-        });
-        //     } else {
-        //       Swal.fire({
-        //         icon: "error",
-        //         title: "Something went wrong",
-        //         text: "Please contact the developer",
-        //         confirmButtonText: "OKAY"
-        //       })
-        //     }
-        //   }
-        // })
-      }
-    });
   });
 }

@@ -1,6 +1,6 @@
 <?php
-$RowNum = $_POST['RowNum'] ?? '';
-$PicklistNum = $_POST['PicklistNum'] ?? '';
+$RowNum = $_POST['rownum'] ?? '';
+$PicklistNum = $_POST['picklistNum'] ?? '';
 ?>
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-start">
@@ -22,5 +22,6 @@ $PicklistNum = $_POST['PicklistNum'] ?? '';
 </div>
 <script>
     const CURRENT_ROWNUM = "<?php echo $RowNum ?? ''; ?>"
+    const PICKLIST_NUM = "<?php echo $PicklistNum ?? ""; ?>"
 </script>
 <script src="dirs/incoming/picklistitems/script/picklistitems.js"></script>

@@ -27,22 +27,19 @@ function loadReturn() {
   });
 }
 
-// function addToPicklist() {
-$(document).on("click", ".picklist-num", function () {
-  const picklistNumber = $(this).data("picklist-num");
-  console.log(`PICKLIST NUMBER: ${picklistNumber}`);
+// $(document).on("click", ".picklist-num", function (e) {
+//   e.preventDefault();
+//   openPicklist();
+// });
 
-  openPicklist();
-});
-
-let basketTable;
+var basketTable;
 
 $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
   return this.api()
     .column(col, { order: "index" })
     .nodes()
     .map(function (td) {
-      if ($(td).text().trim() === "") return Infinity; // push empty rows to bottom
+      if ($(td).text().trim() === "") return Infinity;
       return $(td).text();
     });
 };
@@ -61,14 +58,19 @@ function loadBasket() {
 
         sortedData.forEach((item) => {
           rows.push([
-            `<td data-picklist-num="${item.PickLst_Num}">${item.PickLst_Num}</td>`,
+            // `<td class="open-picklist" data-picklist-num="${item.PickLst_Num}" data-rownum="${item.RowNumOrder}">${item.PickLst_Num}</td>`,
+            `<td><span class="open-picklist"
+                  data-picklist-num="${item.PickLst_Num}"
+                  data-rownum="${item.RowNumOrder}">
+              ${item.PickLst_Num}
+            </span></td>`,
             item.DocDate || "",
             item.PickedQty || "",
             '<div class="dropdown">' +
               '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
               '<i class="bi bi-three-dots"></i></button>' +
               `<ul class="dropdown-menu">
-                    <li><a class="dropdown-item picklist-num" href="#" data-picklist-num="${item.PickLst_Num}">Open</a></li>
+                    <li><a class="dropdown-item open-picklist" href="#" data-rownum="${item.RowNumOrder}" data-picklist-num="${item.PickLst_Num}">Open</a></li>
                     <li><a class="dropdown-item cancel-picklist" href="#" data-picklist="${item.PickLst_Num}">Cancel</a></li>
                     <li><a class="dropdown-item print-item" href="#">Print</a></li>
               </ul>` +
@@ -76,8 +78,10 @@ function loadBasket() {
           ]);
         });
 
-        $("#basketTable").DataTable().clear().destroy();
-
+        // $("#basketTable").DataTable().clear().destroy();
+        if ($.fn.DataTable.isDataTable("#basketTable")) {
+          $("#basketTable").DataTable().clear().destroy();
+        }
         $("#basketTable").DataTable({
           data: rows,
           columns: [
@@ -151,10 +155,23 @@ function loadBasket() {
   });
 }
 
-function openPicklist() {
-  $.post("dirs/incoming/picklistitems/picklistItem.php", {}, function (data) {
-    $("#main-content").html(data);
-  });
+$(document).on("click", ".open-picklist", function (e) {
+  e.preventDefault();
+
+  let picklistNum = $(this).attr("data-picklist-num");
+  let rownum = $(this).attr("data-rownum");
+
+  openPicklist(picklistNum, rownum);
+});
+
+function openPicklist(picklistNum, rownum) {
+  $.post(
+    "dirs/incoming/picklistitems/picklistItem.php",
+    { picklistNum, rownum },
+    function (data) {
+      $("#main-content").html(data);
+    },
+  );
 }
 
 function cancelPicklist() {
