@@ -9,7 +9,7 @@ $PicklistNum = $_POST['picklistNum'] ?? '';
                 <i class="bi bi-arrow-left"></i>
             </button>
             <div>
-                <h3 class="fw-bold text-primary">PL10003</h3>
+                <h3 class="fw-bold text-primary" id="picklistNumDisplay"></h3>
             </div>
         </div>
         <div class="d-flex gap-1">

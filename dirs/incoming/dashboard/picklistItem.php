@@ -1,7 +1,3 @@
-<?php
-// $RowNum = $_POST['rownum'] ?? '';
-// $PicklistNum = $_POST['picklistNum'] ?? '';
-?>
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-start">
         <div class="d-flex justify-content-start align-items-baseline gap-3">
@@ -9,7 +5,7 @@
                 <i class="bi bi-arrow-left"></i>
             </button>
             <div>
-                <h3 class="fw-bold text-primary">PL10003</h3>
+                <h3 class="fw-bold text-primary" id="picklistNumDisplay"></h3>
             </div>
         </div>
         <div class="d-flex gap-1">
@@ -30,7 +26,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr style="height: 40px; min-height: 40px">
+                <!-- <tr style="height: 40px; min-height: 40px">
                     <td class="text-primary ps-2 align-middle" onclick="" style="cursor: pointer; background: #FFFBDF; padding: 3px">SRN10001</td>
                     <td class="text-secondary ps-2 align-middle" style="background: #FFFBDF; padding: 3px">01/29/2026</td>
                     <td class="text-secondary ps-2 align-middle" style="background: #FFFBDF; padding: 3px">PLAZA</td>
@@ -44,7 +40,7 @@
                             <li><a href="#" class="dropdown-item">Print</a></li>
                         </ul>
                     </td>
-                </tr>
+                </tr> -->
                 <tr style="height: 40px; min-height: 40px">
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
@@ -70,8 +66,3 @@
         </table>
     </div>
 </div>
-<script>
-    // const CURRENT_ROWNUM = "<?php echo $RowNum ?? ''; ?>"
-    // const PICKLIST_NUM = "<?php echo $PicklistNum ?? ""; ?>"
-</script>
-<!-- <script src="dirs/incoming/picklistitems/script/picklistitems.js"></script> -->

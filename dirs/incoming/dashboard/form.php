@@ -1,6 +1,15 @@
+<div id="pageLoader"
+    class="position-fixed top-0 start-0 w-100 vh-100 d-none 
+            justify-content-center align-items-center bg-white"
+    style="z-index: 1055;">
+    <div class="text-center">
+        <div class="spinner-border text-primary" role="status"></div>
+        <div class="mt-2">Loading...</div>
+    </div>
+</div>
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-start align-items-baseline gap-3">
-        <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadReturn()">
+        <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadIncomingDashboard()">
             <i class="bi bi-arrow-left"></i>
         </button>
         <div class="d-flex justify-content-start align-items-start gap-3">
