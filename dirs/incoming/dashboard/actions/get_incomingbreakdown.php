@@ -2,7 +2,7 @@
 require_once "../../../../config/connection.php";
 session_start();
 $Userid = $_SESSION['Uid'];
-$PKNumber = $_POST['PKNumber'];
+$PKNumber = $_POST['picklistNum'];
 
 try {
     $conn->beginTransaction();

@@ -82,7 +82,7 @@ try {
                     <img src="assets/image/logo/logo.png" alt="iServe Admin" id="profile-image" style="width: 100px; height: 100px; object-fit: cover;">
                     <br>
                 </a>
-                <small>Karlalooo</small>
+                <small>User</small>
                 <br>
                 <span class="badge text-sm bg-primary" id="system-type">Warehouseman</span>
             </p>
@@ -182,8 +182,6 @@ try {
     </footer>
     </div>
 
-
-
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/plugins/sweetalert2/sweetalert2.min.js"></script>
     <script src="assets/plugins/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -212,6 +210,7 @@ try {
                     [0, "desc"]
                 ]
             });
+            let picklistNumber = null;
         })
     </script>
 </body>

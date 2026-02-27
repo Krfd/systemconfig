@@ -81,7 +81,16 @@ function loadOutgoing() {
         });
       }
 
-      $("#outgoingTableDisplay").DataTable().clear().destroy();
+      if (rows.length === 0) {
+        for (let i = 0; i < 8; i++) {
+          rows.push(["", "", "", "", "", "", ""]);
+        }
+      }
+
+      if ($.fn.DataTable.isDataTable("#outgoingTableDisplay")) {
+        $("#outgoingTableDisplay").DataTable().clear().destroy();
+        $("#outgoingTableDisplay tbody").empty();
+      }
 
       $("#outgoingTableDisplay").DataTable({
         data: rows,
@@ -100,6 +109,9 @@ function loadOutgoing() {
         processing: false,
         autoWidth: false,
         order: [[0, "desc"]],
+        language: {
+          emptyTable: "", // 🔥 removes "No data available in table"
+        },
         rowCallback: function (row, data) {
           $("td", row).css({
             background: "#FFFBDF",

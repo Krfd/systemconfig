@@ -12,11 +12,18 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
+  if ($.fn.DataTable.isDataTable("#incomingTableDisplay")) {
+    $("#incomingTableDisplay").DataTable().clear().destroy();
+  }
   $.post("dirs/incoming/dashboard/components/main.php", {}, function (data) {
     $("#incoming_content").html(data);
+    loadIncoming();
+    // $("#incomingTableDisplay").DataTable({
+    //   pageLength: 50,
+    //   order: [0, "desc"],
+    // });
   });
   cancelPicklist();
-  loadIncoming();
 }
 
 var incomingTable;
@@ -62,6 +69,12 @@ function loadIncoming() {
           ]);
         });
 
+        if (rows.length === 0) {
+          for (let i = 0; i < 8; i++) {
+            rows.push(["", "", "", "", "", "", "", ""]);
+          }
+        }
+
         if ($.fn.DataTable.isDataTable("#incomingTableDisplay")) {
           $("#incomingTableDisplay").DataTable().clear().destroy();
         }
@@ -78,13 +91,15 @@ function loadIncoming() {
             { title: "Date" },
             { title: "Picklist No." },
           ],
-
+          pageLength: 50,
           paging: true,
           searching: true,
           info: true,
           autoWidth: false,
           order: [[1, "desc"]],
-
+          language: {
+            emptyTable: "", // 🔥 removes "No data available in table"
+          },
           rowCallback: function (row, data) {
             $("td:not(:first-child)", row).css({
               background: "#FFFBDF",
@@ -262,8 +277,302 @@ $(document).on("dblclick", "#incomingTableDisplay tbody tr", function (e) {
 
 function openIncoming(RowNum) {
   $("#pageLoader").removeClass("d-none");
+  $.post("dirs/incoming/dashboard/form.php", function (data) {
+    $("#main-content").html(data);
+
+    $.ajax({
+      url: "dirs/incoming/dashboard/actions/get_openincoming.php",
+      type: "POST",
+      data: { RowNum: RowNum },
+      dataType: "json",
+      success: function (response) {
+        if (response.isSuccess === "success") {
+          let rowCount = response.Items.length;
+          let totalQty = 0;
+
+          let header = response.Data;
+          let items = response.Items;
+
+          function selectedValue(selector, value) {
+            $(selector)
+              .empty()
+              .append(`<option value="${value}">${value}</option>`);
+          }
+
+          selectedValue("#typeOfReq", header.RequestType);
+          selectedValue("#destination", header.Destination);
+          selectedValue("#branchWhCode", header.DestinationWhs);
+          selectedValue("#origin", header.Origin);
+          selectedValue("#whcode", header.OriginWhs);
+
+          // ================= HEADER =================
+          $("#srn").val(header.BaseNum_SRN);
+          $("#date").val(header.DocDate);
+          $("#status").val(header.RequestStatus);
+          $("#purpose").val(header.RequestPurpose);
+          $("#reqBy").val(header.PrepBy);
+          $("#remarks").val(header.Remarks);
+
+          // ================= ITEMS =================
+          let rows = "";
+
+          items.forEach(function (item, index) {
+            let quantity = parseFloat(item.Quantity) || 0;
+            totalQty += quantity;
+            rows += `
+                <tr style="height: 40px; min-height: 40px">
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${index + 1}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Brand}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Model}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Category}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
+                </tr>
+              `;
+          });
+
+          $("#totalIncomingQty").text(totalQty);
+          $("#openIncomingTable tbody").html(rows);
+
+          if (rowCount < 8) {
+            let emptyRowsNeeded = 8 - rowCount;
+
+            for (let i = 0; i < emptyRowsNeeded; i++) {
+              let emptyRow = `
+                  <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                  </tr>
+                `;
+              $("#openIncomingTable tbody").append(emptyRow);
+            }
+            $("#totalIncomingQty").text(totalQty);
+          }
+        } else {
+          alert(response.Data);
+        }
+        $("#pageLoader").addClass("d-none");
+      },
+      error: function (xhr) {
+        console.error(xhr.responseText);
+        $("#pageLoader").addClass("d-none");
+      },
+    });
+  }).fail(function () {
+    $("#pageLoader").addClass("d-none");
+  });
+}
+
+var basketTable;
+
+// PICK LIST BASKET
+function picklistBasket() {
+  $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
+    $("#main-content").html(data);
+    loadBasket();
+  });
+}
+
+function loadIncomingDashboard() {
+  $.post("dirs/incoming/dashboard/incoming.php", {}, function (data) {
+    $("#main-content").html(data);
+  });
+}
+
+$(document).on("click", ".open-picklist", function (e) {
+  e.preventDefault();
+  let $row = $(this).closest("tr");
+  let picklistNum = $row.attr("data-picklist-num");
+  picklistNumber = picklistNum;
+  openPicklist(picklistNum);
+});
+
+$(document).on("click", ".open-picklisted", function (e) {
+  e.preventDefault();
+
+  let picklistedRow = $(this).closest("tr");
+  let RowNum = picklistedRow.attr("data-rownum");
+
+  openPicklistedForm(RowNum);
+});
+
+// OPEN PICKLIST
+function openPicklist(picklistNum) {
   $.post(
-    "dirs/incoming/dashboard/form.php",
+    "dirs/incoming/dashboard/picklistItem.php",
+    { picklistNum: picklistNum },
+    function (data) {
+      $("#main-content").html(data);
+
+      $.ajax({
+        url: "dirs/incoming/dashboard/actions/get_incomingbreakdown.php",
+        type: "POST",
+        dataType: "json",
+        data: { picklistNum: picklistNum },
+        success: function (response) {
+          $("#picklistNumDisplay").text(picklistNum);
+          let rows = [];
+          if (response.isSuccess === "success") {
+            let sortedData = response.Data.sort(
+              (a, b) => Number(b.BaseNum_SRN || 0) - Number(a.RowNum || 0),
+            );
+
+            sortedData.forEach((item) => {
+              rows.push([
+                item.BaseNum_SRN || "",
+                item.DocDate || "",
+                item.PrepBranch || "",
+                // item.PickedQty || "",
+                '<div class="dropdown dropstart">' +
+                  '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
+                  '<i class="bi bi-three-dots"></i></button>' +
+                  `<ul class="dropdown-menu">
+                    <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
+                    <li><a class="dropdown-item" href="#">Print</a></li>
+                  </ul>
+                </div>`,
+              ]);
+            });
+
+            $("#picklistItemTable").DataTable().clear().destroy();
+            $("#picklistItemTable").DataTable({
+              data: rows,
+              columns: [
+                { title: "SRN", className: "text-center open-picklisted" },
+                { title: "Date", className: "text-center ps-5" },
+                { title: "Requesting Branch", className: "text-start ps-5" },
+                // { title: "Quantity" },
+                { title: "", orderable: false },
+              ],
+              createdRow: function (row, data, dataIndex) {
+                let originalItem = sortedData[dataIndex];
+
+                $(row)
+                  .attr("data-srn", originalItem.BaseNum_SRN)
+                  .attr("data-rownum", originalItem.RowNum)
+                  .addClass("picklist-row");
+              },
+              paging: true,
+              searching: true,
+              info: true,
+              processing: false,
+              autoWidth: false,
+              order: [[0, "desc"]],
+              rowCallback: function (row, data) {
+                $("td", row).css({
+                  background: "#FFFBDF",
+                  padding: "3px",
+                  height: "40px",
+                  "min-height": "40px",
+                  cursor: "pointer",
+                });
+                $("td:eq(0)", row).addClass("text-primary");
+                $("td:eq(2)", row).css("text-align", "start");
+
+                $(row).hover(
+                  function () {
+                    $(this).css("background", "#FFF4C2");
+                  },
+                  function () {
+                    $(this).css("background", "#FFFBDF");
+                  },
+                );
+              },
+              drawCallback: function () {
+                let tableBody = $("#picklistItemTable tbody");
+                let currentRows = tableBody.find("tr").length;
+
+                for (let i = currentRows; i < 8; i++) {
+                  let $emptyRow = $(`
+                  <tr class="empty-row" style="background: #FFFBDF">
+                    <td colspan="4" style="background: #FFFBDF">&nbsp;</td>
+                  </tr>
+                `);
+                  $emptyRow.css({
+                    background: "#FFFBDF",
+                    height: "40px",
+                    "min-height": "40px",
+                    cursor: "pointer",
+                  });
+                  $emptyRow.hover(
+                    function () {
+                      $(this).css("background", "#FFF4C2");
+                    },
+                    function () {
+                      $(this).css("background", "#FFFBDF");
+                    },
+                  );
+                  tableBody.append($emptyRow);
+                }
+              },
+            });
+          } else {
+            console.error(response.Data);
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error("Error loading outgoing data: ", error);
+        },
+      });
+    },
+  );
+}
+
+// DISPLAY PICKLIST
+function loadPicklistItems() {
+  $.post(
+    "dirs/incoming/dashboard/picklistItem.php",
+    { picklistNum: picklistNumber },
+    function (data) {
+      openPicklist(picklistNumber);
+    },
+  );
+}
+
+// CANCEL PICKLIST
+function cancelPicklist() {
+  $(document).on("click", ".cancel-picklist", function () {
+    const picklistId = $(this).data("picklist");
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You are about to cancel Picklist " + picklistId,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      // cancelButtonColor: "#3085d6",
+      cancelButtonText: "Back",
+      confirmButtonText: "Yes, cancel it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire(
+          "Cancelled!",
+          "Picklist " + picklistId + " has been cancelled.",
+          "success",
+        );
+
+        $(this).closest("tr").remove();
+      }
+    });
+  });
+}
+
+// PICK LIST ITEMS
+function loadBasketContent() {
+  $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
+    $("#main-content").html(data);
+    loadBasket();
+  });
+}
+
+// ALREADY HAS A PICKLIST NUMBER
+function openPicklistedForm(RowNum) {
+  $("#pageLoader").removeClass("d-none");
+  $.post(
+    "dirs/incoming/dashboard/picklistedForm.php",
+    { RowNum: RowNum },
     function (data) {
       $("#main-content").html(data);
 
@@ -307,14 +616,14 @@ function openIncoming(RowNum) {
               let quantity = parseFloat(item.Quantity) || 0;
               totalQty += quantity;
               rows += `
-                <tr style="height: 40px; min-height: 40px">
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${index + 1}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Brand}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Model}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Category}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
-                </tr>
-              `;
+                      <tr style="height: 40px; min-height: 40px">
+                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${index + 1}</td>
+                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Brand}</td>
+                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Model}</td>
+                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Category}</td>
+                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
+                      </tr>
+                    `;
             });
 
             $("#totalIncomingQty").text(totalQty);
@@ -325,14 +634,14 @@ function openIncoming(RowNum) {
 
               for (let i = 0; i < emptyRowsNeeded; i++) {
                 let emptyRow = `
-                  <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
-                  </tr>
-                `;
+                        <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+                          <td style="background: #FFFBDF"></td>
+                          <td style="background: #FFFBDF"></td>
+                          <td style="background: #FFFBDF"></td>
+                          <td style="background: #FFFBDF"></td>
+                          <td style="background: #FFFBDF"></td>
+                        </tr>
+                      `;
                 $("#openIncomingTable tbody").append(emptyRow);
               }
               $("#totalIncomingQty").text(totalQty);
@@ -348,218 +657,12 @@ function openIncoming(RowNum) {
         },
       });
     },
-  )
-  .fail(function () {
+  ).fail(function () {
     $("#pageLoader").addClass("d-none");
   });
 }
 
-var basketTable;
-
-// PICK LIST BASKET
-function picklistBasket() {
-  $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
-    $("#main-content").html(data);
-    loadBasket();
-  });
-}
-
-function loadIncomingDashboard() {
-  $.post("dirs/incoming/dashboard/incoming.php", {}, function (data) {
-    $("#main-content").html(data);
-  });
-}
-
-// function loadReturn() {
-//   $.post("dirs/incoming/dashboard/incoming.php", {}, function (data) {
-//     $("#main-content").html(data);
-//   });
-// }
-
-$(document).on("click", ".open-picklist", function (e) {
-  e.preventDefault();
-
-  let table = $("#basketTable").DataTable();
-  let rowData = table.row($(this).closest("tr")).data();
-
-  // let picklistNum = $(this).attr("data-picklist-num");
-  // let rownum = $(this).attr("data-rownum");
-
-  let picklistNum = rowData[0]; 
-  let rownum = table.row($(this).closest("tr")).index();
-
-  console.log(`PICKLIST NUM: ${picklistNum}`)
-  console.log(`ROWNUM: ${rownum}`)
-
-  openPicklist(picklistNum, rownum);
-});
-
-function openPicklist(picklistNum, rownum) {
-
-  $("#picklistNumDisplay").text(picklistNum)
-
-  $.post(
-    "dirs/incoming/dashboard/picklistItem.php",
-    // { picklistNum, rownum },
-    function (data) {
-      $("#main-content").html(data);
-
-       $.ajax({
-        url: "dirs/incoming/dashboard/actions/get_incomingbreakdown.php",
-        type: "POST",
-        dataType: "json",
-        success: function (response) {
-          let rows = [];
-          if (response.isSuccess === "success") {
-            let sortedData = response.Data.sort(
-              (a, b) => Number(b.BaseNum_SRN || 0) - Number(a.RowNum || 0),
-            );
-
-            sortedData.forEach((item) => {
-              rows.push([
-                item.BaseNum_SRN || "",
-                item.DocDate || "",
-                item.Prep_Branch || "",
-                item.PickedQty || "",
-                '<div class="dropdown dropstart">' +
-                  '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
-                  '<i class="bi bi-three-dots"></i></button>' +
-                  `<ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#" onclick="openPicklistedIncoming(${item.RowNum})">Open</a></li>
-                    <li><a class="dropdown-item" href="#">Print</a></li>
-                  </ul>
-                </div>`,
-              ]);
-            });
-
-            $("#picklistItemTable").DataTable().clear().destroy();
-            $("#picklistItemTable").DataTable({
-              data: rows,
-              columns: [
-                { title: "SRN", className: "text-center" },
-                { title: "Date", className: "text-start" },
-                { title: "Requesting Branch" },
-                { title: "Quantity" },
-                { title: "", orderable: false },
-              ],
-              createdRow: function (row, data, dataIndex) {
-              let originalItem = sortedData[dataIndex];
-
-              console.log(originalItem);
-
-              $(row)
-                .attr("data-rownum", originalItem.RowNumOrder)
-                .attr("data-picklist-num", originalItem.BaseNum_SRN)
-                // .addClass("picklist-row");
-              },
-              paging: true,
-              searching: true,
-              info: true,
-              processing: false,
-              autoWidth: false,
-              order: [[0, "desc"]],
-              rowCallback: function (row, data) {
-                $("td", row).css({
-                  background: "#FFFBDF",
-                  padding: "3px",
-                  height: "40px",
-                  "min-height": "40px",
-                  cursor: "pointer",
-                });
-                $("td:eq(0)", row).addClass("text-primary");
-                $("td:eq(2)", row).css("text-align", "start");
-
-                // Add hover effect to empty rows too
-                $(row).hover(
-                  function () {
-                    $(this).css("background", "#FFF4C2");
-                  },
-                  function () {
-                    $(this).css("background", "#FFFBDF");
-                  },
-                );
-              },
-              drawCallback: function () {
-                let tableBody = $("#picklistItemTable tbody");
-                let currentRows = tableBody.find("tr").length;
-
-                for (let i = currentRows; i < 8; i++) {
-                  let $emptyRow = $(`
-                  <tr class="empty-row" style="background: #FFFBDF">
-                    <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
-                  </tr>
-                `);
-                  $emptyRow.css({
-                    background: "#FFFBDF",
-                    height: "40px",
-                    "min-height": "40px",
-                    cursor: "pointer",
-                  });
-                  $emptyRow.hover(
-                    function () {
-                      $(this).css("background", "#FFF4C2");
-                    },
-                    function () {
-                      $(this).css("background", "#FFFBDF");
-                    },
-                  );
-                  tableBody.append($emptyRow);
-                }
-              },
-            });
-          } else {
-            console.error(response.Data);
-          }
-        },
-        error: function (xhr, status, error) {
-          console.error("Error loading outgoing data: ", error);
-        },
-      });
-    },
-  );
-}
-
-function cancelPicklist() {
-  $(document).on("click", ".cancel-picklist", function () {
-    const picklistId = $(this).data("picklist");
-
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You are about to cancel Picklist " + picklistId,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      // cancelButtonColor: "#3085d6",
-      cancelButtonText: "Back",
-      confirmButtonText: "Yes, cancel it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire(
-          "Cancelled!",
-          "Picklist " + picklistId + " has been cancelled.",
-          "success",
-        );
-
-        $(this).closest("tr").remove();
-      }
-    });
-  });
-}
-
-// PICK LIST ITEMS
-function loadBasketContent() {
-  $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
-    $("#main-content").html(data);
-    loadBasket();
-  });
-}
-
-// function openPicklistedIncoming(RowNum) {
-//   $.post("dirs/incoming/form/form.php", { RowNum: RowNum }, function (data) {
-//     $("#main-content").html(data);
-//   });
-// }
-
+// DISPLAY BASKET
 function loadBasket() {
   $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
     $("#main-content").html(data);
@@ -594,7 +697,7 @@ function loadBasket() {
                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
                 '<i class="bi bi-three-dots"></i></button>' +
                 `<ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#" onclick="openPicklistedIncoming(${item.RowNum})">Open</a></li>
+                  <li><a class="dropdown-item open-picklist" href="#">Open</a></li>
                   <li><a class="dropdown-item" href="#">Print</a></li>
                 </ul>
               </div>`,
@@ -614,11 +717,9 @@ function loadBasket() {
               let originalItem = sortedData[dataIndex];
 
               $(row)
-              .attr("data-rownum", originalItem.RowNumOrder)
-              .attr("data-picklist-num", originalItem.PickLst_Num)
-              // .attr("data-srn", originalItem.BaseNum_SRN)
-              .addClass("picklist-row");
-              // console.log(`PICKLIST NUM: ${originalItem.PickLst_Num}`)
+                .attr("data-rownum", originalItem.RowNum)
+                .attr("data-picklist-num", originalItem.PickLst_Num)
+                .addClass("picklist-row");
             },
             paging: true,
             searching: true,
@@ -683,5 +784,5 @@ function loadBasket() {
         console.error("Error loading outgoing data: ", error);
       },
     });
-  })
+  });
 }
