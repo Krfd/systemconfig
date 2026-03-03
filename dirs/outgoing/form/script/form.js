@@ -36,7 +36,7 @@ function loadReturn() {
 
 /*Function generate stock request number*/
 function get_SRN(){
-    $.post("dirs/outgoing/form/actions/get_srn_generator.php", {}, function(data){
+    $.post("dirs/outgoing/form/actions/get_srngenerator.php", {}, function(data){
         response = JSON.parse(data);
         if ($.trim(response.isSuccess) == "success") {
             let srn = response.Data.SRNNumber;
