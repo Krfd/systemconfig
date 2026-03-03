@@ -239,7 +239,7 @@ function clearTables() {
     showCancelButton: true,
     cancelButtonText: "Back",
   }).then((result) => {
-    if (response.isConfirmed) {
+    if (result.isConfirmed) {
       console.log("Tables has been reset");
 
       $.post(

@@ -10,7 +10,10 @@ try {
     $truncate_table->execute([$Userid]);
 
     $conn->commit();
-    echo "success";
+    echo json_encode([
+        "isSuccess" => "success"
+    ]);
+    exit;
 } catch (PDOException $e) {
     $conn->rollBack();
     echo "Error: " . $e->getMessage();

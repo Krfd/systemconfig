@@ -25,9 +25,9 @@
     <div class="container d-flex justify-content-center align-items-center" style="height: 90vh;">
       <div class="login-card p-4 shadow bg-white">
         <div class="d-flex justify-content-center">
-          <img src="assets/image/logo/logo.png" alt="iShift" style="border-radius: 50%; height: 150px; width: 150px;">
+          <img src="assets/image/logo/iap_icon.png" alt="iShift" style="height: 100px; width: 150px;">
         </div>
-        <div class="text-center mb-2">
+        <div class="text-center my-2">
           <h4>iShift</h4>
         </div>
         <div class="form-floating mb-3">
