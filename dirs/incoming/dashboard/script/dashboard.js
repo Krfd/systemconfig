@@ -18,10 +18,6 @@ function loadDashboard() {
   $.post("dirs/incoming/dashboard/components/main.php", {}, function (data) {
     $("#incoming_content").html(data);
     loadIncoming();
-    // $("#incomingTableDisplay").DataTable({
-    //   pageLength: 50,
-    //   order: [0, "desc"],
-    // });
   });
   cancelPicklist();
 }
@@ -40,14 +36,14 @@ $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
 
 function loadIncoming() {
   $.ajax({
-    url: "dirs/outgoing/dashboard/actions/get_outgoing.php",
+    url: "dirs/incoming/dashboard/actions/get_incoming.php",
     type: "POST",
     dataType: "json",
     success: function (response) {
       let rows = [];
       if (response.isSuccess === "success") {
         let sortedData = response.Data.sort(
-          (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
+          (a, b) => Number(b.SeriesNum || 0) - Number(a.SeriesNum || 0),
         );
 
         sortedData.forEach((item) => {
@@ -57,15 +53,15 @@ function loadIncoming() {
               : "";
 
           rows.push([
-            `<input type="checkbox" name="checkbox" id="${item.RowNum}" data-rownum="${item.RowNum}" 
+            `<input type="checkbox" name="checkbox" id="${item.SeriesNum}" data-rownum="${item.SeriesNum}" 
             class="form-check-input checkbox align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
-            item.RowNum || "",
-            item.BaseNum_SRN || "",
+            item.SeriesNum || "",
+            item.SRN || "",
             item.RequestType || "",
-            item.Orgin_Dstnation || "",
+            item.Branch || "",
             item.RequestStatus || "",
             item.DocDate || "",
-            item.PickListNumber || "",
+            item.PickLst_Num || "",
           ]);
         });
 
@@ -169,10 +165,6 @@ function loadIncoming() {
   });
 }
 
-function handleAddToPicklist() {
-  alert("Items added to picklist!");
-}
-
 function toggleCheckboxes() {
   const createPicklistBtn = document.getElementById("createPicklistBtn");
 
@@ -193,11 +185,20 @@ function toggleCheckboxes() {
     $("#incomingTableDisplay tbody tr").each(function () {
       const row = $(this);
       const srnText = row.find("td:eq(2)").text().trim(); // SRN column
+      const picklistNo = row.find("td:eq(7)").text().trim(); // Picklist No column
+      const checkbox = row.find(".checkbox");
 
       if (srnText.startsWith("SRN")) {
-        row.find(".checkbox").show(); // Show valid rows
+        checkbox.show();
+
+        // If Picklist No. already exists → disable checkbox
+        if (picklistNo !== "") {
+          checkbox.prop("disabled", true);
+        } else {
+          checkbox.prop("disabled", false);
+        }
       } else {
-        row.find(".checkbox").hide(); // Hide invalid rows
+        checkbox.hide();
       }
     });
 
@@ -345,7 +346,7 @@ function openIncoming(RowNum) {
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                   </tr>
-                `;
+              `;
               $("#openIncomingTable tbody").append(emptyRow);
             }
             $("#totalIncomingQty").text(totalQty);
@@ -369,6 +370,9 @@ var basketTable;
 
 // PICK LIST BASKET
 function picklistBasket() {
+  if ($.fn.DataTable.isDataTable("#basketTable")) {
+    $("#basketTable").DataTable().clear().destroy();
+  }
   $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
     $("#main-content").html(data);
     loadBasket();
@@ -430,7 +434,7 @@ function openPicklist(picklistNum) {
                   '<i class="bi bi-three-dots"></i></button>' +
                   `<ul class="dropdown-menu">
                     <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
-                    <li><a class="dropdown-item" href="#">Print</a></li>
+                    <li><a class="dropdown-item print-picklisted" href="#">Print</a></li>
                   </ul>
                 </div>`,
               ]);
@@ -542,7 +546,6 @@ function cancelPicklist() {
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
-      // cancelButtonColor: "#3085d6",
       cancelButtonText: "Back",
       confirmButtonText: "Yes, cancel it!",
     }).then((result) => {
@@ -682,6 +685,17 @@ function loadBasket() {
       type: "POST",
       dataType: "json",
       success: function (response) {
+        // ✅ Safety fallback
+        if (
+          !response ||
+          response.isSuccess !== "success" ||
+          !Array.isArray(response.Data)
+        ) {
+          response = {
+            isSuccess: "success",
+            Data: [],
+          };
+        }
         let rows = [];
         if (response.isSuccess === "success") {
           let sortedData = response.Data.sort(
@@ -704,7 +718,16 @@ function loadBasket() {
             ]);
           });
 
-          $("#basketTable").DataTable().clear().destroy();
+          if (rows.length === 0) {
+            for (let i = 0; i < 8; i++) {
+              rows.push(["", "", "", ""]);
+            }
+          }
+
+          if ($.fn.DataTable.isDataTable("#basketTable")) {
+            $("#basketTable").DataTable().clear().destroy();
+          }
+
           $("#basketTable").DataTable({
             data: rows,
             columns: [
@@ -784,5 +807,40 @@ function loadBasket() {
         console.error("Error loading outgoing data: ", error);
       },
     });
+  });
+}
+
+$(document).on("click", ".print-picklisted", function (e) {
+  e.preventDefault();
+
+  let picklistedRow = $(this).closest("tr");
+  let RowNum = picklistedRow.attr("data-rownum");
+
+  printSrnPicklist(RowNum);
+});
+
+// PRINT PICKLIST ITEMS
+function printPicklist() {
+  Swal.fire({
+    icon: "question",
+    title: "Are you sure to print this picklist?",
+    text: "This will set the picklist into receiving process",
+    showConfirmButton: true,
+    confirmButtonText: "Yes, print picklist",
+    showCancelButton: true,
+    cancelButtonText: "Back",
+  });
+}
+
+// PRINT INDIVIDUAL SRN IN PICKLIST
+function printSrnPicklist(RowNum) {
+  console.log("Printing picklist for SRN RowNum: " + RowNum);
+  Swal.fire({
+    icon: "question",
+    title: "Print this Request?",
+    showConfirmButton: true,
+    confirmButtonText: "Yes, print",
+    showCancelButton: true,
+    cancelButtonText: "Back",
   });
 }

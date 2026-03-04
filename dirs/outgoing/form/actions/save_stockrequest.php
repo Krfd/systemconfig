@@ -1,6 +1,7 @@
 <?php
 require_once "../../../../config/connection.php";
 session_start();
+header('Content-Type: application/json');
 
 $Userid          = $_SESSION['Uid'];
 $SRN             = $_POST['srnForm'];
@@ -51,10 +52,17 @@ try {
     }
 
     $conn->commit();
-    echo "OK";
+    echo json_encode(["status" => "success"]);
+    exit;
 } catch (PDOException $e) {
     if ($conn->inTransaction()) {
         $conn->rollback();
     }
-    echo "<b>Warning. Please Contact System Developer.<br/></b>" . $e->getMessage();
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
+    echo json_encode([
+        "status" => "error",
+        "message" => "Something went wrong. Please contact System Developer."
+        // "message" => $e->getMessage()
+    ]);
+    exit;
 }

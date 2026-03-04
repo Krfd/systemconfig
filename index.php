@@ -49,7 +49,7 @@ try {
     <link rel="stylesheet" href="node_modules/uikit/dist/css/uikit.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/custom.css">
-    <link rel="icon" href="assets/image/logo/logo.png">
+    <link rel="icon" href="assets/image/logo/iap_icon.png">
 
     <style>
         .checkbox {
@@ -156,7 +156,9 @@ try {
                     </ul>
                 </nav>
             </div>
-            <input type="hidden" value="<?php echo $user['Theme']; ?>" id="theme-pref">
+            <!-- <input type="hidden" value="<?php
+                                                // echo $user['Theme']; 
+                                                ?>" id="theme-pref"> -->
             <input type="hidden" value="<?php echo $user['Username']; ?>" id="session-user">
         </aside>
     </div>

@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="d-flex gap-1">
-            <button class="btn btn-primary" type="button">
+            <button class="btn btn-primary" type="button" id="printPicklistItem" onclick="printPicklist()">
                 <i class="bi bi-printer"></i>
             </button>
         </div>
@@ -21,7 +21,6 @@
                     <th class="text-secondary">SRN</th>
                     <th class="text-secondary">Date</th>
                     <th class="text-secondary">Requesting Branch</th>
-                    <!-- <th class="text-secondary">Quantity</th> -->
                     <th></th>
                 </tr>
             </thead>
@@ -31,56 +30,48 @@
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
-                    <!-- <td style="background: #FFFBDF; padding: 0"></td> -->
                 </tr>
                 <tr style="height: 40px; min-height: 40px">
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
-                    <!-- <td style="background: #FFFBDF; padding: 0"></td> -->
                 </tr>
                 <tr style="height: 40px; min-height: 40px">
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
-                    <!-- <td style="background: #FFFBDF; padding: 0"></td> -->
                 </tr>
                 <tr style="height: 40px; min-height: 40px">
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
-                    <!-- <td style="background: #FFFBDF; padding: 0"></td> -->
                 </tr>
                 <tr style="height: 40px; min-height: 40px">
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
-                    <!-- <td style="background: #FFFBDF; padding: 0"></td> -->
                 </tr>
                 <tr style="height: 40px; min-height: 40px">
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
-                    <!-- <td style="background: #FFFBDF; padding: 0"></td> -->
                 </tr>
                 <tr style="height: 40px; min-height: 40px">
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
-                    <!-- <td style="background: #FFFBDF; padding: 0"></td> -->
                 </tr>
                 <tr style="height: 40px; min-height: 40px">
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
                     <td style="background: #FFFBDF; padding: 0"></td>
-                    <!-- <td style="background: #FFFBDF; padding: 0"></td> -->
                 </tr>
             </tbody>
         </table>

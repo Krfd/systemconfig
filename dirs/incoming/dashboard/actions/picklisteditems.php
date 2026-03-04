@@ -2,6 +2,13 @@
 require_once "../../../../config/connection.php";
 session_start();
 
+if (!isset($_SESSION['Uid']) || empty($_SESSION['Uid'])) {
+    echo json_encode([
+        "isSuccess" => "no_session",
+        "Data" => []
+    ]);
+    exit;
+}
 
 $Userid       = $_SESSION['Uid'];
 

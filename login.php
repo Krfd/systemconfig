@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="assets/plugins/summernote/summernote-lite.min.css">
   <link rel="stylesheet" type="text/css" href="assets/css/login.css">
   <link rel="stylesheet" href="assets/plugins/datepicker/jquery-ui.structure.min.css">
-  <link rel="icon" href="assets/image/logo/logo.png">
+  <link rel="icon" href="assets/image/logo/iap_icon.png">
 </head>
 
 <body>

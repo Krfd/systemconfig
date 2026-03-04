@@ -29,7 +29,7 @@ try {
     --------------------------- */
     // Prepare placeholders for IN clause
     $placeholders = implode(',', array_fill(0, count($RowNumber), '?'));
-    $sql = "SELECT BaseNum_SRN, Brnch_Dstnation FROM SRN_REQUEST WHERE RowNum IN ($placeholders)";
+    $sql = "SELECT BaseNum_SRN, Orgin_Dstnation FROM SRN_REQUEST WHERE RowNum IN ($placeholders)";
     $pklist_srn = $conn->prepare($sql);
     $pklist_srn->execute($RowNumber);
     $srn_rows = $pklist_srn->fetchAll(PDO::FETCH_ASSOC);
@@ -41,7 +41,7 @@ try {
 
     foreach ($srn_rows as $row) {
         $SRN   = $row['BaseNum_SRN'];
-        $BDestination = $row['Brnch_Dstnation'];
+        $BDestination = $row['Orgin_Dstnation'];
 
         $pklist_child_sp->execute([$PKNumber, $BDestination, $Userid, $SRN]);
     }
@@ -62,6 +62,7 @@ try {
     if ($conn->inTransaction()) {
         $conn->rollback();
     }
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     echo json_encode([
         "status" => "error",
         "message" => $e->getMessage()

@@ -55,7 +55,18 @@ function get_SRN() {
         $("#srnForm").val(newSRN);
         loadItems();
       } else {
-        alert($.trim(response.Data));
+        Swal.fire({
+          icon: "error",
+          title: "Server under restoring",
+          text: "Please come back later",
+          showConfirmButton: true,
+          confirmButtonText: "OKAY",
+          allowOutsideClick: false,
+        }).then(() => {
+          $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
+            $("#main-content").html(data);
+          });
+        });
       }
     },
   );
@@ -79,7 +90,8 @@ function loadImperialBrands() {
         );
       });
     } else {
-      alert($.trim(response.Data));
+      // alert($.trim(response.Data));
+      console.log(response.Data);
     }
   });
 }
@@ -95,7 +107,20 @@ function get_userinfo() {
       $("#reqByForm").val(response.Data.Fullname);
       loadDestinationWhscodes(response.Data.Branch);
     } else {
-      alert(jQuery.trim(response.Data));
+      // alert(jQuery.trim(response.Data));
+      console.log(response.Data);
+      Swal.fire({
+        icon: "error",
+        title: "Server under restoring",
+        text: "Please come back later",
+        showConfirmButton: true,
+        confirmButtonText: "OKAY",
+        allowOutsideClick: false,
+      }).then(() => {
+        $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
+          $("#main-content").html(data);
+        });
+      });
     }
   });
 }
@@ -122,7 +147,20 @@ function loadDestinationWhscodes(Branch) {
           );
         });
       } else {
-        alert($.trim(response.Data));
+        // alert($.trim(response.Data));
+        console.log(response.Data);
+        Swal.fire({
+          icon: "error",
+          title: "Server under restoring",
+          text: "Please come back later",
+          showConfirmButton: true,
+          confirmButtonText: "OKAY",
+          allowOutsideClick: false,
+        }).then(() => {
+          $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
+            $("#main-content").html(data);
+          });
+        });
       }
     },
   );
@@ -148,7 +186,20 @@ async function loadIAPBranchlist() {
         loadOriginWhscodes(iapbranch[0].Branch);
       }
     } else {
-      alert($.trim(response.Data));
+      // alert($.trim(response.Data));
+      console.log(response.Data);
+      Swal.fire({
+        icon: "error",
+        title: "Server under restoring",
+        text: "Please come back later",
+        showConfirmButton: true,
+        confirmButtonText: "OKAY",
+        allowOutsideClick: false,
+      }).then(() => {
+        $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
+          $("#main-content").html(data);
+        });
+      });
     }
   });
 }
@@ -180,7 +231,20 @@ async function loadOriginWhscodes(Branch) {
           );
         });
       } else {
-        alert($.trim(response.Data));
+        // alert($.trim(response.Data));
+        console.log(response.Data);
+        Swal.fire({
+          icon: "error",
+          title: "Server under restoring",
+          text: "Please come back later",
+          showConfirmButton: true,
+          confirmButtonText: "OKAY",
+          allowOutsideClick: false,
+        }).then(() => {
+          $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
+            $("#main-content").html(data);
+          });
+        });
       }
     },
   );
@@ -546,8 +610,10 @@ function submitReq() {
       data: formData,
       processData: false,
       contentType: false,
+      dataType: "json",
       success: function (response) {
-        if (response == "OK") {
+        console.log(response);
+        if (response.status === "success") {
           Swal.fire({
             icon: "success",
             title: "Success",
@@ -559,7 +625,7 @@ function submitReq() {
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: response,
+            text: response.message || "Something went wrong",
           });
         }
       },

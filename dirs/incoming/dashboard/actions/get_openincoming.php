@@ -22,6 +22,7 @@ try {
         "Items" => $items
     ]);
 } catch (PDOException $e) {
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     echo json_encode([
         "isSuccess" => "Failed",
         "Data" => "<b>Error. Please Contact System Developer.<br/></b>" . $e->getMessage()

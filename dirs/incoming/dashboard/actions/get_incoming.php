@@ -1,22 +1,21 @@
 <?php
 require_once "../../../../config/connection.php";
-
 session_start();
-header('Content-Type: application/json');
-$Userid       = $_SESSION['Uid'];
+
+$Uid     = $_SESSION['Uid'];
 
 try {
   $conn->beginTransaction();
 
-  $fetch_ongoing = $conn->prepare("EXEC dbo.[OUTGOING] ?");
-  $fetch_ongoing->execute([$Userid]);
-  $get_ongoing = $fetch_ongoing->fetchAll(PDO::FETCH_ASSOC);
+  $fetch_incoming = $conn->prepare("EXEC dbo.[INCOMING_REQ] ?");
+  $fetch_incoming->execute([$Uid]);
+  $get_incomingrequest = $fetch_incoming->fetchAll(PDO::FETCH_ASSOC);
 
   $conn->commit();
 
   $response = array(
     "isSuccess" => 'success',
-    "Data" => $get_ongoing
+    "Data" => $get_incomingrequest
   );
   echo json_encode($response);
 } catch (PDOException $e) {
