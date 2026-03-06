@@ -3,13 +3,14 @@ require_once "../../../../config/connection.php";
 
 session_start();
 
-$Userid = $_SESSION['Uid'];
+// $Userid = $_SESSION['Uid'];
 $RowNum = $_POST['RowNum'];
 
 try {
 
-    $stmt = $conn->prepare("EXEC dbo.[OUTGOING_REQUEST] ?, ?");
-    $stmt->execute([$Userid, $RowNum]);
+    $stmt = $conn->prepare("EXEC dbo.[OUTGOING_REQUEST] ?");
+    // $stmt->execute([$Userid, $RowNum]);
+    $stmt->execute([$RowNum]);
     $header = $stmt->fetch(PDO::FETCH_ASSOC);
 
     /*For SRN ITEMS*/

@@ -8,13 +8,13 @@ $(document).ready(function () {
       clickScrolling: true,
     },
   });
-  $(".checkbox").hide();
+  // $(".checkbox").hide();
 });
 
 function loadDashboard() {
-  if ($.fn.DataTable.isDataTable("#incomingTableDisplay")) {
-    $("#incomingTableDisplay").DataTable().clear().destroy();
-  }
+  // if ($.fn.DataTable.isDataTable("#incomingTableDisplay")) {
+  //   $("#incomingTableDisplay").DataTable().clear().destroy();
+  // }
   $.post("dirs/incoming/dashboard/components/main.php", {}, function (data) {
     $("#incoming_content").html(data);
     loadIncoming();
@@ -65,10 +65,9 @@ function loadIncoming() {
           ]);
         });
 
-        if (rows.length === 0) {
-          for (let i = 0; i < 8; i++) {
-            rows.push(["", "", "", "", "", "", "", ""]);
-          }
+        const minRows = 8;
+        while (rows.length < minRows) {
+          rows.push(["", "", "", "", "", "", "", ""]);
         }
 
         if ($.fn.DataTable.isDataTable("#incomingTableDisplay")) {
@@ -92,7 +91,7 @@ function loadIncoming() {
           searching: true,
           info: true,
           autoWidth: false,
-          order: [[1, "desc"]],
+          // order: [[1, "desc"]],
           language: {
             emptyTable: "", // 🔥 removes "No data available in table"
           },
@@ -141,7 +140,6 @@ function loadIncoming() {
                 height: "40px",
               });
 
-              // Hover effect (exclude first column)
               $emptyRow.hover(
                 function () {
                   $("td:not(:first-child)", this).css("background", "#FFF4C2");
@@ -287,6 +285,7 @@ function openIncoming(RowNum) {
       data: { RowNum: RowNum },
       dataType: "json",
       success: function (response) {
+        console.log(`RESPONSE: ${JSON.stringify(response.Data)}`);
         if (response.isSuccess === "success") {
           let rowCount = response.Items.length;
           let totalQty = 0;
@@ -739,10 +738,12 @@ function loadBasket() {
             createdRow: function (row, data, dataIndex) {
               let originalItem = sortedData[dataIndex];
 
-              $(row)
-                .attr("data-rownum", originalItem.RowNum)
-                .attr("data-picklist-num", originalItem.PickLst_Num)
-                .addClass("picklist-row");
+              if (originalItem) {
+                $(row)
+                  .attr("data-rownum", originalItem.RowNum)
+                  .attr("data-picklist-num", originalItem.PickLst_Num)
+                  .addClass("picklist-row");
+              }
             },
             paging: true,
             searching: true,

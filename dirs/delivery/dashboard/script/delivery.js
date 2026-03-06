@@ -1,6 +1,6 @@
-// $(document).ready(function () {
-//   loadDashboard();
-// });
+$(document).ready(function () {
+  loadDashboard();
+});
 
 $(document).ready(function () {
   OverlayScrollbars(document.getElementById("dashboard-display"), {
@@ -12,11 +12,11 @@ $(document).ready(function () {
   });
 });
 
-// function loadDashboard() {
-//   $.post("dirs/delivery/dashboard/components/main.php", {}, function (data) {
-//     $("#delivery_content").html(data);
-//   });
-// }
+function loadDashboard() {
+  $.post("dirs/delivery/dashboard/components/main.php", {}, function (data) {
+    $("#delivery_content").html(data);
+  });
+}
 
 function loadingBasket() {
   $.post("dirs/delivery/loadingbasket/loadingbasket.php", {}, function (data) {
@@ -41,6 +41,40 @@ function openDR3() {
 }
 function openDR4() {
   $.post("dirs/delivery/deliveries/delivery4.php", {}, function (data) {
+    $("#main-content").html(data);
+  });
+}
+
+// FROM LOADING BASKET
+
+$(document).ready(function () {
+  OverlayScrollbars(document.getElementById("dashboard-display"), {
+    className: "os-theme-dark",
+    scrollbars: {
+      autoHide: "leave",
+      clickScrolling: true,
+    },
+  });
+});
+
+function loadReturn() {
+  $.post("dirs/delivery/dashboard/delivery.php", {}, function (data) {
+    $("#main-content").html(data);
+  });
+}
+
+function picklistItem1() {
+  $.post("dirs/delivery/loadingitems/loadingitem1.php", {}, function (data) {
+    $("#main-content").html(data);
+  });
+}
+function picklistItem2() {
+  $.post("dirs/delivery/loadingitems/loadingitem2.php", {}, function (data) {
+    $("#main-content").html(data);
+  });
+}
+function picklistItem3() {
+  $.post("dirs/delivery/loadingitems/loadingitem3.php", {}, function (data) {
     $("#main-content").html(data);
   });
 }
