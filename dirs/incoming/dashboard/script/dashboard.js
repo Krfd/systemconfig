@@ -48,9 +48,13 @@ function loadIncoming() {
 
         sortedData.forEach((item) => {
           const isDisabled =
-            item.PickListNumber && item.PickListNumber.trim() !== ""
+            item.PickLst_Num && item.PickLst_Num.trim() !== ""
               ? "disabled"
               : "";
+
+          console.log(
+            `SERIES NUM: ${item.SeriesNum} | PICKLIST NUM: ${item.PickLst_Num}`,
+          );
 
           rows.push([
             `<input type="checkbox" name="checkbox" id="${item.SeriesNum}" data-rownum="${item.SeriesNum}" 
@@ -285,7 +289,7 @@ function openIncoming(RowNum) {
       data: { RowNum: RowNum },
       dataType: "json",
       success: function (response) {
-        console.log(`RESPONSE: ${JSON.stringify(response.Data)}`);
+        // console.log(`RESPONSE: ${JSON.stringify(response.Data)}`);
         if (response.isSuccess === "success") {
           let rowCount = response.Items.length;
           let totalQty = 0;
@@ -426,7 +430,7 @@ function openPicklist(picklistNum) {
               rows.push([
                 item.BaseNum_SRN || "",
                 item.DocDate || "",
-                item.PrepBranch || "",
+                item.ReqBranch || "",
                 // item.PickedQty || "",
                 '<div class="dropdown dropstart">' +
                   '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +

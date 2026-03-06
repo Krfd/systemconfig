@@ -82,9 +82,9 @@ try {
                     <img src="assets/image/logo/logo.png" alt="iServe Admin" id="profile-image" style="width: 100px; height: 100px; object-fit: cover;">
                     <br>
                 </a>
-                <small>User</small>
+                <small><?php echo isset($user['Username']) ? $user['Username'] : 'Bonjing!'; ?></small>
                 <br>
-                <span class="badge text-sm bg-primary" id="system-type">Warehouseman</span>
+                <span class="badge text-sm bg-primary" id="system-type"><?php echo (isset($user['Role']) ? $user['Role'] : '') . ' - ' . (isset($user['Branch']) ? $user['Branch'] : '') ?></span>
             </p>
             <div class="sidebar">
                 <nav id="main-menu" class="mt-2">
