@@ -8,8 +8,7 @@ $RowNum = $_POST['RowNum'];
 
 try {
 
-    $stmt = $conn->prepare("EXEC dbo.[OUTGOING_REQUEST] ?");
-    // $stmt->execute([$Userid, $RowNum]);
+    $stmt = $conn->prepare("EXEC dbo.[OPENINCOMING_REQUEST] ?");
     $stmt->execute([$RowNum]);
     $header = $stmt->fetch(PDO::FETCH_ASSOC);
 
