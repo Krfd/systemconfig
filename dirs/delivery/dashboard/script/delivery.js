@@ -18,7 +18,7 @@ function loadDashboard() {
   });
 }
 
-function loadingBasket() {
+function loadDeliveryBasket() {
   $.post("dirs/delivery/loadingbasket/loadingbasket.php", {}, function (data) {
     $("#main-content").html(data);
   });
@@ -29,34 +29,8 @@ function openDR1() {
     $("#main-content").html(data);
   });
 }
-function openDR2() {
-  $.post("dirs/delivery/deliveries/delivery2.php", {}, function (data) {
-    $("#main-content").html(data);
-  });
-}
-function openDR3() {
-  $.post("dirs/delivery/deliveries/delivery3.php", {}, function (data) {
-    $("#main-content").html(data);
-  });
-}
-function openDR4() {
-  $.post("dirs/delivery/deliveries/delivery4.php", {}, function (data) {
-    $("#main-content").html(data);
-  });
-}
 
 // FROM LOADING BASKET
-
-$(document).ready(function () {
-  OverlayScrollbars(document.getElementById("dashboard-display"), {
-    className: "os-theme-dark",
-    scrollbars: {
-      autoHide: "leave",
-      clickScrolling: true,
-    },
-  });
-});
-
 function loadReturn() {
   $.post("dirs/delivery/dashboard/delivery.php", {}, function (data) {
     $("#main-content").html(data);
@@ -64,17 +38,14 @@ function loadReturn() {
 }
 
 function picklistItem1() {
-  $.post("dirs/delivery/loadingitems/loadingitem1.php", {}, function (data) {
+  $.post("dirs/delivery/dashboard/loadDeliveryItems.php", {}, function (data) {
     $("#main-content").html(data);
   });
 }
-function picklistItem2() {
-  $.post("dirs/delivery/loadingitems/loadingitem2.php", {}, function (data) {
-    $("#main-content").html(data);
-  });
-}
-function picklistItem3() {
-  $.post("dirs/delivery/loadingitems/loadingitem3.php", {}, function (data) {
-    $("#main-content").html(data);
+
+// DELIVERY FORM
+function loadDeliveryForm() {
+  $.post("dirs/delivery/dashboard/deliveryForm.php", {}, function (data) {
+    $("#delivery_content").html(data);
   });
 }
