@@ -18,19 +18,25 @@ function loadDashboard() {
   });
 }
 
+function openForm() {
+  $.post("dirs/delivery/dashboard/form.php", {}, function (data) {
+    $("#main-content").html(data);
+  });
+}
+
 function loadDeliveryBasket() {
-  $.post("dirs/delivery/loadingbasket/loadingbasket.php", {}, function (data) {
+  $.post("dirs/delivery/dashboard/loadDeliveryBasket.php", {}, function (data) {
     $("#main-content").html(data);
   });
 }
 
-function openDR1() {
-  $.post("dirs/delivery/deliveries/delivery1.php", {}, function (data) {
-    $("#main-content").html(data);
-  });
-}
+// function openDR1() {
+//   $.post("dirs/delivery/dashboard/delivery1.php", {}, function (data) {
+//     $("#main-content").html(data);
+//   });
+// }
 
-// FROM LOADING BASKET
+// LOADING BASKET
 function loadReturn() {
   $.post("dirs/delivery/dashboard/delivery.php", {}, function (data) {
     $("#main-content").html(data);
@@ -38,6 +44,13 @@ function loadReturn() {
 }
 
 function picklistItem1() {
+  $.post("dirs/delivery/dashboard/loadDeliveryItems.php", {}, function (data) {
+    $("#main-content").html(data);
+  });
+}
+
+// LOADING ITEMS
+function loadDeliveryItems() {
   $.post("dirs/delivery/dashboard/loadDeliveryItems.php", {}, function (data) {
     $("#main-content").html(data);
   });
