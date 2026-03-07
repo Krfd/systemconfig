@@ -3,17 +3,15 @@ require_once "../../../../config/connection.php";
 session_start();
 header('Content-Type: application/json');
 
-// Get user ID and RowNumbers
 $Userid    = $_SESSION['Uid'];
 $RowNumber = $_POST['RowNumber'];
 
-// Ensure $RowNumber is always an array
 if (!is_array($RowNumber)) {
     $RowNumber = [$RowNumber];
 }
 
 try {
-    // Start transaction
+
     $conn->beginTransaction();
 
     /* ---------------------------
@@ -22,15 +20,48 @@ try {
     $pklist_gen = $conn->prepare("EXEC dbo.[PKLIST_GENERATOR] ?");
     $pklist_gen->execute([$Userid]);
     $pklist_row = $pklist_gen->fetch(PDO::FETCH_ASSOC);
-    $PKNumber = $pklist_row['PicklistNumber'];
+    $PKNumber   = $pklist_row['PicklistNumber'];
 
     /* ---------------------------
-       Fetch all SRNs for the RowNumbers
+       Prepare placeholders
     --------------------------- */
-    // Prepare placeholders for IN clause
     $placeholders = implode(',', array_fill(0, count($RowNumber), '?'));
-    $sql = "SELECT BaseNum_SRN, Orgin_Dstnation FROM SRN_REQUEST WHERE RowNum IN ($placeholders)";
-    $pklist_srn = $conn->prepare($sql);
+
+    /* ---------------------------
+       Check if SRN already used
+    --------------------------- */
+    $check_sql = "
+        SELECT r.BaseNum_SRN
+        FROM SRN_REQUEST r
+        JOIN PKLIST_BREAKDOWN b 
+            ON b.BaseNum_SRN = r.BaseNum_SRN
+        WHERE r.RowNum IN ($placeholders)
+    ";
+
+    $check = $conn->prepare($check_sql);
+    $check->execute($RowNumber);
+
+    if ($check->fetch()) {
+
+        $conn->rollBack();
+
+        echo json_encode([
+            "status" => "error",
+            "message" => "Some stock requests have already been added to a picklist."
+        ]);
+        exit;
+    }
+
+    /* ---------------------------
+       Fetch SRN rows
+    --------------------------- */
+    $srn_sql = "
+        SELECT BaseNum_SRN, Orgin_Dstnation
+        FROM SRN_REQUEST
+        WHERE RowNum IN ($placeholders)
+    ";
+
+    $pklist_srn = $conn->prepare($srn_sql);
     $pklist_srn->execute($RowNumber);
     $srn_rows = $pklist_srn->fetchAll(PDO::FETCH_ASSOC);
 
@@ -40,10 +71,16 @@ try {
     $pklist_child_sp = $conn->prepare("EXEC dbo.[PKLIST_CHILD] ?, ?, ?, ?");
 
     foreach ($srn_rows as $row) {
-        $SRN   = $row['BaseNum_SRN'];
+
+        $SRN          = $row['BaseNum_SRN'];
         $BDestination = $row['Orgin_Dstnation'];
 
-        $pklist_child_sp->execute([$PKNumber, $BDestination, $Userid, $SRN]);
+        $pklist_child_sp->execute([
+            $PKNumber,
+            $BDestination,
+            $Userid,
+            $SRN
+        ]);
     }
 
     /* ---------------------------
@@ -53,12 +90,14 @@ try {
     $pklist_parent->execute([$PKNumber, $Userid]);
 
     $conn->commit();
+
     echo json_encode([
         "status" => "success",
         "message" => "Picklist created successfully.",
         "pkNumber" => $PKNumber
     ]);
 } catch (PDOException $e) {
+
     if ($conn->inTransaction()) {
         $conn->rollback();
     }
@@ -67,5 +106,4 @@ try {
         "status" => "error",
         "message" => $e->getMessage()
     ]);
-    // echo "<b>Warning. Please Contact System Developer.<br/></b>" . $e->getMessage();
 }

@@ -75,7 +75,9 @@ function loadOutgoing() {
               (item.RequestStatus && item.RequestStatus.toUpperCase() !== "NEW"
                 ? '<li><a class="dropdown-item" href="#">Terminate</a></li>'
                 : "") +
-              '<li><a class="dropdown-item" href="#">Print</a></li>' +
+              '<li><a class="dropdown-item" href="pdf.php?srn=' +
+              item.BaseNum_SRN +
+              '" target="_blank">Print</a></li>' +
               "</ul></div>",
           ]);
         });
@@ -198,14 +200,18 @@ $(document).on("click", ".cancel-outgoing", function (e) {
   e.preventDefault();
   e.stopPropagation();
 
-  let RowNumber = $(this).data("srn");
-  let rowElement = $(this).closest("tr");
+  let SRN = $(this).data("srn");
+  // let rowElement = $(this).closest("tr");
 
-  cancelOutgoingForm(RowNumber, rowElement);
+  // console.log(`CANCEL - RowNumber: ${RowNumber}`);
+
+  // cancelOutgoingForm(RowNumber, rowElement);
+  cancelOutgoingForm(SRN);
 });
 
-function cancelOutgoingForm(RowNumber, rowElement) {
-  if (!RowNumber) {
+// function cancelOutgoingForm(RowNumber, rowElement) {
+function cancelOutgoingForm(SRN) {
+  if (!SRN) {
     Swal.fire({
       icon: "error",
       title: "Missing SRN",
@@ -214,6 +220,8 @@ function cancelOutgoingForm(RowNumber, rowElement) {
     });
     return;
   }
+
+  console.log(`SRN TYPE: ${typeof SRN}, SRN VALUE: ${SRN}`);
 
   Swal.fire({
     icon: "question",
@@ -224,7 +232,38 @@ function cancelOutgoingForm(RowNumber, rowElement) {
     cancelButtonText: "Cancel",
   }).then((result) => {
     if (result.isConfirmed) {
-      // CANCEL THE SRN VIA API
+      $.post(
+        "dirs/outgoing/dashboard/actions/update_cancellation.php",
+        {
+          SRN: SRN,
+        },
+        function (data) {
+          let res;
+          try {
+            res = JSON.parse(data);
+            if (res.isSuccess === "success") {
+              Swal.fire({
+                icon: "success",
+                title: "Request cancelled",
+                confirmButtonText: "OKAY",
+              }).then(() => {
+                location.reload();
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Failed to cancel request",
+                text:
+                  res.message ||
+                  "An error occurred while canceling the request.",
+                confirmButtonText: "OKAY",
+              });
+            }
+          } catch (e) {
+            console.error("Error parsing response: ", e);
+          }
+        },
+      );
     }
   });
 }

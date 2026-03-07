@@ -12,9 +12,6 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
-  // if ($.fn.DataTable.isDataTable("#incomingTableDisplay")) {
-  //   $("#incomingTableDisplay").DataTable().clear().destroy();
-  // }
   $.post("dirs/incoming/dashboard/components/main.php", {}, function (data) {
     $("#incoming_content").html(data);
     loadIncoming();
@@ -41,19 +38,27 @@ function loadIncoming() {
     dataType: "json",
     success: function (response) {
       let rows = [];
+      let existingSeries = new Set();
       if (response.isSuccess === "success") {
         let sortedData = response.Data.sort(
           (a, b) => Number(b.SeriesNum || 0) - Number(a.SeriesNum || 0),
         );
 
         sortedData.forEach((item) => {
+          // 🚫 Skip duplicate rows
+          if (existingSeries.has(item.SeriesNum)) {
+            return;
+          }
+
+          existingSeries.add(item.SeriesNum);
+
           const isDisabled =
-            item.PickLst_Num && item.PickLst_Num.trim() !== ""
+            item.PicklistNumber && item.PicklistNumber.trim() !== ""
               ? "disabled"
               : "";
 
           console.log(
-            `SERIES NUM: ${item.SeriesNum} | PICKLIST NUM: ${item.PickLst_Num}`,
+            `SERIES NUM: ${item.SeriesNum} | PICKLIST NUM: ${item.PicklistNumber}`,
           );
 
           rows.push([
@@ -65,7 +70,7 @@ function loadIncoming() {
             item.Branch || "",
             item.RequestStatus || "",
             item.DocDate || "",
-            item.PickLst_Num || "",
+            item.PicklistNumber || "",
           ]);
         });
 

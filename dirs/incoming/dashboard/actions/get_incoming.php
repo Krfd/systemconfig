@@ -11,19 +11,11 @@ try {
   $fetch_incoming->execute([$Uid]);
   $get_incomingrequest = $fetch_incoming->fetchAll(PDO::FETCH_ASSOC);
 
-  $fetch_incoming->nextRowset();
-  $pknumber = $fetch_incoming->fetchAll(PDO::FETCH_ASSOC);
-
-  for ($i = 0; $i < count($get_incomingrequest); $i++) {
-    $get_incomingrequest[$i]['PickLst_Num'] = $pknumber[$i]['PickLst_Num'] ?? "";
-  }
-
   $conn->commit();
 
   $response = array(
     "isSuccess" => 'success',
-    "Data" => $get_incomingrequest,
-    "pkNumber" => $pknumber
+    "Data" => $get_incomingrequest
   );
   echo json_encode($response);
 } catch (PDOException $e) {

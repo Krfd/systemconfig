@@ -79,7 +79,7 @@ try {
         <aside class="main-sidebar bg-primary-subtle elevation-5">
             <p class="text-center brand-link">
                 <a href="index.php" style="text-decoration: none; color: inherit;">
-                    <img src="assets/image/logo/logo.png" alt="iServe Admin" id="profile-image" style="width: 100px; height: 100px; object-fit: cover;">
+                    <img src="assets/image/logo/iap_icon.png" alt="iShift Admin" id="profile-image" style="width: 100px; height: 65px; object-fit: cover;">
                     <br>
                 </a>
                 <small><?php echo isset($user['Username']) ? $user['Username'] : 'Bonjing!'; ?></small>
