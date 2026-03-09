@@ -186,8 +186,6 @@ async function loadIAPBranchlist() {
         loadOriginWhscodes(iapbranch[0].Branch);
       }
     } else {
-      // alert($.trim(response.Data));
-      console.log(response.Data);
       Swal.fire({
         icon: "error",
         title: "Server under restoring",
@@ -376,19 +374,19 @@ function loadItems() {
 
           for (let i = 0; i < emptyRowsNeeded; i++) {
             let emptyRow = `
-                        <tr class="item-row empty-row" style="height: 40px; max-height: 40px">
-                          <td style="background: #FFFBDF; padding: 0">&nbsp;</td>
-                          <td style="background: #FFFBDF; padding: 0"></td>
-                          <td style="background: #FFFBDF; padding: 0"></td>
-                          <td style="background: #FFFBDF; padding: 0"></td>
-                          <td style="background: #FFFBDF; padding: 0"></td>
-                          <td style="background: #FFFBDF; padding: 0"></td>
-                        </tr>
-                    `;
+              <tr class="item-row empty-row" style="height: 40px; max-height: 40px">
+                <td style="background: #FFFBDF; padding: 0">&nbsp;</td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+                <td style="background: #FFFBDF; padding: 0"></td>
+              </tr>
+            `;
             tbody.append(emptyRow);
           }
-          $("#totalQuantity").text(totalQty);
         }
+        $("#totalQuantity").text(totalQty);
       } else {
         // If no data, show empty yellow row again
         tbody.html(`

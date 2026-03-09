@@ -3,15 +3,16 @@
 ob_start();
 error_reporting(0);
 @ini_set('display_errors', 0);
-require_once "config/connection.php";
-require_once "assets/plugins/fpdf/fpdf.php";
+require_once "../config/connection.php";
+require_once "../assets/plugins/fpdf/fpdf.php";
 
-if (!isset($_GET['srn'])) {
+if (!isset($_GET['srn']) || !isset($_GET['picklist'])) {
     Header("Location: dirs/outgoing/dashboard/outgoing.php");
     return;
 }
 
 $srn = $_GET['srn'];
+$picklist = $_GET['picklist'];
 
 $stmt = $conn->prepare("SELECT * FROM SRN_REQUEST WHERE BaseNum_SRN = ?");
 $stmt->execute([$srn]);
@@ -35,13 +36,13 @@ class PDF extends FPDF
 
     function Header()
     {
-        $this->Image('assets/image/header/header.png', 5, 10, 190);
+        $this->Image('../assets/image/header/header.png', 5, 10, 190);
         $this->Ln(35);
     }
 
     function Footer()
     {
-        $this->Image('assets/image/footer/alphamin.png', 5, 260, 180);
+        $this->Image('../assets/image/footer/alphamin.png', 5, 260, 180);
         $this->SetTextColor($GLOBALS['textColor'][0], $GLOBALS['textColor'][1], $GLOBALS['textColor'][2]);
         $this->SetY(-15);
         $this->SetFont('Arial', '', 8);
@@ -62,19 +63,21 @@ $pdf = new PDF();
 $pdf->AliasNbPages();
 $pdf->AddPage();
 
-function headerDetails($pdf, $srn, $status, $date, $origin)
+function headerDetails($pdf, $picklist, $srn, $status, $date, $origin)
 {
     global $textColor;
-
     $labelWidth = 15;
     $colonWidth = 3;
     $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
 
     $pdf->SetFont('Arial', 'B', 9);
+    $pdf->Cell($labelWidth, 5, 'PICKLIST ', 0, 0);
+    $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+    $pdf->Cell(0, 5, $picklist, 0, 1);
+    $pdf->SetFont('Arial', '', 9);
     $pdf->Cell($labelWidth, 5, 'SRN ', 0, 0);
     $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
     $pdf->Cell(0, 5, $srn, 0, 1);
-    $pdf->SetFont('Arial', '', 9);
     $pdf->Cell($labelWidth, 5, 'Status: ', 0, 0);
     $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
     $pdf->Cell(0, 5, $status, 0, 1);
@@ -175,7 +178,7 @@ function renderItemsTable($pdf, $itemData, $textColor)
 
 /* ---------- HEADER ---------- */
 
-headerDetails($pdf, $srn, $status, $date, $origin);
+headerDetails($pdf, $picklist, $srn, $status, $date, $origin);
 renderItemsTable($pdf, $itemData, $textColor);
 bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $textColor);
 

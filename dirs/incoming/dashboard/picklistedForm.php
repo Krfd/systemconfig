@@ -4,7 +4,7 @@
     style="z-index: 1055;">
     <div class="text-center">
         <div class="spinner-border text-primary" role="status"></div>
-        <div class="mt-2">Loading...</div>
+        <div class="mt-2">Loading form...</div>
     </div>
 </div>
 <div class="container-fluid px-4">

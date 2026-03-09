@@ -8,7 +8,6 @@ $(document).ready(function () {
       clickScrolling: true,
     },
   });
-  // $(".checkbox").hide();
 });
 
 function loadDashboard() {
@@ -45,7 +44,25 @@ function loadIncoming() {
         );
 
         sortedData.forEach((item) => {
-          // 🚫 Skip duplicate rows
+          let status = item.RequestStatus
+            ? item.RequestStatus.toUpperCase()
+            : "";
+          let statusClass = "";
+
+          if (status === "NEW") {
+            statusClass = "bg-primary";
+          } else if (status === "CANCEL" || status === "CANCELLED") {
+            statusClass = "bg-warning";
+          } else if (status === "TERMINATED") {
+            statusClass = "bg-secondary";
+          } else if (status === "REJECTED") {
+            statusClass = "bg-danger";
+          } else if (status === "PROCESSING") {
+            statusClass = "bg-info";
+          }
+
+          let statusBadge = `<span class="badge ${statusClass}">${status || ""}</span>`;
+
           if (existingSeries.has(item.SeriesNum)) {
             return;
           }
@@ -57,10 +74,6 @@ function loadIncoming() {
               ? "disabled"
               : "";
 
-          console.log(
-            `SERIES NUM: ${item.SeriesNum} | PICKLIST NUM: ${item.PicklistNumber}`,
-          );
-
           rows.push([
             `<input type="checkbox" name="checkbox" id="${item.SeriesNum}" data-rownum="${item.SeriesNum}" 
             class="form-check-input checkbox align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
@@ -68,7 +81,7 @@ function loadIncoming() {
             item.SRN || "",
             item.RequestType || "",
             item.Branch || "",
-            item.RequestStatus || "",
+            statusBadge,
             item.DocDate || "",
             item.PicklistNumber || "",
           ]);
@@ -100,7 +113,6 @@ function loadIncoming() {
           searching: true,
           info: true,
           autoWidth: false,
-          // order: [[1, "desc"]],
           language: {
             emptyTable: "", // 🔥 removes "No data available in table"
           },
@@ -175,31 +187,65 @@ function loadIncoming() {
 function toggleCheckboxes() {
   const createPicklistBtn = document.getElementById("createPicklistBtn");
 
-  // Are we currently in selection mode?
   const selectionMode =
     $("#incomingTableDisplay tbody .checkbox:visible").length > 0;
 
-  // Collect checked IDs
   const checkedIds = [];
   $("#incomingTableDisplay tbody .checkbox:checked").each(function () {
     checkedIds.push($(this).data("rownum"));
   });
 
-  // ==========================
-  // ENTER SELECTION MODE
-  // ==========================
   if (!selectionMode) {
+    let availableRows = 0;
+
+    $("#incomingTableDisplay tbody tr").each(function () {
+      const row = $(this);
+      const srnText = row.find("td:eq(2)").text().trim();
+      const picklistNo = row.find("td:eq(7)").text().trim();
+      const statusText = row.find("td:eq(5)").text().trim().toUpperCase();
+
+      if (
+        srnText.startsWith("SRN") &&
+        picklistNo === "" &&
+        statusText === "NEW"
+      ) {
+        availableRows++;
+      }
+    });
+
+    if (availableRows === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "No Available Request(s)",
+        text: "All request(s) are currently unavailable.",
+        confirmButtonText: "OKAY",
+      });
+      return;
+    }
+
     $("#incomingTableDisplay tbody tr").each(function () {
       const row = $(this);
       const srnText = row.find("td:eq(2)").text().trim(); // SRN column
       const picklistNo = row.find("td:eq(7)").text().trim(); // Picklist No column
+      const statusText = row.find("td:eq(5)").text().trim().toUpperCase();
       const checkbox = row.find(".checkbox");
+
+      const restrictedStatuses = [
+        "CANCELLED",
+        "TERMINATED",
+        "REJECTED",
+        "PROCESSING",
+        "IN TRANSIT",
+      ];
 
       if (srnText.startsWith("SRN")) {
         checkbox.show();
 
-        // If Picklist No. already exists → disable checkbox
-        if (picklistNo !== "") {
+        if (
+          picklistNo !== "" ||
+          restrictedStatuses.includes(statusText) ||
+          statusText !== "NEW"
+        ) {
           checkbox.prop("disabled", true);
         } else {
           checkbox.prop("disabled", false);
@@ -214,10 +260,6 @@ function toggleCheckboxes() {
 
     return;
   }
-
-  // ==========================
-  // VALIDATE SELECTION
-  // ==========================
 
   if (checkedIds.length == 0) {
     Swal.fire({
@@ -256,6 +298,7 @@ function toggleCheckboxes() {
               .hide()
               .prop("checked", false);
             createPicklistBtn.textContent = "Create Picklist";
+            loadIncoming();
           } else {
             Swal.fire({
               icon: "error",
@@ -280,13 +323,16 @@ function toggleCheckboxes() {
 $(document).on("dblclick", "#incomingTableDisplay tbody tr", function (e) {
   if ($(e.target).closest(".dropdown").length) return;
   let RowNum = $(this).find("td:nth-child(2)").text().trim();
-  openIncoming(RowNum);
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    openIncoming(RowNum);
+  }, 200);
 });
 
 function openIncoming(RowNum) {
   $("#pageLoader").removeClass("d-none");
   $.post("dirs/incoming/dashboard/form.php", function (data) {
-    $("#main-content").html(data);
+    $("#main-content").hide().html(data).fadeIn(200);
 
     $.ajax({
       url: "dirs/incoming/dashboard/actions/get_openincoming.php",
@@ -294,7 +340,6 @@ function openIncoming(RowNum) {
       data: { RowNum: RowNum },
       dataType: "json",
       success: function (response) {
-        // console.log(`RESPONSE: ${JSON.stringify(response.Data)}`);
         if (response.isSuccess === "success") {
           let rowCount = response.Items.length;
           let totalQty = 0;
@@ -381,42 +426,56 @@ function picklistBasket() {
   if ($.fn.DataTable.isDataTable("#basketTable")) {
     $("#basketTable").DataTable().clear().destroy();
   }
-  $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
-    $("#main-content").html(data);
-    loadBasket();
-  });
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
+      $("#main-content").hide().html(data).fadeIn(200);
+      loadBasket();
+    });
+  }, 200);
 }
 
 function loadIncomingDashboard() {
-  $.post("dirs/incoming/dashboard/incoming.php", {}, function (data) {
-    $("#main-content").html(data);
-  });
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    $.post("dirs/incoming/dashboard/incoming.php", {}, function (data) {
+      $("#main-content").hide().html(data).fadeIn(200);
+    });
+  }, 200);
 }
 
-$(document).on("click", ".open-picklist", function (e) {
+$(document).on("click", "#basketTable tbody .open-picklist", function (e) {
   e.preventDefault();
   let $row = $(this).closest("tr");
   let picklistNum = $row.attr("data-picklist-num");
   picklistNumber = picklistNum;
-  openPicklist(picklistNum);
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    openPicklist(picklistNum);
+  }, 200);
 });
 
-$(document).on("click", ".open-picklisted", function (e) {
-  e.preventDefault();
+$(document).on(
+  "click",
+  "#picklistItemTable tbody.open-picklisted",
+  function (e) {
+    e.preventDefault();
 
-  let picklistedRow = $(this).closest("tr");
-  let RowNum = picklistedRow.attr("data-rownum");
+    let picklistedRow = $(this).closest("tr");
+    let RowNum = picklistedRow.attr("data-rownum");
+    $("#main-content").html(spinner);
+    setTimeout(function () {
+      openPicklistedForm(RowNum);
+    }, 200);
+  },
+);
 
-  openPicklistedForm(RowNum);
-});
-
-// OPEN PICKLIST
 function openPicklist(picklistNum) {
   $.post(
     "dirs/incoming/dashboard/picklistItem.php",
     { picklistNum: picklistNum },
     function (data) {
-      $("#main-content").html(data);
+      $("#main-content").hide().html(data).fadeIn(200);
 
       $.ajax({
         url: "dirs/incoming/dashboard/actions/get_incomingbreakdown.php",
@@ -426,12 +485,21 @@ function openPicklist(picklistNum) {
         success: function (response) {
           $("#picklistNumDisplay").text(picklistNum);
           let rows = [];
+          let existingSeries = new Set();
           if (response.isSuccess === "success") {
             let sortedData = response.Data.sort(
               (a, b) => Number(b.BaseNum_SRN || 0) - Number(a.RowNum || 0),
             );
 
             sortedData.forEach((item) => {
+              if (existingSeries.has(item.BaseNum_SRN)) {
+                return;
+              }
+
+              existingSeries.add(item.BaseNum_SRN);
+
+              console.log(`PICKLIST NUMBER: ${picklistNum}`);
+
               rows.push([
                 item.BaseNum_SRN || "",
                 item.DocDate || "",
@@ -442,7 +510,7 @@ function openPicklist(picklistNum) {
                   '<i class="bi bi-three-dots"></i></button>' +
                   `<ul class="dropdown-menu">
                     <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
-                    <li><a class="dropdown-item print-picklisted" href="#">Print</a></li>
+                    <li><a class="dropdown-item" href="pdf/req.php?srn=${item.BaseNum_SRN}&picklist=${picklistNum}" target="_blank">Print</a></li>
                   </ul>
                 </div>`,
               ]);
@@ -534,13 +602,16 @@ function openPicklist(picklistNum) {
 
 // DISPLAY PICKLIST
 function loadPicklistItems() {
-  $.post(
-    "dirs/incoming/dashboard/picklistItem.php",
-    { picklistNum: picklistNumber },
-    function (data) {
-      openPicklist(picklistNumber);
-    },
-  );
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    $.post(
+      "dirs/incoming/dashboard/picklistItem.php",
+      { picklistNum: picklistNumber },
+      function (data) {
+        openPicklist(picklistNumber);
+      },
+    );
+  }, 200);
 }
 
 // CANCEL PICKLIST
@@ -572,10 +643,13 @@ function cancelPicklist() {
 
 // PICK LIST ITEMS
 function loadBasketContent() {
-  $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
-    $("#main-content").html(data);
-    loadBasket();
-  });
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
+      $("#main-content").hide().html(data).fadeIn(200);
+      loadBasket();
+    });
+  }, 200);
 }
 
 // ALREADY HAS A PICKLIST NUMBER
@@ -585,7 +659,7 @@ function openPicklistedForm(RowNum) {
     "dirs/incoming/dashboard/picklistedForm.php",
     { RowNum: RowNum },
     function (data) {
-      $("#main-content").html(data);
+      $("#main-content").hide().html(data).fadeIn(200);
 
       $.ajax({
         url: "dirs/incoming/dashboard/actions/get_openincoming.php",
@@ -693,7 +767,6 @@ function loadBasket() {
       type: "POST",
       dataType: "json",
       success: function (response) {
-        // ✅ Safety fallback
         if (
           !response ||
           response.isSuccess !== "success" ||
@@ -720,7 +793,7 @@ function loadBasket() {
                 '<i class="bi bi-three-dots"></i></button>' +
                 `<ul class="dropdown-menu">
                   <li><a class="dropdown-item open-picklist" href="#">Open</a></li>
-                  <li><a class="dropdown-item" href="#">Print</a></li>
+                  <li><a class="dropdown-item" href="pdf/requests.php?picklist=${item.PickLst_Num}" target="_blank">Print</a></li>
                 </ul>
               </div>`,
             ]);
@@ -771,7 +844,6 @@ function loadBasket() {
               $("td:eq(0)", row).addClass("text-primary");
               $("td:eq(1)", row).css("text-align", "start");
 
-              // Add hover effect to empty rows too
               $(row).hover(
                 function () {
                   $(this).css("background", "#FFF4C2");

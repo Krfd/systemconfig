@@ -24,6 +24,7 @@ function loadDashboard() {
 }
 
 function newRequest() {
+  $("#main-content").html(spinner);
   $.post("dirs/outgoing/form/form.php", {}, function (data) {
     $("#main-content").html(data);
   });
@@ -55,13 +56,33 @@ function loadOutgoing() {
         );
 
         sortedData.forEach((item) => {
+          let status = item.RequestStatus
+            ? item.RequestStatus.toUpperCase()
+            : "";
+          let statusClass = "";
+
+          if (status === "NEW") {
+            statusClass = "bg-primary";
+          } else if (status === "CANCEL" || status === "CANCELLED") {
+            statusClass = "bg-warning";
+          } else if (status === "TERMINATED") {
+            statusClass = "bg-secondary";
+          } else if (status === "REJECTED") {
+            statusClass = "bg-danger";
+          } else if (status === "PROCESSING") {
+            statusClass = "bg-info";
+          }
+
+          let statusBadge = `<span class="badge ${statusClass}">${status || ""}</span>`;
+
           rows.push([
             item.RowNum !== undefined ? item.RowNum.toString() : "",
             item.BaseNum_SRN || "",
             item.Brnch_Dstnation || "",
-            item.BrnchOrgn_Bcode || "",
-            item.RequestStatus || "",
+            item.Orgin_Dstnation || "",
+            statusBadge,
             item.DocDate || "N/A",
+
             '<div class="dropdown">' +
               '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
               '<i class="bi bi-three-dots"></i></button>' +
@@ -72,7 +93,10 @@ function loadOutgoing() {
                   item.BaseNum_SRN +
                   '" href="#">Cancel</a></li>'
                 : "") +
-              (item.RequestStatus && item.RequestStatus.toUpperCase() !== "NEW"
+              (item.RequestStatus &&
+              !["NEW", "CANCELLED", "CANCEL"].includes(
+                item.RequestStatus.toUpperCase(),
+              )
                 ? '<li><a class="dropdown-item" href="#">Terminate</a></li>'
                 : "") +
               '<li><a class="dropdown-item" href="pdf.php?srn=' +
@@ -187,6 +211,7 @@ $(document).on("click", ".open-item", function (e) {
 });
 
 function openOutgoingForm(rowNum) {
+  $("#main-content").html(spinner);
   $.post(
     "dirs/outgoing/requests/components/main.php",
     { RowNum: rowNum }, // send RowNum to view

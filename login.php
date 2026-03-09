@@ -69,15 +69,12 @@
 </body>
 
 </html>
-
-
 <script>
   function togglePassword() {
     const passwordField = document.getElementById('user-password');
     const checkbox = document.getElementById('toggle-show-password');
     passwordField.type = checkbox.checked ? 'text' : 'password';
   }
-
 
   $("#frm-login").on("submit", function(event) {
     event.preventDefault();

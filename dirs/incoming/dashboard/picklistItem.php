@@ -14,8 +14,8 @@
             </button>
         </div>
     </div>
-    <div class="table-responsive">
-        <table class="table datatables table-hover" id="picklistItemTable">
+    <div class="table-responsive overflow-auto ">
+        <table class="table table-hover datatables" id="picklistItemTable">
             <thead class="sticky-top">
                 <tr>
                     <th class="text-secondary">SRN</th>
@@ -25,54 +25,6 @@
                 </tr>
             </thead>
             <tbody>
-                <tr style="height: 40px; min-height: 40px">
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                </tr>
-                <tr style="height: 40px; min-height: 40px">
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                </tr>
-                <tr style="height: 40px; min-height: 40px">
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                </tr>
-                <tr style="height: 40px; min-height: 40px">
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                </tr>
-                <tr style="height: 40px; min-height: 40px">
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                </tr>
-                <tr style="height: 40px; min-height: 40px">
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                </tr>
-                <tr style="height: 40px; min-height: 40px">
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                </tr>
-                <tr style="height: 40px; min-height: 40px">
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                    <td style="background: #FFFBDF; padding: 0"></td>
-                </tr>
             </tbody>
         </table>
     </div>
