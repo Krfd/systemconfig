@@ -1,5 +1,5 @@
 <div class="table-responsive">
-    <table class="table datatables table-hover" id="outgoingTable">
+    <table class="table datatables table-hover" id="deliveryTableDisplay">
         <thead class="sticky-top">
             <tr>
                 <th class="text-secondary">#</th>
@@ -19,7 +19,7 @@
                 <td class="text-secondary" style="background: #FFFBDF; cursor: pointer">IN TRANSIT</td>
                 <td class="text-secondary" style="background: #FFFBDF; cursor: pointer">01/17/2026</td>
             </tr>
-            <tr style="height: 30px; min-height:30px" onclick="openDR2()">
+            <!-- <tr style="height: 30px; min-height:30px" onclick="openDR2()">
                 <td class="text-secondary" style="background: #FFFBDF; cursor: pointer">3</td>
                 <td class="text-secondary" style="background: #FFFBDF; cursor: pointer">DR-10002</td>
                 <td class="text-secondary" style="background: #FFFBDF; cursor: pointer">PLAZA</td>
@@ -74,7 +74,7 @@
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
                 <td style="background: #FFFBDF"></td>
-            </tr>
+            </tr> -->
         </tbody>
     </table>
 </div>

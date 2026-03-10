@@ -93,11 +93,10 @@ function loadOutgoing() {
                   item.BaseNum_SRN +
                   '" href="#">Cancel</a></li>'
                 : "") +
-              (item.RequestStatus &&
-              !["NEW", "CANCELLED", "CANCEL"].includes(
-                item.RequestStatus.toUpperCase(),
-              )
-                ? '<li><a class="dropdown-item" href="#">Terminate</a></li>'
+              (item.RequestStatus?.toUpperCase() === "PARTIAL"
+                ? '<li><a class="dropdown-item terminate-item" data-srn="' +
+                  item.BaseNum_SRN +
+                  '" href="#">Terminate</a></li>'
                 : "") +
               '<li><a class="dropdown-item" href="pdf.php?srn=' +
               item.BaseNum_SRN +
@@ -166,7 +165,7 @@ function loadOutgoing() {
 
           for (let i = currentRows; i < 8; i++) {
             let $emptyRow = $(`
-              <tr class="empty-row" style="background: #FFFBDF">
+              <tr class="empty-row">
                 <td colspan="7" style="background: #FFFBDF">&nbsp;</td>
               </tr>
             `);
@@ -201,13 +200,22 @@ $(document).on("dblclick", "#outgoingTableDisplay tbody tr", function (e) {
   openOutgoingForm(RowNum);
 });
 
+// TRIGGER TO OPEN A REQUEST
 $(document).on("click", ".open-item", function (e) {
   e.preventDefault(); // prevent # jump
   e.stopPropagation(); // stop row click behavior
 
   let RowNum = $(this).closest("tr").find("td:first").text().trim();
-
   openOutgoingForm(RowNum);
+});
+
+// TRIGGER TO TERMINATE A REQUEST
+$(document).on("click", ".terminate-item", function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  let SRN = $(this).data("srn");
+  terminateOutgoingForm(SRN);
 });
 
 function openOutgoingForm(rowNum) {
@@ -226,15 +234,9 @@ $(document).on("click", ".cancel-outgoing", function (e) {
   e.stopPropagation();
 
   let SRN = $(this).data("srn");
-  // let rowElement = $(this).closest("tr");
-
-  // console.log(`CANCEL - RowNumber: ${RowNumber}`);
-
-  // cancelOutgoingForm(RowNumber, rowElement);
   cancelOutgoingForm(SRN);
 });
 
-// function cancelOutgoingForm(RowNumber, rowElement) {
 function cancelOutgoingForm(SRN) {
   if (!SRN) {
     Swal.fire({
@@ -245,8 +247,6 @@ function cancelOutgoingForm(SRN) {
     });
     return;
   }
-
-  console.log(`SRN TYPE: ${typeof SRN}, SRN VALUE: ${SRN}`);
 
   Swal.fire({
     icon: "question",
@@ -269,7 +269,7 @@ function cancelOutgoingForm(SRN) {
             if (res.isSuccess === "success") {
               Swal.fire({
                 icon: "success",
-                title: "Request cancelled",
+                title: "Request has been cancelled",
                 confirmButtonText: "OKAY",
               }).then(() => {
                 location.reload();
@@ -278,6 +278,63 @@ function cancelOutgoingForm(SRN) {
               Swal.fire({
                 icon: "error",
                 title: "Failed to cancel request",
+                text:
+                  res.message ||
+                  "An error occurred while canceling the request.",
+                confirmButtonText: "OKAY",
+              });
+            }
+          } catch (e) {
+            console.error("Error parsing response: ", e);
+          }
+        },
+      );
+    }
+  });
+}
+
+function terminateOutgoingForm(SRN) {
+  if (!SRN) {
+    Swal.fire({
+      icon: "error",
+      title: "Missing SRN",
+      text: "Make sure that the SRN exists!",
+      confirmButtonText: "OKAY",
+    });
+    return;
+  }
+
+  Swal.fire({
+    icon: "question",
+    title: "Are you sure to terminate this request?",
+    text: "This action cannot be change.",
+    confirmButtonText: "Terminate",
+    confirmButtonColor: "#d33",
+    showCancelButton: true,
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.post(
+        "dirs/outgoing/dashboard/actions/update_termination.php",
+        {
+          SRN: SRN,
+        },
+        function (data) {
+          let res;
+          try {
+            res = JSON.parse(data);
+            if (res.isSuccess === "success") {
+              Swal.fire({
+                icon: "success",
+                title: "Request has been terminated",
+                confirmButtonText: "OKAY",
+              }).then(() => {
+                location.reload();
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Failed to terminate request",
                 text:
                   res.message ||
                   "An error occurred while canceling the request.",

@@ -16,6 +16,10 @@ $picklist = $_GET['picklist'];
 $Uid = $_SESSION['Uid'];
 
 try {
+
+    $toDeliver = $conn->prepare("EXEC dbo.[DELIVERY_Num_GENERATOR] ?");
+    $toDeliver->execute([$Uid]);
+
     $picklistData = $conn->prepare("EXEC dbo.[PRINT_PDF_PICK_LIST] ?, ?");
     $picklistData->execute([$Uid, $picklist]);
 
@@ -26,7 +30,9 @@ try {
     $branchData =  $picklistData->fetchAll(PDO::FETCH_OBJ);
     $branchName = $branchData[0]->ReqBranch ?? "N/A";
     $picklistNum = $picklistHeader->PickLst_Num ?? "N/A";
-    $docDate = $picklistHeader->DocDate ?? "N/A";
+    $docDate = isset($picklistHeader->DocDate)
+        ? date("m/d/y", strtotime($picklistHeader->DocDate))
+        : "N/A";
     $executedby = $picklistHeader->Executedby ?? "N/A";
     $printedby = $picklistHeader->Executedby ?? "N/A";
     $itemData = $picklistItems;
@@ -44,7 +50,7 @@ try {
 
         function Footer()
         {
-            $this->Image('../assets/image/footer/alphamin.png', 5, 260, 180);
+            $this->Image('../assets/image/footer/footer.jpg', 10, 270, 190);
             $this->SetTextColor($GLOBALS['textColor'][0], $GLOBALS['textColor'][1], $GLOBALS['textColor'][2]);
             $this->SetY(-15);
             $this->SetFont('Arial', '', 8);
@@ -79,9 +85,6 @@ try {
         $pdf->Cell($labelWidth, 5, 'Date: ', 0, 0);
         $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
         $pdf->Cell(0, 5, $docDate, 0, 1);
-        $pdf->Cell($labelWidth, 5, 'To: ', 0, 0);
-        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
-        $pdf->Cell(0, 5, 'Requesting Branch', 0, 1);
         $pdf->Ln(1);
     }
 
@@ -92,19 +95,20 @@ try {
         $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
         $pdf->Ln(3);
         $pdf->SetFont('Arial', 'B', 20);
-        $pdf->Cell(0, 12, 'PICKLIST ' . $picklistNum, 0, 1, 'C');
+        $pdf->Cell(0, 12, 'PICKLIST SUMMARY', 0, 1, 'C');
         $pdf->Ln(3);
 
         $pdf->SetFont('Arial', 'B', 9);
 
         // Header to data mapping
         $columns = [
+            '#' => null,
             'Branch' => 'ReqBranch',
             'Brand' => 'Brand',
             'Model' => 'Model',
             'Category' => 'Category',
             'Quantity' => 'Quantity',
-            'Actual Quantity' => null
+            'Actual Qty' => null
         ];
 
         $widths = [];
@@ -123,6 +127,11 @@ try {
                 }
             }
 
+            // Give a minimum width for row counter
+            if ($header === '#') {
+                $maxWidth = max($maxWidth, 10);
+            }
+
             $widths[$header] = $maxWidth;
         }
 
@@ -139,18 +148,24 @@ try {
 
         /* ---------- TABLE ROWS ---------- */
 
+        $counter = 1;
+
         foreach ($itemData as $row) {
 
             foreach ($columns as $header => $field) {
 
-                $value = $field ? ($row->$field ?? '') : '';
-
-                $align = ($header == 'Quantity' || $header == 'Actual Quantity') ? 'C' : 'L';
-
+                if ($header === '#') {
+                    $value = $counter;
+                    $align = 'C';
+                } else {
+                    $value = $field ? ($row->$field ?? '') : '';
+                    $align = ($header == 'Quantity' || $header == 'Actual Quantity') ? 'C' : 'L';
+                }
                 $pdf->Cell($widths[$header], 5, $value, 1, 0, $align);
             }
 
             $pdf->Ln();
+            $counter++;
         }
     }
 

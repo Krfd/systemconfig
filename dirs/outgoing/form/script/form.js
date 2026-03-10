@@ -352,13 +352,13 @@ function loadItems() {
           totalQty += quantity;
 
           let row = `<tr class="item-row">
-                        <td class="align-middle" style="background: #FFFBDF; padding: 3px">${item.DisplayRowNumber}</td>
-                        <td class="align-middle item-brand" style="background: #FFFBDF; padding: 3px">${item.ItemBrand}</td>
-                        <td class="align-middle item-model" style="background: #FFFBDF; padding: 3px">${item.ItemName}</td>
-                        <td class="align-middle item-category" style="background: #FFFBDF; padding: 3px">${item.ItemGroup}</td>
-                        <td class="align-middle item-code" hidden>${item.ItemCode}</td>
-                        <td class="align-middle item-quantity" style="background: #FFFBDF; padding: 3px">${item.Quantity}</td>
-                        <td class="align-middle t-action" style="background: #FFFBDF; padding: 3px">
+                        <td class="ps-2 align-middle" style="background: #FFFBDF; padding: 3px">${item.DisplayRowNumber}</td>
+                        <td class="ps-2 align-middle item-brand" style="background: #FFFBDF; padding: 3px">${item.ItemBrand}</td>
+                        <td class="ps-2 align-middle item-model" style="background: #FFFBDF; padding: 3px">${item.ItemName}</td>
+                        <td class="ps-2 align-middle item-category" style="background: #FFFBDF; padding: 3px">${item.ItemGroup}</td>
+                        <td class="ps-2 align-middle item-code" hidden>${item.ItemCode}</td>
+                        <td class="ps-2 align-middle item-quantity" style="background: #FFFBDF; padding: 3px">${item.Quantity}</td>
+                        <td class="ps-2 align-middle t-action" style="background: #FFFBDF; padding: 3px">
                           <button type="button" class="btn btn-sm btn-danger remove-item-button" id="${item.ItemNum}">
                             <i class="bi bi-dash"></i>
                           </button>
@@ -510,7 +510,7 @@ function clearTable() {
 
   Swal.fire({
     icon: "warning",
-    text: "Are your sure to clear this table?",
+    title: "Are your sure to clear this table?",
     confirmButtonText: "Clear",
     showCancelButton: true,
     cancelButtonColor: "#d33",

@@ -24,7 +24,10 @@ $srnData = $stmt->fetch(PDO::FETCH_OBJ);
 $itemData = $item->fetchAll(PDO::FETCH_OBJ);
 
 $status = $srnData->RequestStatus;
-$date = date("F d, Y", strtotime($srnData->DocDate));
+// $date = date("F d, Y", strtotime($srnData->DocDate));
+$date = isset($srnData->DocDate)
+    ? date("m/d/y", strtotime($srnData->DocDate))
+    : "N/A";
 $origin = $srnData->Orgin_Dstnation;
 $purpose = $srnData->RequestPurpose;
 $requestedBy = $srnData->PrepBy;
@@ -42,7 +45,7 @@ class PDF extends FPDF
 
     function Footer()
     {
-        $this->Image('../assets/image/footer/alphamin.png', 5, 260, 180);
+        $this->Image('../assets/image/footer/footer.jpg', 10, 270, 190);
         $this->SetTextColor($GLOBALS['textColor'][0], $GLOBALS['textColor'][1], $GLOBALS['textColor'][2]);
         $this->SetY(-15);
         $this->SetFont('Arial', '', 8);
@@ -158,8 +161,11 @@ function renderItemsTable($pdf, $itemData, $textColor)
     $pdf->SetFont('Arial', '', 9);
 
     $i = 1;
+    $totalQty = 0;
 
     foreach ($itemData as $row) {
+        $totalQty += $row->Quantity;
+
         $pdf->Cell($headers['#'], 5, $i, 1, 0, 'C');
 
         $brandWidth = max($headers['Brand'], $pdf->GetStringWidth($row->ItemBrand) + 4);
@@ -174,6 +180,17 @@ function renderItemsTable($pdf, $itemData, $textColor)
 
         $i++;
     }
+
+    $pdf->SetFont('Arial', 'B', 9);
+
+    $labelWidth =
+        $headers['#'] +
+        $headers['Brand'] +
+        $headers['Model'] +
+        $headers['Category'];
+
+    $pdf->Cell($labelWidth, 6, 'Total Quantity', 1, 0, 'R');
+    $pdf->Cell($headers['Quantity'], 6, $totalQty, 1, 1, 'C');
 }
 
 /* ---------- HEADER ---------- */

@@ -14,6 +14,10 @@ function loadDashboard() {
   $.post("dirs/incoming/dashboard/components/main.php", {}, function (data) {
     $("#incoming_content").html(data);
     loadIncoming();
+    $("#incomingTableDisplay").DataTable({
+      pageLength: 50,
+      order: [0, "desc"],
+    });
   });
   cancelPicklist();
 }
@@ -87,19 +91,15 @@ function loadIncoming() {
           ]);
         });
 
-        const minRows = 8;
-        while (rows.length < minRows) {
-          rows.push(["", "", "", "", "", "", "", ""]);
-        }
-
         if ($.fn.DataTable.isDataTable("#incomingTableDisplay")) {
           $("#incomingTableDisplay").DataTable().clear().destroy();
+          $("#incomingTableDisplay tbody").empty();
         }
 
         $("#incomingTableDisplay").DataTable({
           data: rows,
           columns: [
-            { title: "", className: "text-center", orderable: false },
+            { title: "", className: "text-center" },
             { title: "#" },
             { title: "SRN" },
             { title: "Type of Request" },
@@ -112,6 +112,7 @@ function loadIncoming() {
           paging: true,
           searching: true,
           info: true,
+          processing: false,
           autoWidth: false,
           language: {
             emptyTable: "", // 🔥 removes "No data available in table"
@@ -121,6 +122,7 @@ function loadIncoming() {
               background: "#FFFBDF",
               padding: "3px",
               height: "40px",
+              "min-height": "40px",
               cursor: "pointer",
             });
 
@@ -140,25 +142,24 @@ function loadIncoming() {
           },
           drawCallback: function () {
             let tableBody = $("#incomingTableDisplay tbody");
+
+            // Remove DataTables generated empty row
+            // tableBody.find("td.dataTables_empty").closest("tr").remove();
+
             let currentRows = tableBody.find("tr").length;
 
             for (let i = currentRows; i < 8; i++) {
               let $emptyRow = $(`
                 <tr class="empty-row">
                   <td></td>
-                  <td style="background:#FFFBDF"></td>
-                  <td style="background:#FFFBDF"></td>
-                  <td style="background:#FFFBDF"></td>
-                  <td style="background:#FFFBDF"></td>
-                  <td style="background:#FFFBDF"></td>
-                  <td style="background:#FFFBDF"></td>
-                  <td style="background:#FFFBDF"></td>
+                  <td colspan="7" style="background:#FFFBDF"></td>
                 </tr>
               `);
 
-              // Set row height
-              $("td", $emptyRow).css({
+              $($emptyRow).css({
+                background: "#FFFBDF",
                 height: "40px",
+                cursor: "pointer",
               });
 
               $emptyRow.hover(
@@ -457,7 +458,7 @@ $(document).on("click", "#basketTable tbody .open-picklist", function (e) {
 
 $(document).on(
   "click",
-  "#picklistItemTable tbody.open-picklisted",
+  "#picklistItemTable tbody .open-picklisted",
   function (e) {
     e.preventDefault();
 
@@ -505,17 +506,23 @@ function openPicklist(picklistNum) {
                 item.DocDate || "",
                 item.ReqBranch || "",
                 // item.PickedQty || "",
-                '<div class="dropdown dropstart">' +
+                '<div class="dropdown dropstart" data-bs-auto-close="outside">' +
                   '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
                   '<i class="bi bi-three-dots"></i></button>' +
                   `<ul class="dropdown-menu">
                     <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
-                    <li><a class="dropdown-item" href="pdf/req.php?srn=${item.BaseNum_SRN}&picklist=${picklistNum}" target="_blank">Print</a></li>
+                    <li>
+                      <a class="dropdown-item print-picklist" 
+                        href="#"
+                        data-srn="${item.BaseNum_SRN}"
+                        data-picklist="${picklistNum}">
+                        Print
+                      </a>
+                    </li>
                   </ul>
                 </div>`,
               ]);
             });
-
             $("#picklistItemTable").DataTable().clear().destroy();
             $("#picklistItemTable").DataTable({
               data: rows,
@@ -586,6 +593,33 @@ function openPicklist(picklistNum) {
                   );
                   tableBody.append($emptyRow);
                 }
+
+                // Attach click for Print buttons dynamically
+                // $(".print-picklist")
+                //   .off("click")
+                //   .on("click", function (e) {
+                //     e.preventDefault();
+                //     e.stopPropagation(); // prevent dropdown or row click from interfering
+
+                //     const srn = $(this).data("srn");
+                //     const picklist = $(this).data("picklist");
+
+                //     Swal.fire({
+                //       title: "Print this Picklist?",
+                //       text: "Do you want to generate the PDF?",
+                //       icon: "question",
+                //       showCancelButton: true,
+                //       confirmButtonText: "Yes, print it",
+                //       cancelButtonText: "Cancel",
+                //     }).then((result) => {
+                //       if (result.isConfirmed) {
+                //         window.open(
+                //           `pdf/req.php?srn=${srn}&picklist=${picklist}`,
+                //           "_blank",
+                //         );
+                //       }
+                //     });
+                //   });
               },
             });
           } else {
@@ -793,7 +827,13 @@ function loadBasket() {
                 '<i class="bi bi-three-dots"></i></button>' +
                 `<ul class="dropdown-menu">
                   <li><a class="dropdown-item open-picklist" href="#">Open</a></li>
-                  <li><a class="dropdown-item" href="pdf/requests.php?picklist=${item.PickLst_Num}" target="_blank">Print</a></li>
+                  <li>
+                      <a class="dropdown-item print-picklist" 
+                        href="#"
+                        data-picklist="${item.PickLst_Num}">
+                        Print
+                      </a>
+                    </li>
                 </ul>
               </div>`,
             ]);
@@ -879,6 +919,36 @@ function loadBasket() {
                 );
                 tableBody.append($emptyRow);
               }
+
+              $("#basketTable").on("click", ".print-picklist", function (e) {
+                e.preventDefault();
+                e.stopPropagation(); // prevent dropdown or row click from interfering
+
+                const srn = $(this).data("srn");
+                const PKlistNum = $(this).data("picklist");
+
+                Swal.fire({
+                  title: "Print this Picklist?",
+                  icon: "question",
+                  showCancelButton: true,
+                  confirmButtonText: "Print",
+                  confirmButtonColor: "#0d6efd",
+                  cancelButtonText: "Cancel",
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    $.post(
+                      "dirs/incoming/dashboard/actions/save_print_delivery.php",
+                      { PKlistNum: PKlistNum },
+                      function () {
+                        window.open(
+                          `pdf/requests.php?srn=${srn}&picklist=${PKlistNum}`,
+                          "_blank",
+                        );
+                      },
+                    );
+                  }
+                });
+              });
             },
           });
         } else {
@@ -902,17 +972,47 @@ $(document).on("click", ".print-picklisted", function (e) {
 });
 
 // PRINT PICKLIST ITEMS
-function printPicklist() {
-  Swal.fire({
-    icon: "question",
-    title: "Are you sure to print this picklist?",
-    text: "This will set the picklist into receiving process",
-    showConfirmButton: true,
-    confirmButtonText: "Yes, print picklist",
-    showCancelButton: true,
-    cancelButtonText: "Back",
-  });
-}
+// $(document).on("click", ".print-picklist", function (e) {
+//   e.preventDefault();
+//   e.stopPropagation();
+
+//   const srn = $(this).data("srn");
+//   const picklist = $(this).data("picklist");
+
+//   Swal.fire({
+//     title: "Print this Picklist?",
+//     text: "Do you want to generate the PDF?",
+//     icon: "question",
+//     showCancelButton: true,
+//     confirmButtonText: "Yes, print it",
+//     cancelButtonText: "Cancel",
+//   }).then((result) => {
+//     if (result.isConfirmed) {
+//       window.open(`pdf/req.php?srn=${srn}&picklist=${picklist}`, "_blank");
+//     }
+//   });
+// });
+
+// $("#basketTable").on("click", ".print-picklist", function (e) {
+//   e.preventDefault();
+//   e.stopPropagation(); // prevent dropdown or row click from interfering
+
+//   const srn = $(this).data("srn");
+//   const picklist = $(this).data("picklist");
+
+//   Swal.fire({
+//     title: "Print this Picklist?",
+//     text: "Do you want to generate the PDF?",
+//     icon: "question",
+//     showCancelButton: true,
+//     confirmButtonText: "Yes, print it",
+//     cancelButtonText: "Cancel",
+//   }).then((result) => {
+//     if (result.isConfirmed) {
+//       window.open(`pdf/req.php?srn=${srn}&picklist=${picklist}`, "_blank");
+//     }
+//   });
+// });
 
 // PRINT INDIVIDUAL SRN IN PICKLIST
 function printSrnPicklist(RowNum) {
