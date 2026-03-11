@@ -91,6 +91,11 @@ function loadIncoming() {
           ]);
         });
 
+        let minRows = 8;
+        if (rows.length < minRows) {
+          rows.push(["", "", "", "", "", "", "", ""]);
+        }
+
         if ($.fn.DataTable.isDataTable("#incomingTableDisplay")) {
           $("#incomingTableDisplay").DataTable().clear().destroy();
           $("#incomingTableDisplay tbody").empty();
@@ -143,8 +148,8 @@ function loadIncoming() {
           drawCallback: function () {
             let tableBody = $("#incomingTableDisplay tbody");
 
-            // Remove DataTables generated empty row
-            // tableBody.find("td.dataTables_empty").closest("tr").remove();
+            tableBody.find(".empty-row").remove();
+            tableBody.find("td.dataTables_empty").closest("tr").remove();
 
             let currentRows = tableBody.find("tr").length;
 

@@ -1,5 +1,5 @@
 <div class="table-responsive">
-    <table class="table datatables table-hover" id="outgoingTable">
+    <table class="table datatables table-hover" id="deliveryItemsTable">
         <thead class="sticky-top">
             <tr>
                 <th class="text-secondary">SRN</th>
