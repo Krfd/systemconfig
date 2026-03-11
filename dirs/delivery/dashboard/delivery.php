@@ -9,4 +9,5 @@
     </div>
     <div id="delivery_content"></div>
 </div>
+<script src="assets/js/load.js"></script>
 <script src="dirs/delivery/dashboard/script/delivery.js"></script>

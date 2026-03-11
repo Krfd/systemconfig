@@ -42,11 +42,11 @@ try {
     foreach ($items as $item) {
         $ins_item->execute([
             $SRN,
-            $item['brand'],      // ItemBrand
-            $item['code'],       // Model
-            $item['model'], // Item number / ItemName
-            $item['category'],      // ItemGroup / Category
-            $item['quantity'],        // Quantity
+            $item['brand'],
+            $item['model'],
+            $item['code'],
+            $item['category'],
+            $item['quantity'],
             $Userid
         ]);
     }

@@ -1,3 +1,12 @@
+<div id="pageLoader"
+    class="position-fixed top-0 start-0 w-100 vh-100 d-none 
+            justify-content-center align-items-center bg-white"
+    style="z-index: 1055;">
+    <div class="text-center">
+        <div class="spinner-border text-primary" role="status"></div>
+        <div class="mt-2">Loading...</div>
+    </div>
+</div>
 <div class="card shadow-sm overflow-auto" id="dashboard-display" style="max-height: 75vh">
     <div class="card-body">
         <section class="content">
@@ -8,53 +17,45 @@
                             <div class="d-flex flex-column gap-1 col-2">
                                 <div>
                                     <label for="drno" class="form-label text-dark-emphasis"><small>DR No:</small></label>
-                                    <input type="text" name="drno" id="drno" class="form-control form-control-sm" style="background: #FFFBDF" value="DR-10001" readonly>
+                                    <input type="text" name="drno" id="drno" class="form-control form-control-sm" style="background: #FFFBDF" readonly>
                                 </div>
                                 <div>
                                     <label for="pcklstno" class="form-label text-dark-emphasis"><small>Picklist No:</small></label>
-                                    <input type="text" name="pcklstno" id="pcklstno" class="form-control form-control-sm" style="background: #FFFBDF" value="PL10001" readonly>
+                                    <input type="text" name="pcklstno" id="pcklstno" class="form-control form-control-sm" style="background: #FFFBDF" readonly>
                                 </div>
                                 <div class="input-group col p-0">
                                     <div class="col p-0">
                                         <label for="origin" class="form-label text-dark-emphasis"><small>Origin:</small></label>
-                                        <select name="origin" id="origin" class="form-select form-select-sm" style="background: #FFFBDF" readonly>
-                                            <option value="showroom" selected>SHOWROOM</option>
-                                        </select>
+                                        <input type="text" id="origin" class="form-control form-control-sm" style="background: #FFFBDF" readonly>
                                     </div>
                                     <div class="col p-0">
                                         <label for="whcode" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
-                                        <select name="whcode" id="whcode" class="form-select form-select-sm" style="background: #FFFBDF" readonly>
-                                            <option value="SHOWWH" selected>SHOWWH</option>
-                                        </select>
+                                        <input type="text" id="whcode" class="form-control form-control-sm" style="background: #FFFBDF" readonly>
                                     </div>
                                 </div>
                                 <div class="input-group col p-0">
                                     <div class="col p-0">
                                         <label for="branchName" class="form-label text-dark-emphasis"><small>Destination:</small></label>
-                                        <select name="branchName" id="branchName" class="form-select form-select-sm" style="background: #FFFBDF;" readonly>
-                                            <option value="plaza" selected>PLAZA</option>
-                                        </select>
+                                        <input type="text" id="branchName" class="form-control form-control-sm" style="background: #FFFBDF;" readonly>
                                     </div>
                                     <div class="col p-0">
                                         <label for="branchWhCode" class="form-label text-dark-emphasis"><small>WHS Code:</small></label>
-                                        <select name="branchWhCode" id="branchWhCode" class="form-select form-select-sm" style="background: #FFFBDF" readonly>
-                                            <option value="plzawh" selected>PLZAWH</option>
-                                        </select>
+                                        <input type="text" id="branchWhCode" class="form-control form-control-sm" style="background: #FFFBDF" readonly>
                                     </div>
                                 </div>
                             </div>
                             <div class="d-flex flex-column gap-1">
                                 <div>
                                     <label for="deldate" class="form-label text-dark-emphasis"><small>Delivery Date:</small></label>
-                                    <input type="text" name="deldate" id="deldate" class="form-control form-control-sm" style="background: #FFFBDF" value="01/30/2026" readonly>
+                                    <input type="text" name="deldate" id="deldate" class="form-control form-control-sm" style="background: #FFFBDF" readonly>
                                 </div>
                                 <div>
                                     <label for="docdate" class="form-label text-dark-emphasis"><small>Document Date:</small></label>
-                                    <input type="text" name="docdate" id="docdate" class="form-control form-control-sm" style="background: #FFFBDF" value="01/30/2026" readonly>
+                                    <input type="text" name="docdate" id="docdate" class="form-control form-control-sm" style="background: #FFFBDF" readonly>
                                 </div>
                                 <div>
                                     <label for="status" class="form-label text-dark-emphasis"><small>Status:</small></label>
-                                    <input type="text" name="status" id="status" class="form-control form-control-sm" style="background: #FFFBDF" value="IN TRANSIT" readonly>
+                                    <input type="text" name="status" id="status" class="form-control form-control-sm" style="background: #FFFBDF" readonly>
                                 </div>
                             </div>
                         </div>
@@ -131,6 +132,15 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <div id="totalRowOutside" class="d-flex border-top fw-bold"
+                            style="background:#FFF7BC;">
+                            <div class="p-2 flex-grow-1 text-end">
+                                Total Quantity:
+                            </div>
+                            <div class="p-2" style="width:120px;" id="totalQuantity">
+                                0
+                            </div>
                         </div>
                         <div class="d-flex justify-content-start align-items-start mt-5 gap-1">
                             <div class="d-flex flex-column gap-1">

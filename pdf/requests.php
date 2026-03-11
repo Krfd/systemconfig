@@ -17,9 +17,6 @@ $Uid = $_SESSION['Uid'];
 
 try {
 
-    $toDeliver = $conn->prepare("EXEC dbo.[DELIVERY_Num_GENERATOR] ?");
-    $toDeliver->execute([$Uid]);
-
     $picklistData = $conn->prepare("EXEC dbo.[PRINT_PDF_PICK_LIST] ?, ?");
     $picklistData->execute([$Uid, $picklist]);
 

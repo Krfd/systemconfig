@@ -2,25 +2,25 @@
 require_once "../../../../config/connection.php";
 session_start();
 
-$Uid     = $_SESSION['Uid'];
+$User         = $_SESSION['Uid'];
+$PickLst_Num       = $_POST['PickLst_Num'];
 
 try {
   $conn->beginTransaction();
 
-  $fetch_incoming = $conn->prepare("EXEC dbo.[INCOMING_REQ] ?");
-  $fetch_incoming->execute([$Uid]);
-  $get_incomingrequest = $fetch_incoming->fetchAll(PDO::FETCH_ASSOC);
+  $srn_breakdown = $conn->prepare("EXEC dbo.[LOADING_BREAKDOWN_SRN_ITEMS] ?, ?");
+  $srn_breakdown->execute([$User, $PickLst_Num]);
+  $get_srn = $srn_breakdown->fetchAll(PDO::FETCH_ASSOC);
 
   $conn->commit();
 
   $response = array(
     "isSuccess" => 'success',
-    "Data" => $get_incomingrequest
+    "Data" => $get_srn
   );
   echo json_encode($response);
 } catch (PDOException $e) {
   $conn->rollback();
-  errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
   $response = array(
     "isSuccess" => 'Failed',
     "Data" => "<b>Error. Please Contact System Developer. <br/></b>" . $e->getMessage()

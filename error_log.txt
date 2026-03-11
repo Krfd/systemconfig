@@ -1,2 +1,0 @@
-[2026-03-10 21:48:57] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [64].  in C:\xampp\htdocs\ishift\config\connection.php on line 18
-[2026-03-10 21:48:57] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishift\index.php on line 13
