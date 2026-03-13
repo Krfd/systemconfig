@@ -4,7 +4,7 @@ require_once "../../../../config/connection.php";
 session_start();
 
 // $Userid = $_SESSION['Uid'];
-$RowNum = $_POST['RowNum'] ?? $_GET['RowNum'] ?? null;;
+$RowNum = $_POST['RowNum'];
 
 try {
 

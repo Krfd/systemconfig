@@ -75,12 +75,8 @@
                         </div>
                         <div id="totalRowOutside" class="d-flex border-top fw-bold"
                             style="background:#FFF7BC;">
-                            <div class="p-2 flex-grow-1 text-end">
-                                Total Quantity:
-                            </div>
-                            <div class="p-2" style="width:120px;" id="totalQuantity">
-                                0
-                            </div>
+                            <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>
+                            <div class="p-2" style="width:120px;" id="totalQuantity">0</div>
                         </div>
                         <div class="d-flex justify-content-between align-items-end mt-3">
                             <div class="d-flex flex-column gap-1 col-4">
@@ -94,7 +90,7 @@
                                 </div>
                                 <div class="d-flex align-items-baseline gap-3">
                                     <label for="remarksForm" class="form-label text-dark-emphasis col-4"><small>Remarks:</small></label>
-                                    <textarea name="remarksForm" id="remarksForm" class="form-control form-control-sm col" rows="3" style="background: #FFFBDF; height: auto"></textarea>
+                                    <textarea name="remarksForm" id="remarksForm" class="form-control form-control-sm col" rows="3" style="background: #FFFBDF; height: auto" maxlength="100"></textarea>
                                 </div>
                             </div>
                             <div>

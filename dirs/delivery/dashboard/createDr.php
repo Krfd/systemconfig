@@ -9,11 +9,11 @@
 </div>
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-start align-items-baseline gap-3">
-        <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadDeliveryDashboard()">
+        <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadDeliveryBasketContent()">
             <i class="bi bi-arrow-left"></i>
         </button>
         <div class="d-flex justify-content-start align-items-start gap-3">
-            <h3 class="fw-bold text-primary">Delivery</h3>
+            <h3 class="fw-bold text-primary">New Delivery</h3>
         </div>
     </div>
     <div class="card shadow-sm overflow-auto" id="dashboard-display">
@@ -56,7 +56,7 @@
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-baseline gap-3">
                                         <label for="deldate" class="form-label text-dark-emphasis col-4"><small>Delivery Date:</small></label>
-                                        <input type="text" name="deldate" id="deldate" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                        <input type="date" name="deldate" id="deldate" class="form-control form-control-sm col" style="background: #FFFBDF">
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="docdate" class="form-label text-dark-emphasis col-4"><small>Document Date:</small></label>
@@ -68,9 +68,16 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive mt-5 d-flex gap-1 overflow-auto" style="max-height: 450px">
+                            <div class="d-flex justify-content-end align-items-baseline gap-3 mt-5">
+                                <div class="form-check form-switch d-flex gap-1">
+                                    <label for="serialToggler" class="form-check-label">Serial: </label>
+                                    <input type="checkbox" id="serialToggler" role="switch" class="form-check-input">
+                                </div>
+                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addDeliveryUnit">Add</button>
+                            </div>
+                            <div class="table-responsive d-flex gap-1 overflow-auto mt-3" style="max-height: 450px">
                                 <table class="table table-hover col-2" id="serialTable">
-                                    <thead>
+                                    <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary" colspan="2">Serial No.</th>
                                         </tr>
@@ -82,63 +89,72 @@
                                     </tbody>
                                 </table>
                                 <table class="table table-hover col" id="deliveryTable">
-                                    <thead>
+                                    <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary">Brand</th>
                                             <th class="text-secondary">Model</th>
                                             <th class="text-secondary">Category</th>
                                             <th class="text-secondary">Quantity</th>
+                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!-- <tr style="height: 30px; min-height: 30px; cursor: pointer">
-                                        <td class="text-secondary" style="background: #FFFBDF">SAMSUNG</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">EF-DX211-GALAXY A+ KEYBOARD SLIM</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">PHONE ACCESSORIES</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">5</td>
-                                    </tr>
-                                    <tr style="height: 30px; min-height: 30px; cursor: pointer">
-                                        <td class="text-secondary" style="background: #FFFBDF">SAMSUNG</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">SAM166-GALAXY A16 5G 4+128GB GOLD</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">PHONE</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">5</td>
-                                    </tr>
-                                    <tr style="height: 30px; min-height: 30px; cursor: pointer">
-                                        <td class="text-secondary" style="background: #FFFBDF">SAMSUNG</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">SAMSUNG 25W POWER ADAPTER</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">PHONE ACCESSORIES</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">30</td>
-                                    </tr>
-                                    <tr style="height: 30px; min-height: 30px; cursor: pointer">
-                                        <td class="text-secondary" style="background: #FFFBDF">SAMSUNG</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">EF-DX211-GALAXY A+ KEYBOARD SLIM</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">PHONE ACCESSORIES</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">10</td>
-                                    </tr>
-                                    <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr>
-                                    <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr>
-                                    <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr>
-                                    <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr> -->
+                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
+                                            <td class="text-secondary" style="background: #FFFBDF">SAMSUNG</td>
+                                            <td class="text-secondary" style="background: #FFFBDF">EF-DX211-GALAXY A+ KEYBOARD SLIM</td>
+                                            <td class="text-secondary" style="background: #FFFBDF">PHONE ACCESSORIES</td>
+                                            <td class="text-secondary" style="background: #FFFBDF">5</td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -151,21 +167,20 @@
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="prepby" class="form-label text-dark-emphasis col-4"><small>Prepared by:</small></label>
-                                        <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #FFFBDF" placeholder="Prepared by" value="Vjay Endoma" readonly>
+                                        <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #FFFBDF">
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="plate" class="form-label text-dark-emphasis col-4"><small>Truck Plate No:</small></label>
-                                        <input type="text" name="plate" id="plate" class="form-control form-control-sm col" style="background: #FFFBDF" placeholder="Truck Plate No." value="KGH-345" readonly>
+                                        <input type="text" name="plate" id="plate" class="form-control form-control-sm col" style="background: #FFFBDF">
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="driver" class="form-label text-dark-emphasis col-4"><small>Driver:</small></label>
-                                        <input type="text" name="driver" id="driver" class="form-control form-control-sm col" style="background: #FFFBDF" placeholder="Driver" value="Roger Amaguin" readonly>
+                                        <input type="text" name="driver" id="driver" class="form-control form-control-sm col" style="background: #FFFBDF">
                                     </div>
                                 </div>
                                 <div class="col-2">
                                     <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
-                                    <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto; resize: horizontal" placeholder="Remarks" maxlength="100" readonly>
-                                    Please transfer the following units, ASAP.
+                                    <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto; resize: horizontal" maxlength="100">
                                 </textarea>
                                 </div>
                             </div>

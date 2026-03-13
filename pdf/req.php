@@ -11,195 +11,300 @@ if (!isset($_GET['srn']) || !isset($_GET['picklist'])) {
     return;
 }
 
-$srn = $_GET['srn'];
-$picklist = $_GET['picklist'];
+try {
+    $srn = $_GET['srn'];
+    $picklist = $_GET['picklist'];
 
-$stmt = $conn->prepare("SELECT * FROM SRN_REQUEST WHERE BaseNum_SRN = ?");
-$stmt->execute([$srn]);
+    $stmt = $conn->prepare("SELECT * FROM SRN_REQUEST WHERE BaseNum_SRN = ?");
+    $stmt->execute([$srn]);
 
-$item = $conn->prepare("SELECT RowNum, ItemBrand, ItemName, ItemGroup, Quantity FROM SRN_ITM WHERE BaseNum_SRN = ?");
-$item->execute([$srn]);
+    $item = $conn->prepare("SELECT RowNum, ItemBrand, ItemName, ItemGroup, Quantity FROM SRN_ITM WHERE BaseNum_SRN = ?");
+    $item->execute([$srn]);
 
-$srnData = $stmt->fetch(PDO::FETCH_OBJ);
-$itemData = $item->fetchAll(PDO::FETCH_OBJ);
+    $srnData = $stmt->fetch(PDO::FETCH_OBJ);
+    $itemData = $item->fetchAll(PDO::FETCH_OBJ);
 
-$status = $srnData->RequestStatus;
-// $date = date("F d, Y", strtotime($srnData->DocDate));
-$date = isset($srnData->DocDate)
-    ? date("m/d/y", strtotime($srnData->DocDate))
-    : "N/A";
-$origin = $srnData->Orgin_Dstnation;
-$purpose = $srnData->RequestPurpose;
-$requestedBy = $srnData->PrepBy;
-$remarks = $srnData->Remarks;
-$textColor = [50, 50, 50];
+    $status = $srnData->RequestStatus;
+    // $date = date("F d, Y", strtotime($srnData->DocDate));
+    $date = isset($srnData->DocDate)
+        ? date("m/d/y", strtotime($srnData->DocDate))
+        : "N/A";
+    $origin = $srnData->Orgin_Dstnation;
+    $purpose = $srnData->RequestPurpose;
+    $requestedBy = $srnData->PrepBy;
+    $remarks = $srnData->Remarks;
+    $textColor = [50, 50, 50];
 
-class PDF extends FPDF
-{
-
-    function Header()
+    class PDF extends FPDF
     {
-        $this->Image('../assets/image/header/header.png', 5, 10, 190);
-        $this->Ln(35);
-    }
 
-    function Footer()
-    {
-        $this->Image('../assets/image/footer/footer.jpg', 10, 270, 190);
-        $this->SetTextColor($GLOBALS['textColor'][0], $GLOBALS['textColor'][1], $GLOBALS['textColor'][2]);
-        $this->SetY(-15);
-        $this->SetFont('Arial', '', 8);
-        $this->SetTextColor(120, 120, 120);
+        function Header()
+        {
+            $this->Image('../assets/image/header/header.png', 5, 10, 190);
+            $this->Ln(35);
+        }
 
-        $this->Cell(
-            0,
-            10,
-            'Page ' . $this->PageNo() . ' of {nb}',
-            0,
-            0,
-            'C'
-        );
-    }
-}
+        function Footer()
+        {
+            $this->Image('../assets/image/footer/footer.jpg', 10, 270, 190);
+            $this->SetTextColor($GLOBALS['textColor'][0], $GLOBALS['textColor'][1], $GLOBALS['textColor'][2]);
+            $this->SetY(-15);
+            $this->SetFont('Arial', '', 8);
+            $this->SetTextColor(120, 120, 120);
 
-$pdf = new PDF();
-$pdf->AliasNbPages();
-$pdf->AddPage();
+            $this->Cell(
+                0,
+                10,
+                'Page ' . $this->PageNo() . ' of {nb}',
+                0,
+                0,
+                'C'
+            );
+        }
 
-function headerDetails($pdf, $picklist, $srn, $status, $date, $origin)
-{
-    global $textColor;
-    $labelWidth = 15;
-    $colonWidth = 3;
-    $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
+        function NbLines($w, $txt)
+        {
+            $cw = &$this->CurrentFont['cw'];
 
-    $pdf->SetFont('Arial', 'B', 9);
-    $pdf->Cell($labelWidth, 5, 'PICKLIST ', 0, 0);
-    $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
-    $pdf->Cell(0, 5, $picklist, 0, 1);
-    $pdf->SetFont('Arial', '', 9);
-    $pdf->Cell($labelWidth, 5, 'SRN ', 0, 0);
-    $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
-    $pdf->Cell(0, 5, $srn, 0, 1);
-    $pdf->Cell($labelWidth, 5, 'Status: ', 0, 0);
-    $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
-    $pdf->Cell(0, 5, $status, 0, 1);
-    $pdf->Cell($labelWidth, 5, 'Date ', 0, 0);
-    $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
-    $pdf->Cell(0, 5, $date, 0, 1);
-    $pdf->Cell($labelWidth, 5, 'Origin ', 0, 0);
-    $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
-    $pdf->Cell(0, 5, $origin, 0, 1);
+            if ($w == 0)
+                $w = $this->w - $this->rMargin - $this->x;
 
-    $pdf->Ln(1);
-}
+            $wmax = ($w - 2 * $this->cMargin) * 1000 / $this->FontSize;
 
-/* ---------- BOTTOM LEFT FUNCTION ---------- */
+            $s = str_replace("\r", '', $txt);
+            $nb = strlen($s);
 
-function bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $textColor)
-{
-    $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
-    $pdf->SetY(-100);
-    $pdf->SetX(10);
+            if ($nb > 0 && $s[$nb - 1] == "\n")
+                $nb--;
 
-    // Purpose
-    $pdf->SetFont('Arial', 'B', 9);
-    $pdf->Cell(0, 5, 'Purpose of Request', 0, 1);
+            $sep = -1;
+            $i = 0;
+            $j = 0;
+            $l = 0;
+            $nl = 1;
 
-    $pdf->SetFont('Arial', '', 9);
-    $pdf->Cell(0, 5, $purpose, 0, 1);
+            while ($i < $nb) {
+                $c = $s[$i];
 
-    $pdf->Ln(3);
+                if ($c == "\n") {
+                    $i++;
+                    $sep = -1;
+                    $j = $i;
+                    $l = 0;
+                    $nl++;
+                    continue;
+                }
 
-    // Requested By
-    $pdf->SetFont('Arial', 'B', 9);
-    $pdf->Cell(0, 5, 'Requested by', 0, 1);
+                if ($c == ' ')
+                    $sep = $i;
 
-    $pdf->SetFont('Arial', '', 9);
-    $pdf->Cell(0, 5, $requestedBy, 0, 1);
+                $l += $cw[$c];
 
-    $pdf->Ln(3);
+                if ($l > $wmax) {
+                    if ($sep == -1) {
+                        if ($i == $j)
+                            $i++;
+                    } else
+                        $i = $sep + 1;
 
-    // Remarks
-    $pdf->SetFont('Arial', 'B', 9);
-    $pdf->Cell(0, 5, 'Remarks', 0, 1);
+                    $sep = -1;
+                    $j = $i;
+                    $l = 0;
+                    $nl++;
+                } else
+                    $i++;
+            }
 
-    $pdf->SetFont('Arial', '', 9);
-    $pdf->Cell(0, 5, $remarks, 0, 1);
-}
-
-function renderItemsTable($pdf, $itemData, $textColor)
-{
-    /* ---------- TITLE ---------- */
-
-    $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
-    $pdf->Ln(3);
-    $pdf->SetFont('Arial', 'B', 20);
-    $pdf->Cell(0, 12, 'REQUEST', 0, 1, 'C');
-    $pdf->Ln(3);
-
-    $pdf->SetFont('Arial', 'B', 9);
-
-    $headers = [
-        '#' => 10,
-        'Brand' => 60,
-        'Model' => 60,
-        'Category' => 40,
-        'Quantity' => 20
-    ];
-
-    $pdf->SetFont('Arial', 'B', 9);
-    $pdf->SetFillColor(255, 255, 0);
-    foreach ($headers as $text => $width) {
-        if ($text === '#') {
-            $pdf->Cell($width, 5, $text, 1, 0, 'C', true);
-        } else {
-            $pdf->Cell($width, 5, $text, 1, 0, '', true);
+            return $nl;
         }
     }
-    $pdf->Ln();
-    $pdf->SetFont('Arial', '', 9);
 
-    $i = 1;
-    $totalQty = 0;
+    $pdf = new PDF();
+    $pdf->AliasNbPages();
+    $pdf->AddPage();
 
-    foreach ($itemData as $row) {
-        $totalQty += $row->Quantity;
+    function headerDetails($pdf, $picklist, $srn, $status, $date, $origin)
+    {
+        global $textColor;
+        $labelWidth = 15;
+        $colonWidth = 3;
+        $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
 
-        $pdf->Cell($headers['#'], 5, $i, 1, 0, 'C');
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell($labelWidth, 5, 'PICKLIST ', 0, 0);
+        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+        $pdf->Cell(0, 5, $picklist, 0, 1);
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->Cell($labelWidth, 5, 'SRN ', 0, 0);
+        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+        $pdf->Cell(0, 5, $srn, 0, 1);
+        $pdf->Cell($labelWidth, 5, 'Status: ', 0, 0);
+        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+        $pdf->Cell(0, 5, $status, 0, 1);
+        $pdf->Cell($labelWidth, 5, 'Date ', 0, 0);
+        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+        $pdf->Cell(0, 5, $date, 0, 1);
+        $pdf->Cell($labelWidth, 5, 'Origin ', 0, 0);
+        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+        $pdf->Cell(0, 5, $origin, 0, 1);
 
-        $brandWidth = max($headers['Brand'], $pdf->GetStringWidth($row->ItemBrand) + 4);
-        $modelWidth = max($headers['Model'], $pdf->GetStringWidth($row->ItemName) + 4);
-        $categoryWidth = max($headers['Category'], $pdf->GetStringWidth($row->ItemGroup) + 4);
-        $quantityWidth = max($headers['Quantity'], $pdf->GetStringWidth($row->Quantity) + 4);
-
-        $pdf->Cell($brandWidth, 5, $row->ItemBrand, 1, 0);
-        $pdf->Cell($modelWidth, 5, $row->ItemName, 1, 0);
-        $pdf->Cell($categoryWidth, 5, $row->ItemGroup, 1, 0);
-        $pdf->Cell($quantityWidth, 5, $row->Quantity, 1, 1, 'C');
-
-        $i++;
+        $pdf->Ln(1);
     }
 
-    $pdf->SetFont('Arial', 'B', 9);
+    /* ---------- BOTTOM LEFT FUNCTION ---------- */
 
-    $labelWidth =
-        $headers['#'] +
-        $headers['Brand'] +
-        $headers['Model'] +
-        $headers['Category'];
+    function bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $textColor)
+    {
+        $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
+        $pdf->SetY(-100);
+        $pdf->SetX(10);
 
-    $pdf->Cell($labelWidth, 6, 'Total Quantity', 1, 0, 'R');
-    $pdf->Cell($headers['Quantity'], 6, $totalQty, 1, 1, 'C');
+        // Purpose
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell(0, 5, 'Purpose of Request', 0, 1);
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->Cell(0, 5, $purpose, 0, 1);
+
+        $pdf->Ln(3);
+
+        // Requested By
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell(0, 5, 'Requested by', 0, 1);
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->Cell(0, 5, $requestedBy, 0, 1);
+
+        $pdf->Ln(3);
+
+        // Remarks
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell(0, 5, 'Remarks', 0, 1);
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->Cell(0, 5, $remarks, 0, 1);
+    }
+
+    function renderItemsTable($pdf, $itemData, $textColor)
+    {
+        /* ---------- TITLE ---------- */
+
+        $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
+        $pdf->Ln(3);
+        $pdf->SetFont('Arial', 'B', 20);
+        $pdf->Cell(0, 12, 'REQUEST', 0, 1, 'C');
+        $pdf->Ln(3);
+
+        $pdf->SetFont('Arial', 'B', 9);
+
+        $headers = [
+            '#' => 10,
+            'Brand' => 35,
+            'Model' => 80,
+            'Category' => 40,
+            'Quantity' => 20
+        ];
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->SetFillColor(255, 255, 0);
+        foreach ($headers as $text => $width) {
+            $pdf->Cell($width, 5, $text, 1, 0, 'C', true);
+        }
+        $pdf->Ln();
+        $pdf->SetFont('Arial', '', 9);
+
+        $lineHeight = 5;
+        $i = 1;
+        $totalQty = 0;
+
+        foreach ($itemData as $row) {
+            $totalQty += $row->Quantity;
+
+            // $pdf->Cell($headers['#'], 5, $i, 1, 0, 'C');
+
+            // $brandWidth = max($headers['Brand'], $pdf->GetStringWidth($row->ItemBrand) + 4);
+            // $modelWidth = max($headers['Model'], $pdf->GetStringWidth($row->ItemName) + 4);
+            // $categoryWidth = max($headers['Category'], $pdf->GetStringWidth($row->ItemGroup) + 4);
+            // $quantityWidth = max($headers['Quantity'], $pdf->GetStringWidth($row->Quantity) + 4);
+
+            $brandLines = $pdf->NbLines($headers['Brand'], $row->ItemBrand);
+            $modelLines = $pdf->NbLines($headers['Model'], $row->ItemName);
+            $categoryLines = $pdf->NbLines($headers['Category'], $row->ItemGroup);
+
+            $maxLines = max($brandLines, $modelLines, $categoryLines, 1);
+            $rowHeight = $lineHeight * $maxLines;
+
+            $x = $pdf->GetX();
+            $y = $pdf->GetY();
+
+            // $pdf->Cell($brandWidth, 5, $row->ItemBrand, 1, 0);
+            // $pdf->Cell($modelWidth, 5, $row->ItemName, 1, 0);
+            // $pdf->Cell($categoryWidth, 5, $row->ItemGroup, 1, 0);
+            // $pdf->Cell($quantityWidth, 5, $row->Quantity, 1, 1, 'C');
+
+            /* ---------- COLUMN # ---------- */
+            $pdf->MultiCell($headers['#'], $rowHeight, $i, 1, 'C');
+            $pdf->SetXY($x + $headers['#'], $y);
+
+            /* ---------- BRAND ---------- */
+            $pdf->MultiCell($headers['Brand'], $rowHeight, $row->ItemBrand, 1);
+            $pdf->SetXY($x + $headers['#'] + $headers['Brand'], $y);
+
+            /* ---------- MODEL ---------- */
+            // $pdf->SetFont('Arial', '', ($pdf->GetStringWidth($row->ItemName) > $headers['Model']) ? 8 : 9);
+            // $pdf->Cell($headers['Model'], $lineHeight, $row->ItemName, 1);
+            $modelText = $row->ItemName;
+
+            // Shrink font if too wide
+            if ($pdf->GetStringWidth($modelText) > $headers['Model']) {
+                $pdf->SetFont('Arial', '', 8); // shrink font
+            } else {
+                $pdf->SetFont('Arial', '', 9); // normal font
+            }
+
+            // Output as a single line cell (no MultiCell)
+            $pdf->Cell($headers['Model'], $rowHeight, $modelText, 1);
+            $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'], $y);
+
+            /* ---------- CATEGORY ---------- */
+            $pdf->MultiCell($headers['Category'], $rowHeight, $row->ItemGroup, 1);
+            $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'], $y);
+
+            /* ---------- QUANTITY ---------- */
+            $pdf->MultiCell($headers['Quantity'], $rowHeight, $row->Quantity, 1, 'C');
+
+            $i++;
+        }
+
+        $pdf->SetFont('Arial', 'B', 9);
+
+        // $labelWidth =
+        //     $headers['#'] +
+        //     $headers['Brand'] +
+        //     $headers['Model'] +
+        //     $headers['Category'];
+
+        // $pdf->Cell($labelWidth, 6, 'Total Quantity', 1, 0, 'R');
+        // $pdf->Cell($headers['Quantity'], 6, $totalQty, 1, 1, 'C');
+
+        // ---------- TOTAL QUANTITY ----------
+        $pdf->SetFont('Arial', 'B', 9);
+        $labelWidth = $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'];
+        $pdf->Cell($labelWidth, 6, 'Total Quantity', 1, 0, 'R');
+        $pdf->Cell($headers['Quantity'], 6, $totalQty, 1, 1, 'C');
+    }
+
+    /* ---------- HEADER ---------- */
+
+    headerDetails($pdf, $picklist, $srn, $status, $date, $origin);
+    renderItemsTable($pdf, $itemData, $textColor);
+    bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $textColor);
+
+    /* ---------- OUTPUT ---------- */
+
+    ob_end_clean();
+    $pdf->Output('I', 'Hello.pdf');
+} catch (PDOException $e) {
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
+    echo "Connection failed: " . $e->getMessage();
 }
-
-/* ---------- HEADER ---------- */
-
-headerDetails($pdf, $picklist, $srn, $status, $date, $origin);
-renderItemsTable($pdf, $itemData, $textColor);
-bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $textColor);
-
-/* ---------- OUTPUT ---------- */
-
-ob_end_clean();
-$pdf->Output('I', 'Hello.pdf');

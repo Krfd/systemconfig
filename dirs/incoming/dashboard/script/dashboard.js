@@ -22,17 +22,15 @@ function loadDashboard() {
   cancelPicklist();
 }
 
-// var incomingTable;
-
-// $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
-//   return this.api()
-//     .column(col, { order: "index" })
-//     .nodes()
-//     .map(function (td) {
-//       if ($(td).text().trim() === "") return Infinity; // push empty rows to bottom
-//       return $(td).text();
-//     });
-// };
+$.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
+  return this.api()
+    .column(col, { order: "index" })
+    .nodes()
+    .map(function (td) {
+      if ($(td).text().trim() === "") return Infinity; // push empty rows to bottom
+      return $(td).text();
+    });
+};
 
 function loadIncoming() {
   $.ajax({
@@ -91,10 +89,11 @@ function loadIncoming() {
           ]);
         });
 
-        // let minRows = 8;
-        // if (rows.length < minRows) {
-        //   rows.push(["", "", "", "", "", "", "", ""]);
-        // }
+        if (rows.length === 0) {
+          for (let i = 0; i < 8; i++) {
+            rows.push(["", "", "", "", "", "", "", ""]);
+          }
+        }
 
         if ($.fn.DataTable.isDataTable("#incomingTableDisplay")) {
           $("#incomingTableDisplay").DataTable().clear().destroy();
@@ -130,7 +129,6 @@ function loadIncoming() {
               "min-height": "40px",
               cursor: "pointer",
             });
-
             $("td:eq(1)", row).addClass("text-center");
             $("td:eq(2)", row).addClass("text-primary");
             $("td:eq(6)", row).addClass("text-start");
@@ -147,10 +145,6 @@ function loadIncoming() {
           },
           drawCallback: function () {
             let tableBody = $("#incomingTableDisplay tbody");
-
-            tableBody.find(".empty-row").remove();
-            tableBody.find("td.dataTables_empty").closest("tr").remove();
-
             let currentRows = tableBody.find("tr").length;
 
             for (let i = currentRows; i < 8; i++) {
@@ -160,13 +154,12 @@ function loadIncoming() {
                   <td colspan="7" style="background:#FFFBDF"></td>
                 </tr>
               `);
-
               $($emptyRow).css({
                 background: "#FFFBDF",
                 height: "40px",
+                "min-height": "40px",
                 cursor: "pointer",
               });
-
               $emptyRow.hover(
                 function () {
                   $("td:not(:first-child)", this).css("background", "#FFF4C2");
@@ -175,7 +168,6 @@ function loadIncoming() {
                   $("td:not(:first-child)", this).css("background", "#FFFBDF");
                 },
               );
-
               tableBody.append($emptyRow);
             }
           },
@@ -425,8 +417,6 @@ function openIncoming(RowNum) {
   });
 }
 
-var basketTable;
-
 // PICK LIST BASKET
 function picklistBasket() {
   if ($.fn.DataTable.isDataTable("#basketTable")) {
@@ -450,31 +440,42 @@ function loadIncomingDashboard() {
   }, 200);
 }
 
-$(document).on("click", "#basketTable tbody .open-picklist", function (e) {
+$(document).on("dblclick", "#basketTable tbody .open-picklist", function (e) {
   e.preventDefault();
   let $row = $(this).closest("tr");
   let picklistNum = $row.attr("data-picklist-num");
-  picklistNumber = picklistNum;
   $("#main-content").html(spinner);
   setTimeout(function () {
     openPicklist(picklistNum);
   }, 200);
 });
 
-$(document).on(
-  "click",
-  "#picklistItemTable tbody .open-picklisted",
-  function (e) {
-    e.preventDefault();
+$(document).on("click", ".dropdown .open-picklist-items", function (e) {
+  e.preventDefault();
 
-    let picklistedRow = $(this).closest("tr");
-    let RowNum = picklistedRow.attr("data-rownum");
-    $("#main-content").html(spinner);
-    setTimeout(function () {
-      openPicklistedForm(RowNum);
-    }, 200);
-  },
-);
+  let picklistedRow = $(this).closest("tr");
+  let picklistNum = picklistedRow.attr("data-picklist-num");
+
+  picklistNumRef = picklistNum;
+
+  console.log(`OPENING PICKLIST ITEMS`);
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    openPicklist(picklistNum);
+  }, 200);
+});
+
+$(document).on("click", ".dropdown .open-picklisted", function (e) {
+  e.preventDefault();
+
+  let picklistedRow = $(this).closest("tr");
+  let RowNum = picklistedRow.attr("data-rownum");
+
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    openPicklistedForm(RowNum);
+  }, 200);
+});
 
 function openPicklist(picklistNum) {
   $.post(
@@ -504,8 +505,6 @@ function openPicklist(picklistNum) {
 
               existingSeries.add(item.BaseNum_SRN);
 
-              console.log(`PICKLIST NUMBER: ${picklistNum}`);
-
               rows.push([
                 item.BaseNum_SRN || "",
                 item.DocDate || "",
@@ -532,8 +531,8 @@ function openPicklist(picklistNum) {
             $("#picklistItemTable").DataTable({
               data: rows,
               columns: [
-                { title: "SRN", className: "text-center open-picklisted" },
-                { title: "Date", className: "text-center ps-5" },
+                { title: "SRN", className: "text-start open-picklisted ps-5" },
+                { title: "Date", className: "text-start ps-5" },
                 { title: "Requesting Branch", className: "text-start ps-5" },
                 // { title: "Quantity" },
                 { title: "", orderable: false },
@@ -600,31 +599,33 @@ function openPicklist(picklistNum) {
                 }
 
                 // Attach click for Print buttons dynamically
-                // $(".print-picklist")
-                //   .off("click")
-                //   .on("click", function (e) {
-                //     e.preventDefault();
-                //     e.stopPropagation(); // prevent dropdown or row click from interfering
+                $(".print-picklist")
+                  .off("click")
+                  .on("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation(); // prevent dropdown or row click from interfering
 
-                //     const srn = $(this).data("srn");
-                //     const picklist = $(this).data("picklist");
+                    const srn = $(this).data("srn");
+                    const picklist = $(this).data("picklist");
 
-                //     Swal.fire({
-                //       title: "Print this Picklist?",
-                //       text: "Do you want to generate the PDF?",
-                //       icon: "question",
-                //       showCancelButton: true,
-                //       confirmButtonText: "Yes, print it",
-                //       cancelButtonText: "Cancel",
-                //     }).then((result) => {
-                //       if (result.isConfirmed) {
-                //         window.open(
-                //           `pdf/req.php?srn=${srn}&picklist=${picklist}`,
-                //           "_blank",
-                //         );
-                //       }
-                //     });
-                //   });
+                    // console.log(`SRN: ${srn} : PICKLIST: ${picklist}`);
+
+                    // Swal.fire({
+                    //   title: "Print this Picklist?",
+                    //   icon: "question",
+                    //   showCancelButton: true,
+                    //   confirmButtonText: "Print",
+                    //   confirmButtonColor: "#0d6efd",
+                    //   cancelButtonText: "Cancel",
+                    // }).then((result) => {
+                    //   if (result.isConfirmed) {
+                    window.open(
+                      `pdf/req.php?srn=${srn}&picklist=${picklist}`,
+                      "_blank",
+                    );
+                    //   }
+                    // });
+                  });
               },
             });
           } else {
@@ -642,12 +643,13 @@ function openPicklist(picklistNum) {
 // DISPLAY PICKLIST
 function loadPicklistItems() {
   $("#main-content").html(spinner);
+  console.log(`RETURNING BACK TO PICKLIST ITEMS`);
   setTimeout(function () {
     $.post(
       "dirs/incoming/dashboard/picklistItem.php",
-      { picklistNum: picklistNumber },
+      { picklistNum: picklistNumRef },
       function (data) {
-        openPicklist(picklistNumber);
+        openPicklist(picklistNumRef);
       },
     );
   }, 200);
@@ -693,6 +695,7 @@ function loadBasketContent() {
 
 // ALREADY HAS A PICKLIST NUMBER
 function openPicklistedForm(RowNum) {
+  console.log(`OPENING PICKLISTED FORM`);
   $("#pageLoader").removeClass("d-none");
   $.post(
     "dirs/incoming/dashboard/picklistedForm.php",
@@ -791,16 +794,6 @@ function loadBasket() {
   $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
     $("#main-content").html(data);
 
-    $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
-      return this.api()
-        .column(col, { order: "index" })
-        .nodes()
-        .map(function (td) {
-          if ($(td).text().trim() === "") return Infinity;
-          return $(td).text();
-        });
-    };
-
     $.ajax({
       url: "dirs/incoming/dashboard/actions/picklisteditems.php",
       type: "POST",
@@ -831,7 +824,7 @@ function loadBasket() {
                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
                 '<i class="bi bi-three-dots"></i></button>' +
                 `<ul class="dropdown-menu">
-                  <li><a class="dropdown-item open-picklist" href="#">Open</a></li>
+                  <li><a class="dropdown-item open-picklist-items" href="#">Open</a></li>
                   <li>
                       <a class="dropdown-item print-picklist" 
                         href="#"
@@ -857,8 +850,11 @@ function loadBasket() {
           $("#basketTable").DataTable({
             data: rows,
             columns: [
-              { title: "Picklist No.", className: "text-center open-picklist" },
-              { title: "Date", className: "text-start" },
+              {
+                title: "Picklist No.",
+                className: "text-start open-picklist ps-5",
+              },
+              { title: "Date", className: "text-start ps-5" },
               { title: "Quantity", className: "text-center" },
               { title: "", orderable: false },
             ],
@@ -925,35 +921,35 @@ function loadBasket() {
                 tableBody.append($emptyRow);
               }
 
-              $("#basketTable").on("click", ".print-picklist", function (e) {
-                e.preventDefault();
-                e.stopPropagation(); // prevent dropdown or row click from interfering
+              // $("#basketTable").on("click", ".print-picklist", function (e) {
+              //   e.preventDefault();
+              //   e.stopPropagation(); // prevent dropdown or row click from interfering
 
-                const srn = $(this).data("srn");
-                const PKlistNum = $(this).data("picklist");
+              //   // const srn = $(this).data("srn");
+              //   const PKlistNum = $(this).data("picklist");
 
-                Swal.fire({
-                  title: "Print this Picklist?",
-                  icon: "question",
-                  showCancelButton: true,
-                  confirmButtonText: "Print",
-                  confirmButtonColor: "#0d6efd",
-                  cancelButtonText: "Cancel",
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    $.post(
-                      "dirs/incoming/dashboard/actions/save_print_delivery.php",
-                      { PKlistNum: PKlistNum },
-                      function () {
-                        window.open(
-                          `pdf/requests.php?picklist=${PKlistNum}`,
-                          "_blank",
-                        );
-                      },
-                    );
-                  }
-                });
-              });
+              //   Swal.fire({
+              //     title: "Print this Picklist?",
+              //     icon: "question",
+              //     showCancelButton: true,
+              //     confirmButtonText: "Print",
+              //     confirmButtonColor: "#0d6efd",
+              //     cancelButtonText: "Cancel",
+              //   }).then((result) => {
+              //     if (result.isConfirmed) {
+              //       $.post(
+              //         "dirs/incoming/dashboard/actions/save_print_delivery.php",
+              //         { PKlistNum: PKlistNum },
+              //         function () {
+              //           window.open(
+              //             `pdf/requests.php?picklist=${PKlistNum}`,
+              //             "_blank",
+              //           );
+              //         },
+              //       );
+              //     }
+              //   });
+              // });
             },
           });
         } else {
@@ -967,24 +963,30 @@ function loadBasket() {
   });
 }
 
-$(document).on("click", ".print-picklisted", function (e) {
+// PRINT PICKLIST
+$("#basketTable").on("click", ".print-picklist", function (e) {
   e.preventDefault();
+  e.stopPropagation(); // prevent dropdown or row click from interfering
 
-  let picklistedRow = $(this).closest("tr");
-  let RowNum = picklistedRow.attr("data-rownum");
+  // const srn = $(this).data("srn");
+  const PKlistNum = $(this).data("picklist");
 
-  printSrnPicklist(RowNum);
-});
-
-// PRINT INDIVIDUAL SRN IN PICKLIST
-function printSrnPicklist(RowNum) {
-  console.log("Printing picklist for SRN RowNum: " + RowNum);
   Swal.fire({
+    title: "Print this Picklist?",
     icon: "question",
-    title: "Print this Request?",
-    showConfirmButton: true,
-    confirmButtonText: "Yes, print",
     showCancelButton: true,
-    cancelButtonText: "Back",
+    confirmButtonText: "Print",
+    confirmButtonColor: "#0d6efd",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.post(
+        "dirs/incoming/dashboard/actions/save_print_delivery.php",
+        { PKlistNum: PKlistNum },
+        function () {
+          window.open(`pdf/requests.php?picklist=${PKlistNum}`, "_blank");
+        },
+      );
+    }
   });
-}
+});

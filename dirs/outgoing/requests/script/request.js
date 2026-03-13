@@ -1,14 +1,7 @@
 $(document).ready(function () {
-  // loadDashboard();
   if (typeof CURRENT_ROWNUM !== "undefined" && CURRENT_ROWNUM !== "") {
     loadOutgoingDetails(CURRENT_ROWNUM);
   }
-  // function initOutgoingRequest(rowNum) {
-  //   if (!rowNum) return;
-
-  //   loadOutgoingDetails(rowNum);
-  //   console.log(`ROWNUM: ${rowNum}`);
-  // }
 });
 
 $(document).ready(function () {
@@ -20,12 +13,6 @@ $(document).ready(function () {
     },
   });
 });
-
-// function loadDashboard() {
-//   $.post("dirs/outgoing/requests/request.php", {}, function (data) {
-//     $("#request_content").html(data);
-//   });
-// }
 
 function returnOutgoing() {
   $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
@@ -85,7 +72,6 @@ function loadOutgoingDetails(RowNum) {
           `;
         });
 
-        // console.log(`TOTAL QUANTITY: ${totalQty}`);
         $("#totalReqQuantity").text(totalQty);
         $("#openIncomingTable tbody").html(rows);
 
@@ -109,44 +95,9 @@ function loadOutgoingDetails(RowNum) {
       } else {
         alert(response.Data);
       }
-
-      // populateForm(response);
     },
     error: function (xhr) {
       console.error(xhr.responseText);
     },
   });
 }
-
-// function populateForm(data) {
-//   console.log(data);
-//   console.log(`BASE NUM: ${data.BaseNum_SRN}`);
-//   $("#srn").val(data.BaseNum_SRN);
-//   $("#date").val(data.DocDate);
-//   $("#status").val(data.RequestStatus);
-//   $("#purpose").val(data.RequestPurpose);
-//   $("#reqBy").val(data.PrepBy);
-//   $("#remarks").val(data.Remarks);
-
-//   // populate table
-//   let tbody = $("#openIncomingTable tbody");
-//   tbody.empty();
-
-//   let totalQty = 0;
-
-//   data.items.forEach((item, index) => {
-//     totalQty += parseInt(item.quantity);
-
-//     tbody.append(`
-//       <tr>
-//         <td>${index + 1}</td>
-//         <td>${item.Brand}</td>
-//         <td>${item.Model}</td>
-//         <td>${item.Category}</td>
-//         <td>${item.Quantity}</td>
-//       </tr>
-//     `);
-//   });
-
-//   $("#totalReqQuantity").text(totalQty);
-// }

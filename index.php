@@ -213,6 +213,9 @@ try {
                 ]
             });
             let picklistNumber = null;
+            let picklistNumRef;
+            let deliveryPicklistNum;
+            let deliveryNum;
         })
     </script>
 </body>

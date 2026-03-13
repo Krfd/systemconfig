@@ -30,8 +30,6 @@ function newRequest() {
   });
 }
 
-var outgoingTable;
-
 $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
   return this.api()
     .column(col, { order: "index" })

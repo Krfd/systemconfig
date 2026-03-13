@@ -1,2 +1,4 @@
 [2026-03-10 18:49:07] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\ishift\actions\logout.php on line 4
 [2026-03-10 21:38:07] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Unable to complete login process due to delay in opening server connection in C:\xampp\htdocs\ishift\config\connection.php on line 18
+[2026-03-12 10:07:09] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShift\actions\logout.php on line 4
+[2026-03-12 11:41:39] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShift\actions\logout.php on line 4
