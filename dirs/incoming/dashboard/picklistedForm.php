@@ -9,7 +9,7 @@
 </div>
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-start align-items-baseline gap-3">
-        <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadPicklistItems()">
+        <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadPicklistItems(picklistNumRef)">
             <i class="bi bi-arrow-left"></i>
         </button>
         <div class="d-flex justify-content-start align-items-start gap-3">

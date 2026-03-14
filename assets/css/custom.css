@@ -73,3 +73,107 @@
 .custom-switch input:checked+label .right {
     color: #fff;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* CREATE DELIVERY */
+.modern-switch {
+    position: relative;
+    width: 125px;
+    height: 30px;
+    cursor: pointer;
+    display: inline-block;
+    font-family: sans-serif;
+}
+
+/* hide checkbox */
+.modern-switch input {
+    display: none;
+}
+
+/* track */
+.switch-track {
+    position: absolute;
+    inset: 0;
+    background: #198754;
+    /* success */
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    color: white;
+    font-weight: 600;
+    font-size: 13px;
+    transition: background .35s ease;
+}
+
+/* text positions */
+.switch-text {
+    z-index: 1;
+    transition: opacity .25s ease;
+}
+
+.switch-text.right {
+    text-align: right;
+}
+
+/* knob */
+.switch-knob {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 60px;
+    height: 22px;
+    border-radius: 30px;
+    background: white;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .25) inset;
+    transition:
+        left .35s cubic-bezier(.4, 0, .2, 1),
+        transform .2s ease;
+}
+
+/* hover */
+.modern-switch:hover .switch-knob {
+    transform: scale(1.05);
+}
+
+/* checked state */
+.modern-switch input:checked+.switch-track {
+    background: #0d6efd;
+    /* primary */
+}
+
+/* move knob */
+.modern-switch input:checked~.switch-knob {
+    left: 58px;
+}
+
+/* text fade effect */
+.modern-switch input:checked+.switch-track .left {
+    opacity: .4;
+    transition-delay: .1s;
+}
+
+.modern-switch input:checked+.switch-track .right {
+    opacity: 1;
+    transition-delay: .15s;
+}
+
+.modern-switch input:not(:checked)+.switch-track .left {
+    opacity: 1;
+}
+
+.modern-switch input:not(:checked)+.switch-track .right {
+    opacity: .4;
+}

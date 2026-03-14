@@ -70,7 +70,7 @@
                             </div>
                             <div class="table-responsive mt-5 d-flex gap-1 overflow-auto" style="max-height: 450px">
                                 <table class="table table-hover col-2" id="serialTable">
-                                    <thead>
+                                    <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary" colspan="2">Serial No.</th>
                                         </tr>
@@ -82,7 +82,7 @@
                                     </tbody>
                                 </table>
                                 <table class="table table-hover col" id="deliveryTable">
-                                    <thead>
+                                    <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary">Brand</th>
                                             <th class="text-secondary">Model</th>

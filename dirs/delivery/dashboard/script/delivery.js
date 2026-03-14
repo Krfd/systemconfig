@@ -203,7 +203,8 @@ $(document).on(
     let PickLst_Num = $row.attr("data-picklist");
     let del_num = $row.attr("data-delivery-num");
     deliveryPicklistNum = PickLst_Num;
-    deliveryNUm = del_num;
+    deliveryNum = del_num;
+
     $("#main-content").html(spinner);
     setTimeout(function () {
       loadDeliveryItems(PickLst_Num, del_num);
@@ -217,7 +218,7 @@ $(document).on("click", ".dropdown .open-picklisted", function (e) {
   let del_num = $(this).closest("tr").attr("data-delivery-num");
 
   deliveryPicklistNum = Picklist;
-  deliveryNUm = del_num;
+  deliveryNum = del_num;
 
   $("#main-content").html(spinner);
   setTimeout(function () {
@@ -240,9 +241,49 @@ $(document).on("click", ".dropdown .create-dr", function (e) {
   }, 200);
 });
 
+// TRIGGER SERIAL
+$(document).on("dblclick", "#deliveryTable tbody tr", {}, function (e) {
+  let brand = $(this).find("td:nth-child(1)").text().trim();
+  let model = $(this).find("td:nth-child(2)").text().trim();
+  let quantity = parseInt($(this).find("td:nth-child(4)").text().trim());
+  let value = brand + " - " + model;
+
+  let DeliveryNum = "DR10003";
+
+  let count = 0;
+  $("#serialTable tbody td").each(function () {
+    if (count < quantity) {
+      $(this).text(value); // overwrite or fill
+      // CALL THE API FOR SERIAL
+      // $("#main-content").html(spinner);
+      serialData(DeliveryNum);
+      count++;
+    } else {
+      $(this).text("");
+      console.log("");
+    }
+  });
+});
+
+function serialData(DeliveryNum) {
+  $.post(
+    "dirs/delivery/dashboard/actions/get_review_deliveries.php",
+    { DeliveryNum: DeliveryNum },
+    function (data) {
+      let res = "";
+      try {
+        res = JSON.parse(data);
+        console.log(`DATA: ${JSON.stringify(res.Data)}`);
+        console.log(`DEV ITEMS: ${JSON.stringify(res.DevItems)}`);
+      } catch (err) {
+        console.error("Error fetching serial: ", err);
+      }
+    },
+  );
+}
+
 // CREATE DELIVERY
 function createDr(createDeliveryNumber, picklistDr) {
-  console.log(`CREATE DR PICKLIST : ${picklistDr}`);
   $.post("dirs/delivery/dashboard/createDr.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
 
@@ -250,8 +291,6 @@ function createDr(createDeliveryNumber, picklistDr) {
     // let totalQty = 0;
     // let header = response.Data;
     // let items = response.Items;
-
-    // console.log(`DELIVERY FORM DATA: ${JSON.stringify(response.Data)}`);
 
     $("#drno").val(createDeliveryNumber);
     $("#pcklstno").val(picklistDr);
@@ -295,9 +334,46 @@ function createDr(createDeliveryNumber, picklistDr) {
     //   }
     //   $("#totalQuantity").text(totalQty);
     // }
+
+    // NEW DELIVERY TOGGLER
+    const toggler = document.getElementById("serialToggler");
+    const knob = document.querySelector(".switch-knob");
+    const manual = document.querySelector(".switch-track .manual");
+    const scan = document.querySelector(".switch-track .scan");
+    const newSerial = document.getElementById("newSerial");
+
+    function updateKnob() {
+      if (toggler.checked) {
+        toggler.dataset.value = "Scan";
+        knob.style.width = "55px";
+        knob.style.transform = "translateX(8px)";
+        toggler.dataset.value = "Scan";
+        scan.classList.remove("text-white");
+        scan.classList.add("text-primary");
+        manual.classList.add("text-white");
+        newSerial.removeAttribute("readonly");
+        console.log("Serial manual");
+      } else {
+        toggler.dataset.value = "Manual";
+        knob.style.width = "60px";
+        knob.style.transform = "translateX(0px)";
+        toggler.dataset.value = "Manual";
+        manual.classList.remove("text-white");
+        manual.classList.add("text-success");
+        scan.classList.add("text-white");
+        newSerial.setAttribute("readonly", "");
+        console.log("Serial scan");
+      }
+    }
+
+    updateKnob();
+
+    toggler.addEventListener("change", updateKnob);
+    // ----------------------------------------------------------
   });
 }
 
+// LOAD DELIVERY BASKET
 function loadDeliveryBasketContent() {
   if ($.fn.DataTable.isDataTable("#deliveryBasketTable")) {
     $("#deliveryBasketTable").DataTable().clear().destroy();
@@ -460,7 +536,6 @@ $(document).on("click", ".remove-picklist", function (e) {
   e.stopPropagation();
 
   let picklist_num = $(this).data("picklist");
-  console.log(`PICKLIST NUMBER: ${picklist_num}`);
   removePicklist(picklist_num);
 });
 
@@ -528,12 +603,9 @@ $(document).on("click", "#deliveryItemsTable tbody .open-srn", function (e) {
   let DeliveryNum = picklistedRow.attr("data-delivery-num");
   let PicklistNumber = picklistedRow.attr("data-picklist");
 
-  console.log(`SRN: ${SRN}`);
-  console.log(`RowNum: ${RowNum}`);
-
   $("#main-content").html(spinner);
   setTimeout(function () {
-    openDeliveryForm(DeliveryNum, PicklistNumber, RowNum);
+    openDeliveryForm(DeliveryNum, PicklistNumber, RowNum, SRN);
   }, 200);
 });
 
@@ -599,9 +671,13 @@ function removeSRN(SRN) {
   });
 }
 
+// LOAD DELIVERY ITEMS
 function loadDeliveryItems(PickLst_Num, del_num) {
   $.post("dirs/delivery/dashboard/loadDeliveryItems.php", {}, function (data) {
     $("#main-content").html(data);
+
+    deliveryPicklistNum = PickLst_Num;
+    deliveryNum = del_num;
 
     $.ajax({
       url: "dirs/delivery/dashboard/actions/get_loading_breakdown.php",
@@ -645,7 +721,7 @@ function loadDeliveryItems(PickLst_Num, del_num) {
 
           if (rows.length === 0) {
             for (let i = 0; i < 8; i++) {
-              rows.push(["", "", "", ""]);
+              rows.push(["", "", "", "", ""]);
             }
           }
 
@@ -739,18 +815,19 @@ function loadDeliveryItems(PickLst_Num, del_num) {
 
 $(document).on("dblclick", "#deliveryItemsTable tbody tr", function (e) {
   if ($(e.target).closest(".dropdown").length) return;
-  let SRN = $(this).find("td:nth-child(1)").text().trim();
 
-  console.log(`SRN : ${SRN}`);
+  let SRN = $(this).data("srn-num");
+  let PickLst_Num = $(this).data("picklist");
+  let DeliveryNum = $(this).data("delivery-num");
+  let RowNum = "";
 
-  // $("#main-content").html(spinner);
-  // setTimeout(function () {
-  //   console.log(`LOADED DELIVERY ITEMS`);
-  //   openDeliverySrn(SRN);
-  // }, 200);
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    openDeliveryForm(DeliveryNum, PickLst_Num, RowNum, SRN);
+  }, 200);
 });
 
-// LOAD DELIVERY ITEMS - SHOULD BE FROM DELIVERY DASHBOARD
+// DELIVERY DASHBOARD - FORM
 function openForm(DeliveryNum, PicklistNumber, RowNumber) {
   $.post("dirs/delivery/dashboard/form.php", function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
@@ -815,37 +892,11 @@ function openForm(DeliveryNum, PicklistNumber, RowNumber) {
   });
 }
 
-// INDIVIDUAL DELIVERY SRN
-// function openDeliverySrn(SRN) {
-//   $.post("dirs/delivery/dashboard/deliveryForm.php", function (data) {
-//     console.log(`LOADED DELIVERY ITEMS`);
-//     $("#main-content").hide().html(data).fadeIn(200);
-
-//     $.ajax({
-//       // url: "dirs/delivery/dashboard/actions/get_review_deliveries.php",
-//       url: "dirs/delivery/dashboard/actions/get_openincoming.php",
-//       type: "POST",
-//       data: { SRN: SRN },
-//       dataType: "json",
-//       success: function (response) {
-//         if (response.isSuccess === "success") {
-//           let rowCount = "";
-//           let totalQty = 0;
-//         } else {
-//         }
-//       },
-//     });
-//   });
-// }
-
-// console.log(
-//   `INDEX PICKLIST NUM: ${deliveryPicklistNum} - INDEX DELIVERY NUM: ${deliveryNum}`,
-// );
-
 // OPEN DELIVERY FORM FROM DELIVERY ITEMS
-function openDeliveryForm(DeliveryNum, PicklistNumber, RowNum) {
+function openDeliveryForm(DeliveryNum, PicklistNumber, RowNum, SRN) {
   $.post("dirs/delivery/dashboard/deliveryForm.php", function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
+
     $.ajax({
       url: "dirs/incoming/dashboard/actions/get_openincoming.php",
       type: "POST",
@@ -853,12 +904,12 @@ function openDeliveryForm(DeliveryNum, PicklistNumber, RowNum) {
       dataType: "json",
       success: function (response) {
         if (response.isSuccess === "success") {
+          $("#deliverySRN").text(SRN);
+
           let rowCount = response.Items.length;
           let totalQty = 0;
           let header = response.Data;
           let items = response.Items;
-
-          console.log(`DELIVERY FORM DATA: ${JSON.stringify(response.Data)}`);
 
           $("#drno").val(DeliveryNum);
           $("#pcklstno").val(PicklistNumber);
@@ -924,10 +975,10 @@ function loadDeliveryUnits() {
 
       tbody.html(`
             <tr>
-                <td colspan="6" class="text-center" style="background:#FFFBDF;">
-                    <span class="spinner-border spinner-border-sm text-secondary me-2"></span>
-                    Loading items...
-                </td>
+              <td colspan="6" class="text-center" style="background:#FFFBDF;">
+                  <span class="spinner-border spinner-border-sm text-secondary me-2"></span>
+                  Loading items...
+              </td>
             </tr>
         `);
     },
@@ -944,7 +995,6 @@ function loadDeliveryUnits() {
           // <td class="ps-2 align-middle" style="background: #FFFBDF; padding: 3px">${item.DisplayRowNumber}</td>
 
           let row = `<tr class="item-row">
-                        
                         <td class="ps-2 align-middle item-brand" style="background: #FFFBDF; padding: 3px">${item.ItemBrand}</td>
                         <td class="ps-2 align-middle item-model" style="background: #FFFBDF; padding: 3px">${item.ItemName}</td>
                         <td class="ps-2 align-middle item-category" style="background: #FFFBDF; padding: 3px">${item.ItemGroup}</td>
@@ -957,7 +1007,6 @@ function loadDeliveryUnits() {
                         </td>
                       </tr>
                     `;
-
           tbody.append(row);
         });
 
@@ -1050,7 +1099,6 @@ function loadDeliveryUnits() {
       }
     },
     error: function (xhr, status, error) {
-      console.log(error);
       Swal.fire({
         icon: "error",
         title: "Error",

@@ -9,6 +9,18 @@ $PKlistNum = $_POST['PKlistNum'];
 
 try {
 
+    // Validate Pick List Number if Exist then Return
+    $validatePicklist = $conn->prepare("EXEC dbo.[VALIDATE_PICKLIST_TO_Delivery] ? ,?");
+    $validatePicklist->execute([$Userid, $PKlistNum]);
+    if ($validatePicklist->fetchColumn() > 0) {
+        $conn->rollBack();
+        echo json_encode([
+            "status" => "error",
+            "message" => "This Picklist already exists"
+        ]);
+        exit;
+    }
+
     $conn->beginTransaction();
 
     /* -------------------------------------------------
@@ -101,7 +113,6 @@ try {
         "status" => "success",
         "delivery_number" => $DeliveryNumber
     ]);
-
 } catch (Throwable $e) {
 
     if ($conn->inTransaction()) {
@@ -113,4 +124,3 @@ try {
         "message" => $e->getMessage()
     ]);
 }
-?>

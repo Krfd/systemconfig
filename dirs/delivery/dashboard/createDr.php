@@ -60,20 +60,28 @@
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="docdate" class="form-label text-dark-emphasis col-4"><small>Document Date:</small></label>
-                                        <input type="text" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                        <input type="date" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #FFFBDF">
                                     </div>
-                                    <div class="d-flex align-baseline gap-3">
+                                    <div class="d-flex align-items-baseline gap-3">
                                         <label for="status" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>
                                         <input type="text" name="status" id="status" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                     </div>
                                 </div>
                             </div>
+                            <!-- SERIAL AND ADD BUTTON -->
                             <div class="d-flex justify-content-end align-items-baseline gap-3 mt-5">
-                                <div class="form-check form-switch d-flex gap-1">
-                                    <label for="serialToggler" class="form-check-label">Serial: </label>
-                                    <input type="checkbox" id="serialToggler" role="switch" class="form-check-input">
+                                <div class="d-flex align-items-center gap-2">
+                                    <label class="mb-0 text-secondary">Serial:</label>
+                                    <label class="modern-switch shadow-sm rounded-5">
+                                        <input type="checkbox" id="serialToggler" class="p-1">
+                                        <div class="switch-track px-3 d-flex justify-content-center gap-4">
+                                            <span class="switch-text text-center text-white manual">Manual</span>
+                                            <span class="switch-text text-start text-white scan">Scan</span>
+                                        </div>
+                                        <div class="switch-knob shadow"></div>
+                                    </label>
                                 </div>
-                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addDeliveryUnit">Add</button>
+                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addDeliveryModal"><i class="bi bi-plus"></i> Add</button>
                             </div>
                             <div class="table-responsive d-flex gap-1 overflow-auto mt-3" style="max-height: 450px">
                                 <table class="table table-hover col-2" id="serialTable">
@@ -107,10 +115,10 @@
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                            <td class="text-secondary" style="background: #FFFBDF"></td>
-                                            <td class="text-secondary" style="background: #FFFBDF"></td>
-                                            <td class="text-secondary" style="background: #FFFBDF"></td>
-                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td class="text-secondary" style="background: #FFFBDF">PANASONIC</td>
+                                            <td class="text-secondary" style="background: #FFFBDF">AF-AX233-GALAXY B+ KEYBOARD FLAT</td>
+                                            <td class="text-secondary" style="background: #FFFBDF">REFRIGERATOR</td>
+                                            <td class="text-secondary" style="background: #FFFBDF">10</td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px; cursor: pointer">
@@ -163,26 +171,28 @@
                                 <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>
                                 <div class="p-2" style="width:120px;" id="totalQuantity">0</div>
                             </div>
-                            <div class="d-flex justify-content-start align-items-start mt-5 gap-1">
-                                <div class="d-flex flex-column gap-1 col-3">
-                                    <div class="d-flex align-items-baseline gap-3">
-                                        <label for="prepby" class="form-label text-dark-emphasis col-4"><small>Prepared by:</small></label>
-                                        <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #FFFBDF">
+                            <div class="d-flex justify-content-between align-items-end mt-5">
+                                <div class="d-flex justify-content-start align-items-end gap-1 col-7">
+                                    <div class="d-flex flex-column gap-1">
+                                        <div class="d-flex align-items-baseline gap-3">
+                                            <label for="prepby" class="form-label text-dark-emphasis col-5"><small>Prepared by:</small></label>
+                                            <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #FFFBDF">
+                                        </div>
+                                        <div class="d-flex align-items-baseline gap-3">
+                                            <label for="plate" class="form-label text-dark-emphasis col-5"><small>Truck Plate No:</small></label>
+                                            <input type="text" name="plate" id="plate" class="form-control form-control-sm col" style="background: #FFFBDF">
+                                        </div>
+                                        <div class="d-flex align-items-baseline gap-3">
+                                            <label for="driver" class="form-label text-dark-emphasis col-5"><small>Driver:</small></label>
+                                            <input type="text" name="driver" id="driver" class="form-control form-control-sm col" style="background: #FFFBDF">
+                                        </div>
                                     </div>
-                                    <div class="d-flex align-items-baseline gap-3">
-                                        <label for="plate" class="form-label text-dark-emphasis col-4"><small>Truck Plate No:</small></label>
-                                        <input type="text" name="plate" id="plate" class="form-control form-control-sm col" style="background: #FFFBDF">
-                                    </div>
-                                    <div class="d-flex align-items-baseline gap-3">
-                                        <label for="driver" class="form-label text-dark-emphasis col-4"><small>Driver:</small></label>
-                                        <input type="text" name="driver" id="driver" class="form-control form-control-sm col" style="background: #FFFBDF">
+                                    <div class="col-3">
+                                        <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
+                                        <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="4" style="background: #FFFBDF; height: auto; resize: horizontal" maxlength="100"></textarea>
                                     </div>
                                 </div>
-                                <div class="col-2">
-                                    <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
-                                    <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto; resize: horizontal" maxlength="100">
-                                </textarea>
-                                </div>
+                                <button class="clearfix btn btn-primary float-end" type="submit" id="submitDeliveryBtn">Submit</button>
                             </div>
                         </form>
                     </div>
@@ -190,3 +200,4 @@
         </div>
     </div>
 </div>
+<?php include("deliveryModal.php") ?>

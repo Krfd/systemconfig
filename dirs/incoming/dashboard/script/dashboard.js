@@ -440,6 +440,7 @@ function loadIncomingDashboard() {
   }, 200);
 }
 
+// PICKLIST BASKET TO PICKLIST ITEMS
 $(document).on("dblclick", "#basketTable tbody .open-picklist", function (e) {
   e.preventDefault();
   let $row = $(this).closest("tr");
@@ -447,6 +448,15 @@ $(document).on("dblclick", "#basketTable tbody .open-picklist", function (e) {
   $("#main-content").html(spinner);
   setTimeout(function () {
     openPicklist(picklistNum);
+  }, 200);
+});
+
+// PICKLIST ITEMS TO INDIVIDUAL SRN
+$(document).on("dblclick", "#picklistItemTable tbody tr", function (e) {
+  let RowNum = $(this).data("rownum");
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    openPicklistedForm(RowNum);
   }, 200);
 });
 
@@ -607,8 +617,6 @@ function openPicklist(picklistNum) {
 
                     const srn = $(this).data("srn");
                     const picklist = $(this).data("picklist");
-
-                    // console.log(`SRN: ${srn} : PICKLIST: ${picklist}`);
 
                     // Swal.fire({
                     //   title: "Print this Picklist?",

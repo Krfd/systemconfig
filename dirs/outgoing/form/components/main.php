@@ -18,17 +18,21 @@
                                         <option value="Buffing">BUFFING</option>
                                     </select>
                                 </div>
+
+
                                 <div class="input-group col p-0 d-flex gap-1">
                                     <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                         <label for="desForm" class="form-label text-dark-emphasis col-5"><small>Destination:</small></label>
                                         <input type="text" name="desForm" id="desForm" class="form-control form-control-sm col ms-3" style="background: #FFFBDF;" required readonly>
                                     </div>
-                                    <div class="col p-0 d-flex align-items-baseline col">
+                                    <div class="col p-0 d-flex align-items-baseline">
                                         <label for="desCodeForm" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
                                         <select name="desCodeForm" id="desCodeForm" class="form-select form-select-sm col" style="background: #FFFBDF;" required>
                                         </select>
                                     </div>
                                 </div>
+
+
                                 <div class="input-group col p-0 d-flex align-items-baseline gap-1">
                                     <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                         <label for="user-origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
@@ -41,6 +45,9 @@
                                         </select>
                                     </div>
                                 </div>
+
+
+
                             </div>
                             <div class="d-flex flex-column gap-1 col-2">
                                 <div class="d-flex align-items-baseline gap-3">
@@ -54,7 +61,7 @@
                             </div>
                         </div>
                         <div class="float-end my-3">
-                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addRequestUnit">Add</button>
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addRequestUnit"><i class="bi bi-plus"></i> Add</button>
                             <button type="button" class="btn btn-sm btn-danger" onclick="clearTable()">Clear</button>
                         </div>
                         <div class="table-responsive overflow-auto" style="max-height: 450px">

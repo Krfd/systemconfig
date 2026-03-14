@@ -3,7 +3,7 @@ require_once "../../../../config/connection.php";
 session_start();
 
 $User = $_SESSION['Uid'];
-$Delivery_Num = $_POST['Delivery_Num'];
+$Delivery_Num = $_POST['DeliveryNum'];
 
 try {
     $conn->beginTransaction();
