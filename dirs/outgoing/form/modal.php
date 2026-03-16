@@ -31,7 +31,7 @@
                     </div>
                     <input type="hidden" name="itemcode" id="itemcode"><!-- Selected Item code -->
                     <div class="modal-footer">
-                        <button class="btn btn-success" type="submit">Add</button>
+                        <button class="btn btn-success" type="submit" id="outgoingModalBtn">Add</button>
                         <button class="btn btn-danger" type="reset">Clear</button>
                     </div>
                 </div>
@@ -60,6 +60,7 @@
 
         }, function(data) {
             if ($.trim(data) == "OK") {
+$("#outgoingModalBtn").disabled = true;
                 $("#frm-add-order")[0].reset();
                 $("#addRequestUnit").modal('hide');
                 loadItems();

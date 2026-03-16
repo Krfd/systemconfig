@@ -313,19 +313,20 @@ function createDr(createDeliveryNumber, picklistDr) {
           // $("#remarks").val(header.Remarks) || "N/A";
           let rows = "";
           items.forEach(function (item, index) {
-            let quantity = parseFloat(item.Quantity) || 0;
-            totalQty += quantity;
+            // let quantity = parseFloat(item.Quantity) || 0;
+            // totalQty += quantity;
             rows += `
                     <tr style="height: 40px; min-height: 40px;">
                       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px" contenteditable="true"></td>
                       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Brand}</td>
                       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Model}</td>
                       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Category}</td>
-                      <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
                     </tr>
                   `;
+
+                  // <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
           });
-          $("#totalQuantity").text(totalQty);
+          // $("#totalQuantity").text(totalQty);
           $("#deliveryTable tbody").html(rows);
           if (rowCount < 8) {
             let emptyRowsNeeded = 8 - rowCount;
@@ -340,7 +341,7 @@ function createDr(createDeliveryNumber, picklistDr) {
                     `;
               $("#deliveryTable tbody").append(emptyRow);
             }
-            $("#totalQuantity").text(totalQty);
+            // $("#totalQuantity").text(totalQty);
           }
         }
       },
@@ -467,7 +468,9 @@ function loadDeliveryBasket() {
             rows.push([
               item.PickList_Num || "",
               item.DocDate || "",
+              item.DateModified || "03/17/2026",
               item.ItemCount || "",
+              item.Status || "Partial",
               '<div class="dropdown dropstart">' +
                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
                 '<i class="bi bi-three-dots"></i></button>' +

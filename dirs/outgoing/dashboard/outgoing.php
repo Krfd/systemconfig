@@ -10,6 +10,5 @@
     </div>
     <div id="dashboard_content"></div>
 </div>
-<?php include("modal.php") ?>
 <script src="assets/js/load.js"></script>
 <script src="dirs/outgoing/dashboard/script/dashboard.js"></script>

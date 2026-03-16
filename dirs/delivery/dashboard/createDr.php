@@ -42,7 +42,7 @@
                                             <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                         </div>
                                     </div>
-                                    <div class="input-group col p-0 d-flex align-items-baseline gap-1">
+                                    <!-- <div class="input-group col p-0 d-flex align-items-baseline gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="branchName" class="form-label text-dark-emphasis col-5"><small>Destination:</small></label>
                                             <input type="text" id="branchName" class="form-control form-control-sm ms-3" style="background: #FFFBDF;" readonly>
@@ -51,7 +51,7 @@
                                             <label for="branchWhCode" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
                                             <input type="text" id="branchWhCode" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-baseline gap-3">
@@ -90,8 +90,8 @@
                                             <th class="text-secondary">Brand</th>
                                             <th class="text-secondary">Model</th>
                                             <th class="text-secondary">Category</th>
-                                            <th class="text-secondary">Quantity</th>
-                                            <th></th>
+                                            <!-- <th class="text-secondary">Quantity</th> -->
+                                            <!-- <th></th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -103,8 +103,8 @@
                                             <td class=" text-secondary" style="background: #FFFBDF;">SAMSUNG</td>
                                             <td class="text-secondary" style="background: #FFFBDF;">EF-DX211-GALAXY A+ KEYBOARD SLIM</td>
                                             <td class="text-secondary" style="background: #FFFBDF;">PHONE ACCESSORIES</td>
-                                            <td class="text-secondary" style="background: #FFFBDF;">5</td>
-                                            <td style="background: #FFFBDF"></td>
+                                            <!-- <td class="text-secondary" style="background: #FFFBDF;">5</td> -->
+                                            <!-- <td style="background: #FFFBDF"></td> -->
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px;">
                                             <td class="text-secondary" style="background: #FFFBDF; width: 150px; max-width: 150px; overflow-x: hidden; white-space: nowrap;  outline: none; scrollbar-width: none; -ms-overflow-style: none;"
@@ -114,65 +114,65 @@
                                             <td class="text-secondary" style="background: #FFFBDF;">PANASONIC</td>
                                             <td class="text-secondary" style="background: #FFFBDF;">AF-AX233-GALAXY B+ KEYBOARD FLAT</td>
                                             <td class="text-secondary" style="background: #FFFBDF;">REFRIGERATOR</td>
-                                            <td class="text-secondary" style="background: #FFFBDF;">10</td>
-                                            <td style="background: #FFFBDF"></td>
+                                            <!-- <td class="text-secondary" style="background: #FFFBDF;">10</td>
+                                            <td style="background: #FFFBDF"></td> -->
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px;">
                                             <td class="text-secondary" style="background: #FFFBDF"></td>
                                             <td class="text-secondary" style="background: #FFFBDF"></td>
                                             <td class="text-secondary" style="background: #FFFBDF"></td>
                                             <td class="text-secondary" style="background: #FFFBDF"></td>
-                                            <td class="text-secondary" style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
+                                            <!-- <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td> -->
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px;">
                                             <td class="text-secondary" style="background: #FFFBDF"></td>
                                             <td class="text-secondary" style="background: #FFFBDF"></td>
                                             <td class="text-secondary" style="background: #FFFBDF"></td>
                                             <td class="text-secondary" style="background: #FFFBDF"></td>
-                                            <td class="text-secondary" style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
+                                            <!-- <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td> -->
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td> -->
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td> -->
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td> -->
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td> -->
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <div id="totalRowOutside" class="d-flex border-top fw-bold"
+                            <!-- <div id="totalRowOutside" class="d-flex border-top fw-bold"
                                 style="background:#FFF7BC;">
                                 <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>
                                 <div class="p-2" style="width:120px;" id="totalQuantity">0</div>
-                            </div>
+                            </div> -->
                             <div class="d-flex justify-content-between align-items-end mt-5">
                                 <div class="d-flex justify-content-start align-items-end gap-1 col-7">
                                     <div class="d-flex flex-column gap-1">
