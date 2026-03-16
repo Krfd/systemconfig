@@ -40,13 +40,13 @@ try {
     <link rel="stylesheet" href="assets/plugins/daterangepicker/daterangepicker.css">
     <link rel="stylesheet" href="assets/plugins/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/plugins/datatables/datatables.min.css">
-    <link rel="stylesheet" href="assets/css/datatables.min.css">
+    <!-- <link rel="stylesheet" href="assets/css/datatables.min.css"> -->
     <link rel="stylesheet" href="assets/plugins/toastr/toastr.min.css">
     <link rel="stylesheet" href="assets/plugins/sweetalert2/sweetalert2.min.css">
     <link rel="stylesheet" href="assets/plugins/daterangepicker/daterangepicker.css">
     <link rel="stylesheet" href="assets/plugins/summernote/summernote-lite.min.css">
     <link rel="stylesheet" href="assets/plugins/datepicker/jquery-ui.structure.min.css">
-    <link rel="stylesheet" href="node_modules/uikit/dist/css/uikit.min.css">
+    <!-- <link rel="stylesheet" href="node_modules/uikit/dist/css/uikit.min.css"> -->
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/custom.css">
     <link rel="icon" href="assets/image/logo/iap_icon.png">

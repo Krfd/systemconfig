@@ -1,8 +1,6 @@
 $(document).ready(function () {
   loadDashboard();
-});
 
-$(document).ready(function () {
   OverlayScrollbars(document.getElementById("dashboard-display"), {
     className: "os-theme-dark",
     scrollbars: {
@@ -19,9 +17,13 @@ function loadDashboard() {
 }
 
 function receivingForm() {
-  $.post("dirs/receiving/form/form.php", {}, function (data) {
-    $("#main-content").html(data);
-  });
+  $("#main-content").html(spinner);
+  (setTimeout(function () {
+    $.post("dirs/receiving/dashboard/receivingForm.php", {}, function (data) {
+      $("#main-content").html(data);
+    });
+  }),
+    200);
 }
 
 function openRec1() {
@@ -41,3 +43,5 @@ function openRec3() {
     $("#main-content").html(data);
   });
 }
+
+function loadReceivingDashboard() {}

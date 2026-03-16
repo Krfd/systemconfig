@@ -57,7 +57,7 @@ function get_SRN() {
       } else {
         Swal.fire({
           icon: "error",
-          title: "Server under restoring",
+          title: "Server is under maintenance",
           text: "Please come back later",
           showConfirmButton: true,
           confirmButtonText: "OKAY",

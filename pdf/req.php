@@ -220,13 +220,6 @@ try {
         foreach ($itemData as $row) {
             $totalQty += $row->Quantity;
 
-            // $pdf->Cell($headers['#'], 5, $i, 1, 0, 'C');
-
-            // $brandWidth = max($headers['Brand'], $pdf->GetStringWidth($row->ItemBrand) + 4);
-            // $modelWidth = max($headers['Model'], $pdf->GetStringWidth($row->ItemName) + 4);
-            // $categoryWidth = max($headers['Category'], $pdf->GetStringWidth($row->ItemGroup) + 4);
-            // $quantityWidth = max($headers['Quantity'], $pdf->GetStringWidth($row->Quantity) + 4);
-
             $brandLines = $pdf->NbLines($headers['Brand'], $row->ItemBrand);
             $modelLines = $pdf->NbLines($headers['Model'], $row->ItemName);
             $categoryLines = $pdf->NbLines($headers['Category'], $row->ItemGroup);
@@ -237,11 +230,6 @@ try {
             $x = $pdf->GetX();
             $y = $pdf->GetY();
 
-            // $pdf->Cell($brandWidth, 5, $row->ItemBrand, 1, 0);
-            // $pdf->Cell($modelWidth, 5, $row->ItemName, 1, 0);
-            // $pdf->Cell($categoryWidth, 5, $row->ItemGroup, 1, 0);
-            // $pdf->Cell($quantityWidth, 5, $row->Quantity, 1, 1, 'C');
-
             /* ---------- COLUMN # ---------- */
             $pdf->MultiCell($headers['#'], $rowHeight, $i, 1, 'C');
             $pdf->SetXY($x + $headers['#'], $y);
@@ -251,8 +239,6 @@ try {
             $pdf->SetXY($x + $headers['#'] + $headers['Brand'], $y);
 
             /* ---------- MODEL ---------- */
-            // $pdf->SetFont('Arial', '', ($pdf->GetStringWidth($row->ItemName) > $headers['Model']) ? 8 : 9);
-            // $pdf->Cell($headers['Model'], $lineHeight, $row->ItemName, 1);
             $modelText = $row->ItemName;
 
             // Shrink font if too wide
@@ -277,15 +263,6 @@ try {
         }
 
         $pdf->SetFont('Arial', 'B', 9);
-
-        // $labelWidth =
-        //     $headers['#'] +
-        //     $headers['Brand'] +
-        //     $headers['Model'] +
-        //     $headers['Category'];
-
-        // $pdf->Cell($labelWidth, 6, 'Total Quantity', 1, 0, 'R');
-        // $pdf->Cell($headers['Quantity'], 6, $totalQty, 1, 1, 'C');
 
         // ---------- TOTAL QUANTITY ----------
         $pdf->SetFont('Arial', 'B', 9);

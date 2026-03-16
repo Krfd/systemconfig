@@ -475,18 +475,6 @@ $(document).on("click", ".dropdown .open-picklist-items", function (e) {
   }, 200);
 });
 
-$(document).on("click", ".dropdown .open-picklisted", function (e) {
-  e.preventDefault();
-
-  let picklistedRow = $(this).closest("tr");
-  let RowNum = picklistedRow.attr("data-rownum");
-
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    openPicklistedForm(RowNum);
-  }, 200);
-});
-
 function openPicklist(picklistNum) {
   $.post(
     "dirs/incoming/dashboard/picklistItem.php",
@@ -519,22 +507,6 @@ function openPicklist(picklistNum) {
                 item.BaseNum_SRN || "",
                 item.DocDate || "",
                 item.ReqBranch || "",
-                // item.PickedQty || "",
-                '<div class="dropdown dropstart" data-bs-auto-close="outside">' +
-                  '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
-                  '<i class="bi bi-three-dots"></i></button>' +
-                  `<ul class="dropdown-menu">
-                    <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
-                    <li>
-                      <a class="dropdown-item print-picklist" 
-                        href="#"
-                        data-srn="${item.BaseNum_SRN}"
-                        data-picklist="${picklistNum}">
-                        Print
-                      </a>
-                    </li>
-                  </ul>
-                </div>`,
               ]);
             });
             $("#picklistItemTable").DataTable().clear().destroy();
@@ -544,8 +516,6 @@ function openPicklist(picklistNum) {
                 { title: "SRN", className: "text-start open-picklisted ps-5" },
                 { title: "Date", className: "text-start ps-5" },
                 { title: "Requesting Branch", className: "text-start ps-5" },
-                // { title: "Quantity" },
-                { title: "", orderable: false },
               ],
               createdRow: function (row, data, dataIndex) {
                 let originalItem = sortedData[dataIndex];
@@ -588,7 +558,7 @@ function openPicklist(picklistNum) {
                 for (let i = currentRows; i < 8; i++) {
                   let $emptyRow = $(`
                   <tr class="empty-row" style="background: #FFFBDF">
-                    <td colspan="4" style="background: #FFFBDF">&nbsp;</td>
+                    <td colspan="3" style="background: #FFFBDF">&nbsp;</td>
                   </tr>
                 `);
                   $emptyRow.css({
@@ -607,33 +577,6 @@ function openPicklist(picklistNum) {
                   );
                   tableBody.append($emptyRow);
                 }
-
-                // Attach click for Print buttons dynamically
-                $(".print-picklist")
-                  .off("click")
-                  .on("click", function (e) {
-                    e.preventDefault();
-                    e.stopPropagation(); // prevent dropdown or row click from interfering
-
-                    const srn = $(this).data("srn");
-                    const picklist = $(this).data("picklist");
-
-                    // Swal.fire({
-                    //   title: "Print this Picklist?",
-                    //   icon: "question",
-                    //   showCancelButton: true,
-                    //   confirmButtonText: "Print",
-                    //   confirmButtonColor: "#0d6efd",
-                    //   cancelButtonText: "Cancel",
-                    // }).then((result) => {
-                    //   if (result.isConfirmed) {
-                    window.open(
-                      `pdf/req.php?srn=${srn}&picklist=${picklist}`,
-                      "_blank",
-                    );
-                    //   }
-                    // });
-                  });
               },
             });
           } else {
@@ -651,7 +594,6 @@ function openPicklist(picklistNum) {
 // DISPLAY PICKLIST
 function loadPicklistItems() {
   $("#main-content").html(spinner);
-  console.log(`RETURNING BACK TO PICKLIST ITEMS`);
   setTimeout(function () {
     $.post(
       "dirs/incoming/dashboard/picklistItem.php",
@@ -929,35 +871,58 @@ function loadBasket() {
                 tableBody.append($emptyRow);
               }
 
-              // $("#basketTable").on("click", ".print-picklist", function (e) {
-              //   e.preventDefault();
-              //   e.stopPropagation(); // prevent dropdown or row click from interfering
+              $("#basketTable").on("click", ".print-picklist", function (e) {
+                e.preventDefault();
+                e.stopPropagation(); // prevent dropdown or row click from interfering
 
-              //   // const srn = $(this).data("srn");
-              //   const PKlistNum = $(this).data("picklist");
+                // const srn = $(this).data("srn");
+                const PKlistNum = $(this).data("picklist");
 
-              //   Swal.fire({
-              //     title: "Print this Picklist?",
-              //     icon: "question",
-              //     showCancelButton: true,
-              //     confirmButtonText: "Print",
-              //     confirmButtonColor: "#0d6efd",
-              //     cancelButtonText: "Cancel",
-              //   }).then((result) => {
-              //     if (result.isConfirmed) {
-              //       $.post(
-              //         "dirs/incoming/dashboard/actions/save_print_delivery.php",
-              //         { PKlistNum: PKlistNum },
-              //         function () {
-              //           window.open(
-              //             `pdf/requests.php?picklist=${PKlistNum}`,
-              //             "_blank",
-              //           );
-              //         },
-              //       );
-              //     }
-              //   });
-              // });
+                Swal.fire({
+                  title: "Print this Picklist?",
+                  icon: "question",
+                  showCancelButton: true,
+                  confirmButtonText: "Print",
+                  confirmButtonColor: "#0d6efd",
+                  cancelButtonText: "Cancel",
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    $.post(
+                      "dirs/incoming/dashboard/actions/save_print_delivery.php",
+                      { PKlistNum: PKlistNum },
+                      function (response) {
+                        if (response.status === "error") {
+                          Swal.fire({
+                            icon: "error",
+                            title: response.message,
+                            // text: response.message,
+                            text: "Would you like to proceed for printing?",
+                            showCancelButton: true,
+                            confirmButtonText: "Proceed",
+                            cancelButtonText: "Back",
+                          }).then((res) => {
+                            if (res.isConfirmed) {
+                              window.open(
+                                `pdf/requests.php?picklist=${PKlistNum}`,
+                                "_blank",
+                              );
+                            }
+                          });
+                          return;
+                        }
+
+                        if (response.status === "success") {
+                          window.open(
+                            `pdf/requests.php?picklist=${PKlistNum}`,
+                            "_blank",
+                          );
+                        }
+                      },
+                      "json",
+                    );
+                  }
+                });
+              });
             },
           });
         } else {
@@ -970,31 +935,3 @@ function loadBasket() {
     });
   });
 }
-
-// PRINT PICKLIST
-$("#basketTable").on("click", ".print-picklist", function (e) {
-  e.preventDefault();
-  e.stopPropagation(); // prevent dropdown or row click from interfering
-
-  // const srn = $(this).data("srn");
-  const PKlistNum = $(this).data("picklist");
-
-  Swal.fire({
-    title: "Print this Picklist?",
-    icon: "question",
-    showCancelButton: true,
-    confirmButtonText: "Print",
-    confirmButtonColor: "#0d6efd",
-    cancelButtonText: "Cancel",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      $.post(
-        "dirs/incoming/dashboard/actions/save_print_delivery.php",
-        { PKlistNum: PKlistNum },
-        function () {
-          window.open(`pdf/requests.php?picklist=${PKlistNum}`, "_blank");
-        },
-      );
-    }
-  });
-});

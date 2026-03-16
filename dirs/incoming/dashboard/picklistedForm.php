@@ -16,7 +16,7 @@
             <h3 class="fw-bold text-primary">Incoming</h3>
         </div>
     </div>
-    <div class="card shadow-sm" id="dashboard-display">
+    <div class="card shadow-sm mt-2" id="dashboard-display">
         <div class="card-body">
             <section class="content">
                 <div class="container-fluid">

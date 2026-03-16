@@ -10,7 +10,7 @@ $RowNum = $_POST['RowNum'] ?? '';
             <h3 class="fw-bold text-primary">Outgoing Request</h3>
         </div>
     </div>
-    <div class="card shadow-sm" id="dashboard-display" style="height: 75vh">
+    <div class="card shadow-sm mt-2" id="dashboard-display" style="height: 75vh">
         <div class="card-body">
             <section class="content">
                 <div class="container-fluid">

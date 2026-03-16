@@ -16,7 +16,7 @@
             <h3 class="fw-bold text-primary">Delivery</h3>
         </div>
     </div>
-    <div class="card shadow-sm overflow-auto" id="dashboard-display">
+    <div class="card shadow-sm overflow-auto mt-2" id="dashboard-display">
         <div class="card-body">
             <section class="content">
                 <div class="container-fluid">
@@ -91,54 +91,6 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!-- <tr style="height: 30px; min-height: 30px; cursor: pointer">
-                                        <td class="text-secondary" style="background: #FFFBDF">SAMSUNG</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">EF-DX211-GALAXY A+ KEYBOARD SLIM</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">PHONE ACCESSORIES</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">5</td>
-                                    </tr>
-                                    <tr style="height: 30px; min-height: 30px; cursor: pointer">
-                                        <td class="text-secondary" style="background: #FFFBDF">SAMSUNG</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">SAM166-GALAXY A16 5G 4+128GB GOLD</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">PHONE</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">5</td>
-                                    </tr>
-                                    <tr style="height: 30px; min-height: 30px; cursor: pointer">
-                                        <td class="text-secondary" style="background: #FFFBDF">SAMSUNG</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">SAMSUNG 25W POWER ADAPTER</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">PHONE ACCESSORIES</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">30</td>
-                                    </tr>
-                                    <tr style="height: 30px; min-height: 30px; cursor: pointer">
-                                        <td class="text-secondary" style="background: #FFFBDF">SAMSUNG</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">EF-DX211-GALAXY A+ KEYBOARD SLIM</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">PHONE ACCESSORIES</td>
-                                        <td class="text-secondary" style="background: #FFFBDF">10</td>
-                                    </tr>
-                                    <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr>
-                                    <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr>
-                                    <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr>
-                                    <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                        <td style="background: #FFFBDF"></td>
-                                    </tr> -->
                                     </tbody>
                                 </table>
                             </div>
@@ -151,22 +103,21 @@
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="prepby" class="form-label text-dark-emphasis col-4"><small>Prepared by:</small></label>
-                                        <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #FFFBDF" placeholder="Prepared by" value="Vjay Endoma" readonly>
+                                        <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="plate" class="form-label text-dark-emphasis col-4"><small>Truck Plate No:</small></label>
-                                        <input type="text" name="plate" id="plate" class="form-control form-control-sm col" style="background: #FFFBDF" placeholder="Truck Plate No." value="KGH-345" readonly>
+                                        <input type="text" name="plate" id="plate" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="driver" class="form-label text-dark-emphasis col-4"><small>Driver:</small></label>
-                                        <input type="text" name="driver" id="driver" class="form-control form-control-sm col" style="background: #FFFBDF" placeholder="Driver" value="Roger Amaguin" readonly>
+                                        <input type="text" name="driver" id="driver" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                     </div>
                                 </div>
                                 <div class="col-2">
                                     <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
-                                    <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto; resize: horizontal" placeholder="Remarks" maxlength="100" readonly>
-                                    Please transfer the following units, ASAP.
-                                </textarea>
+                                    <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto; resize: horizontal" maxlength="100" readonly>
+                                    </textarea>
                                 </div>
                             </div>
                         </form>

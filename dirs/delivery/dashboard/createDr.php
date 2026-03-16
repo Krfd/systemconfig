@@ -16,7 +16,7 @@
             <h3 class="fw-bold text-primary">New Delivery</h3>
         </div>
     </div>
-    <div class="card shadow-sm overflow-auto" id="dashboard-display">
+    <div class="card shadow-sm overflow-auto mt-2" id="dashboard-display">
         <div class="card-body">
             <section class="content">
                 <div class="container-fluid">
@@ -60,7 +60,7 @@
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="docdate" class="form-label text-dark-emphasis col-4"><small>Document Date:</small></label>
-                                        <input type="date" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #FFFBDF">
+                                        <input type="text" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="status" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>
@@ -68,37 +68,25 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- SERIAL AND ADD BUTTON -->
+                            <!-- SERIAL TOGGLER -->
                             <div class="d-flex justify-content-end align-items-baseline gap-3 mt-5">
                                 <div class="d-flex align-items-center gap-2">
                                     <label class="mb-0 text-secondary">Serial:</label>
                                     <label class="modern-switch shadow-sm rounded-5">
                                         <input type="checkbox" id="serialToggler" class="p-1">
                                         <div class="switch-track px-3 d-flex justify-content-center gap-4">
-                                            <span class="switch-text text-center text-white manual">Manual</span>
                                             <span class="switch-text text-start text-white scan">Scan</span>
+                                            <span class="switch-text text-center text-white manual">Manual</span>
                                         </div>
                                         <div class="switch-knob shadow"></div>
                                     </label>
                                 </div>
-                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addDeliveryModal"><i class="bi bi-plus"></i> Add</button>
                             </div>
                             <div class="table-responsive d-flex gap-1 overflow-auto mt-3" style="max-height: 450px">
-                                <table class="table table-hover col-2" id="serialTable">
-                                    <thead class="sticky-top">
-                                        <tr>
-                                            <th class="text-secondary" colspan="2">Serial No.</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="text-secondary" colspan="2" rowspan="9" style="background: #FFFDBF"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
                                 <table class="table table-hover col" id="deliveryTable">
                                     <thead class="sticky-top">
                                         <tr>
+                                            <th class="text-secondary">Serial</th>
                                             <th class="text-secondary">Brand</th>
                                             <th class="text-secondary">Model</th>
                                             <th class="text-secondary">Category</th>
@@ -107,56 +95,70 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                            <td class="text-secondary" style="background: #FFFBDF">SAMSUNG</td>
-                                            <td class="text-secondary" style="background: #FFFBDF">EF-DX211-GALAXY A+ KEYBOARD SLIM</td>
-                                            <td class="text-secondary" style="background: #FFFBDF">PHONE ACCESSORIES</td>
-                                            <td class="text-secondary" style="background: #FFFBDF">5</td>
+                                        <tr style="height: 50px; min-height: 50px;">
+                                            <td class="text-secondary" style="background: #FFFBDF; width: 150px; max-width: 150px; overflow-x: hidden; white-space: nowrap;  outline: none; scrollbar-width: none; -ms-overflow-style: none;"
+                                                contenteditable="true"
+                                                onfocus="this.style.outline='none';"
+                                                oninput="this.scrollLeft = this.scrollWidth"></td>
+                                            <td class=" text-secondary" style="background: #FFFBDF;">SAMSUNG</td>
+                                            <td class="text-secondary" style="background: #FFFBDF;">EF-DX211-GALAXY A+ KEYBOARD SLIM</td>
+                                            <td class="text-secondary" style="background: #FFFBDF;">PHONE ACCESSORIES</td>
+                                            <td class="text-secondary" style="background: #FFFBDF;">5</td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                            <td class="text-secondary" style="background: #FFFBDF">PANASONIC</td>
-                                            <td class="text-secondary" style="background: #FFFBDF">AF-AX233-GALAXY B+ KEYBOARD FLAT</td>
-                                            <td class="text-secondary" style="background: #FFFBDF">REFRIGERATOR</td>
-                                            <td class="text-secondary" style="background: #FFFBDF">10</td>
+                                        <tr style="height: 50px; min-height: 50px;">
+                                            <td class="text-secondary" style="background: #FFFBDF; width: 150px; max-width: 150px; overflow-x: hidden; white-space: nowrap;  outline: none; scrollbar-width: none; -ms-overflow-style: none;"
+                                                contenteditable="true"
+                                                onfocus="this.style.outline='none';"
+                                                oninput="this.scrollLeft = this.scrollWidth"></td>
+                                            <td class="text-secondary" style="background: #FFFBDF;">PANASONIC</td>
+                                            <td class="text-secondary" style="background: #FFFBDF;">AF-AX233-GALAXY B+ KEYBOARD FLAT</td>
+                                            <td class="text-secondary" style="background: #FFFBDF;">REFRIGERATOR</td>
+                                            <td class="text-secondary" style="background: #FFFBDF;">10</td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
+                                        <tr style="height: 50px; min-height: 50px;">
                                             <td class="text-secondary" style="background: #FFFBDF"></td>
-                                            <td class="text-secondary" style="background: #FFFBDF"></td>
-                                            <td class="text-secondary" style="background: #FFFBDF"></td>
-                                            <td class="text-secondary" style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
                                             <td class="text-secondary" style="background: #FFFBDF"></td>
                                             <td class="text-secondary" style="background: #FFFBDF"></td>
                                             <td class="text-secondary" style="background: #FFFBDF"></td>
                                             <td class="text-secondary" style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
+                                        <tr style="height: 50px; min-height: 50px;">
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
+                                            <td class="text-secondary" style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
+                                        <tr style="height: 50px; min-height: 50px;">
+                                            <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
+                                        <tr style="height: 50px; min-height: 50px;">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr style="height: 50px; min-height: 50px;">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr style="height: 50px; min-height: 50px;">
+                                            <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
@@ -200,4 +202,6 @@
         </div>
     </div>
 </div>
-<?php include("deliveryModal.php") ?>
+<?php
+// include("deliveryModal.php") 
+?>

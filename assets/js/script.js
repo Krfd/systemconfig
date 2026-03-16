@@ -45,7 +45,7 @@ $("#main-menu")
       case "receiving":
         $maintitle = "";
         $mainbreadcrumb = `<li class="breadcrumb-item active">Receiving</li>`;
-        $file = "dirs/receiving/dashboard/receiving.php";
+        $file = "dirs/receiving/dashboard/received.php";
         break;
       case "monitoring":
         $maintitle = "";

@@ -8,11 +8,6 @@
                 <h3 class="fw-bold text-primary" id="picklistNumDisplay"></h3>
             </div>
         </div>
-        <!-- <div class="d-flex gap-1">
-            <button class="btn btn-primary" type="button" id="printPicklistItem" onclick="printPicklist()">
-                <i class="bi bi-printer"></i>
-            </button>
-        </div> -->
     </div>
     <div class="table-responsive overflow-auto ">
         <table class="table table-hover datatables" id="picklistItemTable">
@@ -21,7 +16,6 @@
                     <th class="text-secondary">SRN</th>
                     <th class="text-secondary">Date</th>
                     <th class="text-secondary">Requesting Branch</th>
-                    <th></th>
                 </tr>
             </thead>
             <tbody>

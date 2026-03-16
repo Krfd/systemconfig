@@ -62,6 +62,62 @@ try {
                 'C'
             );
         }
+
+        function NbLines($w, $txt)
+        {
+            $cw = &$this->CurrentFont['cw'];
+
+            if ($w == 0)
+                $w = $this->w - $this->rMargin - $this->x;
+
+            $wmax = ($w - 2 * $this->cMargin) * 1000 / $this->FontSize;
+
+            $s = str_replace("\r", '', $txt);
+            $nb = strlen($s);
+
+            if ($nb > 0 && $s[$nb - 1] == "\n")
+                $nb--;
+
+            $sep = -1;
+            $i = 0;
+            $j = 0;
+            $l = 0;
+            $nl = 1;
+
+            while ($i < $nb) {
+                $c = $s[$i];
+
+                if ($c == "\n") {
+                    $i++;
+                    $sep = -1;
+                    $j = $i;
+                    $l = 0;
+                    $nl++;
+                    continue;
+                }
+
+                if ($c == ' ')
+                    $sep = $i;
+
+                $l += $cw[$c];
+
+                if ($l > $wmax) {
+                    if ($sep == -1) {
+                        if ($i == $j)
+                            $i++;
+                    } else
+                        $i = $sep + 1;
+
+                    $sep = -1;
+                    $j = $i;
+                    $l = 0;
+                    $nl++;
+                } else
+                    $i++;
+            }
+
+            return $nl;
+        }
     }
 
     $pdf = new PDF();
@@ -85,6 +141,158 @@ try {
         $pdf->Ln(1);
     }
 
+    // ORIGINAL
+    // function renderItemsTable($pdf, $picklistNum, $itemData, $textColor)
+    // {
+    //     /* ---------- TITLE ---------- */
+
+    //     $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
+    //     $pdf->Ln(3);
+    //     $pdf->SetFont('Arial', 'B', 20);
+    //     $pdf->Cell(0, 12, 'PICKLIST SUMMARY', 0, 1, 'C');
+    //     $pdf->Ln(3);
+
+    //     $pdf->SetFont('Arial', 'B', 9);
+
+    //     // Header to data mapping
+    //     $columns = [
+    //         '#' => null,
+    //         'Branch' => 'ReqBranch',
+    //         'Brand' => 'Brand',
+    //         'Model' => 'Model',
+    //         'Category' => 'Category',
+    //         'Quantity' => 'Quantity',
+    //         'Actual Qty' => null
+    //     ];
+
+    //     $widths = [];
+
+    //     // /* ---------- CALCULATE MAX WIDTH ---------- */
+
+    //     foreach ($columns as $header => $field) {
+
+    //         // Start with header width
+    //         $maxWidth = $pdf->GetStringWidth($header) + 6;
+
+    //         if ($field !== null) {
+    //             foreach ($itemData as $row) {
+    //                 $value = $row->$field ?? '';
+    //                 $maxWidth = max($maxWidth, $pdf->GetStringWidth($value) + 6);
+    //             }
+    //         }
+
+    //         // Give a minimum width for row counter
+    //         if ($header === '#') {
+    //             $maxWidth = max($maxWidth, 10);
+    //         }
+
+    //         $widths[$header] = $maxWidth;
+    //     }
+
+    //     /* ---------- TABLE HEADER ---------- */
+
+    //     $pdf->SetFillColor(255, 255, 0);
+
+    //     foreach ($widths as $header => $width) {
+    //         $pdf->Cell($width, 6, $header, 1, 0, 'C', true);
+    //     }
+
+    //     $pdf->Ln();
+    //     $pdf->SetFont('Arial', '', 9);
+
+    //     /* ---------- TABLE ROWS ---------- */
+
+    //     $counter = 1;
+
+    //     foreach ($itemData as $row) {
+
+    //         foreach ($columns as $header => $field) {
+
+    //             if ($header === '#') {
+    //                 $value = $counter;
+    //                 $align = 'C';
+    //             } else {
+    //                 $value = $field ? ($row->$field ?? '') : '';
+    //                 $align = ($header == 'Quantity' || $header == 'Actual Quantity') ? 'C' : 'L';
+    //             }
+    //             $pdf->Cell($widths[$header], 5, $value, 1, 0, $align);
+    //         }
+
+    //         $pdf->Ln();
+    //         $counter++;
+    //     }
+    // }
+
+    // function renderItemsTable($pdf, $picklistNum, $itemData, $textColor)
+    // {
+    //     /* ---------- TITLE ---------- */
+
+    //     $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
+    //     $pdf->Ln(3);
+    //     $pdf->SetFont('Arial', 'B', 20);
+    //     $pdf->Cell(0, 12, 'PICKLIST SUMMARY', 0, 1, 'C');
+    //     $pdf->Ln(3);
+
+    //     $pdf->SetFont('Arial', 'B', 9);
+
+    //     /* ---------- FIXED HEADERS & WIDTHS ---------- */
+
+    //     $headers = [
+    //         '#' => 10,
+    //         'Branch' => 30,
+    //         'Brand' => 30,
+    //         'Model' => 70,
+    //         'Category' => 20,
+    //         'Quantity' => 15,
+    //         'Actual Qty' => 20
+    //     ];
+
+    //     /* ---------- HEADER TO DATA MAPPING ---------- */
+
+    //     $columns = [
+    //         '#' => null,
+    //         'Branch' => 'ReqBranch',
+    //         'Brand' => 'Brand',
+    //         'Model' => 'Model',
+    //         'Category' => 'Category',
+    //         'Quantity' => 'Quantity',
+    //         'Actual Qty' => null
+    //     ];
+
+    //     /* ---------- TABLE HEADER ---------- */
+
+    //     $pdf->SetFillColor(255, 255, 0);
+
+    //     foreach ($headers as $text => $width) {
+    //         $pdf->Cell($width, 6, $text, 1, 0, 'C', true);
+    //     }
+
+    //     $pdf->Ln();
+    //     $pdf->SetFont('Arial', '', 9);
+
+    //     /* ---------- TABLE ROWS ---------- */
+
+    //     $counter = 1;
+
+    //     foreach ($itemData as $row) {
+    //         foreach ($columns as $header => $field) {
+
+    //             if ($header === '#') {
+    //                 $value = $counter;
+    //                 $align = 'C';
+    //             } else {
+    //                 $value = $field ? ($row->$field ?? '') : '';
+    //                 $align = ($header == 'Quantity' || $header == 'Actual Qty') ? 'C' : 'L';
+    //             }
+
+    //             $pdf->Cell($headers[$header], 5, $value, 1, 0, $align);
+    //         }
+
+    //         $pdf->Ln();
+    //         $counter++;
+    //     }
+    // }
+
     function renderItemsTable($pdf, $picklistNum, $itemData, $textColor)
     {
         /* ---------- TITLE ---------- */
@@ -97,71 +305,82 @@ try {
 
         $pdf->SetFont('Arial', 'B', 9);
 
-        // Header to data mapping
-        $columns = [
-            '#' => null,
-            'Branch' => 'ReqBranch',
-            'Brand' => 'Brand',
-            'Model' => 'Model',
-            'Category' => 'Category',
-            'Quantity' => 'Quantity',
-            'Actual Qty' => null
+        /* ---------- FIXED HEADERS ---------- */
+
+        $headers = [
+            '#' => 10,
+            'Branch' => 25,
+            'Brand' => 30,
+            'Model' => 60,
+            'Category' => 30,
+            'Quantity' => 15,
+            'Actual Qty' => 20
         ];
-
-        $widths = [];
-
-        /* ---------- CALCULATE MAX WIDTH ---------- */
-
-        foreach ($columns as $header => $field) {
-
-            // Start with header width
-            $maxWidth = $pdf->GetStringWidth($header) + 6;
-
-            if ($field !== null) {
-                foreach ($itemData as $row) {
-                    $value = $row->$field ?? '';
-                    $maxWidth = max($maxWidth, $pdf->GetStringWidth($value) + 6);
-                }
-            }
-
-            // Give a minimum width for row counter
-            if ($header === '#') {
-                $maxWidth = max($maxWidth, 10);
-            }
-
-            $widths[$header] = $maxWidth;
-        }
 
         /* ---------- TABLE HEADER ---------- */
 
         $pdf->SetFillColor(255, 255, 0);
 
-        foreach ($widths as $header => $width) {
-            $pdf->Cell($width, 6, $header, 1, 0, 'C', true);
+        foreach ($headers as $text => $width) {
+            $pdf->Cell($width, 6, $text, 1, 0, 'C', true);
         }
 
         $pdf->Ln();
         $pdf->SetFont('Arial', '', 9);
 
-        /* ---------- TABLE ROWS ---------- */
-
+        $lineHeight = 5;
         $counter = 1;
+
+        /* ---------- TABLE ROWS ---------- */
 
         foreach ($itemData as $row) {
 
-            foreach ($columns as $header => $field) {
+            // Calculate required number of lines per column
+            $branchLines = $pdf->NbLines($headers['Branch'], $row->ReqBranch);
+            $brandLines = $pdf->NbLines($headers['Brand'], $row->Brand);
+            $modelLines = $pdf->NbLines($headers['Model'], $row->Model);
+            $categoryLines = $pdf->NbLines($headers['Category'], $row->Category);
 
-                if ($header === '#') {
-                    $value = $counter;
-                    $align = 'C';
-                } else {
-                    $value = $field ? ($row->$field ?? '') : '';
-                    $align = ($header == 'Quantity' || $header == 'Actual Quantity') ? 'C' : 'L';
-                }
-                $pdf->Cell($widths[$header], 5, $value, 1, 0, $align);
-            }
+            $maxLines = max($branchLines, $brandLines, $modelLines, $categoryLines, 1);
+            $rowHeight = $lineHeight * $maxLines;
 
-            $pdf->Ln();
+            $x = $pdf->GetX();
+            $y = $pdf->GetY();
+
+            /* ---------- COLUMN # ---------- */
+
+            $pdf->MultiCell($headers['#'], $rowHeight, $counter, 1, 'C');
+            $pdf->SetXY($x + $headers['#'], $y);
+
+            /* ---------- BRANCH ---------- */
+
+            $pdf->MultiCell($headers['Branch'], $rowHeight, $row->ReqBranch, 1);
+            $pdf->SetXY($x + $headers['#'] + $headers['Branch'], $y);
+
+            /* ---------- BRAND ---------- */
+
+            $pdf->MultiCell($headers['Brand'], $rowHeight, $row->Brand, 1);
+            $pdf->SetXY($x + $headers['#'] + $headers['Branch'] + $headers['Brand'], $y);
+
+            /* ---------- MODEL ---------- */
+
+            $pdf->MultiCell($headers['Model'], $rowHeight, $row->Model, 1);
+            $pdf->SetXY($x + $headers['#'] + $headers['Branch'] + $headers['Brand'] + $headers['Model'], $y);
+
+            /* ---------- CATEGORY ---------- */
+
+            $pdf->MultiCell($headers['Category'], $rowHeight, $row->Category, 1);
+            $pdf->SetXY($x + $headers['#'] + $headers['Branch'] + $headers['Brand'] + $headers['Model'] + $headers['Category'], $y);
+
+            /* ---------- QUANTITY ---------- */
+
+            $pdf->MultiCell($headers['Quantity'], $rowHeight, $row->Quantity, 1, 'C');
+            $pdf->SetXY($x + $headers['#'] + $headers['Branch'] + $headers['Brand'] + $headers['Model'] + $headers['Category'] + $headers['Quantity'], $y);
+
+            /* ---------- ACTUAL QTY ---------- */
+
+            $pdf->MultiCell($headers['Actual Qty'], $rowHeight, '', 1, 'C');
+
             $counter++;
         }
     }

@@ -8,20 +8,24 @@ $Userid    = $_SESSION['Uid'];
 $PKlistNum = $_POST['PKlistNum'];
 
 try {
+    $conn->beginTransaction();
+
+    $response = [];
 
     // Validate Pick List Number if Exist then Return
     $validatePicklist = $conn->prepare("EXEC dbo.[VALIDATE_PICKLIST_TO_Delivery] ? ,?");
     $validatePicklist->execute([$Userid, $PKlistNum]);
     if ($validatePicklist->fetchColumn() > 0) {
         $conn->rollBack();
-        echo json_encode([
+
+        $response = [
             "status" => "error",
-            "message" => "This Picklist already exists"
-        ]);
+            "message" => "This picklist already exists"
+        ];
+
+        echo json_encode($response);
         exit;
     }
-
-    $conn->beginTransaction();
 
     /* -------------------------------------------------
        1. Generate Delivery Number
@@ -109,18 +113,23 @@ try {
     ------------------------------------------------- */
     $conn->commit();
 
-    echo json_encode([
+    $response = [
         "status" => "success",
-        "delivery_number" => $DeliveryNumber
-    ]);
+        "message" => $DeliveryNumber
+    ];
+
+    echo json_encode($response);
+    exit;
 } catch (Throwable $e) {
 
     if ($conn->inTransaction()) {
         $conn->rollBack();
     }
 
-    echo json_encode([
+    $response = [
         "status" => "error",
         "message" => $e->getMessage()
-    ]);
+    ];
+
+    echo json_encode($response);
 }
