@@ -167,6 +167,7 @@ function loadOutgoing() {
                 <td colspan="7" style="background: #FFFBDF">&nbsp;</td>
               </tr>
             `);
+
             $emptyRow.css({
               background: "#FFFBDF",
               height: "40px",
@@ -216,15 +217,103 @@ $(document).on("click", ".terminate-item", function (e) {
   terminateOutgoingForm(SRN);
 });
 
+function returnOutgoing() {
+  $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
+    $("#main-content").html(data);
+  });
+  window.location.reload();
+}
+
 function openOutgoingForm(rowNum) {
   $("#main-content").html(spinner);
-  $.post(
-    "dirs/outgoing/requests/components/main.php",
-    { RowNum: rowNum }, // send RowNum to view
-    function (html) {
-      $("#main-content").html(html);
-    },
-  );
+  setTimeout(function () {
+    openRequest(rowNum);
+    // $.post(
+    //   "dirs/outgoing/requests/components/main.php",
+    //   { RowNum: rowNum }, // send RowNum to view
+    //   function (html) {
+    //     console.log(`OPENING DATA FROM REQUEST DIRECTORY`);
+    //     $("#main-content").html(html);
+    //   },
+    // );
+  }, 200);
+}
+
+function openRequest(rowNum) {
+  $("#main-content").html(spinner);
+  $.post("dirs/outgoing/dashboard/request.php", function (data) {
+    $("#main-content").html(data);
+
+    $.ajax({
+      url: "dirs/outgoing/dashboard/actions/get_openrequest.php",
+      type: "POST",
+      data: { RowNum: rowNum },
+      dataType: "json",
+      success: function (response) {
+        if (response.isSuccess === "success") {
+          let rowCount = response.Items.length;
+          let totalQty = 0;
+
+          let header = response.Data;
+          let items = response.Items;
+
+          $("#srn").val(header.BaseNum_SRN);
+          $("#typeOfReq").val(header.RequestType);
+          $("#destination").val(header.Destination);
+          $("#branchWhCode").val(header.DestinationWhs);
+          $("#origin").val(header.Origin);
+          $("#whcode").val(header.OriginWhs);
+
+          $("#date").val(header.DocDate);
+          $("#status").val(header.RequestStatus);
+          $("#purpose").val(header.RequestPurpose);
+          $("#reqBy").val(header.PrepBy);
+          $("#remarks").val(header.Remarks);
+
+          let rows = "";
+          items.forEach(function (item, index) {
+            let quantity = parseFloat(item.Quantity) || 0;
+            totalQty += quantity;
+            rows += `
+            <tr>
+              <td style="background:#FFFBDF">${index + 1}</td>
+              <td style="background:#FFFBDF">${item.Brand}</td>
+              <td style="background:#FFFBDF">${item.Model}</td>
+              <td style="background:#FFFBDF">${item.Category}</td>
+              <td style="background:#FFFBDF">${item.Quantity}</td>
+            </tr>
+            `;
+          });
+
+          $("#totalReqQuantity").text(totalQty);
+          $("#openIncomingTable tbody").html(rows);
+
+          if (rowCount < 8) {
+            let emptyRows = 8 - rowCount;
+
+            for (let i = 0; i < emptyRows; i++) {
+              let emptyRow = `
+              <tr class="item-row empty-row" style="height: 50px; min-height: 50px;">
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+              </tr>
+              `;
+              $("#openIncomingTable tbody").append(emptyRow);
+            }
+            $("#totalQuantity").text(totalQty);
+          }
+        } else {
+          console.warn(`NO DATA FROM ROWNUM`);
+        }
+      },
+      error: function (xhr) {
+        console.error(xhr.responseText);
+      },
+    });
+  });
 }
 
 $(document).on("click", ".cancel-outgoing", function (e) {

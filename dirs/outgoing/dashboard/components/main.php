@@ -1,5 +1,5 @@
-<div class="table-responsive overflow-auto">
-    <table class="table table-hover datatables" id="outgoingTableDisplay">
+<div class="table-responsive-md">
+    <table class="table table-hover datatables col" id="outgoingTableDisplay">
         <thead class="sticky-top">
             <tr>
                 <th class="text-secondary text-center">#</th>

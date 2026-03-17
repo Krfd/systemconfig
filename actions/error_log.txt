@@ -3,3 +3,4 @@
 [2026-03-12 10:07:09] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShift\actions\logout.php on line 4
 [2026-03-12 11:41:39] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShift\actions\logout.php on line 4
 [2026-03-14 11:07:39] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShift\actions\logout.php on line 4
+[2026-03-17 16:15:14] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShift\actions\logout.php on line 4

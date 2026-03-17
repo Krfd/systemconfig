@@ -9,12 +9,11 @@
             </div>
         </div>
     </div>
-    <div class="table-responsive">
-        <table class="table datatables table-hover w-100" id="deliveryBasketTable">
+    <div class="table-responsive-md">
+        <table class="table datatables table-hover" id="deliveryBasketTable">
             <thead class="sticky-top">
                 <tr>
                     <th class="text-secondary">Picklist No.</th>
-                    <!-- <th class="text-secondary">Date</th> -->
                     <th class="text-secondary">Date Created</th>
                     <th class="text-secondary">Date Modified</th>
                     <th class="text-secondary">Quantity</th>

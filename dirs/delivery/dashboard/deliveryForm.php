@@ -7,7 +7,7 @@
             <h3 class="fw-bold text-primary" id="deliverySRN"></h3>
         </div>
     </div>
-    <div class="card shadow-sm overflow-auto" id="dashboard-display">
+    <div class="card shadow-sm overflow-auto mt-2" id="dashboard-display">
         <div class="card-body">
             <section class="content">
                 <div class="container-fluid">

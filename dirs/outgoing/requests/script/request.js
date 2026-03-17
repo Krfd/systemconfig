@@ -90,7 +90,7 @@ function loadOutgoingDetails(RowNum) {
             `;
             $("#openIncomingTable tbody").append(emptyRow);
           }
-          $("#totalQuantity").text(totalQty);
+          // $("#totalQuantity").text(totalQty);
         }
       } else {
         alert(response.Data);

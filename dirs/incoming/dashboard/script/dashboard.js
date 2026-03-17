@@ -805,7 +805,7 @@ function loadBasket() {
                 className: "text-start open-picklist ps-5",
               },
               { title: "Date", className: "text-start ps-5" },
-              { title: "Quantity", className: "text-center" },
+              { title: "SRN Quantity", className: "text-center" },
               { title: "", orderable: false },
             ],
             createdRow: function (row, data, dataIndex) {

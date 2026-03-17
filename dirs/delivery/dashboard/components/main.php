@@ -1,4 +1,4 @@
-<div class="table-responsive">
+<div class="table-responsive-md">
     <table class="table datatables table-hover" id="deliveryTableDisplay">
         <thead class="sticky-top">
             <tr>

@@ -7,7 +7,7 @@
             <h3 class="fw-bold text-primary">Receiving Form</h3>
         </div>
     </div>
-    <div id="receiving-form-content"></div>
+    <div id="receiving-form-content mt-2"></div>
 </div>
 <script src="dirs/receiving/form/script/form.js"></script>
 <?php

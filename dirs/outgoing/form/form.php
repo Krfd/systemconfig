@@ -9,7 +9,6 @@
     </div>
     <div id="form-content" class="overflow-auto mt-2" style="height: 75vh"></div>
 </div>
+<script src="assets/js/load.js"></script>
 <script src="dirs/outgoing/form/script/form.js"></script>
-<?php
-include("modal.php");
-?>
+<?php include("modal.php"); ?>

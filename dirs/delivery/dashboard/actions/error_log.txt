@@ -1,10 +1,4 @@
-[2026-03-16 21:22:50] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]TCP Provider: Timeout error [258].  in C:\xampp\htdocs\ishift\config\connection.php on line 18
-[2026-03-16 21:23:28] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishift\dirs\delivery\dashboard\actions\get_deliveries.php on line 8
-[2026-03-16 21:23:54] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Unable to complete login process due to delay in opening server connection in C:\xampp\htdocs\ishift\config\connection.php on line 18
-[2026-03-16 21:24:01] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishift\dirs\delivery\dashboard\actions\get_deliveries.php on line 8
-[2026-03-16 21:42:18] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [64].  in C:\xampp\htdocs\ishift\config\connection.php on line 18
-[2026-03-16 21:42:18] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [64].  in C:\xampp\htdocs\ishift\config\connection.php on line 18
-[2026-03-16 21:42:21] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishift\dirs\delivery\dashboard\actions\get_deliveries.php on line 8
-[2026-03-16 21:42:21] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishift\dirs\delivery\dashboard\actions\get_deliveries.php on line 8
-[2026-03-16 21:44:08] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Unable to complete login process due to delay in opening server connection in C:\xampp\htdocs\ishift\config\connection.php on line 18
-[2026-03-16 21:44:18] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishift\dirs\delivery\dashboard\actions\get_deliveries.php on line 8
+[2026-03-17 16:15:06] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShift\dirs\delivery\dashboard\actions\get_deliveries.php on line 5
+[2026-03-17 16:15:09] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShift\dirs\delivery\dashboard\actions\get_deliveries.php on line 5
+[2026-03-17 16:15:11] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShift\dirs\delivery\dashboard\actions\get_deliveries.php on line 5
+[2026-03-17 16:15:13] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShift\dirs\delivery\dashboard\actions\get_deliveries.php on line 5

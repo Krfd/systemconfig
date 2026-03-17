@@ -42,7 +42,7 @@
                                             <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                         </div>
                                     </div>
-                                    <div class="input-group col p-0 d-flex align-items-baseline gap-1">
+                                    <!-- <div class="input-group col p-0 d-flex align-items-baseline gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="branchName" class="form-label text-dark-emphasis col-5"><small>Destination:</small></label>
                                             <input type="text" id="branchName" class="form-control form-control-sm ms-3" style="background: #FFFBDF;" readonly>
@@ -51,7 +51,7 @@
                                             <label for="branchWhCode" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
                                             <input type="text" id="branchWhCode" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-baseline gap-3">
@@ -68,7 +68,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive mt-5 d-flex gap-1 overflow-auto" style="max-height: 450px">
+                            <div class="table-responsive mt-5 d-flex gap-1 overflow-auto" style="max-height: 450px;">
                                 <table class="table table-hover col-2" id="serialTable">
                                     <thead class="sticky-top">
                                         <tr>

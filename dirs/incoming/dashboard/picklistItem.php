@@ -9,7 +9,7 @@
             </div>
         </div>
     </div>
-    <div class="table-responsive overflow-auto ">
+    <div class="table-responsive-md">
         <table class="table table-hover datatables" id="picklistItemTable">
             <thead class="sticky-top">
                 <tr>

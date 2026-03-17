@@ -1,6 +1,3 @@
-<?php
-$RowNum = $_POST['RowNum'] ?? '';
-?>
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-start align-items-baseline gap-3">
         <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="returnOutgoing()">
@@ -10,12 +7,12 @@ $RowNum = $_POST['RowNum'] ?? '';
             <h3 class="fw-bold text-primary">Outgoing Request</h3>
         </div>
     </div>
-    <div class="card shadow-sm mt-2" id="dashboard-display" style="height: 75vh">
+    <div class="card shadow-sm mt-2 overflow-auto" id="dashboard-display" style="height: 75vh">
         <div class="card-body">
             <section class="content">
                 <div class="container-fluid">
                     <div class="row">
-                        <form method="POST" id="openincoming">
+                        <form method="POST">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="d-flex flex-column gap-1 col-4">
                                     <div class="d-flex align-items-baseline gap-3">
@@ -24,31 +21,26 @@ $RowNum = $_POST['RowNum'] ?? '';
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="typeOfReq" class="form-label text-dark-emphasis col-3"><small>Type of Request:</small></label>
-                                        <select name="typeOfReq" id="typeOfReq" class="form-select form-select-sm col" style="background: #FFFBDF" required disabled readonly>
-                                        </select>
+                                        <input type="text" name="typeOfReq" id="typeOfReq" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                     </div>
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="destination" class="form-label text-dark-emphasis col-5"><small>Destination:</small></label>
-                                            <select name="destination" id="destination" class="form-select form-select-sm col ms-3" placeholder="Destination" style="background: #FFFBDF" required disabled readonly>
-                                            </select>
+                                            <input type="text" name="destination" id="destination" class="form-control form-control-sm col ms-3" style="background: #FFFBDF" readonly>
                                         </div>
                                         <div class="col p-0 d-flex align-items-baseline col">
                                             <label for="branchWhCode" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
-                                            <select name="branchWhCode" id="branchWhCode" class="form-select form-select-sm col" style="background: #FFFBDF" required disabled readonly>
-                                            </select>
+                                            <input type="text" name="branchWhCode" id="branchWhCode" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                         </div>
                                     </div>
                                     <div class="input-group col p-0 d-flex align-items-baseline gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
-                                            <select name="origin" id="origin" class="form-select form-select-sm col ms-3" style="background: #FFFBDF" required disabled readonly>
-                                            </select>
+                                            <input type="text" name="origin" id="origin" class="form-control form-control-sm col ms-3" style="background: #FFFBDF" readonly>
                                         </div>
                                         <div class="col p-0 d-flex align-items-baseline">
                                             <label for="whcode" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
-                                            <select name="whcode" id="whcode" class="form-select form-select-sm col" style="background: #FFFBDF" required disabled readonly>
-                                            </select>
+                                            <input type="text" name="whcode" id="whcode" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -111,10 +103,3 @@ $RowNum = $_POST['RowNum'] ?? '';
         </div>
     </div>
 </div>
-<script>
-    const CURRENT_ROWNUM = "<?php echo $RowNum ?? ''; ?>";
-</script>
-<?php
-include("../modal.php");
-?>
-<script src="dirs/outgoing/requests/script/request.js"></script>

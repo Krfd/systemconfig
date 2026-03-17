@@ -2,8 +2,8 @@
 require_once "../../../../config/connection.php";
 session_start();
 
-// $User = $_SESSION['Uid'];
-$User = $_POST['Uid'];
+$User = $_SESSION['Uid'];
+// $User = $_POST['Uid'];
 $Delivery_Num = $_POST['DeliveryNum'];
 
 try {

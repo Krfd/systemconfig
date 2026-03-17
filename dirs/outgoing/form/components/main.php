@@ -18,8 +18,6 @@
                                         <option value="Buffing">BUFFING</option>
                                     </select>
                                 </div>
-
-
                                 <div class="input-group col p-0 d-flex gap-1">
                                     <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                         <label for="desForm" class="form-label text-dark-emphasis col-5"><small>Destination:</small></label>
@@ -31,8 +29,6 @@
                                         </select>
                                     </div>
                                 </div>
-
-
                                 <div class="input-group col p-0 d-flex align-items-baseline gap-1">
                                     <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                         <label for="user-origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
@@ -45,9 +41,6 @@
                                         </select>
                                     </div>
                                 </div>
-
-
-
                             </div>
                             <div class="d-flex flex-column gap-1 col-2">
                                 <div class="d-flex align-items-baseline gap-3">

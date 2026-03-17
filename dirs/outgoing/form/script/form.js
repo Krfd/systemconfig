@@ -136,13 +136,14 @@ function loadDestinationWhscodes(Branch) {
       const response = JSON.parse(data);
       if ($.trim(response.isSuccess) === "success") {
         const whscode = response.Data;
-        $("#desCodeForm").html('<option selected value="">--</option>');
         whscode.forEach((whscode) => {
+          console.log(`good warehouse: ${whscode.WhsCode}`);
           $("#desCodeForm").append(
             $("<option>", {
               value: whscode.WhsCode,
               text: whscode.WhsCode,
               title: whscode.WhsName,
+              selected: whscode.WhsCode.endsWith("WH"),
             }),
           );
         });
