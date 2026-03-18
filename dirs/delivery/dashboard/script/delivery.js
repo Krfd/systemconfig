@@ -242,27 +242,27 @@ $(document).on("click", ".dropdown .create-dr", function (e) {
 });
 
 // TRIGGER SERIAL
-$(document).on("dblclick", "#deliveryTable tbody tr", {}, function (e) {
-  let brand = $(this).find("td:nth-child(1)").text().trim();
-  let model = $(this).find("td:nth-child(2)").text().trim();
-  let quantity = parseInt($(this).find("td:nth-child(4)").text().trim());
-  let value = brand + " - " + model;
+// $(document).on("dblclick", "#deliveryTable tbody tr", {}, function (e) {
+//   let brand = $(this).find("td:nth-child(1)").text().trim();
+//   let model = $(this).find("td:nth-child(2)").text().trim();
+//   let quantity = parseInt($(this).find("td:nth-child(4)").text().trim());
+//   let value = brand + " - " + model;
 
-  let DeliveryNum = "DR10003";
+//   let DeliveryNum = "DR10003";
 
-  let count = 0;
-  $("#serialTable tbody td").each(function () {
-    if (count < quantity) {
-      $(this).text(value); // overwrite or fill
-      // CALL THE API FOR SERIAL
-      // $("#main-content").html(spinner);
-      serialData(DeliveryNum);
-      count++;
-    } else {
-      $(this).text("");
-    }
-  });
-});
+//   let count = 0;
+//   $("#serialTable tbody td").each(function () {
+//     if (count < quantity) {
+//       $(this).text(value); // overwrite or fill
+//       // CALL THE API FOR SERIAL
+//       $("#main-content").html(spinner);
+//       serialData(DeliveryNum);
+//       count++;
+//     } else {
+//       $(this).text("");
+//     }
+//   });
+// });
 
 $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
   let model = $(this).find("td:nth-child(2)").text().trim();
@@ -272,56 +272,125 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
   $("#assignBranchModal").modal("show");
 });
 
-function serialData(DeliveryNum) {
-  $.post(
-    "dirs/delivery/dashboard/actions/get_review_deliveries.php",
-    { DeliveryNum: DeliveryNum },
-    function (data) {
-      let res = "";
-      try {
-        res = JSON.parse(data);
-      } catch (err) {
-        console.error("Error fetching serial: ", err);
-      }
-    },
-  );
-}
-
-// function serialDeliveryInput() {
-//   const serialCell = document.querySelector(
-//     "#delivery-serial-table tbody td[contenteditable='true']",
-//   );
-//   serialCell.addEventListener("keydown", function (e) {
-//     if (e.key === "Enter") {
-//       e.preventDefault(); // Prevents creating a new line
-//       const serialValue = this.innerText.trim();
-
-//       if (serialValue) {
-//         $.ajax({
-//           url: "dirs/delivery/dashboard/actions/get_find_product_serial.php",
-//           type: "POST",
-//           data: { Serial: serialValue },
-//           dataType: "json",
-//           success: function (response) {
-//             if (response.isSuccess === "success") {
-//               console.log(`SERIAN INPUT: ${serialValue}`);
-//               console.log(`RESPONSE: ${JSON.stringify(response.Data)}`);
-
-//               // ITEM DETAILS TO BE IMPORTED IN DELIVERY SERIAL TABLE
-//             }
-//           },
-//         });
+// function serialData(DeliveryNum) {
+//   $.post(
+//     "dirs/delivery/dashboard/actions/get_review_deliveries.php",
+//     { DeliveryNum: DeliveryNum },
+//     function (data) {
+//       let res = "";
+//       try {
+//         res = JSON.parse(data);
+//       } catch (err) {
+//         console.error("Error fetching serial: ", err);
 //       }
-//     }
-//   });
+//     },
+//   );
 // }
+
+function serialDeliveryInput() {
+  const serialCell = document.querySelector(
+    "#delivery-serial-table tbody td[contenteditable='true']",
+  );
+
+  const serials = []
+  serialCell.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevents creating a new line
+
+      const serialValue = this.innerText.trim();
+      
+
+      if (serialValue) {
+        // $.ajax({
+        //   url: "dirs/delivery/dashboard/actions/get_find_product_serial.php",
+        //   type: "POST",
+        //   data: { Serial: serialValue },
+        //   dataType: "json",
+        //   success: function (response) {
+        //     if (response.isSuccess === "success") {
+        //       console.log(`SERIAN INPUT: ${serialValue}`);
+        //       console.log(`RESPONSE: ${JSON.stringify(response.Data)}`);
+
+        //       // ITEM DETAILS TO BE IMPORTED IN DELIVERY SERIAL TABLE
+        //     }
+        //   },
+        // });
+
+        const parts = serialValue.split(", ");
+        let latestInput = parts[parts.length - 1].trim(); // remove spaces
+
+        // If the last part is empty (because user typed a trailing comma), pick the second-to-last
+        if (!latestInput && parts.length > 1) {
+          latestInput = parts[parts.length - 2].trim();
+        }
+
+        console.log(`LATEST INPUT: ${latestInput}`);
+        serials.push(latestInput)
+        console.log(`SERIALS: ${serials}`)
+
+
+      const selection = window.getSelection();
+      const range = selection.getRangeAt(0);
+
+      // Get text before cursor
+      const preRange = range.cloneRange();
+      preRange.selectNodeContents(this);
+      preRange.setEnd(range.endContainer, range.endOffset);
+      const textBeforeCursor = preRange.toString();
+      const currentLine = textBeforeCursor.split("\n").pop().trim();
+
+      // Create line break
+      const br = document.createElement("br");
+
+      if (!currentLine) {
+        // Empty line → just add <br> + empty text node
+        const emptyText = document.createTextNode("\u200B"); // zero-width space
+        range.insertNode(br);
+        range.setStartAfter(br);
+        range.setEndAfter(br);
+        range.insertNode(emptyText);
+        range.setStartAfter(emptyText);
+        range.setEndAfter(emptyText);
+      } else if (!currentLine.endsWith(",")) {
+        // Line has text → add comma + <br> + empty text node
+        const commaNode = document.createTextNode(",");
+        range.insertNode(commaNode);
+
+        range.setStartAfter(commaNode);
+        range.setEndAfter(commaNode);
+
+        const emptyText = document.createTextNode("\u200B");
+        range.insertNode(br);
+        range.setStartAfter(br);
+        range.setEndAfter(br);
+        range.insertNode(emptyText);
+        range.setStartAfter(emptyText);
+        range.setEndAfter(emptyText);
+      } else {
+        // Line already has comma → just <br> + empty text node
+        const emptyText = document.createTextNode("\u200B");
+        range.insertNode(br);
+        range.setStartAfter(br);
+        range.setEndAfter(br);
+        range.insertNode(emptyText);
+        range.setStartAfter(emptyText);
+        range.setEndAfter(emptyText);
+      }
+
+      // Update selection to be after new line
+      selection.removeAllRanges();
+      selection.addRange(range);
+      }
+    }
+  });
+}
 
 // CREATE DELIVERY
 function createDr(createDeliveryNumber, picklistDr) {
   $.post("dirs/delivery/dashboard/createDr.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
 
-    // serialDeliveryInput();
+    serialDeliveryInput();
 
     // $.ajax({
     //   url: "dirs/delivery/dashboard/actions/update_branch_warehouse.php",
@@ -344,8 +413,6 @@ function createDr(createDeliveryNumber, picklistDr) {
           let totalQty = 0;
           let header = response.Data;
           let items = response.DevItems;
-
-          console.log(`PICKLIST: ${picklistDr}`);
 
           $("#drno").val(createDeliveryNumber);
           $("#pcklstno").val(picklistDr);
@@ -378,6 +445,8 @@ function createDr(createDeliveryNumber, picklistDr) {
                   </tr>`;
           });
 
+          
+
           // SERIAL DELIVERY INPUT
 
           $("#summaryQty").text(totalQty);
@@ -408,169 +477,178 @@ function createDr(createDeliveryNumber, picklistDr) {
             }
           }
 
-          // NEW DELIVERY TOGGLER
-          const toggler = document.getElementById("serialToggler");
-          const knob = document.querySelector(".switch-knob");
-          const manual = document.querySelector(".switch-track .manual");
-          const scan = document.querySelector(".switch-track .scan");
-          const editableCells = document.querySelectorAll(
-            "td[contenteditable='true']",
-          );
+          // SWITCH DELIVERY TOGGLER
+          function toggler() {
+            const toggler = document.getElementById("serialToggler");
+            const knob = document.querySelector(".switch-knob");
+            const manual = document.querySelector(".switch-track .manual");
+            const scan = document.querySelector(".switch-track .scan");
+            const editableCells = document.querySelectorAll(
+              "td[contenteditable='true']",
+            );
 
-          function updateKnob() {
-            scan.style.transition = "opacity 0.3s ease";
-            manual.style.transition = "opacity 0.3s ease";
+            function updateKnob() {
+              scan.style.transition = "opacity 0.3s ease";
+              manual.style.transition = "opacity 0.3s ease";
 
-            if (toggler.checked) {
-              toggler.dataset.value = "Scan";
-              knob.style.width = "55px";
-              knob.style.transform = "translateX(8px)";
-              scan.classList.add("text-white");
-              manual.style.opacity = "0";
-              manual.style.pointerEvents = "none";
-              scan.style.opacity = "1";
-              scan.style.pointerEvents = "auto";
+              if (toggler.checked) {
+                toggler.dataset.value = "Scan";
+                knob.style.width = "55px";
+                knob.style.transform = "translateX(8px)";
+                scan.classList.add("text-white");
+                manual.style.opacity = "0";
+                manual.style.pointerEvents = "none";
+                scan.style.opacity = "1";
+                scan.style.pointerEvents = "auto";
 
-              editableCells.forEach((cell) => {
-                cell.setAttribute("contenteditable", "true");
-                cell.addEventListener("keydown", preventTyping);
-              });
-            } else {
-              toggler.dataset.value = "Manual";
-              knob.style.width = "60px";
-              knob.style.transform = "translateX(0px)";
-              manual.classList.add("text-white");
-              scan.style.opacity = "0";
-              scan.style.pointerEvents = "none";
-              manual.style.opacity = "1";
-              manual.style.pointerEvents = "auto";
+                editableCells.forEach((cell) => {
+                  cell.setAttribute("contenteditable", "true");
+                  cell.addEventListener("keydown", preventTyping);
+                });
+              } else {
+                toggler.dataset.value = "Manual";
+                knob.style.width = "60px";
+                knob.style.transform = "translateX(0px)";
+                manual.classList.add("text-white");
+                scan.style.opacity = "0";
+                scan.style.pointerEvents = "none";
+                manual.style.opacity = "1";
+                manual.style.pointerEvents = "auto";
 
-              editableCells.forEach((cell) => {
-                cell.setAttribute("contenteditable", "true");
-                cell.removeEventListener("keydown", preventTyping);
-              });
+                editableCells.forEach((cell) => {
+                  cell.setAttribute("contenteditable", "true");
+                  cell.removeEventListener("keydown", preventTyping);
+                });
+              }
             }
-          }
 
-          function preventTyping(e) {
-            const allowedKeys = ["Enter", "Tab"]; // allow scanner's "Enter" or tab navigation
-            if (!allowedKeys.includes(e.key)) {
-              e.preventDefault();
+            function preventTyping(e) {
+              const allowedKeys = ["Enter", "Tab"]; // allow scanner's "Enter" or tab navigation
+              if (!allowedKeys.includes(e.key)) {
+                e.preventDefault();
+              }
             }
+
+            updateKnob();
+
+            toggler.addEventListener("change", updateKnob);
           }
-
-          updateKnob();
-
-          toggler.addEventListener("change", updateKnob);
+          toggler()
           // ----------------------------------------------------------
 
-          const commitBtn = document.getElementById("deliveryBtn");
-          const summaryEditables = document.querySelectorAll(
-            "#summaryTable tbody tr td[contenteditable='true']",
-          );
+          // const commitBtn = document.getElementById("deliveryBtn");
+          const addBtn = document.getElementById("addDeliveryModalBtn");
+          const newItemModal = new bootstrap.Modal(document.getElementById("addDeliveryModal"));
+          // const summaryEditables = document.querySelectorAll(
+          //   "#summaryTable tbody tr td[contenteditable='true']",
+          // );
 
-          function validateDeliveryForm() {
-            let isValid = true;
+          // function validateDeliveryForm() {
+          //   let isValid = true;
 
-            const serialCell = $("#delivery-serial-table tbody td")
-              .text()
-              .trim();
-            if (serialCell === "") isValid = false;
+          //   const serialCell = $("#delivery-serial-table tbody td")
+          //     .text()
+          //     .trim();
+          //   if (serialCell === "") isValid = false;
 
-            const deliveryRows = $("#deliveryTable tbody tr");
-            let hasData = false;
+          //   const deliveryRows = $("#deliveryTable tbody tr");
+          //   let hasData = false;
 
-            deliveryRows.each(function () {
-              const cells = $(this).find("td").text().trim();
-              if (cells !== "") {
-                hasData = true;
-              }
-            });
+          //   deliveryRows.each(function () {
+          //     const cells = $(this).find("td").text().trim();
+          //     if (cells !== "") {
+          //       hasData = true;
+          //     }
+          //   });
 
-            if (!hasData) isValid = false;
+          //   if (!hasData) isValid = false;
 
-            // INPUTS
-            if ($("#prepby").val().trim() === "") isValid = false;
-            if ($("#plate").val().trim() === "") isValid = false;
-            if ($("#driver").val().trim() === "") isValid = false;
+          //   // INPUTS
+          //   if ($("#prepby").val().trim() === "") isValid = false;
+          //   if ($("#plate").val().trim() === "") isValid = false;
+          //   if ($("#driver").val().trim() === "") isValid = false;
 
-            // ENABLE / DISABLE BUTTON
-            commitBtn.disabled = !isValid;
-          }
+          //   // ENABLE / DISABLE BUTTON
+          //   // commitBtn.disabled = !isValid;
+          // }
 
-          $(document).on(
-            "input",
-            "#delivery-serial-table td, #deliveryTable td, #prepby, #plate, #driver",
-            function () {
-              validateDeliveryForm();
-            },
-          );
+          // $(document).on(
+          //   "input",
+          //   "#delivery-serial-table td, #deliveryTable td, #prepby, #plate, #driver",
+          //   function () {
+          //     validateDeliveryForm();
+          //   },
+          // );
 
-          let isCommitted = false;
+          // let isCommitted = false;
+          let allowNonserialize = false;
 
-          commitBtn.addEventListener("click", function () {
-            if (isCommitted) {
+          // commitBtn.addEventListener("click", function () {
+          addBtn.addEventListener("click", function () {
+            if (allowNonserialize) {
+              newItemModal.show()
               return;
             }
 
             Swal.fire({
-              title: "Commit Delivery?",
+              title: "Allow manual adding non-serialize items?",
               text: "Please confirm before proceeding.",
               icon: "warning",
               showCancelButton: true,
-              confirmButtonText: "Commit",
+              confirmButtonText: "Allow",
               cancelButtonText: "Cancel",
             }).then((result) => {
               if (result.isConfirmed) {
-                isCommitted = true;
-                $("#serialToggler").prop("disabled", true);
-                summaryEditables.forEach((cell) => {
-                  cell.setAttribute("contenteditable", "true");
-                });
-                $("#delivery-serial-table tbody tr td").each(function () {
-                  this.setAttribute("contenteditable", "false");
-                });
-                $("#prepby").attr("disabled");
-                $("#plate").attr("disabled");
-                $("#driver").attr("disabled");
-                $("#remarks").attr("disabled");
+                allowNonserialize = true;
+                newItemModal.show();
+                // $("#serialToggler").prop("disabled", true);
+                // summaryEditables.forEach((cell) => {
+                //   cell.setAttribute("contenteditable", "true");
+                // });
+                // $("#delivery-serial-table tbody tr td").each(function () {
+                //   this.setAttribute("contenteditable", "false");
+                // });
+                // $("#prepby").attr("disabled");
+                // $("#plate").attr("disabled");
+                // $("#driver").attr("disabled");
+                // $("#remarks").attr("disabled");
 
-                const createDrBtn = document.getElementById("createDrBtn");
-                createDrBtn.disabled = true;
+                // const createDrBtn = document.getElementById("createDrBtn");
+                // createDrBtn.disabled = true;
 
                 // store the original total quantity
-                let originalQty = parseInt($("#summaryQty").text().trim()) || 0;
+                // let originalQty = parseInt($("#summaryQty").text().trim()) || 0;
 
-                function updateSummaryQty() {
-                  let enteredTotal = 0;
+                // function updateSummaryQty() {
+                //   let enteredTotal = 0;
 
-                  // sum all qty-cell values
-                  $("#summaryTable tbody .qty-cell").each(function () {
-                    let val = parseInt(
-                      $(this).text().trim().replace(/\D/g, ""),
-                    );
-                    if (!isNaN(val)) {
-                      enteredTotal += val;
-                    }
-                  });
+                //   // sum all qty-cell values
+                //   $("#summaryTable tbody .qty-cell").each(function () {
+                //     let val = parseInt(
+                //       $(this).text().trim().replace(/\D/g, ""),
+                //     );
+                //     if (!isNaN(val)) {
+                //       enteredTotal += val;
+                //     }
+                //   });
 
-                  console.log(`ENTERED TOTAL: ${enteredTotal}`);
+                //   console.log(`ENTERED TOTAL: ${enteredTotal}`);
 
-                  let remaining = originalQty - enteredTotal;
-                  if (remaining < 0) remaining = 0;
-                  $("#summaryQty").text(remaining);
-                  console.log(`REMAINING: ${remaining}`);
+                //   let remaining = originalQty - enteredTotal;
+                //   if (remaining < 0) remaining = 0;
+                //   $("#summaryQty").text(remaining);
+                //   console.log(`REMAINING: ${remaining}`);
 
-                  createDrBtn.disabled = remaining !== 0;
-                }
+                //   createDrBtn.disabled = remaining !== 0;
+                // }
 
-                $(document).on(
-                  "input keyup",
-                  "#summaryTable tbody .qty-cell",
-                  function () {
-                    updateSummaryQty();
-                  },
-                );
+                // $(document).on(
+                //   "input keyup",
+                //   "#summaryTable tbody .qty-cell",
+                //   function () {
+                //     updateSummaryQty();
+                //   },
+                // );
               }
             });
           });
@@ -589,10 +667,80 @@ function createDr(createDeliveryNumber, picklistDr) {
 
           // update on window resize
           window.addEventListener("resize", adjustTotalWidth);
+
+          // FORM SUBMISSION
+          let commitBtn = document.getElementById("deliveryBtn")
+          // let isCommitted = false;
+
+          commitBtn.addEventListener("click", function() {
+
+            Swal.fire({
+              icon: "warning",
+              title: "Submit this for delivery?",
+              text: "This action cannot be changed",
+              confirmButtonText: "Submit",
+            }).then((res) => {
+              if(res.isConfirmed) {
+                // PROCEED FOR SUBMISSION
+
+
+
+              }
+            })
+          })
+
+          qtyCells()
         }
       },
     });
   });
+}
+
+function qtyCells() {
+  const quantityCells = document.querySelectorAll(
+  "#summaryTable td[contenteditable='true']"
+);
+
+quantityCells.forEach(cell => {
+  // Only allow number keys and control keys
+  cell.addEventListener("keydown", function (e) {
+    const allowedKeys = [
+      "Backspace",
+      "Delete",
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowUp",
+      "ArrowDown",
+      "Tab",
+      "Enter",
+    ];
+
+    // Allow Ctrl/Cmd + C, V, X, A
+    if (e.ctrlKey || e.metaKey) {
+      if (["c", "v", "x", "a"].includes(e.key.toLowerCase())) return;
+    }
+
+    // Allow only digits and allowedKeys
+    if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+      e.preventDefault();
+    }
+  });
+
+  // Prevent pasting non-numeric content
+  cell.addEventListener("paste", function (e) {
+    const paste = (e.clipboardData || window.clipboardData).getData("text");
+    if (!/^\d+$/.test(paste.trim())) {
+      e.preventDefault();
+    }
+  });
+
+  // Optional: remove any non-numeric characters if user somehow typed them
+  cell.addEventListener("input", function () {
+    this.innerText = this.innerText.replace(/\D/g, "");
+  });
+
+  console.log(`INPUT RESTRICTED TO NUMBERS`)
+});
 }
 
 // LOAD DELIVERY BASKET
@@ -785,8 +933,8 @@ function removePicklist(picklistNum, rowNum) {
     return;
   }
 
-  console.log(`PICKLIST NUMBER: ${picklistNum}`);
-  console.log(`ROW NUMBER: ${rowNum}`);
+  // console.log(`PICKLIST NUMBER: ${picklistNum}`);
+  // console.log(`ROW NUMBER: ${rowNum}`);
 
   Swal.fire({
     icon: "question",

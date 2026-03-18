@@ -71,7 +71,7 @@
                                         <div class="switch-knob shadow"></div>
                                     </label>
                                 </div>
-                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addDeliveryModal"><i class="bi bi-plus"></i> Add</button>
+                                <button type="button" class="btn btn-sm btn-primary" id="addDeliveryModalBtn"><i class="bi bi-plus"></i> Add</button> 
                             </div>
                             <div class="table-responsive d-flex gap-1 overflow-auto mt-3" style="max-height: 450px">
                                 <table class="table table-hover col-2" id="delivery-serial-table">
@@ -202,15 +202,15 @@
                                     <div class="d-flex flex-column gap-1">
                                         <div class="d-flex align-items-baseline gap-3">
                                             <label for="prepby" class="form-label text-dark-emphasis col-5"><small>Prepared by:</small></label>
-                                            <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #FFFBDF">
+                                            <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #FFFBDF" required>
                                         </div>
                                         <div class="d-flex align-items-baseline gap-3">
                                             <label for="plate" class="form-label text-dark-emphasis col-5"><small>Truck Plate No:</small></label>
-                                            <input type="text" name="plate" id="plate" class="form-control form-control-sm col" style="background: #FFFBDF">
+                                            <input type="text" name="plate" id="plate" class="form-control form-control-sm col" style="background: #FFFBDF" required>
                                         </div>
                                         <div class="d-flex align-items-baseline gap-3">
                                             <label for="driver" class="form-label text-dark-emphasis col-5"><small>Driver:</small></label>
-                                            <input type="text" name="driver" id="driver" class="form-control form-control-sm col" style="background: #FFFBDF">
+                                            <input type="text" name="driver" id="driver" class="form-control form-control-sm col" style="background: #FFFBDF" required>
                                         </div>
                                     </div>
                                     <div class="col-3">

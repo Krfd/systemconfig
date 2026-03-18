@@ -7,14 +7,17 @@
                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                  </div>
                  <div class="modal-body">
-                     <div class="form-input mb-2 d-flex gap-1">
+                     <div class="form-input mb-2">
                          <label for="newSerial" id="newSerialLabel" class="form-label text-dark-emphasis"><small>Serial:</small></label>
-                         <!-- <select class="form-select" id="newBrand" style="background: #FFFBDF" required>
-                            <option selected value="">--Choose Brand--</option>
-                        </select> -->
                          <input type="text" class="form-select form-select-sm" id="newSerial" style="background: #FFFBDF" required>
                      </div>
-                     <!-- <div class="form-input mb-2">
+                     <div class="form-input mb-2">
+                        <label for="newBrand" id="newBrandLabel" class="form-label text-dark-emphasis"><small>Brand:</small></label>
+                        <select class="form-select" id="newBrand" style="background: #FFFBDF" required>
+                            <option selected value="">--Choose Brand--</option>
+                        </select>
+                     </div>
+                     <div class="form-input mb-2">
                         <label for="newModel" class="form-label text-dark-emphasis"><small>Model:</small></label>
                         <select class="form-select" id="newModel" style="background: #FFFBDF" required>
                             <option selected value="">--Choose Model--</option>
@@ -29,8 +32,8 @@
                         <input type="number" name="newQuantity" id="newQuantity" class="form-control" style="background: #FFFBDF" min="1" inputmode="numeric"
                             pattern="[1-9][0-9]*"
                             required>
-                    </div> -->
-                     <!-- <input type="hidden" name="itemcode" id="itemcode"> -->
+                    </div>
+                     <input type="hidden" name="itemcode" id="itemcode">
                      <div class="modal-footer">
                          <button class="btn btn-success" type="submit">Add</button>
                          <button class="btn btn-danger" type="reset">Clear</button>
