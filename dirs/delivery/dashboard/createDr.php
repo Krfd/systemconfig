@@ -71,9 +71,14 @@
                                         <div class="switch-knob shadow"></div>
                                     </label>
                                 </div>
-                                <button type="button" class="btn btn-sm btn-primary" id="addDeliveryModalBtn"><i class="bi bi-plus"></i> Add</button> 
+                                <div class="d-flex gap-1">
+                                    <button type="button" class="btn btn-sm btn-primary" id="addDeliveryModalBtn"><i class="bi bi-plus"></i> Add</button>
+                                    <button type="button" class="btn btn-sm btn-danger" id="clearDeliveryTableBtn" onclick="clearTable()">Clear</button>
+                                    <button type="button" class="btn btn-sm btn-info" id="deliverySummaryBtn" data-bs-toggle="modal" data-bs-target="#deliverySummary">Delivery</button>
+                                </div>
                             </div>
                             <div class="table-responsive d-flex gap-1 overflow-auto mt-3" style="max-height: 450px">
+                                <!--SERIAL TABLE  -->
                                 <table class="table table-hover col-2" id="delivery-serial-table">
                                     <thead class="sticky-top">
                                         <tr>
@@ -85,10 +90,12 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td rowspan="9" colspan="2" style="background: #FFFDBF" contenteditable="true"></td>
+                                            <td rowspan="9" colspan="2" style="background: #FFFDBF" contenteditable="true"
+                                                style="white-space: pre-wrap;"></td>
                                         </tr>
                                     </tbody>
                                 </table>
+                                <!-- DELIVERY ITEMS TABLE -->
                                 <table class="table table-hover col" id="deliveryTable">
                                     <thead class="sticky-top">
                                         <tr>
@@ -140,6 +147,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                                <!-- SUMMARY TABLE -->
                                 <table class="table table-hover col" id="summaryTable">
                                     <thead class="sticky-top">
                                         <tr>
@@ -192,11 +200,11 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- <div id="totalRowOutside" class="d-flex border-top fw-bold ms-auto"
+                            <div id="totalRowOutside" class="d-flex border-top fw-bold ms-auto"
                                 style="background:#FFF7BC;">
                                 <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>
                                 <div class="p-2" style="width:120px;" id="summaryQty">0</div>
-                            </div> -->
+                            </div>
                             <div class="d-flex justify-content-between align-items-end mt-5">
                                 <div class="d-flex justify-content-start align-items-end gap-1 col-7">
                                     <div class="d-flex flex-column gap-1">
@@ -218,7 +226,7 @@
                                         <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="4" style="background: #FFFBDF; height: auto; resize: horizontal" maxlength="100"></textarea>
                                     </div>
                                 </div>
-                                <button class="clearfix btn btn-primary float-end" type="submit" id="deliveryBtn">Commit</button>
+                                <button class="clearfix btn btn-primary float-end" type="submit" id="deliveryBtn" disabled>Commit</button>
                             </div>
                         </form>
                     </div>

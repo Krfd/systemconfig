@@ -90,7 +90,6 @@ function loadImperialBrands() {
         );
       });
     } else {
-      // alert($.trim(response.Data));
       console.log(response.Data);
     }
   });
@@ -137,7 +136,6 @@ function loadDestinationWhscodes(Branch) {
       if ($.trim(response.isSuccess) === "success") {
         const whscode = response.Data;
         whscode.forEach((whscode) => {
-          console.log(`good warehouse: ${whscode.WhsCode}`);
           $("#desCodeForm").append(
             $("<option>", {
               value: whscode.WhsCode,

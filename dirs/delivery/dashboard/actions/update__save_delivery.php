@@ -2,7 +2,7 @@
 require_once "../../../../config/connection.php";
 session_start();
 
-$User   = $$_SESSION['Uid'];
+$User   = $_SESSION['Uid'];
 $DRNUmber = $_POST['DRNUmber'];
 $RowNum = $_POST['RowNum'];
 $DeliveryDate = $_POST['DeliveryDate'];
@@ -20,12 +20,18 @@ try {
     $conn->commit();
 
     $response = array(
-        "isSuccess" => 'success',
-        "message" => "Picklist has been saved"
+        "isSuccess" => "success",
+        "message" => "Sent for delivery"
     );
 
     echo json_encode($response);
 } catch (PDOException $e) {
     $conn->rollBack();
-    echo "Error: " . $e->getMessage();
+
+    $response = array(
+        "isSuccess" => "error",
+        "message" => $e->getMessage(),
+    );
+
+    echo json_encode($response);
 }

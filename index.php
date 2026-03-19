@@ -216,6 +216,23 @@ try {
             let picklistNumRef;
             let deliveryPicklistNum;
             let deliveryNum;
+            let summaryTable;
+
+            $.post(
+                "actions/update_inventory_list.php", {},
+                function(data) {
+                    let response;
+                    try {
+                        response = JSON.parse(data);
+                        if (response.status === "success") {
+                            console.log(`RESPONSE: ${response.status}`);
+                        }
+                    } catch (e) {
+                        console.error("Invalid updating inventory list", e);
+                        return;
+                    }
+                },
+            );
         })
     </script>
 </body>

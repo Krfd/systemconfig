@@ -60,7 +60,7 @@
 
         }, function(data) {
             if ($.trim(data) == "OK") {
-$("#outgoingModalBtn").disabled = true;
+                $("#outgoingModalBtn").disabled = true;
                 $("#frm-add-order")[0].reset();
                 $("#addRequestUnit").modal('hide');
                 loadItems();

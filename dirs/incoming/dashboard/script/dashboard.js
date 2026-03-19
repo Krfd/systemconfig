@@ -158,7 +158,6 @@ function loadIncoming() {
                 background: "#FFFBDF",
                 height: "40px",
                 "min-height": "40px",
-                cursor: "pointer",
               });
               $emptyRow.hover(
                 function () {
@@ -187,8 +186,6 @@ function toggleCheckboxes() {
 
   const selectionMode =
     $("#incomingTableDisplay tbody .checkbox:visible").length > 0;
-
-  const checkedIds = [];
   $("#incomingTableDisplay tbody .checkbox:checked").each(function () {
     checkedIds.push($(this).data("rownum"));
   });
@@ -223,8 +220,8 @@ function toggleCheckboxes() {
 
     $("#incomingTableDisplay tbody tr").each(function () {
       const row = $(this);
-      const srnText = row.find("td:eq(2)").text().trim(); // SRN column
-      const picklistNo = row.find("td:eq(7)").text().trim(); // Picklist No column
+      const srnText = row.find("td:eq(2)").text().trim();
+      const picklistNo = row.find("td:eq(7)").text().trim();
       const statusText = row.find("td:eq(5)").text().trim().toUpperCase();
       const checkbox = row.find(".checkbox");
 
@@ -273,7 +270,7 @@ function toggleCheckboxes() {
 
   Swal.fire({
     icon: "question",
-    title: "Generate picklist number and add the following items?",
+    title: "Create picklist on this item(s)?",
     text: "This action cannot be change",
     confirmButtonText: "Create",
     showCancelButton: true,
@@ -320,6 +317,8 @@ function toggleCheckboxes() {
 
 $(document).on("dblclick", "#incomingTableDisplay tbody tr", function (e) {
   if ($(e.target).closest(".dropdown").length) return;
+  if ($("#incomingTableDisplay tbody .checkbox:visible").length > 0) return;
+  if ($(this).hasClass("empty-row")) return;
   let RowNum = $(this).find("td:nth-child(2)").text().trim();
   $("#main-content").html(spinner);
   setTimeout(function () {
@@ -443,6 +442,7 @@ function loadIncomingDashboard() {
 // PICKLIST BASKET TO PICKLIST ITEMS
 $(document).on("dblclick", "#basketTable tbody .open-picklist", function (e) {
   e.preventDefault();
+  if (!$(this).find(".open-picklist").length) return;
   let $row = $(this).closest("tr");
   let picklistNum = $row.attr("data-picklist-num");
   $("#main-content").html(spinner);
@@ -453,6 +453,9 @@ $(document).on("dblclick", "#basketTable tbody .open-picklist", function (e) {
 
 // PICKLIST ITEMS TO INDIVIDUAL SRN
 $(document).on("dblclick", "#picklistItemTable tbody tr", function (e) {
+  e.preventDefault();
+  if ($(this).hasClass("empty-row")) return;
+  console.log(``);
   let RowNum = $(this).data("rownum");
   $("#main-content").html(spinner);
   setTimeout(function () {
@@ -537,7 +540,6 @@ function openPicklist(picklistNum) {
                   padding: "3px",
                   height: "40px",
                   "min-height": "40px",
-                  cursor: "pointer",
                 });
                 $("td:eq(0)", row).addClass("text-primary");
                 $("td:eq(2)", row).css("text-align", "start");
@@ -645,7 +647,6 @@ function loadBasketContent() {
 
 // ALREADY HAS A PICKLIST NUMBER
 function openPicklistedForm(RowNum) {
-  console.log(`OPENING PICKLISTED FORM`);
   $("#pageLoader").removeClass("d-none");
   $.post(
     "dirs/incoming/dashboard/picklistedForm.php",
@@ -830,7 +831,6 @@ function loadBasket() {
                 padding: "3px",
                 height: "40px",
                 "min-height": "40px",
-                cursor: "pointer",
               });
               $("td:eq(0)", row).addClass("text-primary");
               $("td:eq(1)", row).css("text-align", "start");
@@ -858,7 +858,6 @@ function loadBasket() {
                   background: "#FFFBDF",
                   height: "40px",
                   "min-height": "40px",
-                  cursor: "pointer",
                 });
                 $emptyRow.hover(
                   function () {

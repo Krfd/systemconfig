@@ -19,7 +19,6 @@ function loadDashboard() {
       order: [0, "desc"],
     });
   });
-  // cancelPicklist();
 }
 
 $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
@@ -265,11 +264,18 @@ $(document).on("click", ".dropdown .create-dr", function (e) {
 // });
 
 $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
+  if ($(e.target).closest("[contenteditable='true']").length) {
+    return;
+  }
+
+  let brand = $(this).find("td:nth-child(1)").text().trim();
   let model = $(this).find("td:nth-child(2)").text().trim();
   let qty = $(this).find("td:nth-child(3)").text().trim();
+  $("#assignBranchModal #brand").val(brand);
   $("#assignBranchModal #model").val(model);
   $("#assignBranchModal #qty").val(qty);
   $("#assignBranchModal").modal("show");
+  // console.log(`ASSIGNING VALUES IN SUMMARY MODAL TABLE`);
 });
 
 // function serialData(DeliveryNum) {
@@ -287,18 +293,133 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
 //   );
 // }
 
+/*load Imperial Brands*/
+function loadImperialBrands() {
+  $.post("dirs/outgoing/form/actions/get_iapbrands.php", {}, function (data) {
+    const response = JSON.parse(data);
+    if ($.trim(response.isSuccess) === "success") {
+      const brand = response.Data;
+
+      $("#newBrand").html(
+        '<option selected value="">--Choose Brand--</option>',
+      );
+      brand.forEach((brand) => {
+        $("#newBrand").append(
+          $("<option>", {
+            value: brand.Brand,
+            text: brand.Brand,
+          }),
+        );
+      });
+    } else {
+      console.log(response.Data);
+    }
+  });
+}
+
+async function loadIAPBranchlist() {
+  $.post("dirs/outgoing/form/actions/get_branchlist.php", {}, function (data) {
+    const response = JSON.parse(data);
+    if ($.trim(response.isSuccess) === "success") {
+      const iapbranch = response.Data;
+      $("#branch").html('<option selected value="">Select Branch</option>');
+      iapbranch.forEach((iapbranch) => {
+        $("#branch").append(
+          $("<option>", {
+            value: iapbranch.Branch,
+            text: iapbranch.Branch,
+          }),
+        );
+      });
+      if (iapbranch.length > 0) {
+        $("#branch").val(iapbranch[0].Branch);
+      }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Server under restoring",
+        text: "Please come back later",
+        showConfirmButton: true,
+        confirmButtonText: "OKAY",
+        allowOutsideClick: false,
+      }).then(() => {
+        $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
+          $("#main-content").html(data);
+        });
+      });
+    }
+  });
+}
+
+/*load Imperial Model and category*/
+async function loadImperialModel() {
+  var Brand = $("#newBrand").val();
+  $("#newModel").html('<option value="">Loading...</option>');
+  $("#newCategory").val("");
+  $("#itemcode").val("");
+  if (!Brand) {
+    $("#newModel").html('<option value="">--Choose Model--</option>');
+    return;
+  }
+  $.post(
+    "dirs/outgoing/form/actions/get_mdlcategory.php",
+    {
+      Brand: Brand,
+    },
+    function (data) {
+      let response;
+      try {
+        response = JSON.parse(data);
+      } catch (e) {
+        console.error("Invalid JSON:", data);
+        return;
+      }
+      if ($.trim(response.isSuccess) === "success") {
+        const rows = response.Data;
+        if (!rows || rows.length === 0) {
+          $("#newModel").html(
+            '<option value="" disabled selected>No Model Available</option>',
+          );
+          $("#newCategory").val("No Category Available");
+          $("#itemcode").val("");
+
+          return;
+        }
+
+        $("#newModel").html('<option value="">--Choose Model--</option>');
+        rows.forEach((row) => {
+          $("#newModel").append(
+            $("<option>", {
+              value: row.ItemModel,
+              text: row.ItemModel,
+              "data-category": row.ItemCategory,
+              "data-itemcode": row.ItemCode,
+            }),
+          );
+        });
+      } else {
+        $("#newModel").html(
+          '<option value="" disabled selected>No Model Available</option>',
+        );
+        $("#newCategory").val("No Category Available");
+        $("#itemcode").val("");
+      }
+    },
+  );
+}
+
+// SERIAL QUERY
 function serialDeliveryInput() {
   const serialCell = document.querySelector(
     "#delivery-serial-table tbody td[contenteditable='true']",
   );
 
-  const serials = []
+  const serials = [];
   serialCell.addEventListener("keydown", function (e) {
     if (e.key === "Enter") {
       e.preventDefault(); // Prevents creating a new line
 
       const serialValue = this.innerText.trim();
-      
 
       if (serialValue) {
         // $.ajax({
@@ -325,72 +446,305 @@ function serialDeliveryInput() {
         }
 
         console.log(`LATEST INPUT: ${latestInput}`);
-        serials.push(latestInput)
-        console.log(`SERIALS: ${serials}`)
+        serials.push(latestInput);
+        console.log(`SERIALS: ${serials}`);
 
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
 
-      const selection = window.getSelection();
-      const range = selection.getRangeAt(0);
+        // Get text before cursor
+        const preRange = range.cloneRange();
+        preRange.selectNodeContents(this);
+        preRange.setEnd(range.endContainer, range.endOffset);
+        const textBeforeCursor = preRange.toString();
+        const currentLine = textBeforeCursor.split("\n").pop().trim();
 
-      // Get text before cursor
-      const preRange = range.cloneRange();
-      preRange.selectNodeContents(this);
-      preRange.setEnd(range.endContainer, range.endOffset);
-      const textBeforeCursor = preRange.toString();
-      const currentLine = textBeforeCursor.split("\n").pop().trim();
+        // Create line break
+        const br = document.createElement("br");
 
-      // Create line break
-      const br = document.createElement("br");
+        if (!currentLine) {
+          // Empty line → just add <br> + empty text node
+          const emptyText = document.createTextNode("\u200B"); // zero-width space
+          range.insertNode(br);
+          range.setStartAfter(br);
+          range.setEndAfter(br);
+          range.insertNode(emptyText);
+          range.setStartAfter(emptyText);
+          range.setEndAfter(emptyText);
+        } else if (!currentLine.endsWith(",")) {
+          // Line has text → add comma + <br> + empty text node
+          const commaNode = document.createTextNode(",");
+          range.insertNode(commaNode);
 
-      if (!currentLine) {
-        // Empty line → just add <br> + empty text node
-        const emptyText = document.createTextNode("\u200B"); // zero-width space
-        range.insertNode(br);
-        range.setStartAfter(br);
-        range.setEndAfter(br);
-        range.insertNode(emptyText);
-        range.setStartAfter(emptyText);
-        range.setEndAfter(emptyText);
-      } else if (!currentLine.endsWith(",")) {
-        // Line has text → add comma + <br> + empty text node
-        const commaNode = document.createTextNode(",");
-        range.insertNode(commaNode);
+          range.setStartAfter(commaNode);
+          range.setEndAfter(commaNode);
 
-        range.setStartAfter(commaNode);
-        range.setEndAfter(commaNode);
+          const emptyText = document.createTextNode("\u200B");
+          range.insertNode(br);
+          range.setStartAfter(br);
+          range.setEndAfter(br);
+          range.insertNode(emptyText);
+          range.setStartAfter(emptyText);
+          range.setEndAfter(emptyText);
+        } else {
+          // Line already has comma → just <br> + empty text node
+          const emptyText = document.createTextNode("\u200B");
+          range.insertNode(br);
+          range.setStartAfter(br);
+          range.setEndAfter(br);
+          range.insertNode(emptyText);
+          range.setStartAfter(emptyText);
+          range.setEndAfter(emptyText);
+        }
 
-        const emptyText = document.createTextNode("\u200B");
-        range.insertNode(br);
-        range.setStartAfter(br);
-        range.setEndAfter(br);
-        range.insertNode(emptyText);
-        range.setStartAfter(emptyText);
-        range.setEndAfter(emptyText);
-      } else {
-        // Line already has comma → just <br> + empty text node
-        const emptyText = document.createTextNode("\u200B");
-        range.insertNode(br);
-        range.setStartAfter(br);
-        range.setEndAfter(br);
-        range.insertNode(emptyText);
-        range.setStartAfter(emptyText);
-        range.setEndAfter(emptyText);
-      }
-
-      // Update selection to be after new line
-      selection.removeAllRanges();
-      selection.addRange(range);
+        // Update selection to be after new line
+        selection.removeAllRanges();
+        selection.addRange(range);
       }
     }
   });
 }
 
+// SUMMARY
+function branchDelivery() {
+  let Serial = $("#assignBranchModal #serial").val();
+  let selectedBrand = $("#assignBranchModal #brand").val();
+  let selectedModel = $("#assignBranchModal #model").val();
+  let selectedBranch = $("#assignBranchModal #branch").val();
+  let selectedQty = $("#assignBranchModal #qty").val();
+
+  // ✅ Validate inputs FIRST
+  if (!selectedBrand || !selectedModel || !selectedBranch || !selectedQty) {
+    alert("Please fill in all fields before adding.");
+    return;
+  }
+
+  // loop through summary table rows
+  $("#summaryTable tbody tr").each(function () {
+    let model = $(this).find("td:nth-child(2)").text().trim();
+
+    let inserted = false;
+
+    if (model === selectedModel) {
+      $("#summaryDeliveryTable tbody tr").each(function (index) {
+        let serialCell = $(this).find("td:nth-child(2)").text().trim();
+
+        if (!serialCell) {
+          let rowCount = index + 1;
+
+          $(this).html(`
+            <td style="background:#FFFBDF">${rowCount}</td>
+            <td style="background:#FFFBDF" class="text-primary">${Serial}</td>
+            <td style="background:#FFFBDF">${selectedBranch}</td>
+            <td style="background:#FFFBDF">${selectedBrand}</td>
+            <td style="background:#FFFBDF">${selectedModel}</td>
+            <td style="background:#FFFBDF">${selectedQty}</td>
+          `);
+
+          inserted = true;
+          return false; // stop loop
+        }
+      });
+
+      // 🔥 if no empty row found → append at bottom
+      if (!inserted) {
+        let rowCount = $("#summaryDeliveryTable tbody tr").length + 1;
+
+        $("#summaryDeliveryTable tbody").append(`
+          <tr>
+            <td>${rowCount}</td>
+            <td>${Serial}</td>
+            <td>${selectedBranch}</td>
+            <td>${selectedBrand}</td>
+            <td>${selectedModel}</td>
+            <td>${selectedQty}</td>
+          </tr>
+        `);
+      }
+
+      console.log(
+        `ADDED TO SUMMARY: ${Serial} | ${selectedBranch} | ${selectedBrand} | ${selectedModel} | ${selectedQty}`,
+      );
+
+      // Optional: reset modal inputs
+      $("#assignBranchModal #serial").val("");
+      $("#assignBranchModal #brand").val("");
+      $("#assignBranchModal #model").val("");
+      $("#assignBranchModal #branch").val("");
+      $("#assignBranchModal #qty").val("");
+
+      // Optional: close modal
+      $("#assignBranchModal").modal("hide");
+
+      return false;
+    }
+  });
+}
+
+// CLEAR THE TABLE
+function clearTable() {
+  Swal.fire({
+    icon: "question",
+    title: "Are you sure to clear this form?",
+    confirmButtonText: "Clear",
+    showCancelButton: true,
+    cancelButtonColor: "#d33",
+  }).then((res) => {
+    if (res.isConfirmed) {
+      // $("#delivery")[0].reset();
+
+      let row = [];
+
+      $("#delivery-serial-table tbody").empty();
+      $("#deliveryTable tbody").empty();
+      $("#summaryTable tbody").empty();
+      $("#summaryDeliveryTable tbody").empty();
+
+      for (let i = 0; i < 8; i++) {
+        row = `
+          <tr>
+          <td style="background: #FFFBDF; height: 40px;"></td>
+          <td style="background: #FFFBDF; height: 40px;"></td>
+          <td style="background: #FFFBDF; height: 40px;"></td>
+          <td style="background: #FFFBDF; height: 40px;"></td>
+          <td style="background: #FFFBDF; height: 40px;"></td>
+          <td style="background: #FFFBDF; height: 40px;"></td>
+        </tr>
+        `;
+
+        $("#deliveryTable tbody").append(row);
+        $("#summaryTable tbody").append(row);
+        $("#summaryDeliveryTable tbody").append(row);
+      }
+
+      let serialRow = `<tr>
+          <td rowspan="9" colspan="2" style="background: #FFFBDF" contenteditable="true" style="white-space: pre-wrap;">
+          </td>
+        </tr>`;
+
+      $("#delivery-serial-table tbody").append(serialRow);
+
+      console.log("Form and table cleared ✅");
+    }
+  });
+}
+
+function summaryData() {
+  let rows = [];
+
+  if (rows.length === 0) {
+    for (let i = 0; i < 8; i++) {
+      rows.push(["", "", "", "", "", ""]);
+    }
+  }
+
+  if ($.fn.DataTable.isDataTable("#summaryDeliveryTable")) {
+    $("#summaryDeliveryTable").DataTable().clear().destroy();
+    $("#summaryDeliveryTable tbody").empty();
+  }
+  $("#deliveryBtn").prop("disabled", false);
+  summaryTable = $("#summaryDeliveryTable").DataTable({
+    data: rows,
+    columns: [
+      { title: "#" },
+      { title: "Serial" },
+      { title: "Branch" },
+      { title: "Brand" },
+      { title: "Model" },
+      { title: "Quantity" },
+    ],
+    pageLength: 50,
+    paging: true,
+    searching: true,
+    info: true,
+    processing: false,
+    autoWidth: false,
+    language: {
+      emptyTable: "",
+    },
+    rowCallback: function (row, data) {
+      $("td", row).css({
+        background: "#FFFBDF",
+        padding: "3px",
+        height: "40px",
+        "min-height": "40px",
+      });
+
+      $("td:eq(0)", row).addClass("text-center");
+      $("td:eq(1)", row).addClass("text-primary");
+      $("td:eq(4)", row).addClass("text-start");
+
+      $(row).hover(
+        function () {
+          $(this).css("background", "#FFF4C2");
+        },
+        function () {
+          $(this).css("background", "#FFFBDF");
+        },
+      );
+    },
+    drawCallback: function () {
+      let tableBody = $("#summaryDeliveryTable tbody");
+      let currentRows = tableBody.find("tr").length;
+
+      for (let i = currentRows; i < 8; i++) {
+        let $emptyRow = $(`
+                <tr class="empty-row">
+                  <td colspan="6" style="background:#FFFBDF"></td>
+                </tr>
+              `);
+
+        $($emptyRow).css({
+          background: "#FFFBDF",
+          height: "40px",
+        });
+
+        $emptyRow.hover(
+          function () {
+            $("td:not(:first-child)", this).css("background", "#FFF4C2");
+          },
+          function () {
+            $("td:not(:first-child)", this).css("background", "#FFFBDF");
+          },
+        );
+
+        tableBody.append($emptyRow);
+      }
+    },
+  });
+}
 // CREATE DELIVERY
 function createDr(createDeliveryNumber, picklistDr) {
   $.post("dirs/delivery/dashboard/createDr.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
 
+    loadImperialBrands();
     serialDeliveryInput();
+    loadIAPBranchlist();
+    summaryData();
+
+    $("#branchDeliveryUnit").on("submit", function (e) {
+      e.preventDefault();
+      branchDelivery();
+
+      $("#assignBranchModal").modal("hide");
+      $("#branchDeliveryUnit")[0].reset(); // clear modal
+    });
+
+    /*Function for reselecting brand to find another model*/
+    $("#newBrand").on("change", function () {
+      $("#newModel").html('<option value="">Select Model</option>');
+      $("#newCategory").val("");
+      $("#itemcode").val("");
+      loadImperialModel();
+    });
+
+    /*Script for selecting model and category*/
+    $("#newModel").on("change", function () {
+      const selected = $(this).find(":selected");
+      $("#newCategory").val(selected.data("category") || "");
+      $("#itemcode").val(selected.data("itemcode") || "");
+    });
 
     // $.ajax({
     //   url: "dirs/delivery/dashboard/actions/update_branch_warehouse.php",
@@ -409,7 +763,6 @@ function createDr(createDeliveryNumber, picklistDr) {
       success: function (response) {
         if (response.isSuccess === "success") {
           let rowCount = response.DevItems.length;
-          // let rowCount = 0;
           let totalQty = 0;
           let header = response.Data;
           let items = response.DevItems;
@@ -419,8 +772,6 @@ function createDr(createDeliveryNumber, picklistDr) {
           $("#docdate").val(header.DocumentDate);
           $("#origin").val(header.BDestination);
           $("#whcode").val(header.BWhsDestination);
-          // $("#branchName").val(header.BOrigin);
-          // $("#branchWhCode").val(header.BWhsOrigin);
           $("#status").val("NEW");
           $("#prepby").val(header.PreparedBy);
 
@@ -445,10 +796,7 @@ function createDr(createDeliveryNumber, picklistDr) {
                   </tr>`;
           });
 
-          
-
           // SERIAL DELIVERY INPUT
-
           $("#summaryQty").text(totalQty);
           $("#deliveryTable tbody").html(rows);
           $("#summaryTable tbody").html(row);
@@ -533,65 +881,25 @@ function createDr(createDeliveryNumber, picklistDr) {
 
             toggler.addEventListener("change", updateKnob);
           }
-          toggler()
+          toggler();
           // ----------------------------------------------------------
 
           // const commitBtn = document.getElementById("deliveryBtn");
           const addBtn = document.getElementById("addDeliveryModalBtn");
-          const newItemModal = new bootstrap.Modal(document.getElementById("addDeliveryModal"));
-          // const summaryEditables = document.querySelectorAll(
-          //   "#summaryTable tbody tr td[contenteditable='true']",
-          // );
+          const newItemModal = new bootstrap.Modal(
+            document.getElementById("addDeliveryModal"),
+          );
 
-          // function validateDeliveryForm() {
-          //   let isValid = true;
-
-          //   const serialCell = $("#delivery-serial-table tbody td")
-          //     .text()
-          //     .trim();
-          //   if (serialCell === "") isValid = false;
-
-          //   const deliveryRows = $("#deliveryTable tbody tr");
-          //   let hasData = false;
-
-          //   deliveryRows.each(function () {
-          //     const cells = $(this).find("td").text().trim();
-          //     if (cells !== "") {
-          //       hasData = true;
-          //     }
-          //   });
-
-          //   if (!hasData) isValid = false;
-
-          //   // INPUTS
-          //   if ($("#prepby").val().trim() === "") isValid = false;
-          //   if ($("#plate").val().trim() === "") isValid = false;
-          //   if ($("#driver").val().trim() === "") isValid = false;
-
-          //   // ENABLE / DISABLE BUTTON
-          //   // commitBtn.disabled = !isValid;
-          // }
-
-          // $(document).on(
-          //   "input",
-          //   "#delivery-serial-table td, #deliveryTable td, #prepby, #plate, #driver",
-          //   function () {
-          //     validateDeliveryForm();
-          //   },
-          // );
-
-          // let isCommitted = false;
           let allowNonserialize = false;
 
-          // commitBtn.addEventListener("click", function () {
           addBtn.addEventListener("click", function () {
             if (allowNonserialize) {
-              newItemModal.show()
+              newItemModal.show();
               return;
             }
 
             Swal.fire({
-              title: "Allow manual adding non-serialize items?",
+              title: "Enter non-serialize items?",
               text: "Please confirm before proceeding.",
               icon: "warning",
               showCancelButton: true,
@@ -601,54 +909,6 @@ function createDr(createDeliveryNumber, picklistDr) {
               if (result.isConfirmed) {
                 allowNonserialize = true;
                 newItemModal.show();
-                // $("#serialToggler").prop("disabled", true);
-                // summaryEditables.forEach((cell) => {
-                //   cell.setAttribute("contenteditable", "true");
-                // });
-                // $("#delivery-serial-table tbody tr td").each(function () {
-                //   this.setAttribute("contenteditable", "false");
-                // });
-                // $("#prepby").attr("disabled");
-                // $("#plate").attr("disabled");
-                // $("#driver").attr("disabled");
-                // $("#remarks").attr("disabled");
-
-                // const createDrBtn = document.getElementById("createDrBtn");
-                // createDrBtn.disabled = true;
-
-                // store the original total quantity
-                // let originalQty = parseInt($("#summaryQty").text().trim()) || 0;
-
-                // function updateSummaryQty() {
-                //   let enteredTotal = 0;
-
-                //   // sum all qty-cell values
-                //   $("#summaryTable tbody .qty-cell").each(function () {
-                //     let val = parseInt(
-                //       $(this).text().trim().replace(/\D/g, ""),
-                //     );
-                //     if (!isNaN(val)) {
-                //       enteredTotal += val;
-                //     }
-                //   });
-
-                //   console.log(`ENTERED TOTAL: ${enteredTotal}`);
-
-                //   let remaining = originalQty - enteredTotal;
-                //   if (remaining < 0) remaining = 0;
-                //   $("#summaryQty").text(remaining);
-                //   console.log(`REMAINING: ${remaining}`);
-
-                //   createDrBtn.disabled = remaining !== 0;
-                // }
-
-                // $(document).on(
-                //   "input keyup",
-                //   "#summaryTable tbody .qty-cell",
-                //   function () {
-                //     updateSummaryQty();
-                //   },
-                // );
               }
             });
           });
@@ -664,32 +924,84 @@ function createDr(createDeliveryNumber, picklistDr) {
 
           // run on load
           adjustTotalWidth();
-
-          // update on window resize
           window.addEventListener("resize", adjustTotalWidth);
 
           // FORM SUBMISSION
-          let commitBtn = document.getElementById("deliveryBtn")
-          // let isCommitted = false;
+          let commitBtn = document.getElementById("deliveryBtn");
 
-          commitBtn.addEventListener("click", function() {
-
+          commitBtn.addEventListener("click", function () {
             Swal.fire({
               icon: "warning",
               title: "Submit this for delivery?",
               text: "This action cannot be changed",
               confirmButtonText: "Submit",
+              allowOutsideClick: false,
+              showCancelButton: true,
+              cancelButtonText: "Back",
             }).then((res) => {
-              if(res.isConfirmed) {
+              if (res.isConfirmed) {
                 // PROCEED FOR SUBMISSION
 
+                console.log(`SUBMIT DELIVERY`);
 
+                let items = [];
+                $("#summaryTable tbody tr")
+                  .not(".empty-row")
+                  .each(function () {
+                    let serial = $(this).find(".item-serial").text().trim();
+                    let branch = $(this).find(".item-branch").text().trim();
+                    let brand = $(this).find(".item-brand").text().trim();
+                    let model = $(this).find(".item-model").text().trim();
+                    let quantity = $(this).find(".item-quantity").text().trim();
 
+                    if (brand !== "") {
+                      items.push({
+                        serial: serial,
+                        branch: branch,
+                        brand: brand,
+                        model: model,
+                        quantity: quantity,
+                      });
+                    }
+                  });
+
+                if (items.length === 0) {
+                  e.preventDefault();
+                  Swal.fire({
+                    icon: "error",
+                    title: "No items on summary",
+                    text: "No item(s) found on the summary",
+                  });
+                  return;
+                }
+
+                let formData = new FormData(
+                  document.getElementById("delivery"),
+                );
+                formData.append("items", JSON.stringify(items));
+
+                // $.ajax({
+                //   url: "dirs/delivery/dashboard/actions/update_save_delivery.php",
+                //   type: "POST",
+                //   data: formData,
+                //   processData: false,
+                //   contentType: false,
+                //   dataType: "json",
+                //   success: function (response) {
+                //     if (response.isSuccess === "success") {
+                //       console.log(`RESPONSE: ${response.message}`);
+                //     } else {
+                //       console.error("Error submitting data");
+                //     }
+                //   },
+                // });
+
+                console.log(`FORM DATA: ${formData}`);
               }
-            })
-          })
+            });
+          });
 
-          qtyCells()
+          qtyCells();
         }
       },
     });
@@ -698,49 +1010,47 @@ function createDr(createDeliveryNumber, picklistDr) {
 
 function qtyCells() {
   const quantityCells = document.querySelectorAll(
-  "#summaryTable td[contenteditable='true']"
-);
+    "#summaryTable td[contenteditable='true']",
+  );
 
-quantityCells.forEach(cell => {
-  // Only allow number keys and control keys
-  cell.addEventListener("keydown", function (e) {
-    const allowedKeys = [
-      "Backspace",
-      "Delete",
-      "ArrowLeft",
-      "ArrowRight",
-      "ArrowUp",
-      "ArrowDown",
-      "Tab",
-      "Enter",
-    ];
+  quantityCells.forEach((cell) => {
+    // Only allow number keys and control keys
+    cell.addEventListener("keydown", function (e) {
+      const allowedKeys = [
+        "Backspace",
+        "Delete",
+        "ArrowLeft",
+        "ArrowRight",
+        "ArrowUp",
+        "ArrowDown",
+        "Tab",
+        "Enter",
+      ];
 
-    // Allow Ctrl/Cmd + C, V, X, A
-    if (e.ctrlKey || e.metaKey) {
-      if (["c", "v", "x", "a"].includes(e.key.toLowerCase())) return;
-    }
+      // Allow Ctrl/Cmd + C, V, X, A
+      if (e.ctrlKey || e.metaKey) {
+        if (["c", "v", "x", "a"].includes(e.key.toLowerCase())) return;
+      }
 
-    // Allow only digits and allowedKeys
-    if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
-      e.preventDefault();
-    }
+      // Allow only digits and allowedKeys
+      if (!/[0-9]/.test(e.key) && !allowedKeys.includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+
+    // Prevent pasting non-numeric content
+    cell.addEventListener("paste", function (e) {
+      const paste = (e.clipboardData || window.clipboardData).getData("text");
+      if (!/^\d+$/.test(paste.trim())) {
+        e.preventDefault();
+      }
+    });
+
+    // Optional: remove any non-numeric characters if user somehow typed them
+    cell.addEventListener("input", function () {
+      this.innerText = this.innerText.replace(/\D/g, "");
+    });
   });
-
-  // Prevent pasting non-numeric content
-  cell.addEventListener("paste", function (e) {
-    const paste = (e.clipboardData || window.clipboardData).getData("text");
-    if (!/^\d+$/.test(paste.trim())) {
-      e.preventDefault();
-    }
-  });
-
-  // Optional: remove any non-numeric characters if user somehow typed them
-  cell.addEventListener("input", function () {
-    this.innerText = this.innerText.replace(/\D/g, "");
-  });
-
-  console.log(`INPUT RESTRICTED TO NUMBERS`)
-});
 }
 
 // LOAD DELIVERY BASKET
@@ -932,9 +1242,6 @@ function removePicklist(picklistNum, rowNum) {
     });
     return;
   }
-
-  // console.log(`PICKLIST NUMBER: ${picklistNum}`);
-  // console.log(`ROW NUMBER: ${rowNum}`);
 
   Swal.fire({
     icon: "question",
@@ -1300,10 +1607,6 @@ function openDeliveryForm(DeliveryNum, PicklistNumber, RowNum, SRN) {
           let items = response.Items;
           // let items = response.DevItems;
 
-          console.log(`ROW NUMBER: ${RowNum}`);
-          console.log(`DATA: ${JSON.stringify(header)}`);
-          console.log(`ITEMS: ${JSON.stringify(items)}`);
-
           $("#drno").val(DeliveryNum);
           $("#pcklstno").val(PicklistNumber);
           $("#docdate").val(header.DocDate);
@@ -1346,49 +1649,6 @@ function openDeliveryForm(DeliveryNum, PicklistNumber, RowNum, SRN) {
             }
             $("#totalQuantity").text(totalQty);
           }
-
-          // $("#drno").val(DeliveryNum);
-          // $("#pcklstno").val(PicklistNumber);
-          // $("#docdate").val(header.DocumentDate);
-          // $("#origin").val(header.BDestination);
-          // $("#whcode").val(header.BWhsDestination);
-          // $("#branchName").val(header.BOrigin);
-          // $("#branchWhCode").val(header.BWhsOrigin);
-          // $("#status").val(header.Delivery_Status);
-          // $("#prepby").val(header.PreparedBy) || "N/A";
-          // $("#plate").val(header.PlateNumber) || "N/A";
-          // $("#driver").val(header.Delivery_Personnel) || "N/A";
-          // $("#remarks").val(header.Remarks) || "N/A";
-          // let rows = "";
-          // items.forEach(function (item, index) {
-          //   let quantity = parseFloat(item.Quantity) || 0;
-          //   totalQty += quantity;
-          //   rows += `
-          //     <tr style="height: 40px; min-height: 40px; cursor: pointer">
-          //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Brand}</td>
-          //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Model}</td>
-          //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Category}</td>
-          //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
-          //     </tr>
-          //   `;
-          // });
-          // $("#totalQuantity").text(totalQty);
-          // $("#deliveryTable tbody").html(rows);
-          // if (rowCount < 8) {
-          //   let emptyRowsNeeded = 8 - rowCount;
-          //   for (let i = 0; i < emptyRowsNeeded; i++) {
-          //     let emptyRow = `
-          //       <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
-          //         <td style="background: #FFFBDF"></td>
-          //         <td style="background: #FFFBDF"></td>
-          //         <td style="background: #FFFBDF"></td>
-          //         <td style="background: #FFFBDF"></td>
-          //       </tr>
-          //     `;
-          //     $("#deliveryTable tbody").append(emptyRow);
-          //   }
-          //   $("#totalQuantity").text(totalQty);
-          // }
         }
       },
     });
