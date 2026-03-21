@@ -312,7 +312,18 @@ function loadImperialBrands() {
         );
       });
     } else {
-      console.log(response.Data);
+      Swal.fire({
+        icon: "error",
+        title: "Server under restoring",
+        text: "Please come back later",
+        showConfirmButton: true,
+        confirmButtonText: "OKAY",
+        allowOutsideClick: false,
+      }).then(() => {
+        $.post("dirs/delivery/dashboard/delivery.php", {}, function (data) {
+          $("#main-content").html(data);
+        });
+      });
     }
   });
 }
@@ -343,7 +354,7 @@ async function loadIAPBranchlist() {
         confirmButtonText: "OKAY",
         allowOutsideClick: false,
       }).then(() => {
-        $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
+        $.post("dirs/delivery/dashboard/delivery.php", {}, function (data) {
           $("#main-content").html(data);
         });
       });
@@ -419,25 +430,26 @@ function serialDeliveryInput() {
     if (e.key === "Enter") {
       e.preventDefault(); // Prevents creating a new line
 
-      const serialValue = this.innerText.trim();
+      const Serial = this.innerText.trim();
 
-      if (serialValue) {
-        // $.ajax({
-        //   url: "dirs/delivery/dashboard/actions/get_find_product_serial.php",
-        //   type: "POST",
-        //   data: { Serial: serialValue },
-        //   dataType: "json",
-        //   success: function (response) {
-        //     if (response.isSuccess === "success") {
-        //       console.log(`SERIAN INPUT: ${serialValue}`);
-        //       console.log(`RESPONSE: ${JSON.stringify(response.Data)}`);
+      if (Serial) {
+        $.ajax({
+          url: "dirs/delivery/dashboard/actions/get_branch_stock_serial.php",
+          type: "POST",
+          data: { Serial: Serial },
+          dataType: "json",
+          success: function (response) {
+            if (response.isSuccess === "success") {
+              // console.log(`SERIAL INPUT: ${Serial}`);
+              console.log(`RESPONSE: ${JSON.stringify(response.Data)}`);
+              // ITEM DETAILS TO BE IMPORTED IN DELIVERY SERIAL TABLE
+            } else {
+              console.log(`RESPONSE: ${JSON.stringify(response.Data)}`);
+            }
+          },
+        });
 
-        //       // ITEM DETAILS TO BE IMPORTED IN DELIVERY SERIAL TABLE
-        //     }
-        //   },
-        // });
-
-        const parts = serialValue.split(", ");
+        const parts = Serial.split(", ");
         let latestInput = parts[parts.length - 1].trim(); // remove spaces
 
         // If the last part is empty (because user typed a trailing comma), pick the second-to-last
@@ -445,7 +457,7 @@ function serialDeliveryInput() {
           latestInput = parts[parts.length - 2].trim();
         }
 
-        console.log(`LATEST INPUT: ${latestInput}`);
+        // console.log(`LATEST INPUT: ${latestInput}`);
         serials.push(latestInput);
         console.log(`SERIALS: ${serials}`);
 
@@ -746,15 +758,6 @@ function createDr(createDeliveryNumber, picklistDr) {
       $("#itemcode").val(selected.data("itemcode") || "");
     });
 
-    // $.ajax({
-    //   url: "dirs/delivery/dashboard/actions/update_branch_warehouse.php",
-    //   type: "POST",
-    //   dataType: "json",
-    //   success: function (data) {
-    //     console.log(`DATA: ${JSON.stringify(data.isSuccess)}`);
-    //   },
-    // });
-
     $.ajax({
       url: "dirs/delivery/dashboard/actions/get_review_deliveries.php",
       type: "POST",
@@ -884,7 +887,6 @@ function createDr(createDeliveryNumber, picklistDr) {
           toggler();
           // ----------------------------------------------------------
 
-          // const commitBtn = document.getElementById("deliveryBtn");
           const addBtn = document.getElementById("addDeliveryModalBtn");
           const newItemModal = new bootstrap.Modal(
             document.getElementById("addDeliveryModal"),
@@ -930,6 +932,21 @@ function createDr(createDeliveryNumber, picklistDr) {
           let commitBtn = document.getElementById("deliveryBtn");
 
           commitBtn.addEventListener("click", function () {
+            let plateInput = document.getElementById("plate");
+            let driverInput = document.getElementById("driver");
+
+            // CHECK PLATE
+            if (plateInput.value.trim() === "") {
+              plateInput.focus();
+              return;
+            }
+
+            // CHECK DRIVER
+            if (driverInput.value.trim() === "") {
+              driverInput.focus();
+              return;
+            }
+
             Swal.fire({
               icon: "warning",
               title: "Submit this for delivery?",

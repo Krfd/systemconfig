@@ -24,10 +24,6 @@
                         <form method="POST" id="delivery">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="d-flex flex-column gap-1 col-4">
-                                    <!-- <div class="d-flex align-items-baseline gap-3">
-                                        <label for="drno" class="form-label text-dark-emphasis col-3"><small>DR No:</small></label>
-                                        <input type="text" name="drno" id="drno" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
-                                    </div> -->
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="pcklstno" class="form-label text-dark-emphasis col-3"><small>Picklist No:</small></label>
                                         <input type="text" name="pcklstno" id="pcklstno" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>

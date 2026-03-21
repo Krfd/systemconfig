@@ -14,7 +14,7 @@ try {
     // Fetch result
     $user_info = $stmtUser->fetch(PDO::FETCH_ASSOC);
     $Branch = $user_info['Branch'] ?? null;
-    $Region = $user_info['Region'] ?? null;
+    $Region = ' ';
 
     // 2. Update item stocks
     $stmtUpdStocks = $conn->prepare("EXEC dbo.[UPDATE_OITW] ?");

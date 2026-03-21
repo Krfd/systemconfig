@@ -166,28 +166,29 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="d-flex justify-content-between align-items-end mt-3">
-                                <div class="d-flex flex-column gap-1 col-4">
-                                    <div class="d-flex align-items-baseline gap-3">
-                                        <label for="receiveByRecForm" class="form-label text-dark-emphasis col-4"><small>Received by:</small></label>
-                                        <input type="text" name="receiveByRecForm" id="receiveByRecForm" class="form-control form-control-sm col" style="background: #FFFFF2" readonly disabled required>
+                            <!-- BOTTOM DATA -->
+                            <div class="d-flex justify-content-between align-items-end mt-5">
+                                <div class="d-flex justify-content-start align-items-end gap-1 col-7">
+                                    <div class="d-flex flex-column gap-1">
+                                        <div class="d-flex align-items-baseline gap-3">
+                                            <label for="receiveByRecForm" class="form-label text-dark-emphasis col-5"><small>Received by:</small></label>
+                                            <input type="text" name="receiveByRecForm" id="receiveByRecForm" class="form-control form-control-sm col" style="background: #FFFFF2" readonly disabled required>
+                                        </div>
+                                        <div class="d-flex align-items-baseline gap-3">
+                                            <label for=" plateRecForm" class="form-label text-dark-emphasis col-5"><small>Truck Plate No:</small></label>
+                                            <input type="text" name="plateRecForm" id="plateRecForm" class="form-control form-control-sm col" style="background: #FFFFF2" readonly disabled required>
+                                        </div>
+                                        <div class="d-flex align-items-baseline gap-3">
+                                            <label for=" driverRecForm" class="form-label text-dark-emphasis col-5"><small>Driver:</small></label>
+                                            <input type="text" name="driverRecForm" id="driverRecForm" class="form-control form-control-sm col" style="background: #FFFFF2" readonly disabled required>
+                                        </div>
                                     </div>
-                                    <div class="d-flex align-items-baseline gap-3">
-                                        <label for=" plateRecForm" class="form-label text-dark-emphasis col-4"><small>Truck Plate No:</small></label>
-                                        <input type="text" name="plateRecForm" id="plateRecForm" class="form-control form-control-sm col" style="background: #FFFFF2" readonly disabled required>
-                                    </div>
-                                    <div class="d-flex align-items-baseline gap-3">
-                                        <label for=" driverRecForm" class="form-label text-dark-emphasis col-4"><small>Driver:</small></label>
-                                        <input type="text" name="driverRecForm" id="driverRecForm" class="form-control form-control-sm col" style="background: #FFFFF2" readonly disabled required>
-                                    </div>
-                                    <div class="d-flex align-items-baseline gap-3">
-                                        <label for=" remarksRecForm" class="form-label text-dark-emphasis col-4"><small>Remarks:</small></label>
+                                    <div class="col-3">
+                                        <label for=" remarksRecForm" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
                                         <textarea name="remarksRecForm" id="remarksRecForm" class="form-control form-control-sm col" rows="3" style="background: #FFFFF2; height: auto;" disabled readonly></textarea>
                                     </div>
                                 </div>
-                                <div>
-                                    <button type="submit" class="btn btn-primary" id="submitRecBtn">Submit</button>
-                                </div>
+                                <button type="submit" class="btn btn-primary" id="submitRecBtn">Submit</button>
                             </div>
                         </form>
                     </div>

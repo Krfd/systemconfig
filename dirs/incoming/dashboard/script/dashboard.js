@@ -183,6 +183,7 @@ function loadIncoming() {
 
 function toggleCheckboxes() {
   const createPicklistBtn = document.getElementById("createPicklistBtn");
+  const checkedIds = [];
 
   const selectionMode =
     $("#incomingTableDisplay tbody .checkbox:visible").length > 0;
