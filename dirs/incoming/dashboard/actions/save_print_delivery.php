@@ -93,7 +93,7 @@ try {
                Insert Delivery Item
             ----------------------------------------- */
             $stmtInsertItem = $conn->prepare(
-                "EXEC dbo.[DELIVERY_ITEMS_CREATE] ?, ?, ?, ?, ?, ?, ?"
+                "EXEC dbo.[DELIVERY_ITEMS_CREATE] ?, ?, ?, ?, ?, ?, ?, ?"
             );
 
             $stmtInsertItem->execute([
@@ -101,6 +101,7 @@ try {
                 $PKlistNum,
                 $DeliveryNumber,
                 $Brand,
+                $ItemCode,
                 $Model,
                 $Category,
                 $Quantity

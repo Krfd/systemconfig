@@ -12,26 +12,26 @@ $(document).ready(function () {
   });
 });
 
-function loadLoginData() {
-  $.post("actions/update_inventory_list.php", {}, function (data) {
-    let response;
-    try {
-      response = JSON.parse(data);
-      if (response.status === "success") {
-        // console.log(`RESPONSE: ${response.status}`);
-      }
-    } catch (e) {
-      console.error("Invalid updating inventory list", e);
-      return;
-    }
-  });
-}
+// function loadLoginData() {
+//   $.post("actions/update_inventory_list.php", {}, function (data) {
+//     let response;
+//     try {
+//       response = JSON.parse(data);
+//       if (response.status === "success") {
+//         // console.log(`RESPONSE: ${response.status}`);
+//       }
+//     } catch (e) {
+//       console.error("Invalid updating inventory list", e);
+//       return;
+//     }
+//   });
+// }
 
 function loadDashboard() {
   $("#dashboard_content").html(spinner);
   $.post("dirs/outgoing/dashboard/components/main.php", {}, function (data) {
     $("#dashboard_content").html(data);
-    loadLoginData();
+    // loadLoginData();
 
     $("#outgoingTableDisplay tbody").html(`
       <tr>

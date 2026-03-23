@@ -12,20 +12,20 @@
                          <input type="text" class="form-select form-select-sm" id="newSerial" style="background: #FFFBDF" required>
                      </div>
                      <div class="form-input mb-2">
+                         <label for="newItemCode" id="newItemCodeLabel" class="form-label text-dark-emphasis"><small>Item Code:</small></label>
+                         <input type="text" class="form-select form-select-sm" id="newItemCode" style="background: #FFFBDF" required>
+                     </div>
+                     <div class="form-input mb-2">
                          <label for="newBrand" id="newBrandLabel" class="form-label text-dark-emphasis"><small>Brand:</small></label>
-                         <select class="form-select" id="newBrand" style="background: #FFFBDF" required>
-                             <option selected value="">--Choose Brand--</option>
-                         </select>
+                         <input type="text" name="newBrand" id="newBrand" class="form-control" required disabled>
                      </div>
                      <div class="form-input mb-2">
                          <label for="newModel" class="form-label text-dark-emphasis"><small>Model:</small></label>
-                         <select class="form-select" id="newModel" style="background: #FFFBDF" required>
-                             <option selected value="">--Choose Model--</option>
-                         </select>
+                         <input type="text" name="newModel" id="newModel" class="form-control" required disabled>
                      </div>
                      <div class="form-input mb-2">
                          <label for="newCategory" class="form-label text-dark-emphasis"><small>Category:</small></label>
-                         <input type="text" name="newCategory" id="newCategory" class="form-control" style="background: #FFFBDF" readonly>
+                         <input type="text" name="newCategory" id="newCategory" class="form-control" required disabled>
                      </div>
                      <div class="form-input">
                          <label for="newQuantity" class="form-label text-dark-emphasis"><small>Quantity:</small></label>
@@ -34,6 +34,36 @@
                              required>
                      </div>
                      <input type="hidden" name="itemcode" id="itemcode">
+
+
+                     <!-- <div class="table-responsive">
+                         <table class="table table-hover datatables" id="branchToDeliverModal">
+                             <thead class="sticky-top">
+                                 <tr>
+                                     <th class="text-secondary">Branch</th>
+                                     <th class="text-secondary">Model</th>
+                                     <th class="text-secondary">Quantity</th>
+                                 </tr>
+                             </thead>
+                             <tbody>
+                                 <tr>
+                                     <td>VIAC</td>
+                                     <td>AH-X15BEF</td>
+                                     <td contenteditable="true"></td>
+                                 </tr>
+                                 <tr>
+                                     <td>GALLERIA</td>
+                                     <td>AH-X15BEF</td>
+                                     <td contenteditable="true"></td>
+                                 </tr>
+                                 <tr>
+                                     <td>PLAZA</td>
+                                     <td>AH-X15BEF</td>
+                                     <td contenteditable="true"></td>
+                                 </tr>
+                             </tbody>
+                         </table>
+                     </div> -->
                      <div class="modal-footer">
                          <button class="btn btn-success" type="submit">Add</button>
                          <button class="btn btn-danger" type="reset">Clear</button>
@@ -65,14 +95,6 @@
                              </tr>
                          </thead>
                          <tbody>
-                             <tr>
-                                 <td class="" style="background: #FFFBDF; height: 40px; max-height: 40px"></td>
-                                 <td class="" style="background: #FFFBDF; height: 40px; max-height: 40px"></td>
-                                 <td class="" style="background: #FFFBDF; height: 40px; max-height: 40px"></td>
-                                 <td class="" style="background: #FFFBDF; height: 40px; max-height: 40px"></td>
-                                 <td class="" style="background: #FFFBDF; height: 40px; max-height: 40px"></td>
-                                 <td class="" style="background: #FFFBDF; height: 40px; max-height: 40px"></td>
-                             </tr>
                          </tbody>
                      </table>
                  </div>

@@ -98,45 +98,54 @@
                                             <th class="text-secondary">Brand</th>
                                             <th class="text-secondary">Model</th>
                                             <th class="text-secondary">Category</th>
+                                            <th class="text-secondary">Qty</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr style="height: 50px; min-height: 50px;">
+                                        <tr class="empty-row" style="height: 50px; min-height: 50px;">
                                             <td style="background: #FFFBDF;"></td>
-                                            <td style="background: #FFFBDF;"></td>
-                                            <td style="background: #FFFBDF;"></td>
-                                        </tr>
-                                        <tr style="height: 50px; min-height: 50px;">
                                             <td style="background: #FFFBDF;"></td>
                                             <td style="background: #FFFBDF;"></td>
                                             <td style="background: #FFFBDF;"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px;">
+                                        <tr class="empty-row" style="height: 50px; min-height: 50px;">
+                                            <td style="background: #FFFBDF;"></td>
+                                            <td style="background: #FFFBDF;"></td>
+                                            <td style="background: #FFFBDF;"></td>
+                                            <td style="background: #FFFBDF;"></td>
+                                        </tr>
+                                        <tr class="empty-row" style="height: 50px; min-height: 50px;">
+                                            <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px;">
+                                        <tr class="empty-row" style="height: 50px; min-height: 50px;">
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr style="height: 50px; min-height: 50px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px;">
+                                        <tr class="empty-row" style="height: 50px; min-height: 50px;">
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr style="height: 50px; min-height: 50px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px;">
+                                        <tr class="empty-row" style="height: 50px; min-height: 50px;">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr class="empty-row" style="height: 50px; min-height: 50px;">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr class="empty-row" style="height: 50px; min-height: 50px;">
+                                            <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
@@ -150,48 +159,57 @@
                                             <th class="text-secondary">Brand</th>
                                             <th class="text-secondary">Model</th>
                                             <th class="text-secondary">Quantity</th>
+                                            <th class="text-secondary">Allocated</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr style="height: 40px; min-height: 40px;">
+                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF" class="qty-cell"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 40px; min-height: 40px;">
+                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF" class="qty-cell"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 40px; min-height: 40px;">
+                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF" class="qty-cell"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 40px; min-height: 40px;">
+                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF" class="qty-cell"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 40px; min-height: 40px;">
+                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF" class="qty-cell"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 40px; min-height: 40px;">
+                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF" class="qty-cell"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 40px; min-height: 40px;">
+                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF" class="qty-cell"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
                                         </tr>
-                                        <tr style="height: 40px; min-height: 40px;">
+                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF" class="qty-cell"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
                                         </tr>
                                     </tbody>
                                 </table>

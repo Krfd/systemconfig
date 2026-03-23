@@ -1,39 +1,92 @@
 <?php
 require_once "../../../../config/connection.php";
 session_start();
-$User     = $_SESSION['Uid'];
-$Serial = trim($_POST['Serial']);
+
+$User      = $_SESSION['Uid'];
+$DrNUmber  = $_POST['DrNUmber'] ?? '';
+
+$ItemSerial = $_POST['ItemSerial'] ?? '';
+$ItemCode   = $_POST['ItemCode'] ?? '';
 
 try {
-  $conn->beginTransaction();
 
-  $find_item_serial = $conn->prepare("EXEC dbo.[SEARCH_Serial_Delivery] ?, ?");
-  $find_item_serial->execute([$User, $Serial]);
-  $get_item = $find_item_serial->fetchAll(PDO::FETCH_ASSOC);
+    /* ==============================
+       USER BRANCH
+    ============================== */
+    $stmt = $conn->prepare("EXEC dbo.[SESSIONUSER] ?");
+    $stmt->execute([$User]);
+    $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-  $conn->commit();
+    $Branch = $userData['Branch'] ?? '';
 
-  $response = array(
-    "isSuccess" => 'success',
-    "Data" => $get_item
-  );
+    /* ==============================
+       BRANCH CONNECTION
+    ============================== */
+    $stmt = $conn->prepare("EXEC dbo.[Branch_Connection_DB] ?");
+    $stmt->execute([$User]);
+    $connData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-  $logFile = 'log.txt';
+    $Branch_DB  = $connData['Branch_DB'] ?? '';
+    $IP_Address = $connData['IP_Address'] ?? '';
 
-  $logData = "User: " . $User . PHP_EOL .
-    "Serial: " . $Serial . PHP_EOL .
-    "Result: " . json_encode($get_item, JSON_PRETTY_PRINT) . PHP_EOL .
-    "Time: " . date("Y-m-d H:i:s") . PHP_EOL .
-    "-----------------------------" . PHP_EOL;
+    /* ==============================
+       FIND ITEM (SERIAL / ITEMCODE)
+    ============================== */
+    $stmt = $conn->prepare("EXEC dbo.[SEARCH_INVENTORYSERIAL_REIL] ?, ?, ?, ?, ?");
+    $stmt->execute([$IP_Address, $Branch_DB, $ItemCode, $ItemSerial, $Branch]);
+    $item = $stmt->fetch(PDO::FETCH_ASSOC);
 
-  file_put_contents($logFile, $logData, FILE_APPEND);
+    if (!$item) {
+        echo json_encode([
+            "isSuccess" => "failed",
+            "message"   => "Item not found."
+        ]);
+        exit;
+    }
 
-  echo json_encode($response);
+    $Brand    = $item['ItemBrand'];
+    $ItemCode = $item['ItemCode'];
+    $Model    = $item['ItemName'];
+    $Category = $item['ItemGrpName'];
+
+    /* ==============================
+       VALIDATE DELIVERY ITEM
+    ============================== */
+    $stmt = $conn->prepare("EXEC dbo.[VALIDATION_ITM_DELIVERY] ?, ?, ?");
+    $stmt->execute([$Branch, $DrNUmber, $ItemCode]);
+
+    $count = $validation['Count'] ?? 0;
+
+    if ($count > 0) {
+        echo json_encode([
+            "isSuccess" => "failed",
+            "message"   => "Success."
+        ]);
+    } else {
+        echo json_encode([
+            "isSuccess" => "failed",
+            "message"   => "Item doesn't exist."
+        ]);
+    }
+    exit;
+    /* ==============================
+       SUCCESS RESPONSE
+    ============================== */
+    echo json_encode([
+        "isSuccess" => "success",
+        "Data" => [
+            "Brand"    => $Brand,
+            "ItemCode" => $ItemCode,
+            "Model"    => $Model,
+            "Category" => $Category
+        ]
+    ]);
+
 } catch (PDOException $e) {
-  $conn->rollback();
-  $response = array(
-    "isSuccess" => 'Failed',
-    "Data" => "<b>Error. Please Contact System Developer. <br/></b>" . $e->getMessage()
-  );
-  echo json_encode($response);
+
+    echo json_encode([
+        "isSuccess" => "failed",
+        "message"   => "System Error: " . $e->getMessage()
+    ]);
 }
+?>
