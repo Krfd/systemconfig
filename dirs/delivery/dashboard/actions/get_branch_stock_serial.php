@@ -2,9 +2,9 @@
 require_once "../../../../config/connection.php";
 session_start();
 
-$User      = $_SESSION['Uid'];
-$DrNUmber  = $_POST['DrNUmber'] ?? '';
 
+$User       = $_SESSION['Uid'] ?? '';
+$DrNumber   = $_POST['DrNumber'] ?? '';
 $ItemSerial = $_POST['ItemSerial'] ?? '';
 $ItemCode   = $_POST['ItemCode'] ?? '';
 
@@ -17,17 +17,18 @@ try {
     $stmt->execute([$User]);
     $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $Branch = $userData['Branch'] ?? '';
+
+    $Branch = $userData['Branch'];
 
     /* ==============================
        BRANCH CONNECTION
     ============================== */
     $stmt = $conn->prepare("EXEC dbo.[Branch_Connection_DB] ?");
-    $stmt->execute([$User]);
+    $stmt->execute([$Branch]);
     $connData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $Branch_DB  = $connData['Branch_DB'] ?? '';
-    $IP_Address = $connData['IP_Address'] ?? '';
+    $Branch_DB  = $connData['Branch_DB'];
+    $IP_Address = $connData['IP_Address'];
 
     /* ==============================
        FIND ITEM (SERIAL / ITEMCODE)
@@ -36,57 +37,46 @@ try {
     $stmt->execute([$IP_Address, $Branch_DB, $ItemCode, $ItemSerial, $Branch]);
     $item = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$item) {
+    if (
+        !$item ||
+        empty($item['ItemCode']) ||
+        empty($item['ItemBrand']) ||
+        empty($item['ItemName']) ||
+        empty($item['ItemGrpName'])
+    ) {
         echo json_encode([
-            "isSuccess" => "failed",
-            "message"   => "Item not found."
+            "isSuccess" => "empty",
+            "message"   => "Item doesn't exist."
         ]);
         exit;
     }
 
-    $Brand    = $item['ItemBrand'];
-    $ItemCode = $item['ItemCode'];
-    $Model    = $item['ItemName'];
-    $Category = $item['ItemGrpName'];
-
     /* ==============================
-       VALIDATE DELIVERY ITEM
+       VALIDATE DELIVERY ITEM (TOP 1)
     ============================== */
     $stmt = $conn->prepare("EXEC dbo.[VALIDATION_ITM_DELIVERY] ?, ?, ?");
-    $stmt->execute([$Branch, $DrNUmber, $ItemCode]);
+    $stmt->execute([$Branch, $DrNumber, $item['ItemCode']]);
+    $validation = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $count = $validation['Count'] ?? 0;
 
-    if ($count > 0) {
-        echo json_encode([
-            "isSuccess" => "failed",
-            "message"   => "Success."
-        ]);
-    } else {
-        echo json_encode([
-            "isSuccess" => "failed",
-            "message"   => "Item doesn't exist."
-        ]);
-    }
-    exit;
     /* ==============================
        SUCCESS RESPONSE
     ============================== */
     echo json_encode([
         "isSuccess" => "success",
-        "Data" => [
-            "Brand"    => $Brand,
-            "ItemCode" => $ItemCode,
-            "Model"    => $Model,
-            "Category" => $Category
-        ]
+        "Data" => [[
+            "Brand"    => $item['ItemBrand'],
+            "ItemCode" => $item['ItemCode'],
+            "Model"    => $item['ItemName'],
+            "Category" => $item['ItemGrpName']
+        ]]
     ]);
-
+    exit;
 } catch (PDOException $e) {
-
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     echo json_encode([
         "isSuccess" => "failed",
         "message"   => "System Error: " . $e->getMessage()
     ]);
+    exit;
 }
-?>

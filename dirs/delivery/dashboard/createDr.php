@@ -240,7 +240,7 @@
                                         <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="4" style="background: #FFFBDF; height: auto; resize: horizontal" maxlength="100"></textarea>
                                     </div>
                                 </div>
-                                <button class="clearfix btn btn-primary float-end" type="submit" id="deliveryBtn" disabled>Commit</button>
+                                <button class="clearfix btn btn-primary float-end" type="submit" id="deliveryBtn">Commit</button>
                             </div>
                         </form>
                     </div>

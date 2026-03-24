@@ -13,6 +13,7 @@
                     </div>
                     <input type="hidden" id="serial">
                     <input type="hidden" id="brand">
+                    <input type="hidden" id="itemCode">
                     <div class="table-responsive">
                         <table class="table table-hover datatables" id="branchToDeliverModal">
                             <thead class="sticky-top">
@@ -23,21 +24,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td style="background:#FFF7BC;">VIAC</td>
-                                    <td style="background:#FFF7BC;">AH-X15BEF</td>
-                                    <td style="background:#FFF7BC; outline: none" contenteditable="true" class="border border-3 border-warning"></td>
-                                </tr>
-                                <tr>
-                                    <td style="background:#FFF7BC;">GALLERIA</td>
-                                    <td style="background:#FFF7BC;">AH-X15BEF</td>
-                                    <td style="background:#FFF7BC; outline: none" contenteditable="true" class="border border-3 border-warning"></td>
-                                </tr>
-                                <tr>
-                                    <td style="background:#FFF7BC;">PLAZA</td>
-                                    <td style="background:#FFF7BC;">AH-X15BEF</td>
-                                    <td style="background:#FFF7BC; outline: none" contenteditable="true" class="border border-3 border-warning"></td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>

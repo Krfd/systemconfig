@@ -8,10 +8,6 @@
                  </div>
                  <div class="modal-body">
                      <div class="form-input mb-2">
-                         <label for="newSerial" id="newSerialLabel" class="form-label text-dark-emphasis"><small>Serial:</small></label>
-                         <input type="text" class="form-select form-select-sm" id="newSerial" style="background: #FFFBDF" required>
-                     </div>
-                     <div class="form-input mb-2">
                          <label for="newItemCode" id="newItemCodeLabel" class="form-label text-dark-emphasis"><small>Item Code:</small></label>
                          <input type="text" class="form-select form-select-sm" id="newItemCode" style="background: #FFFBDF" required>
                      </div>
@@ -33,37 +29,6 @@
                              pattern="[1-9][0-9]*"
                              required>
                      </div>
-                     <input type="hidden" name="itemcode" id="itemcode">
-
-
-                     <!-- <div class="table-responsive">
-                         <table class="table table-hover datatables" id="branchToDeliverModal">
-                             <thead class="sticky-top">
-                                 <tr>
-                                     <th class="text-secondary">Branch</th>
-                                     <th class="text-secondary">Model</th>
-                                     <th class="text-secondary">Quantity</th>
-                                 </tr>
-                             </thead>
-                             <tbody>
-                                 <tr>
-                                     <td>VIAC</td>
-                                     <td>AH-X15BEF</td>
-                                     <td contenteditable="true"></td>
-                                 </tr>
-                                 <tr>
-                                     <td>GALLERIA</td>
-                                     <td>AH-X15BEF</td>
-                                     <td contenteditable="true"></td>
-                                 </tr>
-                                 <tr>
-                                     <td>PLAZA</td>
-                                     <td>AH-X15BEF</td>
-                                     <td contenteditable="true"></td>
-                                 </tr>
-                             </tbody>
-                         </table>
-                     </div> -->
                      <div class="modal-footer">
                          <button class="btn btn-success" type="submit">Add</button>
                          <button class="btn btn-danger" type="reset">Clear</button>
@@ -83,7 +48,7 @@
              </div>
              <div class="modal-body">
                  <div class="table-responsive-md">
-                     <table class="table" id="summaryDeliveryTable">
+                     <table class="table datatables" id="summaryDeliveryTable">
                          <thead class="sticky-top">
                              <tr>
                                  <th class="text-secondary">#</th>
@@ -105,59 +70,84 @@
 
 
  <script>
-     /*Function submit item prepared request*/
-     $("#frm-add-delivery").submit(function(event) {
-         event.preventDefault();
+     //  $("#frm-add-delivery").submit(function(event) {
+     //      event.preventDefault();
 
-         var Serial = $("#newSerial").val().trim();
-         var Brand = $("#newBrand option:selected").text();
-         var Model = $("#newModel option:selected").text();
-         var Category = $("#newCategory").val();
-         var Quantity = $("#newQuantity").val();
+     //      var ItemCode = $("#newItemCode").val().trim();
+     //      var Brand = $("#newBrand option:selected").text();
+     //      var Model = $("#newModel option:selected").text();
+     //      var Category = $("#newCategory").val();
+     //      var Quantity = $("#newQuantity").val();
 
-         /* SERIAL COLUMN */
-         let serialCell = $("#delivery-serial-table tbody td[contenteditable='true']");
+     //      /* DELIVERY TABLE */
+     //      let emptyRow = $("#deliveryTable tbody tr").filter(function() {
+     //          return $(this).find("td:first").text().trim() === "";
+     //      }).first();
 
-         let currentSerials = serialCell.html().trim();
+     //      let summaryEmptyRow = $("#summaryTable tbody tr").filter(function() {
+     //          return $(this).find("td:first").text().trim() === "";
+     //      }).first();
 
-         currentSerials = currentSerials.replace(/(<br>\s*)+$/, "");
-         if (!currentSerials) {
-             serialCell.html(Serial + ",<br>");
-         } else {
-             // Ensure last line ends with comma
-             if (!currentSerials.endsWith(",")) {
-                 currentSerials += ",";
-             }
+     //      if (emptyRow.length) {
 
-             // Append properly
-             serialCell.html(currentSerials + "<br>" + Serial + ",<br>");
-         }
+     //          // $(this).attr("data-branch", selectedBranch)
 
-         /* DELIVERY TABLE */
-         let emptyRow = $("#deliveryTable tbody tr").filter(function() {
-             return $(this).find("td:first").text().trim() === "";
-         }).first();
+     //          emptyRow.find("td:eq(0)").text(Brand);
+     //          emptyRow.find("td:eq(1)").text(Model);
+     //          emptyRow.find("td:eq(2)").text(Category);
 
-         let summaryEmptyRow = $("#summaryTable tbody tr").filter(function() {
-             return $(this).find("td:first").text().trim() === "";
-         }).first();
+     //          summaryEmptyRow.find("td:eq(0)").text(Brand);
+     //          summaryEmptyRow.find("td:eq(1)").text(Model);
+     //          //  summaryEmptyRow.find("td:eq(2)").text(Category);
+     //          summaryEmptyRow.find("td:eq(2)").text(Quantity);
+     //      }
 
-         if (emptyRow.length) {
+     //      /* reset modal */
+     //      $("#frm-add-delivery")[0].reset();
+     //      $("#addDeliveryModal").modal("hide");
+     //  });
 
-             // $(this).attr("data-branch", selectedBranch)
 
-             emptyRow.find("td:eq(0)").text(Brand);
-             emptyRow.find("td:eq(1)").text(Model);
-             emptyRow.find("td:eq(2)").text(Category);
 
-             summaryEmptyRow.find("td:eq(0)").text(Brand);
-             summaryEmptyRow.find("td:eq(1)").text(Model);
-             //  summaryEmptyRow.find("td:eq(2)").text(Category);
-             summaryEmptyRow.find("td:eq(2)").text(Quantity);
-         }
 
-         /* reset modal */
-         $("#frm-add-delivery")[0].reset();
-         $("#addDeliveryModal").modal("hide");
-     });
+
+
+
+
+
+
+
+
+
+
+
+     //  $("#newItemCode").on("keydown", function(e) {
+     //      if (e.key === "Enter") {
+     //          e.preventDefault(); // stop form submit
+
+     //          let itemCode = $(this).val().trim();
+     //          let ItemSerial = "";
+     //          let DrNumber = DeliveryNumber;
+
+     //          if (!itemCode) return;
+
+     //          // Call your API
+     //          //  fetchItemDetails(itemCode);
+     //          $.ajax({
+     //              url: "dirs/delivery/dashboard/actions/get_branch_stock_serial.php",
+     //              type: "POST",
+     //              data: {
+     //                  ItemSerial: ItemSerial,
+     //                  DrNumber: DrNumber,
+     //                  ItemCode: ItemCode
+     //              },
+     //              dataType: "json",
+     //              success: function(response) {
+     //                  if (response.isSuccess === "success") {
+     //                      console.log(`DATA IS SUPPOSEDLY FETCHED FROM THE API-ENDPOINT`)
+     //                  }
+     //              }
+     //          })
+     //      }
+     //  });
  </script>
