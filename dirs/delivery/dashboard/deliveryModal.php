@@ -1,5 +1,6 @@
+ <!-- FOR NEW ITEM -->
  <form id="frm-add-delivery" method="POST">
-     <div class="modal fade" tabindex="-1" id="addDeliveryModal">
+     <div class="modal fade" tabindex="-1" id="addDeliveryModal" data-bs-backdrop="static" data-bs-keyboard="false">
          <div class="modal-dialog modal-dialog-centered">
              <div class="modal-content">
                  <div class="modal-header">
@@ -30,7 +31,7 @@
                              required>
                      </div>
                      <div class="modal-footer">
-                         <button class="btn btn-success" type="submit">Add</button>
+                         <button class="btn btn-success" type="submit" id="nonSerializeBtn">Add</button>
                          <button class="btn btn-danger" type="reset">Clear</button>
                      </div>
                  </div>
@@ -39,6 +40,7 @@
      </div>
  </form>
 
+ <!-- SUMMARY -->
  <div class="modal fade" tabindex="-1" id="deliverySummary">
      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
          <div class="modal-content">
@@ -57,6 +59,7 @@
                                  <th class="text-secondary">Brand</th>
                                  <th class="text-secondary">Model</th>
                                  <th class="text-secondary">Quantity</th>
+                                 <th class="text-secondary d-none">Item Code</th>
                              </tr>
                          </thead>
                          <tbody>
@@ -67,87 +70,3 @@
          </div>
      </div>
  </div>
-
-
- <script>
-     //  $("#frm-add-delivery").submit(function(event) {
-     //      event.preventDefault();
-
-     //      var ItemCode = $("#newItemCode").val().trim();
-     //      var Brand = $("#newBrand option:selected").text();
-     //      var Model = $("#newModel option:selected").text();
-     //      var Category = $("#newCategory").val();
-     //      var Quantity = $("#newQuantity").val();
-
-     //      /* DELIVERY TABLE */
-     //      let emptyRow = $("#deliveryTable tbody tr").filter(function() {
-     //          return $(this).find("td:first").text().trim() === "";
-     //      }).first();
-
-     //      let summaryEmptyRow = $("#summaryTable tbody tr").filter(function() {
-     //          return $(this).find("td:first").text().trim() === "";
-     //      }).first();
-
-     //      if (emptyRow.length) {
-
-     //          // $(this).attr("data-branch", selectedBranch)
-
-     //          emptyRow.find("td:eq(0)").text(Brand);
-     //          emptyRow.find("td:eq(1)").text(Model);
-     //          emptyRow.find("td:eq(2)").text(Category);
-
-     //          summaryEmptyRow.find("td:eq(0)").text(Brand);
-     //          summaryEmptyRow.find("td:eq(1)").text(Model);
-     //          //  summaryEmptyRow.find("td:eq(2)").text(Category);
-     //          summaryEmptyRow.find("td:eq(2)").text(Quantity);
-     //      }
-
-     //      /* reset modal */
-     //      $("#frm-add-delivery")[0].reset();
-     //      $("#addDeliveryModal").modal("hide");
-     //  });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     //  $("#newItemCode").on("keydown", function(e) {
-     //      if (e.key === "Enter") {
-     //          e.preventDefault(); // stop form submit
-
-     //          let itemCode = $(this).val().trim();
-     //          let ItemSerial = "";
-     //          let DrNumber = DeliveryNumber;
-
-     //          if (!itemCode) return;
-
-     //          // Call your API
-     //          //  fetchItemDetails(itemCode);
-     //          $.ajax({
-     //              url: "dirs/delivery/dashboard/actions/get_branch_stock_serial.php",
-     //              type: "POST",
-     //              data: {
-     //                  ItemSerial: ItemSerial,
-     //                  DrNumber: DrNumber,
-     //                  ItemCode: ItemCode
-     //              },
-     //              dataType: "json",
-     //              success: function(response) {
-     //                  if (response.isSuccess === "success") {
-     //                      console.log(`DATA IS SUPPOSEDLY FETCHED FROM THE API-ENDPOINT`)
-     //                  }
-     //              }
-     //          })
-     //      }
-     //  });
- </script>

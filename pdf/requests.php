@@ -182,8 +182,6 @@ try {
 
         foreach ($itemData as $row) {
 
-            // Calculate required number of lines per column
-            // $branchLines = $pdf->NbLines($headers['Branch'], $row->ReqBranch);
             $brandLines = $pdf->NbLines($headers['Brand'], $row->Brand);
             $modelLines = $pdf->NbLines($headers['Model'], $row->Model);
             $categoryLines = $pdf->NbLines($headers['Category'], $row->Category);
@@ -199,11 +197,6 @@ try {
             $pdf->MultiCell($headers['#'], $rowHeight, $counter, 1, 'C');
             $pdf->SetXY($x + $headers['#'], $y);
 
-            /* ---------- BRANCH ---------- */
-
-            // $pdf->MultiCell($headers['Branch'], $rowHeight, $row->ReqBranch, 1);
-            // $pdf->SetXY($x + $headers['#'] + $headers['Branch'], $y);
-
             /* ---------- BRAND ---------- */
 
             $pdf->MultiCell($headers['Brand'], $rowHeight, $row->Brand, 1);
@@ -216,7 +209,7 @@ try {
 
             /* ---------- CATEGORY ---------- */
 
-            $pdf->MultiCell($headers['Category'], $rowHeight, $row->Category, 1);
+            $pdf->MultiCell($headers['Category'], $lineHeight, $row->Category, 1);
             $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'], $y);
 
             /* ---------- QUANTITY ---------- */

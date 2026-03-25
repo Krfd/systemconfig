@@ -265,6 +265,10 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
   $("#assignBranchModal #itemCode").val(itemCode);
   $("#assignBranchModal #deliveryQty").text(qty);
 
+  console.log(
+    `DELIVERY NUMBER: ${deliveryNumber} | PICKLIST NUMBER: ${picklistNumber}`,
+  );
+
   loadPicklistBranches(deliveryNumber, picklistNumber, model);
 
   $("#assignBranchModal").modal("show");
@@ -481,7 +485,7 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr) {
                       <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
                       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">1</td>
                       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
-                        <span class="badge bg-warning rounded-5 d-inline-block p-1"></span>
+                        <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">Unassigned</span>
                       </td>
                     </tr>
                   `;
@@ -629,88 +633,10 @@ function validateBranchAssignment() {
 }
 
 // SUMMARY
-// function branchDelivery() {
-//   let Serial = $("#assignBranchModal #serial").val();
-//   let brand = $("#assignBranchModal #brand").val();
-//   let rowCount = 0;
-
-//   if ($.fn.DataTable.isDataTable("#summaryDeliveryTable")) {
-//     $("#summaryDeliveryTable").DataTable().clear().destroy();
-//   }
-
-//   $("#branchToDeliverModal tbody tr").each(function () {
-//     let branch = $(this).find("td:nth-child(1)").text().trim();
-//     let model = $(this).find("td:nth-child(2)").text().trim();
-//     let qty = $(this).find("td:nth-child(3)").text().trim();
-
-//     // 🚫 skip empty qty
-//     if (!qty || qty === "0") return;
-
-//     rowCount++;
-
-//     let newRow = $(`
-//       <tr style="padding: 3px; height: 40px; min-height: 40px">
-//         <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
-//         <td style="background:#FFFBDF" class="text-primary">${Serial}</td>
-//         <td style="background:#FFFBDF">${branch}</td>
-//         <td style="background:#FFFBDF">${brand}</td>
-//         <td style="background:#FFFBDF" class="text-start">${model}</td>
-//         <td style="background:#FFFBDF">${qty}</td>
-//       </tr>
-//     `);
-
-//     // Insert BEFORE the first empty row, if any
-//     let firstEmpty = $("#summaryDeliveryTable tbody tr.empty-row").first();
-//     if (firstEmpty.length) {
-//       newRow.insertBefore(firstEmpty);
-//     } else {
-//       $("#summaryDeliveryTable tbody").append(newRow);
-//     }
-
-//     // Hover effect
-//     newRow.hover(
-//       function () {
-//         $(this).css("background", "#FFF4C2");
-//       },
-//       function () {
-//         $(this).css("background", "#FFFBDF");
-//       },
-//     );
-//   });
-
-//   // After adding real rows, ensure there are at least 8 rows (add empty rows if needed)
-//   let totalRows = $("#summaryDeliveryTable tbody tr").not(".empty-row").length;
-//   let tableBody = $("#summaryDeliveryTable tbody");
-//   for (let i = totalRows; i < 8; i++) {
-//     let emptyRow = $(`
-//       <tr class="empty-row">
-//         <td colspan="6" style="background:#FFFBDF"></td>
-//       </tr>
-//     `);
-//     emptyRow.css({ background: "#FFFBDF", height: "40px" });
-//     emptyRow.hover(
-//       function () {
-//         $("td:not(:first-child)", this).css("background", "#FFF4C2");
-//       },
-//       function () {
-//         $("td:not(:first-child)", this).css("background", "#FFFBDF");
-//       },
-//     );
-//     tableBody.append(emptyRow);
-//   }
-
-//   // Optional reset
-//   $("#assignBranchModal").modal("hide");
-//   resetBranchQuantities();
-// }
-
-// SUMMARY
 function branchDelivery() {
   let Serial = $("#assignBranchModal #serial").val();
   let brand = $("#assignBranchModal #brand").val();
-  // let rowCount = $("#summaryDeliveryTable tbody tr").not(".empty-row").length;
-
-  // let rowCount = 0;
+  let itemCode = $("#assignBranchModal #itemCode").val();
 
   let rowCount = $("#summaryDeliveryTable tbody tr").filter(function () {
     return $(this).find("td:nth-child(2)").text().trim() !== "";
@@ -720,27 +646,48 @@ function branchDelivery() {
     $("#summaryDeliveryTable").DataTable().clear().destroy();
   }
 
+  let exists = false;
+
+  $("#summaryDeliveryTable tbody tr").each(function () {
+    let code = $(this).data("itemcode");
+
+    if (code == itemCode) {
+      exists = true;
+      return false; // break loop
+    }
+  });
+
+  // OR SIMPLY DISABLE THE SAVE BUTTON
+  if (exists) {
+    Swal.fire({
+      icon: "error",
+      title: "Item already assigned to the branch",
+      text: "",
+      confirmButtonText: "OKAY",
+    });
+    return;
+  }
+
   $("#branchToDeliverModal tbody tr").each(function () {
     let branch = $(this).find("td:nth-child(1)").text().trim();
     let model = $(this).find("td:nth-child(2)").text().trim();
     let qty = $(this).find("td:nth-child(3)").text().trim();
 
-    // 🚫 skip empty qty
     if (!qty || qty === "0") return;
 
     rowCount++;
 
-    // Try to find the first empty row to replace
     let $emptyRow = $("#summaryDeliveryTable tbody tr.empty-row").first();
 
     let newRow = $(`
-      <tr style="padding: 3px; height: 40px; min-height: 40px">
+      <tr data-itemcode="${itemCode}" style="padding: 3px; height: 40px; min-height: 40px">
         <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
         <td style="background:#FFFBDF" class="text-primary">${Serial}</td>
         <td style="background:#FFFBDF">${branch}</td>
         <td style="background:#FFFBDF">${brand}</td>
         <td style="background:#FFFBDF" class="text-start">${model}</td>
-        <td style="background:#FFFBDF">${qty}</td>
+        <td style="background:#FFFBDF" class="text-center">${qty}</td>
+        <td style="background:#FFFBDF" class="d-none">${itemCode}</td>
       </tr>
     `);
 
@@ -750,7 +697,6 @@ function branchDelivery() {
       $("#summaryDeliveryTable tbody").append(newRow);
     }
 
-    // Hover effect
     newRow.hover(
       function () {
         $(this).css("background", "#FFF4C2");
@@ -815,7 +761,7 @@ function summaryData() {
 
   if (rows.length === 0) {
     for (let i = 0; i < 8; i++) {
-      rows.push(["", "", "", "", "", ""]);
+      rows.push(["", "", "", "", "", "", ""]);
     }
   }
 
@@ -828,6 +774,7 @@ function summaryData() {
       { title: "Brand" },
       { title: "Model" },
       { title: "Quantity" },
+      { title: "Item Code" },
     ],
     pageLength: 50,
     paging: true,
@@ -849,7 +796,8 @@ function summaryData() {
       $("td:eq(0)", row).addClass("text-center");
       $("td:eq(1)", row).addClass("text-primary");
       $("td:eq(4)", row).addClass("text-start");
-      // $("td:eq(5)", row).addClass("empty-row");
+      $("td:eq(6)", row).addClass("text-center");
+      $("td:eq(7)", row).addClass("d-none");
 
       $(row).hover(
         function () {
@@ -867,7 +815,7 @@ function summaryData() {
       for (let i = currentRows; i < 8; i++) {
         let emptyRow = $(`
                 <tr class="empty-row">
-                  <td colspan="6" style="background:#FFFBDF"></td>
+                  <td colspan="7" style="background:#FFFBDF"></td>
                 </tr>
               `);
 
@@ -934,6 +882,110 @@ function loadPicklistBranches(deliveryNumber, picklistNumber, model) {
   });
 }
 
+function addNonSerialize(ItemSerial, DrNumber, itemCode, picklistDr) {
+  console.log(
+    `ITEM SERIAL: ${ItemSerial} | DR NUMBER: ${DrNumber} | ITEM CODE: ${itemCode}`,
+  );
+  $("#frm-add-delivery").on("submit", function (e) {
+    e.preventDefault();
+
+    let quantity = parseInt($("#newQuantity").val()) || 1;
+
+    if (!itemCode) {
+      Swal.fire({
+        icon: "error",
+        title: "Enter the item code",
+      });
+      return;
+    }
+
+    $.ajax({
+      url: "dirs/delivery/dashboard/actions/get_branch_stock_serial.php",
+      type: "POST",
+      data: {
+        ItemSerial: ItemSerial,
+        DrNumber: DrNumber,
+        ItemCode: itemCode,
+      },
+      dataType: "json",
+      success: function (response) {
+        if (response.isSuccess === "success") {
+          let item = response.Data[0];
+
+          // Populate brand, model, category
+          $("#newBrand").val(item.Brand);
+          $("#newModel").val(item.Model);
+          $("#newCategory").val(item.Category);
+
+          let $deliveryTbody = $("#deliveryTable tbody");
+          let $summaryTbody = $("#summaryTable tbody");
+
+          // ----------- DELIVERY TABLE ----------
+          let deliveryRow = `
+          <tr style="height: 40px; min-height: 40px;">
+            <td style="background:#FFFBDF">${item.Brand}</td>
+            <td style="background:#FFFBDF">${item.Model}</td>
+            <td style="background:#FFFBDF">${item.Category}</td>
+            <td style="background:#FFFBDF">${quantity}</td>
+          </tr>
+        `;
+          let $emptyDeliveryRow = $deliveryTbody.find("tr.empty-row").first();
+          if ($emptyDeliveryRow.length) {
+            $emptyDeliveryRow.replaceWith(deliveryRow);
+          } else {
+            $deliveryTbody.append(deliveryRow);
+          }
+
+          // ----------- SUMMARY TABLE ----------
+          let $existingRow = $summaryTbody.find(
+            `tr[data-itemcode="${itemCode}"]`,
+          );
+          if ($existingRow.length) {
+            let currentQty =
+              parseInt($existingRow.find("td:nth-child(3)").text()) || 0;
+            $existingRow.find("td:nth-child(3)").text(currentQty + quantity);
+          } else {
+            let summaryRow = `
+            <tr data-itemcode="${itemCode}" data-deliverynum="${DrNumber}" data-picklist="${picklistDr}" style="height: 40px;">
+              <td style="background:#FFFBDF">${item.Brand}</td>
+              <td style="background:#FFFBDF">${item.Model}</td>
+              <td style="background:#FFFBDF">${quantity}</td>
+              <td style="background:#FFFBDF">
+                <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">Unassigned</span>
+              </td>
+            </tr>
+            `;
+
+            let $emptySummaryRow = $summaryTbody.find("tr.empty-row").first();
+            if ($emptySummaryRow.length) {
+              $emptySummaryRow.replaceWith(summaryRow);
+            } else {
+              $summaryTbody.append(summaryRow);
+            }
+          }
+
+          $("#newItemCode").val("");
+          $("#newQuantity").val("");
+          $("#newBrand").val("").prop("disabled", true);
+          $("#newModel").val("").prop("disabled", true);
+          $("#newCategory").val("").prop("disabled", true);
+          $("#addDeliveryModal").modal("hide");
+        } else if (response.isSuccess === "empty") {
+          Swal.fire({
+            icon: "error",
+            title: "Unavailable stock for this model",
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: response.Data,
+          });
+        }
+      },
+    });
+  });
+}
+
 // CREATE DELIVERY
 function createDr(createDeliveryNumber, picklistDr) {
   $.post("dirs/delivery/dashboard/createDr.php", {}, function (data) {
@@ -967,7 +1019,11 @@ function createDr(createDeliveryNumber, picklistDr) {
       let $row = $(`#summaryTable tbody tr[data-itemcode="${itemCode}"]`);
 
       // ✅ UPDATE BADGE
-      $row.find(".badge").removeClass("bg-warning").addClass("bg-success");
+      $row
+        .find(".badge")
+        .removeClass("bg-warning")
+        .addClass("bg-success text-light")
+        .text("Assigned");
 
       if (totalInput > requiredQty) {
         Swal.fire({
@@ -993,13 +1049,14 @@ function createDr(createDeliveryNumber, picklistDr) {
         title: "Valid Allocation",
         text: "All quantities match the required delivery quantity.",
         confirmButtonText: "Proceed",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // 👉 submit form here (AJAX or normal)
-          // this.submit();
-          // alert("All quantities are valid!");
-        }
       });
+      // .then((result) => {
+      //   if (result.isConfirmed) {
+      //     // 👉 submit form here (AJAX or normal)
+      //     // this.submit();
+      //     // alert("All quantities are valid!");
+      //   }
+      // });
 
       branchDelivery();
 
@@ -1126,132 +1183,52 @@ function createDr(createDeliveryNumber, picklistDr) {
             });
           });
 
-          // ✅ MOVE your handler here
           $("#newItemCode").on("keydown", function (e) {
             if (e.key === "Enter") {
               e.preventDefault();
 
               let itemCode = $(this).val().trim();
-              let ItemSerial = "";
-              let DrNumber = createDeliveryNumber; // now accessible
-
               if (!itemCode) return;
+
+              let ItemSerial = "";
+              let DrNumber = createDeliveryNumber; // accessible in scope
 
               $.ajax({
                 url: "dirs/delivery/dashboard/actions/get_branch_stock_serial.php",
                 type: "POST",
-                data: {
-                  ItemSerial: ItemSerial,
-                  DrNumber: DrNumber,
-                  ItemCode: itemCode,
-                },
+                data: { ItemSerial, DrNumber, ItemCode: itemCode },
                 dataType: "json",
                 success: function (response) {
                   if (response.isSuccess === "success") {
-                    console.log(
-                      `NON-SERIALIZE DATA: ${JSON.stringify(response.Data)}`,
-                    );
+                    let item = response.Data[0];
 
-                    let items = response.Data;
+                    let newBrand = document.getElementById("newBrand");
+                    let newModel = document.getElementById("newModel");
+                    let newCategory = document.getElementById("newCategory");
 
-                    let $deliveryTbody = $("#deliveryTable tbody");
-                    let $summaryTbody = $("#summaryTable tbody");
+                    newBrand.value = item.Brand;
+                    newModel.value = item.Model;
+                    newCategory.value = item.Category;
 
-                    let totalQty = parseInt($("#summaryQty").text()) || 0;
-
-                    items.forEach(function (item) {
-                      let brand = item.Brand;
-                      let model = item.Model;
-                      let category = item.Category;
-                      let itemCode = item.ItemCode;
-
-                      // 🚫 skip invalid
-                      if (!brand || !model || !category || !itemCode) return;
-
-                      // =========================
-                      // ✅ DELIVERY TABLE INSERT
-                      // =========================
-                      let deliveryRow = `
-              <tr style="height: 50px; min-height: 50px;">
-                <td style="background:#FFFBDF">${brand}</td>
-                <td style="background:#FFFBDF">${model}</td>
-                <td style="background:#FFFBDF">${category}</td>
-                <td style="background:#FFFBDF">1</td>
-              </tr>
-            `;
-
-                      let $emptyDeliveryRow = $deliveryTbody
-                        .find("tr.empty-row")
-                        .first();
-
-                      if ($emptyDeliveryRow.length) {
-                        $emptyDeliveryRow.replaceWith(deliveryRow);
-                      } else {
-                        $deliveryTbody.append(deliveryRow);
-                      }
-
-                      // =========================
-                      // ✅ SUMMARY TABLE LOGIC
-                      // =========================
-                      let $existingRow = $summaryTbody.find(
-                        `tr[data-itemcode="${itemCode}"]`,
-                      );
-
-                      if ($existingRow.length) {
-                        // update qty
-                        let currentQty =
-                          parseInt(
-                            $existingRow.find("td:nth-child(3)").text(),
-                          ) || 0;
-
-                        $existingRow
-                          .find("td:nth-child(3)")
-                          .text(currentQty + 1);
-                      } else {
-                        // create new row
-                        let summaryRow = `
-                <tr data-itemcode="${itemCode}" style="height: 40px;">
-                  <td style="background:#FFFBDF">${brand}</td>
-                  <td style="background:#FFFBDF">${model}</td>
-                  <td style="background:#FFFBDF">1</td>
-                  <td style="background:#FFFBDF">
-                    <span class="badge bg-warning rounded-5 p-1"></span>
-                  </td>
-                </tr>
-              `;
-
-                        let $emptySummaryRow = $summaryTbody
-                          .find("tr.empty-row")
-                          .first();
-
-                        if ($emptySummaryRow.length) {
-                          $emptySummaryRow.replaceWith(summaryRow);
-                        } else {
-                          $summaryTbody.append(summaryRow);
-                        }
-                      }
-
-                      totalQty += 1;
+                    // Optional: focus on Quantity so user can type
+                    $("#newQuantity").focus();
+                  } else if (response.isSuccess === "empty") {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Unavailable stock for this model",
                     });
-
-                    $("#summaryQty").text(totalQty);
-
-                    //   // clear input after success
-                    //   $("#newItemCode").val("");
-                    // } else if (response.isSuccess === "empty") {
-                    //   Swal.fire({
-                    //     icon: "error",
-                    //     title: "Unavailable stock for this model",
-                    //   });
-                    // } else {
-                    //   Swal.fire({
-                    //     icon: "error",
-                    //     title: response.Data,
-                    //   });
-                    // }
+                  } else {
+                    Swal.fire({ icon: "error", title: response.Data });
                   }
                 },
               });
+
+              addNonSerialize(
+                (ItemSerial = ""),
+                createDeliveryNumber,
+                itemCode,
+                picklistDr,
+              );
             }
           });
 
@@ -1272,19 +1249,46 @@ function createDr(createDeliveryNumber, picklistDr) {
           // FORM SUBMISSION
           let commitBtn = document.getElementById("deliveryBtn");
 
-          commitBtn.addEventListener("click", function () {
+          commitBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+
             let plateInput = document.getElementById("plate");
             let driverInput = document.getElementById("driver");
+            let deliveryDate = document.getElementById("deldate");
 
             // CHECK PLATE
             if (plateInput.value.trim() === "") {
-              plateInput.focus();
+              Swal.fire({
+                icon: "error",
+                title: "Missing Plate Number",
+                text: "Enter the truck plate number.",
+              }).then(() => {
+                plateInput.focus();
+              });
               return;
             }
 
             // CHECK DRIVER
             if (driverInput.value.trim() === "") {
-              driverInput.focus();
+              Swal.fire({
+                icon: "error",
+                title: "Missing Driver",
+                text: "Enter the driver's name.",
+              }).then(() => {
+                driverInput.focus();
+              });
+              return;
+            }
+
+            // CHECK DELIVERY DATE
+            if (deliveryDate.value.trim() === "") {
+              Swal.fire({
+                icon: "error",
+                title: "Missing Delivery Date",
+                text: "Enter a delivery date",
+              }).then(() => {
+                deliveryDate.focus();
+              });
               return;
             }
 
@@ -1299,30 +1303,30 @@ function createDr(createDeliveryNumber, picklistDr) {
             }).then((res) => {
               if (res.isConfirmed) {
                 // PROCEED FOR SUBMISSION
-
                 let items = [];
-                $("#summaryTable tbody tr")
-                  .not(".empty-row")
-                  .each(function () {
-                    let serial = $(this).find(".item-serial").text().trim();
-                    let branch = $(this).find(".item-branch").text().trim();
-                    let brand = $(this).find(".item-brand").text().trim();
-                    let model = $(this).find(".item-model").text().trim();
-                    let quantity = $(this).find(".item-quantity").text().trim();
 
-                    if (brand !== "") {
-                      items.push({
-                        serial: serial,
-                        branch: branch,
-                        brand: brand,
-                        model: model,
-                        quantity: quantity,
-                      });
-                    }
-                  });
+                $("#summaryDeliveryTable tbody tr").each(function () {
+                  let serial = $(this).find("td:nth-child(2)").text().trim();
+                  let branch = $(this).find("td:nth-child(3)").text().trim();
+                  let brand = $(this).find("td:nth-child(4)").text().trim();
+                  let model = $(this).find("td:nth-child(5)").text().trim();
+                  let quantity = $(this).find("td:nth-child(6)").text().trim();
+                  let itemCode = $(this).find("td:nth-child(7)").text().trim();
 
+                  if (serial !== "" && brand !== "") {
+                    items.push({
+                      serial: serial,
+                      branch: branch,
+                      brand: brand,
+                      model: model,
+                      quantity: quantity,
+                      itemCode: itemCode,
+                    });
+                  }
+                });
+
+                // 🚫 No items check
                 if (items.length === 0) {
-                  e.preventDefault();
                   Swal.fire({
                     icon: "error",
                     title: "No items on summary",
@@ -1335,6 +1339,8 @@ function createDr(createDeliveryNumber, picklistDr) {
                   document.getElementById("delivery"),
                 );
                 formData.append("items", JSON.stringify(items));
+
+                console.log(items);
 
                 // $.ajax({
                 //   url: "dirs/delivery/dashboard/actions/update_save_delivery.php",
@@ -1352,7 +1358,13 @@ function createDr(createDeliveryNumber, picklistDr) {
                 //   },
                 // });
 
-                console.log(`FORM DATA: ${formData}`);
+                // console.log(`FORM DATA: ${formData}`);
+                let obj = {};
+                formData.forEach((value, key) => {
+                  obj[key] = value;
+                });
+
+                console.log(obj);
               }
             });
           });
