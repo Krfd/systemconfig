@@ -265,10 +265,6 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
   $("#assignBranchModal #itemCode").val(itemCode);
   $("#assignBranchModal #deliveryQty").text(qty);
 
-  console.log(
-    `DELIVERY NUMBER: ${deliveryNumber} | PICKLIST NUMBER: ${picklistNumber}`,
-  );
-
   loadPicklistBranches(deliveryNumber, picklistNumber, model);
 
   $("#assignBranchModal").modal("show");
@@ -596,7 +592,6 @@ function validateBranchAssignment() {
 
   let $qtyDisplay = $("#deliveryQty");
 
-  // Reset classes
   $qtyDisplay.removeClass("text-primary text-warning text-danger");
 
   if (totalInput === requiredQty) {
@@ -882,46 +877,49 @@ function loadPicklistBranches(deliveryNumber, picklistNumber, model) {
   });
 }
 
+// NEW ITEM FOR NON-SERIALIZE
 function addNonSerialize(ItemSerial, DrNumber, itemCode, picklistDr) {
-  console.log(
-    `ITEM SERIAL: ${ItemSerial} | DR NUMBER: ${DrNumber} | ITEM CODE: ${itemCode}`,
-  );
-  $("#frm-add-delivery").on("submit", function (e) {
-    e.preventDefault();
+  $("#frm-add-delivery")
+    .off("submit")
+    .on("submit", function (e) {
+      e.preventDefault();
 
-    let quantity = parseInt($("#newQuantity").val()) || 1;
+      let quantity = parseInt($("#newQuantity").val()) || 1;
 
-    if (!itemCode) {
-      Swal.fire({
-        icon: "error",
-        title: "Enter the item code",
-      });
-      return;
-    }
+      if (!itemCode) {
+        Swal.fire({
+          icon: "error",
+          title: "Enter the item code",
+        });
+        return;
+      }
 
-    $.ajax({
-      url: "dirs/delivery/dashboard/actions/get_branch_stock_serial.php",
-      type: "POST",
-      data: {
-        ItemSerial: ItemSerial,
-        DrNumber: DrNumber,
-        ItemCode: itemCode,
-      },
-      dataType: "json",
-      success: function (response) {
-        if (response.isSuccess === "success") {
-          let item = response.Data[0];
+      $.ajax({
+        url: "dirs/delivery/dashboard/actions/get_branch_stock_serial.php",
+        type: "POST",
+        data: {
+          ItemSerial: ItemSerial,
+          DrNumber: DrNumber,
+          ItemCode: itemCode,
+        },
+        dataType: "json",
+        success: function (response) {
+          if (response.isSuccess === "success") {
+            let item = response.Data[0];
 
-          // Populate brand, model, category
-          $("#newBrand").val(item.Brand);
-          $("#newModel").val(item.Model);
-          $("#newCategory").val(item.Category);
+            let existingTotal = parseInt($("#summaryQty").text()) || 0;
+            // let totalQty = existingTotal + quantity;
 
-          let $deliveryTbody = $("#deliveryTable tbody");
-          let $summaryTbody = $("#summaryTable tbody");
+            // Populate brand, model, category
+            $("#newBrand").val(item.Brand);
+            $("#newModel").val(item.Model);
+            $("#newCategory").val(item.Category);
 
-          // ----------- DELIVERY TABLE ----------
-          let deliveryRow = `
+            let $deliveryTbody = $("#deliveryTable tbody");
+            let $summaryTbody = $("#summaryTable tbody");
+
+            // ----------- DELIVERY TABLE ----------
+            let deliveryRow = `
           <tr style="height: 40px; min-height: 40px;">
             <td style="background:#FFFBDF">${item.Brand}</td>
             <td style="background:#FFFBDF">${item.Model}</td>
@@ -929,24 +927,24 @@ function addNonSerialize(ItemSerial, DrNumber, itemCode, picklistDr) {
             <td style="background:#FFFBDF">${quantity}</td>
           </tr>
         `;
-          let $emptyDeliveryRow = $deliveryTbody.find("tr.empty-row").first();
-          if ($emptyDeliveryRow.length) {
-            $emptyDeliveryRow.replaceWith(deliveryRow);
-          } else {
-            $deliveryTbody.append(deliveryRow);
-          }
+            let $emptyDeliveryRow = $deliveryTbody.find("tr.empty-row").first();
+            if ($emptyDeliveryRow.length) {
+              $emptyDeliveryRow.replaceWith(deliveryRow);
+            } else {
+              $deliveryTbody.append(deliveryRow);
+            }
 
-          // ----------- SUMMARY TABLE ----------
-          let $existingRow = $summaryTbody.find(
-            `tr[data-itemcode="${itemCode}"]`,
-          );
-          if ($existingRow.length) {
-            let currentQty =
-              parseInt($existingRow.find("td:nth-child(3)").text()) || 0;
-            $existingRow.find("td:nth-child(3)").text(currentQty + quantity);
-          } else {
-            let summaryRow = `
-            <tr data-itemcode="${itemCode}" data-deliverynum="${DrNumber}" data-picklist="${picklistDr}" style="height: 40px;">
+            // ----------- SUMMARY TABLE ----------
+            let $existingRow = $summaryTbody.find(
+              `tr[data-itemcode="${itemCode}"]`,
+            );
+            if ($existingRow.length) {
+              let currentQty =
+                parseInt($existingRow.find("td:nth-child(3)").text()) || 0;
+              $existingRow.find("td:nth-child(3)").text(currentQty + quantity);
+            } else {
+              let summaryRow = `
+            <tr data-itemcode="${itemCode}" data-deliverynum="${DrNumber}" data-picklist="${picklistDr}" style="height: 40px; cursor: pointer">
               <td style="background:#FFFBDF">${item.Brand}</td>
               <td style="background:#FFFBDF">${item.Model}</td>
               <td style="background:#FFFBDF">${quantity}</td>
@@ -956,32 +954,84 @@ function addNonSerialize(ItemSerial, DrNumber, itemCode, picklistDr) {
             </tr>
             `;
 
-            let $emptySummaryRow = $summaryTbody.find("tr.empty-row").first();
-            if ($emptySummaryRow.length) {
-              $emptySummaryRow.replaceWith(summaryRow);
-            } else {
-              $summaryTbody.append(summaryRow);
+              let $emptySummaryRow = $summaryTbody.find("tr.empty-row").first();
+              if ($emptySummaryRow.length) {
+                $emptySummaryRow.replaceWith(summaryRow);
+              } else {
+                $summaryTbody.append(summaryRow);
+              }
             }
-          }
 
-          $("#newItemCode").val("");
-          $("#newQuantity").val("");
-          $("#newBrand").val("").prop("disabled", true);
-          $("#newModel").val("").prop("disabled", true);
-          $("#newCategory").val("").prop("disabled", true);
-          $("#addDeliveryModal").modal("hide");
-        } else if (response.isSuccess === "empty") {
-          Swal.fire({
-            icon: "error",
-            title: "Unavailable stock for this model",
-          });
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: response.Data,
-          });
-        }
-      },
+            $("#newItemCode").val("");
+            $("#newQuantity").val("");
+            $("#newBrand").val("").prop("disabled", true);
+            $("#newModel").val("").prop("disabled", true);
+            $("#newCategory").val("").prop("disabled", true);
+            $("#addDeliveryModal").modal("hide");
+            $("#summaryQty").text(existingTotal + quantity);
+          } else if (response.isSuccess === "empty") {
+            Swal.fire({
+              icon: "error",
+              title: "Unavailable stock for this model",
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: response.Data,
+            });
+          }
+        },
+      });
+    });
+}
+
+// BRANCH ASSIGNMENT
+function submitBranchDelivery() {
+  $("#branchDeliveryUnit").on("submit", function (e) {
+    e.preventDefault();
+
+    let { totalInput, requiredQty } = validateBranchAssignment();
+
+    if (totalInput > requiredQty) {
+      Swal.fire({
+        icon: "error",
+        title: "Exceeded Quantity",
+        text: "Allocated quantity exceeds the required delivery quantity.",
+        confirmButtonText: "OKAY",
+      });
+      return;
+    }
+
+    if (totalInput < requiredQty) {
+      Swal.fire({
+        icon: "warning",
+        title: "Incomplete Allocation",
+        text: "Allocated quantity is less than the required delivery quantity.",
+      });
+      return;
+    }
+
+    // ✅ GET IDENTIFIER
+    let itemCode = $("#assignBranchModal #itemCode").val();
+
+    // ✅ FIND MATCHING ROW IN SUMMARY TABLE
+    let $row = $(`#summaryTable tbody tr[data-itemcode="${itemCode}"]`);
+
+    // ✅ UPDATE BADGE
+    $row
+      .find(".badge")
+      .removeClass("bg-warning")
+      .addClass("bg-success text-light")
+      .text("Assigned");
+
+    Swal.fire({
+      icon: "success",
+      title: "Valid Allocation",
+      text: "All quantities match the required delivery quantity.",
+      confirmButtonText: "Proceed",
+    }).then(() => {
+      branchDelivery();
+      $("#assignBranchModal").modal("hide");
     });
   });
 }
@@ -996,74 +1046,18 @@ function createDr(createDeliveryNumber, picklistDr) {
     loadIAPBranchlist();
     summaryData();
 
-    $(document).on(
-      "input",
-      "#branchToDeliverModal td[contenteditable='true']",
-      function () {
-        validateBranchAssignment();
-      },
-    );
+    $(document)
+      .off("input", "#branchToDeliverModal td[contenteditable='true']")
+      .on(
+        "input",
+        "#branchToDeliverModal td[contenteditable='true']",
+        function () {
+          validateBranchAssignment();
+        },
+      );
 
-    $("#branchDeliveryUnit").on("submit", function (e) {
-      e.preventDefault();
+    submitBranchDelivery();
 
-      let { totalInput, requiredQty } = validateBranchAssignment();
-
-      if (totalInput > requiredQty) return;
-      if (totalInput < requiredQty) return;
-
-      // ✅ GET IDENTIFIER
-      let itemCode = $("#assignBranchModal #itemCode").val();
-
-      // ✅ FIND MATCHING ROW IN SUMMARY TABLE
-      let $row = $(`#summaryTable tbody tr[data-itemcode="${itemCode}"]`);
-
-      // ✅ UPDATE BADGE
-      $row
-        .find(".badge")
-        .removeClass("bg-warning")
-        .addClass("bg-success text-light")
-        .text("Assigned");
-
-      if (totalInput > requiredQty) {
-        Swal.fire({
-          icon: "error",
-          title: "Exceeded Quantity",
-          text: "Allocated quantity exceeds the required delivery quantity.",
-          confirmButtonText: "OKAY",
-        });
-        return;
-      }
-
-      if (totalInput < requiredQty) {
-        Swal.fire({
-          icon: "warning",
-          title: "Incomplete Allocation",
-          text: "Allocated quantity is less than the required delivery quantity.",
-        });
-        return;
-      }
-
-      Swal.fire({
-        icon: "success",
-        title: "Valid Allocation",
-        text: "All quantities match the required delivery quantity.",
-        confirmButtonText: "Proceed",
-      });
-      // .then((result) => {
-      //   if (result.isConfirmed) {
-      //     // 👉 submit form here (AJAX or normal)
-      //     // this.submit();
-      //     // alert("All quantities are valid!");
-      //   }
-      // });
-
-      branchDelivery();
-
-      $("#assignBranchModal").modal("hide");
-    });
-
-    /*Function for reselecting brand to find another model*/
     $("#newBrand").on("change", function () {
       $("#newModel").html('<option value="">Select Model</option>');
       $("#newCategory").val("");
@@ -1071,7 +1065,6 @@ function createDr(createDeliveryNumber, picklistDr) {
       loadImperialModel();
     });
 
-    /*Script for selecting model and category*/
     $("#newModel").on("change", function () {
       const selected = $(this).find(":selected");
       $("#newCategory").val(selected.data("category") || "");
@@ -1152,8 +1145,6 @@ function createDr(createDeliveryNumber, picklistDr) {
             toggler.addEventListener("change", updateKnob);
           }
 
-          // ----------------------------------------------------------
-
           // FOR NON-SERIALIZE ITEMS
           const addBtn = document.getElementById("addDeliveryModalBtn");
           const newItemModal = new bootstrap.Modal(
@@ -1191,7 +1182,7 @@ function createDr(createDeliveryNumber, picklistDr) {
               if (!itemCode) return;
 
               let ItemSerial = "";
-              let DrNumber = createDeliveryNumber; // accessible in scope
+              let DrNumber = createDeliveryNumber;
 
               $.ajax({
                 url: "dirs/delivery/dashboard/actions/get_branch_stock_serial.php",
@@ -1210,7 +1201,6 @@ function createDr(createDeliveryNumber, picklistDr) {
                     newModel.value = item.Model;
                     newCategory.value = item.Category;
 
-                    // Optional: focus on Quantity so user can type
                     $("#newQuantity").focus();
                   } else if (response.isSuccess === "empty") {
                     Swal.fire({
@@ -1223,12 +1213,7 @@ function createDr(createDeliveryNumber, picklistDr) {
                 },
               });
 
-              addNonSerialize(
-                (ItemSerial = ""),
-                createDeliveryNumber,
-                itemCode,
-                picklistDr,
-              );
+              addNonSerialize("", createDeliveryNumber, itemCode, picklistDr);
             }
           });
 
@@ -1246,130 +1231,142 @@ function createDr(createDeliveryNumber, picklistDr) {
           adjustTotalWidth();
           window.addEventListener("resize", adjustTotalWidth);
 
-          // FORM SUBMISSION
-          let commitBtn = document.getElementById("deliveryBtn");
-
-          commitBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-
-            let plateInput = document.getElementById("plate");
-            let driverInput = document.getElementById("driver");
-            let deliveryDate = document.getElementById("deldate");
-
-            // CHECK PLATE
-            if (plateInput.value.trim() === "") {
-              Swal.fire({
-                icon: "error",
-                title: "Missing Plate Number",
-                text: "Enter the truck plate number.",
-              }).then(() => {
-                plateInput.focus();
-              });
-              return;
-            }
-
-            // CHECK DRIVER
-            if (driverInput.value.trim() === "") {
-              Swal.fire({
-                icon: "error",
-                title: "Missing Driver",
-                text: "Enter the driver's name.",
-              }).then(() => {
-                driverInput.focus();
-              });
-              return;
-            }
-
-            // CHECK DELIVERY DATE
-            if (deliveryDate.value.trim() === "") {
-              Swal.fire({
-                icon: "error",
-                title: "Missing Delivery Date",
-                text: "Enter a delivery date",
-              }).then(() => {
-                deliveryDate.focus();
-              });
-              return;
-            }
-
-            Swal.fire({
-              icon: "warning",
-              title: "Submit this for delivery?",
-              text: "This action cannot be changed",
-              confirmButtonText: "Submit",
-              allowOutsideClick: false,
-              showCancelButton: true,
-              cancelButtonText: "Back",
-            }).then((res) => {
-              if (res.isConfirmed) {
-                // PROCEED FOR SUBMISSION
-                let items = [];
-
-                $("#summaryDeliveryTable tbody tr").each(function () {
-                  let serial = $(this).find("td:nth-child(2)").text().trim();
-                  let branch = $(this).find("td:nth-child(3)").text().trim();
-                  let brand = $(this).find("td:nth-child(4)").text().trim();
-                  let model = $(this).find("td:nth-child(5)").text().trim();
-                  let quantity = $(this).find("td:nth-child(6)").text().trim();
-                  let itemCode = $(this).find("td:nth-child(7)").text().trim();
-
-                  if (serial !== "" && brand !== "") {
-                    items.push({
-                      serial: serial,
-                      branch: branch,
-                      brand: brand,
-                      model: model,
-                      quantity: quantity,
-                      itemCode: itemCode,
-                    });
-                  }
-                });
-
-                // 🚫 No items check
-                if (items.length === 0) {
-                  Swal.fire({
-                    icon: "error",
-                    title: "No items on summary",
-                    text: "No item(s) found on the summary",
-                  });
-                  return;
-                }
-
-                let formData = new FormData(
-                  document.getElementById("delivery"),
-                );
-                formData.append("items", JSON.stringify(items));
-
-                console.log(items);
-
-                // $.ajax({
-                //   url: "dirs/delivery/dashboard/actions/update_save_delivery.php",
-                //   type: "POST",
-                //   data: formData,
-                //   processData: false,
-                //   contentType: false,
-                //   dataType: "json",
-                //   success: function (response) {
-                //     if (response.isSuccess === "success") {
-                //       console.log(`RESPONSE: ${response.message}`);
-                //     } else {
-                //       console.error("Error submitting data");
-                //     }
-                //   },
-                // });
-
-                // console.log(`FORM DATA: ${formData}`);
-                let obj = {};
-                formData.forEach((value, key) => {
-                  obj[key] = value;
-                });
-
-                console.log(obj);
-              }
-            });
-          });
+          submitDelivery();
         }
       },
+    });
+  });
+}
+
+// SUBMIT DELIVERY
+function submitDelivery() {
+  // FORM SUBMISSION
+  let commitBtn = document.getElementById("deliveryBtn");
+
+  commitBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    let plateInput = document.getElementById("plate");
+    let driverInput = document.getElementById("driver");
+    let deliveryDate = document.getElementById("deldate");
+
+    // CHECK PLATE
+    if (plateInput.value.trim() === "") {
+      Swal.fire({
+        icon: "error",
+        title: "Missing Plate Number",
+        text: "Enter the truck plate number.",
+      }).then(() => {
+        plateInput.focus();
+      });
+      return;
+    }
+
+    // CHECK DRIVER
+    if (driverInput.value.trim() === "") {
+      Swal.fire({
+        icon: "error",
+        title: "Missing Driver",
+        text: "Enter the driver's name.",
+      }).then(() => {
+        driverInput.focus();
+      });
+      return;
+    }
+
+    // CHECK DELIVERY DATE
+    if (deliveryDate.value.trim() === "") {
+      Swal.fire({
+        icon: "error",
+        title: "Missing Delivery Date",
+        text: "Enter a delivery date",
+      }).then(() => {
+        deliveryDate.focus();
+      });
+      return;
+    }
+
+    Swal.fire({
+      icon: "warning",
+      title: "Submit this for delivery?",
+      text: "This action cannot be changed",
+      confirmButtonText: "Submit",
+      allowOutsideClick: false,
+      showCancelButton: true,
+      cancelButtonText: "Back",
+    }).then((res) => {
+      if (res.isConfirmed) {
+        // PROCEED FOR SUBMISSION
+        let items = [];
+
+        let hasUnassigned = false;
+
+        $("#summaryDeliveryTable tbody tr").each(function () {
+          let badgeText = $(this).find(".badge").text().trim().toLowerCase();
+          let serial = $(this).find("td:nth-child(2)").text().trim();
+          let branch = $(this).find("td:nth-child(3)").text().trim();
+          let brand = $(this).find("td:nth-child(4)").text().trim();
+          let model = $(this).find("td:nth-child(5)").text().trim();
+          let quantity = $(this).find("td:nth-child(6)").text().trim();
+          let itemCode = $(this).find("td:nth-child(7)").text().trim();
+
+          if (badgeText === "unassigned") {
+            hasUnassigned = true;
+            return false; // break loop
+          }
+
+          if (serial !== "" && brand !== "") {
+            items.push({
+              serial: serial,
+              branch: branch,
+              brand: brand,
+              model: model,
+              quantity: quantity,
+              itemCode: itemCode,
+            });
+          }
+        });
+
+        if (hasUnassigned) {
+          Swal.fire({
+            icon: "error",
+            title: "Unassigned Items Found",
+            text: "Please assign all items before submitting.",
+          });
+          return;
+        }
+
+        // 🚫 No items check
+        if (items.length === 0) {
+          Swal.fire({
+            icon: "error",
+            title: "No items on summary",
+            text: "No item(s) found on the summary",
+          });
+          return;
+        }
+
+        let formData = new FormData(document.getElementById("delivery"));
+        formData.append("items", JSON.stringify(items));
+
+        console.log(items);
+
+        // $.ajax({
+        //   url: "dirs/delivery/dashboard/actions/update_save_delivery.php",
+        //   type: "POST",
+        //   data: formData,
+        //   processData: false,
+        //   contentType: false,
+        //   dataType: "json",
+        //   success: function (response) {
+        //     if (response.isSuccess === "success") {
+        //       console.log(`RESPONSE: ${response.message}`);
+        //     } else {
+        //       console.error("Error submitting data");
+        //     }
+        //   },
+        // });
+      }
     });
   });
 }
