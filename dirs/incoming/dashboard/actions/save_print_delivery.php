@@ -88,12 +88,13 @@ try {
             $ItemCode    = $item['ItemCode'];
             $Category    = $item['Category'];
             $Quantity    = $item['Quantity'];
+            $WhsCode    = $item['Whscode'];
 
             /* -----------------------------------------
                Insert Delivery Item
             ----------------------------------------- */
             $stmtInsertItem = $conn->prepare(
-                "EXEC dbo.[DELIVERY_ITEMS_CREATE] ?, ?, ?, ?, ?, ?, ?, ?"
+                "EXEC dbo.[DELIVERY_ITEMS_CREATE] ?, ?, ?, ?, ?, ?, ?, ?, ?"
             );
 
             $stmtInsertItem->execute([
@@ -104,7 +105,8 @@ try {
                 $ItemCode,
                 $Model,
                 $Category,
-                $Quantity
+                $Quantity,
+                $WhsCode,
             ]);
         }
     }

@@ -71,6 +71,7 @@
                                     <button type="button" class="btn btn-sm btn-primary" id="addDeliveryModalBtn"><i class="bi bi-plus"></i> Add</button>
                                     <button type="button" class="btn btn-sm btn-danger" id="clearDeliveryTableBtn" onclick="clearTable()">Clear</button>
                                     <button type="button" class="btn btn-sm btn-info" id="deliverySummaryBtn" data-bs-toggle="modal" data-bs-target="#deliverySummary">Delivery</button>
+                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#nonSerializeSummary">NonSerialize</button>
                                 </div>
                             </div>
                             <div class="table-responsive d-flex gap-1 overflow-auto mt-3" style="max-height: 450px">

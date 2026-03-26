@@ -41,7 +41,6 @@
 </form>
 
 <script>
-    /*Function submit item prepared request*/
     $("#frm-add-order").submit(function(event) {
         event.preventDefault();
         var Brand = $("#newBrand").val();

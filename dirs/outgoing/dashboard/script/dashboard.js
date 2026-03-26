@@ -12,21 +12,6 @@ $(document).ready(function () {
   });
 });
 
-// function loadLoginData() {
-//   $.post("actions/update_inventory_list.php", {}, function (data) {
-//     let response;
-//     try {
-//       response = JSON.parse(data);
-//       if (response.status === "success") {
-//         // console.log(`RESPONSE: ${response.status}`);
-//       }
-//     } catch (e) {
-//       console.error("Invalid updating inventory list", e);
-//       return;
-//     }
-//   });
-// }
-
 function loadDashboard() {
   $("#dashboard_content").html(spinner);
   $.post("dirs/outgoing/dashboard/components/main.php", {}, function (data) {
@@ -38,13 +23,6 @@ function loadDashboard() {
         <td colspan="100%" class="text-center">${spinner}</td>
       </tr>
     `);
-
-    // ORIGINAL
-    // loadOutgoing();
-    // $("#outgoingTableDisplay").DataTable({
-    //   pageLength: 50,
-    //   order: [0, "desc"],
-    // });
 
     loadOutgoing(() => {
       $("#outgoingTableDisplay").DataTable({

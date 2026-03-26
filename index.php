@@ -217,7 +217,6 @@ try {
             let deliveryPicklistNum;
             let deliveryNum;
             let summaryTable;
-            // const itemQtyMap = {};
         })
     </script>
 </body>
