@@ -853,8 +853,7 @@ function loadBasket() {
                 let $emptyRow = $(`
                 <tr class="empty-row" style="background: #FFFBDF">
                   <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
-                </tr>
-              `);
+                </tr>`);
                 $emptyRow.css({
                   background: "#FFFBDF",
                   height: "40px",
@@ -895,7 +894,6 @@ function loadBasket() {
                           Swal.fire({
                             icon: "error",
                             title: response.message,
-                            // text: response.message,
                             text: "Would you like to proceed for printing?",
                             showCancelButton: true,
                             confirmButtonText: "Proceed",

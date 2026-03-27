@@ -88,13 +88,12 @@ try {
             $ItemCode    = $item['ItemCode'];
             $Category    = $item['Category'];
             $Quantity    = $item['Quantity'];
-            $WhsCode    = $item['Whscode'];
 
             /* -----------------------------------------
                Insert Delivery Item
             ----------------------------------------- */
             $stmtInsertItem = $conn->prepare(
-                "EXEC dbo.[DELIVERY_ITEMS_CREATE] ?, ?, ?, ?, ?, ?, ?, ?, ?"
+                "EXEC dbo.[DELIVERY_ITEMS_CREATE] ?, ?, ?, ?, ?, ?, ?, ?"
             );
 
             $stmtInsertItem->execute([
@@ -106,7 +105,6 @@ try {
                 $Model,
                 $Category,
                 $Quantity,
-                $WhsCode,
             ]);
         }
     }
@@ -124,7 +122,7 @@ try {
     echo json_encode($response);
     exit;
 } catch (Throwable $e) {
-
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     if ($conn->inTransaction()) {
         $conn->rollBack();
     }

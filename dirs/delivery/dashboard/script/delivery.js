@@ -347,7 +347,7 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
   let model = $(this).find("td:nth-child(2)").text().trim();
   let qty = $(this).find("td:nth-child(3)").text().trim();
 
-  console.log(`PICKLIST NUMBER: ${picklistNumber}`);
+  // console.log(`PICKLIST NUMBER: ${picklistNumber}`);
 
   // ✅ Prevent modal if row is empty
   if (!brand && !model && !qty) {
@@ -370,15 +370,16 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
     picklistNumber,
     model,
     function (length) {
-      console.log("BRANCH LENGTH (dblclick):", length);
+      // console.log("BRANCH LENGTH (dblclick):", length);
 
       // ✅ now you can use it
       if (length > 1) {
-        console.log("Multiple branches");
+        // console.log("Multiple branches");
         $("#assignBranchModal").modal("show");
-      } else {
-        console.log("Single branch");
       }
+      //  else {
+      //   console.log("Single branch");
+      // }
     },
   );
 });
@@ -1022,14 +1023,14 @@ function branchDelivery() {
 
     let noSerialRow =
       $(`<tr data-itemcode="${itemCode}" style="padding: 3px; height: 40px; min-height: 40px">
-        <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
-        <td style="background:#FFFBDF">${branch}</td>
-        <td style="background:#FFFBDF">${brand}</td>
-        <td style="background:#FFFBDF" class="text-start">${model}</td>
-        <td style="background:#FFFBDF" class="text-center">${qty}</td>
-        <td style="background:#FFFBDF" class="d-none">${itemCode}</td>
+      <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
+      <td style="background:#FFFBDF">${branch}</td>
+      <td style="background:#FFFBDF">${brand}</td>
+      <td style="background:#FFFBDF" class="text-start">${model}</td>
+      <td style="background:#FFFBDF" class="text-center">${qty}</td>
+      <td style="background:#FFFBDF" class="d-none">${itemCode}</td>
       </tr>
-      `);
+    `);
 
     if ($emptyRow.length) {
       $emptyRow.replaceWith(newRow);
@@ -1037,10 +1038,18 @@ function branchDelivery() {
       $("#summaryDeliveryTable tbody").append(newRow);
     }
 
-    if ($emptySerialRow.length) {
-      $emptySerialRow.replaceWith(noSerialRow);
-    } else {
-      $("#nonSerializeSummary tbody").append(noSerialRow);
+    // if ($emptySerialRow.length) {
+    //   $emptySerialRow.replaceWith(noSerialRow);
+    // } else {
+    //   $("#nonSerializeSummary tbody").append(noSerialRow);
+    // }
+
+    if (!Serial || Serial.trim() === "") {
+      if ($emptySerialRow.length) {
+        $emptySerialRow.replaceWith(noSerialRow);
+      } else {
+        $("#nonSerializeSummary tbody").append(noSerialRow);
+      }
     }
 
     newRow.hover(
@@ -1233,7 +1242,7 @@ function loadPicklistBranches(deliveryNumber, picklistNumber, model, callback) {
             tbody.append(row);
           });
         }
-        console.log(`BRANCHES LENGTH" ${branches.length}`);
+        // console.log(`BRANCHES LENGTH ${branches.length}`);
         if (callback) callback(length, branches[0].ReqBranch);
       }
     },
@@ -1246,7 +1255,6 @@ function loadPicklistBranches(deliveryNumber, picklistNumber, model, callback) {
 // NEW ITEM FOR NON-SERIALIZE
 // function addNonSerialize(ItemSerial, DrNumber, itemCode, picklistDr) {
 function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
-  console.log(`PICKLIST num: ${picklistDr}`);
   $("#frm-add-delivery")
     .off("submit")
     .on("submit", function (e) {
@@ -1254,23 +1262,13 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
 
       let Brand = $("#newBrand").val();
       let Model = $("#newModel").val();
+      // let Category = $("#newCategory").val();
       let quantity = parseInt($("#newQuantity").val()) || 1;
-
-      // if (!itemCode) {
-      //   Swal.fire({
-      //     icon: "error",
-      //     title: "Enter the item code",
-      //   });
-      //   return;
-      // }
 
       $.ajax({
         url: "dirs/delivery/dashboard/actions/get_nonserialized_item.php",
         type: "POST",
         data: {
-          // ItemSerial: ItemSerial,
-          // DrNumber: DrNumber,
-          // ItemCode: itemCode,
           Brand: Brand,
           Model: Model,
         },
@@ -1279,12 +1277,17 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
           if (response.isSuccess === "success") {
             let item = response.Data[0];
 
-            let existingTotal = parseInt($("#summaryQty").text()) || 0;
+            if (response.Data.length === 0) {
+              Swal.fire({
+                icon: "error",
+                title: "Unavailable stock(s) for this model",
+                text: "Please try other item",
+                confirmButtonText: "OKAY",
+              });
+              return;
+            }
 
-            // Populate brand, model, category
-            $("#newBrand").val(item.Brand);
-            $("#newModel").val(item.Model);
-            $("#newCategory").val(item.Category);
+            let existingTotal = parseInt($("#summaryQty").text()) || 0;
 
             let $deliveryTbody = $("#deliveryTable tbody");
             let $summaryTbody = $("#summaryTable tbody");
@@ -1333,10 +1336,10 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
               }
             }
 
-            $("#newItemCode").val("");
+            // $("#newItemCode").val("");
             $("#newQuantity").val("");
-            $("#newBrand").val("").prop("disabled", true);
-            $("#newModel").val("").prop("disabled", true);
+            $("#newBrand").val("");
+            $("#newModel").val("");
             $("#newCategory").val("").prop("disabled", true);
             $("#addDeliveryModal").modal("hide");
             $("#summaryQty").text(existingTotal + quantity);
@@ -1348,7 +1351,7 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
           } else {
             Swal.fire({
               icon: "error",
-              title: response.Data,
+              title: response.isSuccess,
             });
           }
         },
@@ -1451,7 +1454,10 @@ function createDr(createDeliveryNumber, picklistDr, previousSerials = []) {
         if (response.isSuccess === "success") {
           let header = response.Data;
 
+          // console.log(`DELIVERY DETAILS: ${JSON.stringify(header)}`);
+
           $("#drno").val(createDeliveryNumber);
+          // $("#srn").val(header.BaseNum_SRN);
           $("#pcklstno").val(picklistDr);
           $("#docdate").val(header.DocumentDate);
           $("#origin").val(header.BDestination);
@@ -1544,45 +1550,6 @@ function createDr(createDeliveryNumber, picklistDr, previousSerials = []) {
               }
             });
           });
-
-          // $("#newItemCode").on("keydown", function (e) {
-          //   if (e.key === "Enter") {
-          //     e.preventDefault();
-
-          //     let itemCode = $(this).val().trim();
-          //     if (!itemCode) return;
-
-          //     let ItemSerial = "";
-          //     let DrNumber = createDeliveryNumber;
-
-          //     $.ajax({
-          //       url: "dirs/delivery/dashboard/actions/get_branch_stock_serial.php",
-          //       type: "POST",
-          //       data: { ItemSerial, DrNumber, ItemCode: itemCode },
-          //       dataType: "json",
-          //       success: function (response) {
-          //         if (response.isSuccess === "success") {
-          //           let item = response.Data[0];
-
-          //           let newBrand = document.getElementById("newBrand");
-          //           let newModel = document.getElementById("newModel");
-          //           let newCategory = document.getElementById("newCategory");
-
-          //           newBrand.value = item.Brand;
-          //           newModel.value = item.Model;
-          //           newCategory.value = item.Category;
-
-          //           $("#newQuantity").focus();
-          //         } else if (response.isSuccess === "empty") {
-          //           Swal.fire({
-          //             icon: "error",
-          //             title: "Unavailable stock for this model",
-          //           });
-          //         } else {
-          //           Swal.fire({ icon: "error", title: response.Data });
-          //         }
-          //       },
-          //     });
 
           // console.log(`PICKLIST DR: ${picklistDr}`);
           // addNonSerialize("", createDeliveryNumber, itemCode, picklistDr);
@@ -1686,10 +1653,10 @@ function submitDelivery() {
 
           if (badgeText === "unassigned") {
             hasUnassigned = true;
-            return false; // break loop
+            return false;
           }
 
-          if (serial !== "" && brand !== "") {
+          if (brand !== "") {
             items.push({
               serial: serial,
               branch: branch,
@@ -1701,19 +1668,12 @@ function submitDelivery() {
           }
         });
 
-        $("#nonSerializeSummary tbody tr").each(function () {
-          // let badgeText = $(this).find(".badge").text().trim().toLowerCase();
-          // let serial = $(this).find("td:nth-child(2)").text().trim();
+        $("#summaryNonserializeTable tbody tr").each(function () {
           let branch = $(this).find("td:nth-child(2)").text().trim();
           let brand = $(this).find("td:nth-child(3)").text().trim();
           let model = $(this).find("td:nth-child(4)").text().trim();
           let quantity = $(this).find("td:nth-child(5)").text().trim();
           let itemCode = $(this).find("td:nth-child(6)").text().trim();
-
-          // if (badgeText === "unassigned") {
-          //   hasUnassigned = true;
-          //   return false; // break loop
-          // }
 
           if (itemCode !== "" && brand !== "") {
             nonSerializeItems.push({
@@ -1735,8 +1695,7 @@ function submitDelivery() {
           return;
         }
 
-        // 🚫 No items check
-        if (items.length === 0) {
+        if (items.length === 0 && nonSerializeItems.length === 0) {
           Swal.fire({
             icon: "error",
             title: "No items on summary",
@@ -1745,27 +1704,71 @@ function submitDelivery() {
           return;
         }
 
-        let formData = new FormData(document.getElementById("delivery"));
-        formData.append("items", JSON.stringify(items));
+        let formData = new FormData();
 
-        console.log(items);
-        console.log(`NON-SERIALIZE ITEMS: ${nonSerializeItems}`);
+        formData.append("DeliveryNum", $("#drno").val());
+        formData.append("PickListNum", $("#pcklstno").val());
+        formData.append("Branch", $("#origin").val());
+        formData.append("OrginWhscode", $("#whcode").val());
+        formData.append("DeliveryDate", $("#deldate").val());
+        formData.append("TruckPlateNum", $("#plate").val());
+        formData.append("TruckDriver", $("#driver").val());
+        formData.append("Remarks", $("#remarks").val());
 
-        // $.ajax({
-        //   url: "dirs/delivery/dashboard/actions/update_save_delivery.php",
-        //   type: "POST",
-        //   data: formData,
-        //   processData: false,
-        //   contentType: false,
-        //   dataType: "json",
-        //   success: function (response) {
-        //     if (response.isSuccess === "success") {
-        //       console.log(`RESPONSE: ${response.message}`);
-        //     } else {
-        //       console.error("Error submitting data");
-        //     }
-        //   },
-        // });
+        // SERIALIZED
+        items.forEach((item, i) => {
+          formData.append(`Serial[${i}]`, item.serial);
+          formData.append(`Brand[${i}]`, item.brand);
+          formData.append(`Model[${i}]`, item.model);
+          formData.append(`ItemCode[${i}]`, item.itemCode);
+          formData.append(`Category[${i}]`, ""); // add if needed
+          formData.append(`Quantity[${i}]`, item.quantity);
+        });
+
+        // NON-SERIALIZED
+        nonSerializeItems.forEach((item, i) => {
+          formData.append(`NonSerializedItemCode[${i}]`, item.itemCode);
+          formData.append(`NonSerializedBrand[${i}]`, item.brand);
+          formData.append(`NonSerializedModel[${i}]`, item.model);
+          formData.append(`NonSerializedCategory[${i}]`, ""); // add if needed
+          formData.append(`NonQuantity[${i}]`, item.quantity);
+        });
+
+        // ================= DEBUG =================
+        console.log("Serialized:", items);
+        console.log("Non-Serialized:", nonSerializeItems);
+
+        $.ajax({
+          url: "dirs/delivery/dashboard/actions/save_dlvry_to_receiving.php",
+          type: "POST",
+          data: formData,
+          processData: false,
+          contentType: false,
+          dataType: "json",
+          success: function (response) {
+            if (response.isSuccess === "success") {
+              Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: `Receiving #: ${response.ReceivingNumber}`,
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Failed",
+                text: response.message || "Error submitting data",
+              });
+            }
+          },
+          error: function (xhr) {
+            console.error(xhr.responseText);
+            Swal.fire({
+              icon: "error",
+              title: "Server Error",
+              text: "Something went wrong.",
+            });
+          },
+        });
       }
     });
   });

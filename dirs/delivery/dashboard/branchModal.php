@@ -11,7 +11,7 @@
                         <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>
                         <div class="p-2 text-warning" id="deliveryQty">0</div>
                     </div>
-                    <input type="text" id="serial">
+                    <input type="hidden" id="serial">
                     <input type="hidden" id="brand">
                     <input type="hidden" id="itemCode">
                     <div class="table-responsive">
