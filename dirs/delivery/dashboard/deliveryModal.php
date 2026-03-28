@@ -100,3 +100,28 @@
          </div>
      </div>
  </div>
+
+ <!-- FOR NEW ITEM -->
+ <form id="serial-delivery" method="POST">
+     <div class="modal fade" tabindex="-1" id="addSerialModal" data-bs-backdrop="static" data-bs-keyboard="false">
+         <div class="modal-dialog modal-dialog-centered">
+             <div class="modal-content">
+                 <div class="modal-header">
+                     <h4 class="modal-title text-secondary">Enter Serial</h4>
+                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                 </div>
+                 <div class="modal-body">
+                     <div class="form-input">
+                         <label for="newSerial" class="form-label text-dark-emphasis"><small>Serial:</small></label>
+                         <input type="text" name="newSerial" id="newSerial" class="form-control" style="background: #FFFBDF" inputmode="numeric"
+                             required>
+                     </div>
+                     <div class="modal-footer">
+                         <button class="btn btn-success" type="submit" id="nonSerializeBtn">Add</button>
+                         <button class="btn btn-danger" type="reset">Clear</button>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </div>
+ </form>

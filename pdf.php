@@ -16,7 +16,7 @@ try {
     $stmt = $conn->prepare("SELECT * FROM SRN_REQUEST WHERE BaseNum_SRN = ?");
     $stmt->execute([$srn]);
 
-    $item = $conn->prepare("SELECT RowNum, ItemBrand, ItemName, ItemGroup, Quantity FROM SRN_ITM WHERE BaseNum_SRN = ?");
+    $item = $conn->prepare("SELECT RowNum, ItemBrand, ItemName, ItemGroup, Quantity, DocDate, DocTime FROM SRN_ITM WHERE BaseNum_SRN = ?");
     $item->execute([$srn]);
 
     $srnData = $stmt->fetch(PDO::FETCH_OBJ);
@@ -30,8 +30,9 @@ try {
     $origin = $srnData->Orgin_Dstnation;
     $purpose = $srnData->RequestPurpose;
     $requestedBy = $srnData->PrepBy;
-    // $remarks = $srnData->Remarks;
     $remarks = empty($srnData->Remarks) ? "N/A" : $srnData->Remarks;
+    $datetimeStr = $srnData->DocDate . ' ' . $srnData->DocTime;
+    $timestamp = date("m/d/y h:i A", strtotime($datetimeStr));
     $textColor = [50, 50, 50];
 
     class PDF extends FPDF
@@ -39,13 +40,21 @@ try {
 
         function Header()
         {
-            $this->Image('assets/image/header/header.png', 5, 10, 190);
-            $this->Ln(35);
+            // $this->Image('assets/image/header/header.png', 5, 10, 190);
+            $this->Image('assets/image/logo/iap_icon.png', 10, 10, 30);
+            $this->SetFont('Arial', 'B', 20);
+
+            $pageWidth = $this->GetPageWidth();
+
+            $this->SetX(10);
+            $this->Cell($pageWidth - 10, 20, 'STOCK REQUEST', 0, 1, 'C');
+
+            $this->Ln(10);
         }
 
         function Footer()
         {
-            $this->Image('assets/image/footer/footer.jpg', 10, 270, 190);
+            // $this->Image('assets/image/footer/footer.jpg', 10, 270, 190);
             $this->SetTextColor($GLOBALS['textColor'][0], $GLOBALS['textColor'][1], $GLOBALS['textColor'][2]);
             $this->SetY(-15);
             $this->SetFont('Arial', '', 8);
@@ -126,34 +135,58 @@ try {
     {
         global $textColor;
 
-        $labelWidth = 15;
-        $colonWidth = 3;
         $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
 
-        $pdf->SetFont('Arial', 'B', 9);
-        $pdf->Cell($labelWidth, 5, 'SRN ', 0, 0);
-        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
-        $pdf->Cell(0, 5, $srn, 0, 1);
-        $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell($labelWidth, 5, 'Status: ', 0, 0);
-        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
-        $pdf->Cell(0, 5, $status, 0, 1);
-        $pdf->Cell($labelWidth, 5, 'Date ', 0, 0);
-        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
-        $pdf->Cell(0, 5, $date, 0, 1);
-        $pdf->Cell($labelWidth, 5, 'Origin ', 0, 0);
-        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
-        $pdf->Cell(0, 5, $origin, 0, 1);
+        $labelWidth = 15;
+        $colonWidth = 3;
+        $valueWidth = 60;
 
-        $pdf->Ln(1);
+        // total width of right block
+        $rightBlockWidth = $labelWidth + $colonWidth + $valueWidth;
+
+        $pdf->SetFont('Arial', 'B', 9);
+
+        /* ---------- ROW 1 ---------- */
+        // SRN (left)
+        $pdf->Cell($labelWidth, 5, 'SRN', 0, 0);
+        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+        $pdf->Cell($valueWidth, 5, $srn, 0, 0);
+
+        // Move to RIGHT EDGE
+        $pdf->SetX($pdf->GetPageWidth() - $rightBlockWidth + 30);
+
+        // Status (right)
+        $pdf->Cell($labelWidth, 5, 'Status', 0, 0);
+        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+        $pdf->Cell($valueWidth, 5, $status, 0, 1);
+
+        $pdf->SetFont('Arial', '', 9);
+
+        /* ---------- ROW 2 ---------- */
+        // Origin (left)
+        $pdf->Cell($labelWidth, 5, 'Origin', 0, 0);
+        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+        $pdf->Cell($valueWidth, 5, $origin, 0, 0);
+
+        // Move to RIGHT EDGE again
+        $pdf->SetX($pdf->GetPageWidth() - $rightBlockWidth + 30);
+
+        // Date (right)
+        $pdf->Cell($labelWidth, 5, 'Date', 0, 0);
+        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+        $pdf->Cell($valueWidth, 5, $date, 0, 1);
+
+        $pdf->Ln(3);
     }
 
     /* ---------- BOTTOM LEFT FUNCTION ---------- */
 
-    function bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $textColor)
+    function bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $timestamp, $textColor)
     {
         $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
-        $pdf->SetY(-100);
+        // $pdf->SetY(-100);
+        // $pdf->SetX(10);
+        $pdf->Ln(5); // 5mm gap after table
         $pdf->SetX(10);
 
         // Purpose
@@ -180,15 +213,18 @@ try {
 
         $pdf->SetFont('Arial', '', 9);
         $pdf->Cell(0, 5, $remarks, 0, 1);
+
+        // $pdf->SetFont('Arial', '', 9);
+        // $pdf->Cell(0, 5, 'Timestamp', 0, 1);
+
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->Cell(0, 5, $timestamp, 0, 1);
     }
 
     function renderItemsTable($pdf, $itemData, $textColor)
     {
         /* ---------- TITLE ---------- */
         $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
-        $pdf->Ln(3);
-        $pdf->SetFont('Arial', 'B', 20);
-        $pdf->Cell(0, 12, 'REQUEST', 0, 1, 'C');
         $pdf->Ln(3);
 
         $pdf->SetFont('Arial', 'B', 9);
@@ -201,9 +237,8 @@ try {
         ];
 
         // Header row
-        $pdf->SetFillColor(255, 255, 0);
         foreach ($headers as $text => $width) {
-            $pdf->Cell($width, 6, $text, 1, 0, 'C', true);
+            $pdf->Cell($width, 6, $text, 1, 0, 'C');
         }
         $pdf->Ln();
         $pdf->SetFont('Arial', '', 9);
@@ -235,8 +270,6 @@ try {
             $pdf->SetXY($x + $headers['#'] + $headers['Brand'], $y);
 
             /* ---------- MODEL ---------- */
-            // $pdf->SetFont('Arial', '', ($pdf->GetStringWidth($row->ItemName) > $headers['Model']) ? 8 : 9);
-            // $pdf->Cell($headers['Model'], $lineHeight, $row->ItemName, 1);
             $modelText = $row->ItemName;
 
             // Shrink font if too wide
@@ -263,7 +296,7 @@ try {
         // ---------- TOTAL QUANTITY ----------
         $pdf->SetFont('Arial', 'B', 9);
         $labelWidth = $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'];
-        $pdf->Cell($labelWidth, 6, 'Total Quantity', 1, 0, 'R');
+        $pdf->Cell($labelWidth, 6, 'Total Quantity', 1, 0, 'C');
         $pdf->Cell($headers['Quantity'], 6, $totalQty, 1, 1, 'C');
     }
 
@@ -271,7 +304,7 @@ try {
 
     headerDetails($pdf, $srn, $status, $date, $origin);
     renderItemsTable($pdf, $itemData, $textColor);
-    bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $textColor);
+    bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $timestamp, $textColor);
 
     /* ---------- OUTPUT ---------- */
 

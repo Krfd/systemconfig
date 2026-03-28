@@ -106,6 +106,11 @@ var tooltipList = [...tooltipTriggerList].map(
 );
 
 function logout() {
+  $.post("actions/save_logs_logout.php", {}, function (res) {
+    if ($.trim(res) == "OK") {
+      console.log(`LOGOUT HAS BEEN LOGGED`);
+    }
+  });
   $.post("actions/logout.php", {}, function (data) {
     if ($.trim(data) == "OK") {
       window.location.assign("index.php");

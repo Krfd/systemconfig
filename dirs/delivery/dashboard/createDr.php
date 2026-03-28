@@ -38,11 +38,7 @@
                                             <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                         </div>
                                     </div>
-                                    <!-- <div class="d-flex align-items-baseline gap-3"> -->
-                                    <!-- <label for="drno" class="form-label text-dark-emphasis col-3"><small>Delivery Number:</small></label> -->
                                     <input type="hidden" name="drno" id="drno" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
-                                    <!-- <input type="text" name="srn" id="srn" class="form-control form-control-sm col" style="background: #FFFBDF" readonly> -->
-                                    <!-- </div> -->
                                 </div>
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-baseline gap-3">

@@ -25,7 +25,8 @@ try {
     $picklistItems = $picklistData->fetchAll(PDO::FETCH_OBJ);
     $picklistData->nextRowset();
     $branchData =  $picklistData->fetchAll(PDO::FETCH_OBJ);
-    // $branchName = $branchData[0]->ReqBranch ?? "N/A";
+
+    $branchName = $picklistItems[0]->ReqBranch ?? "N/A";
     $picklistNum = $picklistHeader->PickLst_Num ?? "N/A";
     $docDate = isset($picklistHeader->DocDate)
         ? date("m/d/y", strtotime($picklistHeader->DocDate))
@@ -166,10 +167,10 @@ try {
 
         /* ---------- TABLE HEADER ---------- */
 
-        $pdf->SetFillColor(255, 255, 0);
-
+        // $pdf->SetFillColor(255, 255, 0);
         foreach ($headers as $text => $width) {
-            $pdf->Cell($width, 6, $text, 1, 0, 'C', true);
+            // $pdf->Cell($width, 6, $text, 1, 0, 'C', true);
+            $pdf->Cell($width, 6, $text, 1, 0, 'C');
         }
 
         $pdf->Ln();
@@ -225,7 +226,7 @@ try {
         }
     }
 
-    function bottomLeftDetails($pdf, $executedby, $printedby, $textColor)
+    function bottomLeftDetails($pdf, $executedby, $printedby, $branchName, $textColor)
     {
         $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
         $pdf->SetY(-100);
@@ -246,13 +247,14 @@ try {
 
         $pdf->SetFont('Arial', '', 9);
         $pdf->Cell(0, 5, $printedby, 0, 1);
+        $pdf->Cell(0, 5, $branchName, 0, 1);
 
         $pdf->Ln(3);
     }
 
     headerDetails($pdf, $picklistNum, $docDate);
     renderItemsTable($pdf, $picklistNum, $itemData, $textColor);
-    bottomLeftDetails($pdf, $executedby, $printedby, $textColor);
+    bottomLeftDetails($pdf, $executedby, $printedby, $branchName, $textColor);
 
     ob_end_clean();
     $pdf->Output('I', $picklist . '.pdf');

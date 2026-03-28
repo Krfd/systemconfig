@@ -151,6 +151,55 @@ try {
         $pdf->Ln(1);
     }
 
+    // REFERENCE
+    // function headerDetails($pdf, $srn, $status, $date, $origin)
+    // {
+    //     global $textColor;
+
+    //     $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
+
+    //     $labelWidth = 15;
+    //     $colonWidth = 3;
+    //     $valueWidth = 60;
+
+    //     // total width of right block
+    //     $rightBlockWidth = $labelWidth + $colonWidth + $valueWidth;
+
+    //     $pdf->SetFont('Arial', 'B', 9);
+
+    //     /* ---------- ROW 1 ---------- */
+    //     // SRN (left)
+    //     $pdf->Cell($labelWidth, 5, 'SRN', 0, 0);
+    //     $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+    //     $pdf->Cell($valueWidth, 5, $srn, 0, 0);
+
+    //     // Move to RIGHT EDGE
+    //     $pdf->SetX($pdf->GetPageWidth() - $rightBlockWidth + 30);
+
+    //     // Status (right)
+    //     $pdf->Cell($labelWidth, 5, 'Status', 0, 0);
+    //     $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+    //     $pdf->Cell($valueWidth, 5, $status, 0, 1);
+
+    //     $pdf->SetFont('Arial', '', 9);
+
+    //     /* ---------- ROW 2 ---------- */
+    //     // Origin (left)
+    //     $pdf->Cell($labelWidth, 5, 'Origin', 0, 0);
+    //     $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+    //     $pdf->Cell($valueWidth, 5, $origin, 0, 0);
+
+    //     // Move to RIGHT EDGE again
+    //     $pdf->SetX($pdf->GetPageWidth() - $rightBlockWidth + 30);
+
+    //     // Date (right)
+    //     $pdf->Cell($labelWidth, 5, 'Date', 0, 0);
+    //     $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+    //     $pdf->Cell($valueWidth, 5, $date, 0, 1);
+
+    //     $pdf->Ln(1);
+    // }
+
     /* ---------- BOTTOM LEFT FUNCTION ---------- */
 
     function bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $textColor)
@@ -206,9 +255,10 @@ try {
         ];
 
         $pdf->SetFont('Arial', 'B', 9);
-        $pdf->SetFillColor(255, 255, 0);
+        // $pdf->SetFillColor(255, 255, 0);
         foreach ($headers as $text => $width) {
-            $pdf->Cell($width, 5, $text, 1, 0, 'C', true);
+            // $pdf->Cell($width, 5, $text, 1, 0, 'C', true);
+            $pdf->Cell($width, 5, $text, 1, 0, 'C');
         }
         $pdf->Ln();
         $pdf->SetFont('Arial', '', 9);
@@ -267,7 +317,7 @@ try {
         // ---------- TOTAL QUANTITY ----------
         $pdf->SetFont('Arial', 'B', 9);
         $labelWidth = $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'];
-        $pdf->Cell($labelWidth, 6, 'Total Quantity', 1, 0, 'R');
+        $pdf->Cell($labelWidth, 6, 'Total Quantity', 1, 0, 'C');
         $pdf->Cell($headers['Quantity'], 6, $totalQty, 1, 1, 'C');
     }
 

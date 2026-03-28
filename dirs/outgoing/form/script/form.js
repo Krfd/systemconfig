@@ -12,7 +12,6 @@ $(document).ready(function () {
   });
 });
 
-/*Function load main form display*/
 function loadDashboard() {
   $.post("dirs/outgoing/form/components/main.php", {}, function (data) {
     $("#form-content").html(data);
@@ -22,6 +21,7 @@ function loadDashboard() {
     get_SRN();
     formattedDate();
     removeItem();
+    addItem();
     numberInput();
     submitReq();
   });
@@ -51,7 +51,7 @@ function get_SRN() {
         } else {
           num = parseInt(srn.replace(/\D/g, ""), 10) + 1;
         }
-        newSRN = "SRN-" + branchCode + "-" + String(num).padStart(8, "0");
+        newSRN = "SRN" + branchCode + String(num).padStart(8, "0");
         $("#srnForm").val(newSRN);
         loadItems();
       } else {
@@ -146,7 +146,6 @@ function loadDestinationWhscodes(Branch) {
           );
         });
       } else {
-        // alert($.trim(response.Data));
         console.log(response.Data);
         Swal.fire({
           icon: "error",
@@ -217,7 +216,7 @@ async function loadOriginWhscodes(Branch) {
       const response = JSON.parse(data);
       if ($.trim(response.isSuccess) === "success") {
         const whscode = response.Data;
-        $("#originCodeForm").html('<option selected value="">--</option>');
+        $("#originCodeForm").empty();
         whscode.forEach((whscode) => {
           $("#originCodeForm").append(
             $("<option>", {
@@ -340,32 +339,174 @@ function loadItems() {
             </tr>
         `);
     },
+    // ORIGINAL
+    // success: function (response) {
+    //   let tbody = $("#outgoingTable tbody");
+    //   tbody.empty(); // remove yellow placeholder row
+    //   if (response.isSuccess === "success" && response.Data.length > 0) {
+    //     let rowCount = response.Data.length;
+    //     let totalQty = 0;
+
+    //     $.each(response.Data, function (index, item) {
+    //       let quantity = parseFloat(item.Quantity) || 0; // ensure number
+    //       totalQty += quantity;
+
+    //       let row = `<tr class="item-row">
+    //                     <td class="ps-2 align-middle" style="background: #FFFBDF; padding: 3px">${item.DisplayRowNumber}</td>
+    //                     <td class="ps-2 align-middle item-brand" style="background: #FFFBDF; padding: 3px">${item.ItemBrand}</td>
+    //                     <td class="ps-2 align-middle item-model" style="background: #FFFBDF; padding: 3px">${item.ItemName}</td>
+    //                     <td class="ps-2 align-middle item-category" style="background: #FFFBDF; padding: 3px">${item.ItemGroup}</td>
+    //                     <td class="ps-2 align-middle item-code" hidden>${item.ItemCode}</td>
+    //                     <td class="ps-2 align-middle item-quantity text-center" style="background: #FFFBDF; padding: 3px">${item.Quantity}</td>
+    //                     <td class="ps-2 align-middle d-flex gap-1" style="background: #FFFBDF; padding: 3px">
+    //                       <button type="button" class="btn btn-sm btn-danger remove-item-button" id="${item.ItemNum}">
+    //                         <i class="bi bi-dash"></i>
+    //                       </button>
+    //                       <button type="button" class="btn btn-sm btn-primary add-item-button" id="${item.ItemNum}">
+    //                         <i class="bi bi-plus"></i>
+    //                       </button>
+    //                     </td>
+    //                   </tr>
+    //                 `;
+
+    //       tbody.append(row);
+    //     });
+
+    //     if (rowCount < 8) {
+    //       let emptyRowsNeeded = 8 - rowCount;
+
+    //       for (let i = 0; i < emptyRowsNeeded; i++) {
+    //         let emptyRow = `
+    //           <tr class="item-row empty-row" style="height: 40px; max-height: 40px">
+    //             <td style="background: #FFFBDF; padding: 0">&nbsp;</td>
+    //             <td style="background: #FFFBDF; padding: 0"></td>
+    //             <td style="background: #FFFBDF; padding: 0"></td>
+    //             <td style="background: #FFFBDF; padding: 0"></td>
+    //             <td style="background: #FFFBDF; padding: 0"></td>
+    //             <td style="background: #FFFBDF; padding: 0"></td>
+    //           </tr>
+    //         `;
+    //         tbody.append(emptyRow);
+    //       }
+    //     }
+    //     $("#totalQuantity").text(totalQty);
+    //   } else {
+    //     // If no data, show empty yellow row again
+    //     tbody.html(`
+    //                 <tr style="height:40px; min-height:40px">
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                 </tr>
+    //                 <tr style="height:40px; min-height:40px">
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                 </tr>
+    //                 <tr style="height:40px; min-height:40px">
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                 </tr>
+    //                 <tr style="height:40px; min-height:40px">
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                 </tr>
+    //                 <tr style="height:40px; min-height:40px">
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                 </tr>
+    //                 <tr style="height:40px; min-height:40px">
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                 </tr>
+    //                 <tr style="height:40px; min-height:40px">
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                 </tr>
+    //                 <tr style="height:40px; min-height:40px">
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                   <td style="background:#FFFBDF"></td>
+    //                 </tr>
+    //             `);
+    //   }
+    // },
+
+    // ACCUMULATES
     success: function (response) {
       let tbody = $("#outgoingTable tbody");
       tbody.empty(); // remove yellow placeholder row
+
       if (response.isSuccess === "success" && response.Data.length > 0) {
         let rowCount = response.Data.length;
         let totalQty = 0;
+
+        // Track existing items by ItemCode
+        let existingItems = {};
+
         $.each(response.Data, function (index, item) {
-          let quantity = parseFloat(item.Quantity) || 0; // ensure number
+          let quantity = parseFloat(item.Quantity) || 0;
           totalQty += quantity;
 
-          let row = `<tr class="item-row">
-                        <td class="ps-2 align-middle" style="background: #FFFBDF; padding: 3px">${item.DisplayRowNumber}</td>
-                        <td class="ps-2 align-middle item-brand" style="background: #FFFBDF; padding: 3px">${item.ItemBrand}</td>
-                        <td class="ps-2 align-middle item-model" style="background: #FFFBDF; padding: 3px">${item.ItemName}</td>
-                        <td class="ps-2 align-middle item-category" style="background: #FFFBDF; padding: 3px">${item.ItemGroup}</td>
-                        <td class="ps-2 align-middle item-code" hidden>${item.ItemCode}</td>
-                        <td class="ps-2 align-middle item-quantity" style="background: #FFFBDF; padding: 3px">${item.Quantity}</td>
-                        <td class="ps-2 align-middle t-action" style="background: #FFFBDF; padding: 3px">
-                          <button type="button" class="btn btn-sm btn-danger remove-item-button" id="${item.ItemNum}">
+          if (existingItems[item.ItemCode]) {
+            // If row already exists, accumulate quantity
+            let $existingRow = existingItems[item.ItemCode];
+            let oldQty =
+              parseFloat($existingRow.find(".item-quantity").text()) || 0;
+            let newQty = oldQty + quantity;
+            $existingRow.find(".item-quantity").text(newQty);
+          } else {
+            // Create new row
+            let row = `<tr class="item-row">
+                    <td class="ps-2 align-middle" style="background: #FFFBDF; padding: 3px">${item.DisplayRowNumber}</td>
+                    <td class="ps-2 align-middle item-brand" style="background: #FFFBDF; padding: 3px">${item.ItemBrand}</td>
+                    <td class="ps-2 align-middle item-model" style="background: #FFFBDF; padding: 3px">${item.ItemName}</td>
+                    <td class="ps-2 align-middle item-category" style="background: #FFFBDF; padding: 3px">${item.ItemGroup}</td>
+                    <td class="ps-2 align-middle item-code" hidden>${item.ItemCode}</td>
+                    <td class="ps-2 align-middle item-quantity text-center" style="background: #FFFBDF; padding: 3px">${item.Quantity}</td>
+                    <td class="ps-2 align-middle d-flex gap-1" style="background: #FFFBDF; padding: 3px">
+                        <button type="button" class="btn btn-sm btn-danger remove-item-button" id="${item.ItemNum}">
                             <i class="bi bi-dash"></i>
-                          </button>
-                        </td>
-                      </tr>
-                    `;
+                        </button>
+                        <button type="button" class="btn btn-sm btn-primary add-item-button" id="${item.ItemNum}">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </td>
+                </tr>`;
 
-          tbody.append(row);
+            let $row = $(row);
+            tbody.append($row);
+            existingItems[item.ItemCode] = $row; // track this row
+          }
         });
 
         if (rowCount < 8) {
@@ -373,87 +514,86 @@ function loadItems() {
 
           for (let i = 0; i < emptyRowsNeeded; i++) {
             let emptyRow = `
-              <tr class="item-row empty-row" style="height: 40px; max-height: 40px">
-                <td style="background: #FFFBDF; padding: 0">&nbsp;</td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-              </tr>
-            `;
+                  <tr class="item-row empty-row" style="height: 40px; max-height: 40px">
+                    <td style="background: #FFFBDF; padding: 0">&nbsp;</td>
+                    <td style="background: #FFFBDF; padding: 0"></td>
+                    <td style="background: #FFFBDF; padding: 0"></td>
+                    <td style="background: #FFFBDF; padding: 0"></td>
+                    <td style="background: #FFFBDF; padding: 0"></td>
+                    <td style="background: #FFFBDF; padding: 0"></td>
+                  </tr>
+                `;
             tbody.append(emptyRow);
           }
         }
         $("#totalQuantity").text(totalQty);
       } else {
-        // If no data, show empty yellow row again
         tbody.html(`
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                `);
+                        <tr style="height:40px; min-height:40px">
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                        </tr>
+                        <tr style="height:40px; min-height:40px">
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                        </tr>
+                        <tr style="height:40px; min-height:40px">
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                        </tr>
+                        <tr style="height:40px; min-height:40px">
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                        </tr>
+                        <tr style="height:40px; min-height:40px">
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                        </tr>
+                        <tr style="height:40px; min-height:40px">
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                        </tr>
+                        <tr style="height:40px; min-height:40px">
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                        </tr>
+                        <tr style="height:40px; min-height:40px">
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                          <td style="background:#FFFBDF"></td>
+                        </tr>
+          `);
       }
     },
     error: function (xhr, status, error) {
@@ -475,6 +615,15 @@ function removeItem() {
   });
   loadItems();
 }
+function addItem() {
+  $(document).off("click", ".add-item-button");
+  $(document).on("click", ".add-item-button", function () {
+    const ItemNum = $(this).attr("id");
+    addItemAPI(ItemNum);
+    console.log(`ITEM SHOULD BE INCREMENTED`);
+  });
+  loadItems();
+}
 
 function removeItemAPI(ItemNum) {
   $.ajax({
@@ -487,6 +636,25 @@ function removeItemAPI(ItemNum) {
         loadItems();
       } else {
         console.error(`Failed to remove item`);
+      }
+    },
+    error: function () {
+      alert("Request failed.");
+    },
+  });
+}
+
+function addItemAPI(ItemNum) {
+  $.ajax({
+    url: "dirs/outgoing/form/actions/update_add_prepitem_qty.php",
+    type: "POST",
+    data: { ItemNum: ItemNum },
+    dataType: "json",
+    success: function (response) {
+      if (response.isSuccess === "success") {
+        loadItems();
+      } else {
+        console.error(`Failed to add item`);
       }
     },
     error: function () {

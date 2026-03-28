@@ -596,6 +596,8 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
 
               let $summaryTbody = $("#summaryTable tbody");
 
+              console.log(`ITEMS: ${JSON.stringify(items)}`);
+
               items.forEach(function (item, index) {
                 let brand = item.Brand;
                 let model = item.Model;
@@ -1507,6 +1509,12 @@ function createDr(createDeliveryNumber, picklistDr, previousSerials = []) {
                   cell.setAttribute("contenteditable", "true");
                   cell.removeEventListener("keydown", preventTyping);
                 });
+
+                // // ✅ SHOW MODAL HERE
+                // const serialModal = new bootstrap.Modal(
+                //   document.getElementById("addSerialModal"),
+                // );
+                // serialModal.show();
               }
             }
 
@@ -1751,6 +1759,8 @@ function submitDelivery() {
                 icon: "success",
                 title: "Success",
                 text: `Receiving #: ${response.ReceivingNumber}`,
+              }).then(() => {
+                loadDeliveryBasketContent();
               });
             } else {
               Swal.fire({
