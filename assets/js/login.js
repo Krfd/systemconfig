@@ -53,7 +53,12 @@ $(document).ready(function () {
             window.location.assign("login.php");
           }
         } else {
-          console.log("Login failed: " + response.message);
+          Swal.fire({
+            icon: "error",
+            title: response.Message,
+            text: "Please try again",
+            confirmButtonText: "OKAY",
+          });
         }
       },
     );

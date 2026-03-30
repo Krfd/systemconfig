@@ -6,6 +6,7 @@ header('Content-Type: application/json');
 
 $Userid    = $_SESSION['Uid'];
 $PKlistNum = $_POST['PKlistNum'];
+$executedBy = $_POST['executedBy'] ?? '';
 
 try {
     $conn->beginTransaction();
@@ -26,6 +27,10 @@ try {
         echo json_encode($response);
         exit;
     }
+
+    // INSERT EXECUTED BY
+    $ins_executer = $conn->prepare("EXEC dbo.[PICKLIST_ExecutedBy] ?, ?, ?");
+    $ins_executer->execute([$Userid, $PKListNum, $executedBy]);
 
     /* -------------------------------------------------
        1. Generate Delivery Number

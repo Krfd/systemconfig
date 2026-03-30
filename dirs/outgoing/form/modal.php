@@ -21,7 +21,7 @@
                     </div>
                     <div class="form-input mb-2">
                         <label for="newCategory" class="form-label text-dark-emphasis"><small>Category:</small></label>
-                        <input type="text" name="newCategory" id="newCategory" class="form-control" style="background: #FFFBDF" readonly>
+                        <input type="text" name="newCategory" id="newCategory" class="form-control" style="background: #f2f2f2" readonly>
                     </div>
                     <div class="form-input">
                         <label for="newQuantity" class="form-label text-dark-emphasis"><small>Quantity:</small></label>

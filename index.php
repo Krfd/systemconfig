@@ -111,6 +111,12 @@ try {
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="#" class="nav-link" name="menu" menucode="basket">
+                                <i class="nav-icon bi bi-cart"></i>
+                                <p>Loading Basket</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="delivery">
                                 <i class="nav-icon bi bi-truck"></i>
                                 <p>Delivery</p>

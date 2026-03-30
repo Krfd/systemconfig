@@ -63,7 +63,7 @@ function loadDelivery() {
           let status = item.Status ? item.Status.toUpperCase() : "";
           let statusClass = "";
 
-          if (status === "NEW") {
+          if (status === "NEW" || status === "IN TRANSIT") {
             statusClass = "bg-primary";
           } else if (status === "CANCEL" || status === "CANCELLED") {
             statusClass = "bg-warning";
@@ -345,7 +345,8 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
   let picklistNumber = $(this).data("picklist");
   let brand = $(this).find("td:nth-child(1)").text().trim();
   let model = $(this).find("td:nth-child(2)").text().trim();
-  let qty = $(this).find("td:nth-child(3)").text().trim();
+  let category = $(this).find("td:nth-child(3)").text().trim();
+  let qty = $(this).find("td:nth-child(4)").text().trim();
 
   // console.log(`PICKLIST NUMBER: ${picklistNumber}`);
 
@@ -369,12 +370,9 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
     deliveryNumber,
     picklistNumber,
     model,
+    category,
     function (length) {
-      // console.log("BRANCH LENGTH (dblclick):", length);
-
-      // ✅ now you can use it
       if (length > 1) {
-        // console.log("Multiple branches");
         $("#assignBranchModal").modal("show");
       }
       //  else {
@@ -382,6 +380,16 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
       // }
     },
   );
+});
+
+$(document).on("click", "#summaryTable tbody tr", function (e) {
+  e.preventDefault();
+  let serial = $(this).data("serial");
+  console.log(`SERIAL : ${serial}`);
+
+  let $serialCell = $("#delivery-serial-table tbody td").first();
+  let formattedSerial = serial.split(",").join("<br>");
+  $serialCell.html(formattedSerial);
 });
 
 async function loadIAPBranchlist() {
@@ -419,471 +427,270 @@ async function loadIAPBranchlist() {
 }
 
 function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
-  const serialCell = document.querySelector(
-    "#delivery-serial-table tbody td[contenteditable='true']",
-  );
+  $("#serial-delivery").on("submit", function (e) {
+    e.preventDefault(); // Prevents creating a new line
+    const serialInput = $("#newSerial");
+    const Serial = serialInput.val().trim();
+    // Normalize innerText
+    let lines = Serial.split(/\r?\n/)
+      .map((s) => s.replace(/[\u200B\s]+/g, "").trim()) // remove zero-width + whitespace
+      .filter(Boolean); // remove empty lines
+    let latestInput = lines[lines.length - 1] || "";
+    let ItemCode = "";
+    if (Serial) {
+      $.ajax({
+        url: "dirs/delivery/dashboard/actions/get_branch_stock_serial.php",
+        type: "POST",
+        data: {
+          ItemSerial: latestInput,
+          DrNumber: DeliveryNumber,
+          ItemCode: ItemCode,
+        },
+        dataType: "json",
+        success: function (response) {
+          if (response.isSuccess === "success") {
+            let items = response.Data;
+            let rows = [];
+            let existingTotal = parseInt($("#summaryQty").text()) || 0;
+            let totalQty = existingTotal;
+            let $summaryTbody = $("#summaryTable tbody");
 
-  serialCell.addEventListener("input", function () {
-    const Serial = this.innerText.trim();
-    removeSerial(Serial);
-  });
+            const groupedItems = {};
 
-  function removeSerial(SerialInput) {
-    console.log("SERIAL SHOULD BE REMOVED");
+            items.forEach((item) => {
+              if (!item.ItemCode) return;
 
-    // Normalize input
-    const currentSerials = SerialInput.split(/,|\n/)
-      .map((s) => s.replace(/[\u200B\s]+/g, "").trim())
-      .filter(Boolean);
+              if (!groupedItems[item.ItemCode]) {
+                groupedItems[item.ItemCode] = {
+                  ...item,
+                  qty: 0,
+                };
+              }
 
-    // Count how many of each serial exist in input
-    const serialCountMap = {};
-    currentSerials.forEach((s) => {
-      serialCountMap[s] = (serialCountMap[s] || 0) + 1;
-    });
+              groupedItems[item.ItemCode].qty += 1;
+            });
 
-    // -----------------------------
-    // STEP 1: Count deliveryTable rows
-    // -----------------------------
-    const tableSerialMap = {};
-    $("#deliveryTable tbody tr").each(function () {
-      const serial = ($(this).data("serial") || "").toString().trim();
-      if (!serial) return; // ignore empty/filler rows
-      tableSerialMap[serial] = (tableSerialMap[serial] || 0) + 1;
-    });
-
-    // -----------------------------
-    // STEP 2: Remove exact excess rows from deliveryTable
-    // -----------------------------
-    const toRemoveMap = {};
-    Object.keys(tableSerialMap).forEach((serial) => {
-      const tableCount = tableSerialMap[serial];
-      const inputCount = serialCountMap[serial] || 0;
-      if (tableCount > inputCount) {
-        toRemoveMap[serial] = tableCount - inputCount;
-      }
-    });
-
-    $("#deliveryTable tbody tr").each(function () {
-      const serial = ($(this).data("serial") || "").toString().trim();
-      if (!serial) return;
-      if (toRemoveMap[serial] > 0) {
-        $(this).remove();
-        toRemoveMap[serial]--;
-        console.log(`Removed ONE ${serial} from deliveryTable`);
-      }
-    });
-
-    // -----------------------------
-    // STEP 3: Update summaryTable quantities correctly
-    // -----------------------------
-    $("#summaryTable tbody tr")
-      .not(".empty-row")
-      .each(function () {
-        if (!$(this).data("serialbased")) {
-          return; // 🚫 skip untouched rows
-        }
-
-        const brand = $(this).find("td:nth-child(1)").text().trim();
-        const model = $(this).find("td:nth-child(2)").text().trim();
-
-        // Skip if row is actually empty
-        if (!brand && !model) return;
-
-        const remainingCount = $("#deliveryTable tbody tr").filter(function () {
-          const rowBrand = $(this).find("td:nth-child(1)").text().trim();
-          const rowModel = $(this).find("td:nth-child(2)").text().trim();
-          const rowSerial = ($(this).data("serial") || "").toString().trim();
-
-          return rowBrand === brand && rowModel === model && rowSerial !== "";
-        }).length;
-
-        const qtyCell = $(this).find("td:nth-child(3)");
-
-        if (remainingCount <= 0) {
-          $(this).hide(); // only hide REAL rows
-        } else {
-          qtyCell.text(remainingCount);
-          $(this).show();
-        }
-      });
-
-    // -----------------------------
-    // STEP 4: Update summaryDeliveryTable similarly
-    // -----------------------------
-    $("#summaryDeliveryTable tbody tr").each(function () {
-      const serial = $(this).find("td:nth-child(2)").text().trim();
-      const remainingCount = $("#deliveryTable tbody tr").filter(function () {
-        return ($(this).data("serial") || "").toString().trim() === serial;
-      }).length;
-
-      if (remainingCount <= 0) {
-        $(this).remove();
-        console.log(`Removed summaryDeliveryTable row for ${serial}`);
-      }
-    });
-
-    // -----------------------------
-    // STEP 5: Ensure 8 rows in deliveryTable
-    // -----------------------------
-    maintainDeliveryTableRows();
-  }
-
-  function maintainDeliveryTableRows() {
-    const tbody = $("#deliveryTable tbody");
-    const emptyRowTemplate = tbody.find("tr.empty-row").first().clone();
-    let currentRows = tbody.find("tr").length;
-
-    // Count non-empty rows
-    const dataRows = tbody.find("tr").filter(function () {
-      // const serial = $(this).data("serial") || "";
-      const serial = ($(this).data("serial") || "").toString().trim();
-      return serial.trim() !== "";
-    }).length;
-
-    // Hide extra empty rows beyond 8
-    tbody.find("tr.empty-row").each(function () {
-      // const serial = $(this).data("serial") || "";
-      const serial = ($(this).data("serial") || "").toString().trim();
-      if (serial.trim() === "" && tbody.find("tr").length > 8) {
-        $(this).remove();
-      }
-    });
-
-    // Append empty rows until we have at least 8 rows
-    while (tbody.find("tr").length < 8) {
-      const newEmptyRow = emptyRowTemplate.clone();
-      newEmptyRow.find("td").each(function () {
-        $(this).html(""); // reset content
-      });
-      tbody.append(newEmptyRow);
-    }
-  }
-
-  serialCell.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") {
-      e.preventDefault(); // Prevents creating a new line
-
-      const Serial = this.innerText.trim();
-
-      // Normalize innerText
-      let lines = Serial.split(/\r?\n/)
-        .map((s) => s.replace(/[\u200B\s]+/g, "").trim()) // remove zero-width + whitespace
-        .filter(Boolean); // remove empty lines
-
-      let latestInput = lines[lines.length - 1] || "";
-      let ItemCode = "";
-
-      if (Serial) {
-        $.ajax({
-          url: "dirs/delivery/dashboard/actions/get_branch_stock_serial.php",
-          type: "POST",
-          data: {
-            ItemSerial: latestInput,
-            DrNumber: DeliveryNumber,
-            ItemCode: ItemCode,
-          },
-          dataType: "json",
-          success: function (response) {
-            if (response.isSuccess === "success") {
-              let items = response.Data;
-
-              let rows = [];
-              let qty = 1;
-
-              let existingTotal = parseInt($("#summaryQty").text()) || 0;
-              let totalQty = existingTotal;
-
-              let $summaryTbody = $("#summaryTable tbody");
-
-              console.log(`ITEMS: ${JSON.stringify(items)}`);
-
-              items.forEach(function (item, index) {
-                let brand = item.Brand;
-                let model = item.Model;
-                let category = item.Category;
-                let itemCode = item.ItemCode;
-
-                // 🚫 Skip if any required value is null/empty
-                if (!brand || !model || !category || !itemCode) {
-                  console.warn("Skipped item due to null/empty value:", item);
-                  return; // skip this iteration
-                }
-                totalQty += 1;
-
-                // Check if row already exists
-                let $existingRow = $summaryTbody.find(
-                  `tr[data-itemcode="${itemCode}"]`,
-                );
-
-                loadPicklistBranches(
-                  DeliveryNumber,
-                  PicklistDr,
-                  model,
-                  function (length, branchName) {
-                    if (length > 1) {
-                      rows += `
+            // items.forEach(function (item, index) {
+            Object.values(groupedItems).forEach(function (item) {
+              let brand = item.Brand;
+              let model = item.Model;
+              let category = item.Category;
+              let itemCode = item.ItemCode;
+              let qty = item.qty;
+              // 🚫 Skip if any required value is null/empty
+              if (!brand || !model || !category || !itemCode) {
+                console.warn("Skipped item due to null/empty value:", item);
+                return; // skip this iteration
+              }
+              // totalQty += 1;
+              totalQty += qty;
+              // Check if row already exists
+              // let $existingRow = $summaryTbody.find(
+              //   `tr[data-itemcode="${itemCode}"][data-branch="${branch}"]`,
+              // );
+              let $existingRow = $summaryTbody.find(
+                `tr[data-itemcode="${itemCode}"]`,
+              );
+              loadPicklistBranches(
+                DeliveryNumber,
+                PicklistDr,
+                model,
+                category,
+                function (length, branchName) {
+                  if (length > 1) {
+                    rows += `
                         <tr style="height: 40px; min-height: 40px;" data-serial="${latestInput}">
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${model}</td>
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${category}</td>
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${qty}</td>
                         </tr>`;
+                    if ($existingRow.length) {
+                      // ✅ Update quantity
+                      let currentQty =
+                        parseInt($existingRow.find("td:nth-child(4)").text()) ||
+                        0;
+                      $existingRow.find("td:nth-child(4)").text(currentQty + 1);
 
-                      if ($existingRow.length) {
-                        // ✅ UPDATE EXISTING ROW
-                        let currentQty =
-                          parseInt(
-                            $existingRow.find("td:nth-child(3)").text(),
-                          ) || 0;
-                        $existingRow
-                          .find("td:nth-child(3)")
-                          .text(currentQty + 1);
+                      // ✅ Update badge to Unassigned automatically
+                      $existingRow.find("td:nth-child(5)").html(`
+                          <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">
+                              Unassigned
+                          </span>
+                      `);
 
-                        $existingRow.attr("data-serial", latestInput);
-                        $existingRow.attr("data-itemcode", itemCode);
-                      } else {
-                        // ✅ CREATE NEW ROW
-                        let newRow = `
+                      // ✅ Update data attributes if needed
+                      $existingRow.attr("data-serial", latestInput);
+                      $existingRow.attr("data-itemcode", itemCode);
+                    } else {
+                      // ✅ CREATE NEW ROW
+                      let newRow = `
                         <tr data-itemcode="${itemCode}" data-serialbased="true" data-serial="${latestInput}" data-deliverynum="${DeliveryNumber}" data-picklist="${PicklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
                           <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
                           <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
+                          <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">1</td>
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
                             <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">Unassigned</span>
                           </td>
                         </tr>
                       `;
-
-                        // Replace first empty row if exists
-                        let $emptyRow = $summaryTbody
-                          .find("tr.empty-row")
-                          .first();
-
-                        if ($emptyRow.length) {
-                          $emptyRow.replaceWith(newRow);
-                        } else {
-                          $summaryTbody.append(newRow);
-                        }
-                      }
-                    } else {
-                      rows += `
-                      <tr style="height: 40px; min-height: 40px;">
-                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
-                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${model}</td>
-                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${category}</td>
-                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${qty}</td>
-                      </tr>`;
-
-                      if ($existingRow.length) {
-                        // ✅ UPDATE EXISTING ROW
-                        let currentQty =
-                          parseInt(
-                            $existingRow.find("td:nth-child(3)").text(),
-                          ) || 0;
-                        $existingRow
-                          .find("td:nth-child(3)")
-                          .text(currentQty + 1);
-                        $existingRow.attr("data-serial", latestInput);
-                        $existingRow.attr("data-itemcode", itemCode);
+                      let $emptyRow = $summaryTbody
+                        .find("tr.empty-row")
+                        .first();
+                      if ($emptyRow.length) {
+                        $emptyRow.replaceWith(newRow);
                       } else {
-                        // ✅ CREATE NEW ROW
-                        let newRow = `
+                        $summaryTbody.append(newRow);
+                      }
+                    }
+                  } else {
+                    rows += `
+                        <tr style="height: 40px; min-height: 40px;">
+                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
+                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${model}</td>
+                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${category}</td>
+                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${qty}</td>
+                        </tr>`;
+                    if ($existingRow.length) {
+                      // ✅ Update quantity
+                      let currentQty =
+                        parseInt($existingRow.find("td:nth-child(4)").text()) ||
+                        0;
+                      $existingRow.find("td:nth-child(4)").text(currentQty + 1);
+
+                      // ✅ Update badge to Unassigned automatically
+                      $existingRow.find("td:nth-child(5)").html(`
+                          <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">
+                              Unassigned
+                          </span>
+                      `);
+
+                      // ✅ Update data attributes if needed
+                      $existingRow.attr("data-serial", latestInput);
+                      $existingRow.attr("data-itemcode", itemCode);
+                    } else {
+                      // ✅ CREATE NEW ROW
+                      let newRow = `
                           <tr data-itemcode="${itemCode}" data-serial="${latestInput}" data-deliverynum="${DeliveryNumber}" data-picklist="${PicklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
                             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
                             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
+                            <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
                             <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">1</td>
                             <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
                               <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">Assigned</span>
                             </td>
                           </tr>
                         `;
-
-                        // Replace first empty row if exists
-                        let $emptyRow = $summaryTbody
-                          .find("tr.empty-row")
-                          .first();
-
-                        if ($emptyRow.length) {
-                          $emptyRow.replaceWith(newRow);
-                        } else {
-                          $summaryTbody.append(newRow);
-                        }
-
-                        let rowCount = $(
-                          "#summaryDeliveryTable tbody tr",
-                        ).filter(function () {
+                      // Replace first empty row if exists
+                      let $emptyRow = $summaryTbody
+                        .find("tr.empty-row")
+                        .first();
+                      if ($emptyRow.length) {
+                        $emptyRow.replaceWith(newRow);
+                      } else {
+                        $summaryTbody.append(newRow);
+                      }
+                      let rowCount = $("#summaryDeliveryTable tbody tr").filter(
+                        function () {
                           return (
                             $(this).find("td:nth-child(2)").text().trim() !== ""
                           );
-                        }).length;
-
-                        if (
-                          $.fn.DataTable.isDataTable("#summaryDeliveryTable")
-                        ) {
-                          $("#summaryDeliveryTable")
-                            .DataTable()
-                            .clear()
-                            .destroy();
-                        }
-
-                        let exists = false;
-
-                        $("#summaryDeliveryTable tbody tr").each(function () {
-                          let code = $(this).data("itemcode");
-
-                          if (code == itemCode) {
-                            exists = true;
-                            return false; // break loop
-                          }
-                        });
-
-                        // OR SIMPLY DISABLE THE SAVE BUTTON
-                        if (exists) {
-                          Swal.fire({
-                            icon: "error",
-                            title: "Item already assigned to the branch",
-                            text: "",
-                            confirmButtonText: "OKAY",
-                          });
-                          return;
-                        }
-
-                        $("#summaryTable tbody tr").each(function () {
-                          let branch = $(this)
-                            .find("td:nth-child(1)")
-                            .text()
-                            .trim();
-                          let model = $(this)
-                            .find("td:nth-child(2)")
-                            .text()
-                            .trim();
-                          let qty = $(this)
-                            .find("td:nth-child(3)")
-                            .text()
-                            .trim();
-
-                          if (!qty || qty === "0") return;
-
-                          rowCount++;
-
-                          let $emptyRow = $(
-                            "#summaryDeliveryTable tbody tr.empty-row",
-                          ).first();
-
-                          let newRow = $(`
-                            <tr data-itemcode="${itemCode}" style="padding: 3px; height: 40px; min-height: 40px">
-                              <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
-                              <td style="background:#FFFBDF" class="text-primary">${Serial}</td>
-                              <td style="background:#FFFBDF">${branchName}</td>
-                              <td style="background:#FFFBDF">${brand}</td>
-                              <td style="background:#FFFBDF" class="text-start">${model}</td>
-                              <td style="background:#FFFBDF" class="text-center">${qty}</td>
-                              <td style="background:#FFFBDF" class="d-none">${itemCode}</td>
-                            </tr>
-                          `);
-
-                          if ($emptyRow.length) {
-                            $emptyRow.replaceWith(newRow);
-                          } else {
-                            $("#summaryDeliveryTable tbody").append(newRow);
-                          }
-
-                          newRow.hover(
-                            function () {
-                              $(this).css("background", "#FFF4C2");
-                            },
-                            function () {
-                              $(this).css("background", "#FFFBDF");
-                            },
-                          );
-                        });
+                        },
+                      ).length;
+                      if ($.fn.DataTable.isDataTable("#summaryDeliveryTable")) {
+                        $("#summaryDeliveryTable")
+                          .DataTable()
+                          .clear()
+                          .destroy();
                       }
+                      let exists = false;
+                      $("#summaryDeliveryTable tbody tr").each(function () {
+                        let code = $(this).data("itemcode");
+                        if (code == itemCode) {
+                          exists = true;
+                          return false; // break loop
+                        }
+                      });
+                      // OR SIMPLY DISABLE THE SAVE BUTTON
+                      if (exists) {
+                        Swal.fire({
+                          icon: "error",
+                          title: "Item already assigned to the branch",
+                          text: "",
+                          confirmButtonText: "OKAY",
+                        });
+                        return;
+                      }
+                      $("#summaryTable tbody tr").each(function () {
+                        let branch = $(this)
+                          .find("td:nth-child(1)")
+                          .text()
+                          .trim();
+                        let model = $(this)
+                          .find("td:nth-child(2)")
+                          .text()
+                          .trim();
+                        let qty = $(this).find("td:nth-child(3)").text().trim();
+                        if (!qty || qty === "0") return;
+                        rowCount++;
+                        let $emptyRow = $(
+                          "#summaryDeliveryTable tbody tr.empty-row",
+                        ).first();
+                        console.log(
+                          `CATEGORY FOR SUMMARYDELIVERYTABLE: ${category}`,
+                        );
+                        let newRow = $(`
+                              <tr data-itemcode="${itemCode}" style="padding: 3px; height: 40px; min-height: 40px">
+                                <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
+                                <td style="background:#FFFBDF" class="text-primary">${Serial}</td>
+                                <td style="background:#FFFBDF">${branchName}</td>
+                                <td style="background:#FFFBDF">${brand}</td>
+                                <td style="background:#FFFBDF" class="text-start">${model}</td>
+                                <td style="background:#FFFBDF" class="text-start">${category}</td>
+                                <td style="background:#FFFBDF" class="text-center">${qty}</td>
+                                <td style="background:#FFFBDF" class="d-none">${itemCode}</td>
+                              </tr>
+                            `);
+                        if ($emptyRow.length) {
+                          $emptyRow.replaceWith(newRow);
+                        } else {
+                          $("#summaryDeliveryTable tbody").append(newRow);
+                        }
+                        newRow.hover(
+                          function () {
+                            $(this).css("background", "#FFF4C2");
+                          },
+                          function () {
+                            $(this).css("background", "#FFFBDF");
+                          },
+                        );
+                      });
                     }
-
-                    let $emptyDeliveryRow = $(
-                      "#deliveryTable tbody tr.empty-row",
-                    ).first();
-
-                    if ($emptyDeliveryRow.length) {
-                      $emptyDeliveryRow.replaceWith(rows);
-                    } else {
-                      $("#deliveryTable tbody").append(rows);
-                    }
-
-                    $("#summaryQty").text(totalQty);
-                  },
-                );
-              });
-            } else if (response.isSuccess === "empty") {
-              Swal.fire({
-                icon: "error",
-                title: "Unavailable stock for this model",
-                confirmButtonText: "OKAY",
-              });
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: response.Data,
-                confirmButtonText: "OKAY",
-              });
-            }
-          },
-        });
-
-        const selection = window.getSelection();
-        const range = selection.getRangeAt(0);
-
-        // Get text before cursor
-        const preRange = range.cloneRange();
-        preRange.selectNodeContents(this);
-        preRange.setEnd(range.endContainer, range.endOffset);
-        const textBeforeCursor = preRange.toString();
-        const currentLine = textBeforeCursor.split("\n").pop().trim();
-
-        // Create line break
-        const br = document.createElement("br");
-
-        if (!currentLine) {
-          // Empty line → just add <br> + empty text node
-          const emptyText = document.createTextNode("\u200B"); // zero-width space
-          range.insertNode(br);
-          range.setStartAfter(br);
-          range.setEndAfter(br);
-          range.insertNode(emptyText);
-          range.setStartAfter(emptyText);
-          range.setEndAfter(emptyText);
-        } else if (!currentLine.endsWith(",")) {
-          // Line has text → add comma + <br> + empty text node
-          const commaNode = document.createTextNode(",");
-          range.insertNode(commaNode);
-
-          range.setStartAfter(commaNode);
-          range.setEndAfter(commaNode);
-
-          const emptyText = document.createTextNode("\u200B");
-          range.insertNode(br);
-          range.setStartAfter(br);
-          range.setEndAfter(br);
-          range.insertNode(emptyText);
-          range.setStartAfter(emptyText);
-          range.setEndAfter(emptyText);
-        } else {
-          // Line already has comma → just <br> + empty text node
-          const emptyText = document.createTextNode("\u200B");
-          range.insertNode(br);
-          range.setStartAfter(br);
-          range.setEndAfter(br);
-          range.insertNode(emptyText);
-          range.setStartAfter(emptyText);
-          range.setEndAfter(emptyText);
-        }
-
-        // Update selection to be after new line
-        selection.removeAllRanges();
-        selection.addRange(range);
-      }
+                  }
+                  $("#summaryQty").text(totalQty);
+                },
+              );
+            });
+          } else if (response.isSuccess === "empty") {
+            Swal.fire({
+              icon: "error",
+              title: "Unavailable stock for this model",
+              confirmButtonText: "OKAY",
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: response.Data,
+              confirmButtonText: "OKAY",
+            });
+          }
+        },
+      });
     }
+    serialInput.val(""); // clear after submit
+    serialInput.focus();
+    // }
   });
 }
 
@@ -956,103 +763,145 @@ function branchDelivery() {
     $("#nonSerializeSummary").DataTable().clear().destroy();
   }
 
-  let exists = false;
-  let noSerialExists = false;
+  // let exists = false;
+  // let noSerialExists = false;
 
-  $("#summaryDeliveryTable tbody tr").each(function () {
-    let code = $(this).data("itemcode");
+  // $("#summaryDeliveryTable tbody tr").each(function () {
+  //   let code = $(this).data("itemcode");
 
-    if (code == itemCode) {
-      exists = true;
-      return false; // break loop
-    }
-  });
+  //   if (code == itemCode) {
+  //     exists = true;
+  //     return false; // break loop
+  //   }
+  // });
 
-  $("#summaryDeliveryTable tbody tr").each(function () {
-    let code = $(this).data("itemcode");
+  // $("#summaryDeliveryTable tbody tr").each(function () {
+  //   let code = $(this).data("itemcode");
 
-    if (code == itemCode) {
-      noSerialExists = true;
-      return false; // break loop
-    }
-  });
+  //   if (code == itemCode) {
+  //     noSerialExists = true;
+  //     return false; // break loop
+  //   }
+  // });
 
   // OR SIMPLY DISABLE THE SAVE BUTTON
-  if (exists) {
-    Swal.fire({
-      icon: "error",
-      title: "Item already assigned to the branch",
-      text: "",
-      confirmButtonText: "OKAY",
-    });
-    return;
-  }
+  // if (exists) {
+  //   Swal.fire({
+  //     icon: "error",
+  //     title: "Item already assigned to the branch",
+  //     confirmButtonText: "OKAY",
+  //   });
+  //   return;
+  // }
 
-  if (noSerialExists) {
-    // Swal.fire({
-    //   icon: "error",
-    //   title: "Item already assigned to the branch",
-    //   text: "",
-    //   confirmButtonText: "OKAY",
-    // });
-    return;
-  }
+  // if (noSerialExists) {
+  //   Swal.fire({
+  //     icon: "error",
+  //     title: "Item already assigned to the branch",
+  //     text: "",
+  //     confirmButtonText: "OKAY",
+  //   });
+  //   return;
+  // }
 
   $("#branchToDeliverModal tbody tr").each(function () {
     let branch = $(this).find("td:nth-child(1)").text().trim();
     let model = $(this).find("td:nth-child(2)").text().trim();
-    let qty = $(this).find("td:nth-child(3)").text().trim();
+    let category = $(this).find("td:nth-child(3)").text().trim();
+    let qty = $(this).find("td:nth-child(4)").text().trim();
 
     if (!qty || qty === "0") return;
 
     rowCount++;
     serialRowCount++;
 
-    let $emptyRow = $("#summaryDeliveryTable tbody tr.empty-row").first();
-    let $emptySerialRow = $("#nonSerializeSummary tbody tr.empty-row").first();
+    // Check if the row already exists for this branch + itemCode
+    let $existingRow = $("#summaryDeliveryTable tbody tr").filter(function () {
+      return (
+        $(this).data("itemcode") == itemCode && $(this).data("branch") == branch
+      );
+    });
+
+    // let $emptyRow = $("#summaryDeliveryTable tbody tr.empty-row").first();
+    // let $emptySerialRow = $("#nonSerializeSummary tbody tr.empty-row").first();
 
     let newRow = $(`
-      <tr data-itemcode="${itemCode}" style="padding: 3px; height: 40px; min-height: 40px">
+      <tr data-itemcode="${itemCode}" data-branch="${branch}" style="padding: 3px; height: 40px; min-height: 40px">
         <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
         <td style="background:#FFFBDF" class="text-primary">${Serial}</td>
         <td style="background:#FFFBDF">${branch}</td>
         <td style="background:#FFFBDF">${brand}</td>
         <td style="background:#FFFBDF" class="text-start">${model}</td>
+        <td style="background:#FFFBDF" class="text-start">${category}</td>
         <td style="background:#FFFBDF" class="text-center">${qty}</td>
         <td style="background:#FFFBDF" class="d-none">${itemCode}</td>
       </tr>
     `);
 
     let noSerialRow =
-      $(`<tr data-itemcode="${itemCode}" style="padding: 3px; height: 40px; min-height: 40px">
+      $(`<tr data-itemcode="${itemCode}" data-branch="${branch}" style="padding: 3px; height: 40px; min-height: 40px">
       <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
       <td style="background:#FFFBDF">${branch}</td>
       <td style="background:#FFFBDF">${brand}</td>
       <td style="background:#FFFBDF" class="text-start">${model}</td>
+      <td style="background:#FFFBDF" class="text-start">${category}</td>
       <td style="background:#FFFBDF" class="text-center">${qty}</td>
       <td style="background:#FFFBDF" class="d-none">${itemCode}</td>
       </tr>
     `);
 
-    if ($emptyRow.length) {
-      $emptyRow.replaceWith(newRow);
+    if ($existingRow.length) {
+      // Replace the existing row
+      $existingRow.replaceWith(newRow);
     } else {
-      $("#summaryDeliveryTable tbody").append(newRow);
+      // Append new row if none exists
+      let $emptyRow = $("#summaryDeliveryTable tbody tr.empty-row").first();
+      if ($emptyRow.length) {
+        $emptyRow.replaceWith(newRow);
+      } else {
+        $("#summaryDeliveryTable tbody").append(newRow);
+      }
     }
 
-    // if ($emptySerialRow.length) {
-    //   $emptySerialRow.replaceWith(noSerialRow);
-    // } else {
-    //   $("#nonSerializeSummary tbody").append(noSerialRow);
-    // }
-
+    // Handle non-serial rows
     if (!Serial || Serial.trim() === "") {
+      let $emptySerialRow = $(
+        "#nonSerializeSummary tbody tr.empty-row",
+      ).first();
       if ($emptySerialRow.length) {
         $emptySerialRow.replaceWith(noSerialRow);
       } else {
         $("#nonSerializeSummary tbody").append(noSerialRow);
       }
     }
+
+    // Recount all rows in summaryDeliveryTable to ensure correct numbering
+    $("#summaryDeliveryTable tbody tr").each(function (index) {
+      $(this)
+        .find("td:first")
+        .text(index + 1);
+    });
+
+    // Recount all rows in nonSerializeSummary as well
+    $("#nonSerializeSummary tbody tr").each(function (index) {
+      $(this)
+        .find("td:first")
+        .text(index + 1);
+    });
+
+    // if ($emptyRow.length) {
+    //   $emptyRow.replaceWith(newRow);
+    // } else {
+    //   $("#summaryDeliveryTable tbody").append(newRow);
+    // }
+
+    // if (!Serial || Serial.trim() === "") {
+    //   if ($emptySerialRow.length) {
+    //     $emptySerialRow.replaceWith(noSerialRow);
+    //   } else {
+    //     $("#nonSerializeSummary tbody").append(noSerialRow);
+    //   }
+    // }
 
     newRow.hover(
       function () {
@@ -1091,7 +940,7 @@ function clearTable() {
       let row = [];
 
       $("#delivery-serial-table tbody").empty();
-      $("#deliveryTable tbody").empty();
+      // $("#deliveryTable tbody").empty();
       $("#summaryTable tbody").empty();
       $("#summaryDeliveryTable tbody").empty();
 
@@ -1104,10 +953,11 @@ function clearTable() {
           <td style="background: #FFFBDF; height: 40px;"></td>
           <td style="background: #FFFBDF; height: 40px;"></td>
           <td style="background: #FFFBDF; height: 40px;"></td>
+          <td style="background: #FFFBDF; height: 40px;"></td>
         </tr>
         `;
 
-        $("#deliveryTable tbody").append(row);
+        // $("#deliveryTable tbody").append(row);
         $("#summaryTable tbody").append(row);
         $("#summaryDeliveryTable tbody").append(row);
       }
@@ -1127,7 +977,7 @@ function summaryData() {
 
   if (rows.length === 0) {
     for (let i = 0; i < 8; i++) {
-      rows.push(["", "", "", "", "", "", ""]);
+      rows.push(["", "", "", "", "", "", "", ""]);
     }
   }
 
@@ -1139,6 +989,7 @@ function summaryData() {
       { title: "Branch" },
       { title: "Brand" },
       { title: "Model" },
+      { title: "Category" },
       { title: "Quantity" },
       { title: "Item Code" },
     ],
@@ -1213,7 +1064,13 @@ function resetBranchQuantities() {
     });
 }
 
-function loadPicklistBranches(deliveryNumber, picklistNumber, model, callback) {
+function loadPicklistBranches(
+  deliveryNumber,
+  picklistNumber,
+  model,
+  category,
+  callback,
+) {
   $.ajax({
     url: "dirs/delivery/dashboard/actions/get_product_distribution_setup.php",
     type: "POST",
@@ -1237,6 +1094,7 @@ function loadPicklistBranches(deliveryNumber, picklistNumber, model, callback) {
             <tr>
               <td style="background: #FFF7BC">${branch.ReqBranch}</td>
               <td style="background: #FFF7BC">${model}</td>
+              <td style="background: #FFF7BC">${category}</td>
               <td style="background: #FFF7BC; outline: none" contenteditable="true" class="border border-3 border-warning"></td>
             </tr>
           `;
@@ -1264,7 +1122,6 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
 
       let Brand = $("#newBrand").val();
       let Model = $("#newModel").val();
-      // let Category = $("#newCategory").val();
       let quantity = parseInt($("#newQuantity").val()) || 1;
 
       $.ajax({
@@ -1290,27 +1147,12 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
             }
 
             let existingTotal = parseInt($("#summaryQty").text()) || 0;
-
-            let $deliveryTbody = $("#deliveryTable tbody");
             let $summaryTbody = $("#summaryTable tbody");
 
-            // ----------- DELIVERY TABLE ----------
-            let deliveryRow = `
-              <tr style="height: 40px; min-height: 40px;">
-                <td style="background:#FFFBDF">${item.Brand}</td>
-                <td style="background:#FFFBDF">${item.Model}</td>
-                <td style="background:#FFFBDF">${item.Category}</td>
-                <td style="background:#FFFBDF">${quantity}</td>
-              </tr>
-            `;
-            let $emptyDeliveryRow = $deliveryTbody.find("tr.empty-row").first();
-            if ($emptyDeliveryRow.length) {
-              $emptyDeliveryRow.replaceWith(deliveryRow);
-            } else {
-              $deliveryTbody.append(deliveryRow);
-            }
-
             // ----------- SUMMARY TABLE ----------
+            // let $existingRow = $summaryTbody.find(
+            //   `tr[data-itemcode="${item.ItemCode}"][data-branch="${branch}"]`,
+            // );
             let $existingRow = $summaryTbody.find(
               `tr[data-itemcode="${item.ItemCode}"]`,
             );
@@ -1323,7 +1165,8 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
             <tr data-itemcode="${item.ItemCode}" data-deliverynum="${DrNumber}" data-picklist="${picklistDr}" style="height: 40px; cursor: pointer">
               <td style="background:#FFFBDF">${item.Brand}</td>
               <td style="background:#FFFBDF">${item.Model}</td>
-              <td style="background:#FFFBDF">${quantity}</td>
+              <td style="background:#FFFBDF">${item.Category}</td>
+              <td style="background:#FFFBDF" class="ms-3">${quantity}</td>
               <td style="background:#FFFBDF">
                 <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">Unassigned</span>
               </td>
@@ -1345,11 +1188,6 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
             $("#newCategory").val("").prop("disabled", true);
             $("#addDeliveryModal").modal("hide");
             $("#summaryQty").text(existingTotal + quantity);
-            // } else if (response.isSuccess === "empty") {
-            //   Swal.fire({
-            //     icon: "error",
-            //     title: "Unavailable stock for this model",
-            //   });
           } else {
             Swal.fire({
               icon: "error",
@@ -1456,15 +1294,13 @@ function createDr(createDeliveryNumber, picklistDr, previousSerials = []) {
         if (response.isSuccess === "success") {
           let header = response.Data;
 
-          // console.log(`DELIVERY DETAILS: ${JSON.stringify(header)}`);
-
           $("#drno").val(createDeliveryNumber);
           // $("#srn").val(header.BaseNum_SRN);
           $("#pcklstno").val(picklistDr);
           $("#docdate").val(header.DocumentDate);
           $("#origin").val(header.BDestination);
           $("#whcode").val(header.BWhsDestination);
-          $("#status").val("NEW");
+          $("#status").val(header.Delivery_Status || "NEW");
           $("#prepby").val(header.PreparedBy);
 
           // MANUAL OR SCAN
@@ -1473,9 +1309,7 @@ function createDr(createDeliveryNumber, picklistDr, previousSerials = []) {
             const knob = document.querySelector(".switch-knob");
             const manual = document.querySelector(".switch-track .manual");
             const scan = document.querySelector(".switch-track .scan");
-            const editableCells = document.querySelectorAll(
-              "#delivery-serial-table td[contenteditable='true']",
-            );
+            const serialInput = document.getElementById("newSerial");
 
             function updateKnob() {
               scan.style.transition = "opacity 0.3s ease";
@@ -1491,10 +1325,7 @@ function createDr(createDeliveryNumber, picklistDr, previousSerials = []) {
                 scan.style.opacity = "1";
                 scan.style.pointerEvents = "auto";
 
-                editableCells.forEach((cell) => {
-                  cell.setAttribute("contenteditable", "true");
-                  cell.addEventListener("keydown", preventTyping);
-                });
+                serialInput.removeEventListener("keydown", preventTyping);
               } else {
                 toggler.dataset.value = "Manual";
                 knob.style.width = "60px";
@@ -1505,16 +1336,7 @@ function createDr(createDeliveryNumber, picklistDr, previousSerials = []) {
                 manual.style.opacity = "1";
                 manual.style.pointerEvents = "auto";
 
-                editableCells.forEach((cell) => {
-                  cell.setAttribute("contenteditable", "true");
-                  cell.removeEventListener("keydown", preventTyping);
-                });
-
-                // // ✅ SHOW MODAL HERE
-                // const serialModal = new bootstrap.Modal(
-                //   document.getElementById("addSerialModal"),
-                // );
-                // serialModal.show();
+                serialInput.removeEventListener("keydown", preventTyping);
               }
             }
 
@@ -1559,7 +1381,6 @@ function createDr(createDeliveryNumber, picklistDr, previousSerials = []) {
             });
           });
 
-          // console.log(`PICKLIST DR: ${picklistDr}`);
           // addNonSerialize("", createDeliveryNumber, itemCode, picklistDr);
           addNonSerialize("", createDeliveryNumber, picklistDr);
           //   }
@@ -1575,10 +1396,8 @@ function createDr(createDeliveryNumber, picklistDr, previousSerials = []) {
           }
 
           toggler();
-          // run on load
           adjustTotalWidth();
           window.addEventListener("resize", adjustTotalWidth);
-
           submitDelivery();
         }
       },
@@ -1594,45 +1413,45 @@ function submitDelivery() {
   commitBtn.addEventListener("click", function (e) {
     e.preventDefault();
 
-    let plateInput = document.getElementById("plate");
-    let driverInput = document.getElementById("driver");
-    let deliveryDate = document.getElementById("deldate");
+    // let plateInput = document.getElementById("plate");
+    // let driverInput = document.getElementById("driver");
+    // let deliveryDate = document.getElementById("deldate");
 
-    // CHECK PLATE
-    if (plateInput.value.trim() === "") {
-      Swal.fire({
-        icon: "error",
-        title: "Missing Plate Number",
-        text: "Enter the truck plate number.",
-      }).then(() => {
-        plateInput.focus();
-      });
-      return;
-    }
+    // // CHECK PLATE
+    // if (plateInput.value.trim() === "") {
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Missing Plate Number",
+    //     text: "Enter the truck plate number.",
+    //   }).then(() => {
+    //     plateInput.focus();
+    //   });
+    //   return;
+    // }
 
-    // CHECK DRIVER
-    if (driverInput.value.trim() === "") {
-      Swal.fire({
-        icon: "error",
-        title: "Missing Driver",
-        text: "Enter the driver's name.",
-      }).then(() => {
-        driverInput.focus();
-      });
-      return;
-    }
+    // // CHECK DRIVER
+    // if (driverInput.value.trim() === "") {
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Missing Driver",
+    //     text: "Enter the driver's name.",
+    //   }).then(() => {
+    //     driverInput.focus();
+    //   });
+    //   return;
+    // }
 
-    // CHECK DELIVERY DATE
-    if (deliveryDate.value.trim() === "") {
-      Swal.fire({
-        icon: "error",
-        title: "Missing Delivery Date",
-        text: "Enter a delivery date",
-      }).then(() => {
-        deliveryDate.focus();
-      });
-      return;
-    }
+    // // CHECK DELIVERY DATE
+    // if (deliveryDate.value.trim() === "") {
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Missing Delivery Date",
+    //     text: "Enter a delivery date",
+    //   }).then(() => {
+    //     deliveryDate.focus();
+    //   });
+    //   return;
+    // }
 
     Swal.fire({
       icon: "warning",
@@ -1656,8 +1475,9 @@ function submitDelivery() {
           let branch = $(this).find("td:nth-child(3)").text().trim();
           let brand = $(this).find("td:nth-child(4)").text().trim();
           let model = $(this).find("td:nth-child(5)").text().trim();
-          let quantity = $(this).find("td:nth-child(6)").text().trim();
-          let itemCode = $(this).find("td:nth-child(7)").text().trim();
+          let category = $(this).find("td:nth-child(6)").text().trim();
+          let quantity = $(this).find("td:nth-child(7)").text().trim();
+          let itemCode = $(this).find("td:nth-child(8)").text().trim();
 
           if (badgeText === "unassigned") {
             hasUnassigned = true;
@@ -1670,6 +1490,7 @@ function submitDelivery() {
               branch: branch,
               brand: brand,
               model: model,
+              category: category,
               quantity: quantity,
               itemCode: itemCode,
             });
@@ -1680,14 +1501,16 @@ function submitDelivery() {
           let branch = $(this).find("td:nth-child(2)").text().trim();
           let brand = $(this).find("td:nth-child(3)").text().trim();
           let model = $(this).find("td:nth-child(4)").text().trim();
-          let quantity = $(this).find("td:nth-child(5)").text().trim();
-          let itemCode = $(this).find("td:nth-child(6)").text().trim();
+          let category = $(this).find("td:nth-child(5)").text().trim();
+          let quantity = $(this).find("td:nth-child(6)").text().trim();
+          let itemCode = $(this).find("td:nth-child(7)").text().trim();
 
           if (itemCode !== "" && brand !== "") {
             nonSerializeItems.push({
               branch: branch,
               brand: brand,
               model: model,
+              category: category,
               quantity: quantity,
               itemCode: itemCode,
             });
@@ -1718,9 +1541,9 @@ function submitDelivery() {
         formData.append("PickListNum", $("#pcklstno").val());
         formData.append("Branch", $("#origin").val());
         formData.append("OrginWhscode", $("#whcode").val());
-        formData.append("DeliveryDate", $("#deldate").val());
-        formData.append("TruckPlateNum", $("#plate").val());
-        formData.append("TruckDriver", $("#driver").val());
+        // formData.append("DeliveryDate", $("#deldate").val());
+        // formData.append("TruckPlateNum", $("#plate").val());
+        // formData.append("TruckDriver", $("#driver").val());
         formData.append("Remarks", $("#remarks").val());
 
         // SERIALIZED
@@ -1729,7 +1552,7 @@ function submitDelivery() {
           formData.append(`Brand[${i}]`, item.brand);
           formData.append(`Model[${i}]`, item.model);
           formData.append(`ItemCode[${i}]`, item.itemCode);
-          formData.append(`Category[${i}]`, ""); // add if needed
+          formData.append(`Category[${i}]`, item.category); // add if needed
           formData.append(`Quantity[${i}]`, item.quantity);
         });
 
@@ -1738,7 +1561,7 @@ function submitDelivery() {
           formData.append(`NonSerializedItemCode[${i}]`, item.itemCode);
           formData.append(`NonSerializedBrand[${i}]`, item.brand);
           formData.append(`NonSerializedModel[${i}]`, item.model);
-          formData.append(`NonSerializedCategory[${i}]`, ""); // add if needed
+          formData.append(`NonSerializedCategory[${i}]`, item.category); // add if needed
           formData.append(`NonQuantity[${i}]`, item.quantity);
         });
 
@@ -1833,7 +1656,7 @@ function loadDeliveryBasket() {
             rows.push([
               item.PickList_Num || "",
               item.DocDate || "",
-              item.DateModified || "03/17/2026",
+              item.DateModified || "",
               item.ItemCount || "",
               item.Status || "Partial",
               '<div class="dropdown dropstart">' +
@@ -1842,7 +1665,7 @@ function loadDeliveryBasket() {
                 `<ul class="dropdown-menu">
                   <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
                   <li><a class="dropdown-item remove-picklist" href="#" data-picklist="${item.PickList_Num}" data-rownum="${item.RowNumOrder}">Remove</a></li>
-                  <li><a class="dropdown-item create-dr" href="#" data-picklist="${item.PickList_Num}">Create DR</a></li>
+                  <li><a class="dropdown-item create-dr" href="#" data-picklist="${item.PickList_Num}">Branch Assignment</a></li>
                 </ul>
               </div>`,
             ]);
@@ -2294,22 +2117,6 @@ function openForm(DeliveryNum, PicklistNumber, RowNumber) {
             `;
           });
           $("#totalQuantity").text(totalQty);
-          $("#deliveryTable tbody").html(rows);
-          if (rowCount < 8) {
-            let emptyRowsNeeded = 8 - rowCount;
-            for (let i = 0; i < emptyRowsNeeded; i++) {
-              let emptyRow = `
-                <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
-                  <td style="background: #FFFBDF"></td>
-                  <td style="background: #FFFBDF"></td>
-                  <td style="background: #FFFBDF"></td>
-                  <td style="background: #FFFBDF"></td>
-                </tr>
-              `;
-              $("#deliveryTable tbody").append(emptyRow);
-            }
-            $("#totalQuantity").text(totalQty);
-          }
         }
       },
     });
@@ -2364,22 +2171,22 @@ function openDeliveryForm(DeliveryNum, PicklistNumber, RowNum, SRN) {
             `;
           });
           $("#totalQuantity").text(totalQty);
-          $("#deliveryTable tbody").html(rows);
-          if (rowCount < 8) {
-            let emptyRowsNeeded = 8 - rowCount;
-            for (let i = 0; i < emptyRowsNeeded; i++) {
-              let emptyRow = `
-                <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
-                  <td style="background: #FFFBDF"></td>
-                  <td style="background: #FFFBDF"></td>
-                  <td style="background: #FFFBDF"></td>
-                  <td style="background: #FFFBDF"></td>
-                </tr>
-              `;
-              $("#deliveryTable tbody").append(emptyRow);
-            }
-            $("#totalQuantity").text(totalQty);
-          }
+          // $("#deliveryTable tbody").html(rows);
+          // if (rowCount < 8) {
+          //   let emptyRowsNeeded = 8 - rowCount;
+          //   for (let i = 0; i < emptyRowsNeeded; i++) {
+          //     let emptyRow = `
+          //       <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+          //         <td style="background: #FFFBDF"></td>
+          //         <td style="background: #FFFBDF"></td>
+          //         <td style="background: #FFFBDF"></td>
+          //         <td style="background: #FFFBDF"></td>
+          //       </tr>
+          //     `;
+          //     $("#deliveryTable tbody").append(emptyRow);
+          //   }
+          //   $("#totalQuantity").text(totalQty);
+          // }
         }
       },
     });
@@ -2397,131 +2204,131 @@ function loadDeliveryUnits() {
     },
     dataType: "json",
     beforeSend: function () {
-      let tbody = $("#deliveryTable tbody");
-
-      tbody.html(`
-            <tr>
-              <td colspan="6" class="text-center" style="background:#FFFBDF;">
-                  <span class="spinner-border spinner-border-sm text-secondary me-2"></span>
-                  Loading items...
-              </td>
-            </tr>
-        `);
+      // let tbody = $("#deliveryTable tbody");
+      // tbody.html(`
+      //       <tr>
+      //         <td colspan="6" class="text-center" style="background:#FFFBDF;">
+      //             <span class="spinner-border spinner-border-sm text-secondary me-2"></span>
+      //             Loading items...
+      //         </td>
+      //       </tr>
+      //   `);
     },
     success: function (response) {
-      let tbody = $("#deliveryTable tbody");
-      tbody.empty(); // remove yellow placeholder row
+      // let tbody = $("#deliveryTable tbody");
+      // tbody.empty(); // remove yellow placeholder row
       if (response.isSuccess === "success" && response.Data.length > 0) {
         let rowCount = response.Data.length;
         let totalQty = 0;
-        $.each(response.Data, function (index, item) {
-          let quantity = parseFloat(item.Quantity) || 0; // ensure number
-          totalQty += quantity;
+        console.log(`RESPONSE DATA: ${JSON.stringify(response.Data)}`);
+        // $.each(response.Data, function (index, item) {
+        //   let quantity = parseFloat(item.Quantity) || 0; // ensure number
+        //   totalQty += quantity;
 
-          // <td class="ps-2 align-middle" style="background: #FFFBDF; padding: 3px">${item.DisplayRowNumber}</td>
+        // <td class="ps-2 align-middle" style="background: #FFFBDF; padding: 3px">${item.DisplayRowNumber}</td>
 
-          let row = `<tr class="item-row">
-                        <td class="ps-2 align-middle item-brand" style="background: #FFFBDF; padding: 3px">${item.ItemBrand}</td>
-                        <td class="ps-2 align-middle item-model" style="background: #FFFBDF; padding: 3px">${item.ItemName}</td>
-                        <td class="ps-2 align-middle item-category" style="background: #FFFBDF; padding: 3px">${item.ItemGroup}</td>
-                        <td class="ps-2 align-middle item-code" hidden>${item.ItemCode}</td>
-                        <td class="ps-2 align-middle item-quantity" style="background: #FFFBDF; padding: 3px">${item.Quantity}</td>
-                        <td class="ps-2 align-middle t-action" style="background: #FFFBDF; padding: 3px">
-                          <button type="button" class="btn btn-sm btn-danger remove-item-button" id="${item.ItemNum}">
-                            <i class="bi bi-dash"></i>
-                          </button>
-                        </td>
-                      </tr>
-                    `;
-          tbody.append(row);
-        });
+        //   let row = `<tr class="item-row">
+        //                 <td class="ps-2 align-middle item-brand" style="background: #FFFBDF; padding: 3px">${item.ItemBrand}</td>
+        //                 <td class="ps-2 align-middle item-model" style="background: #FFFBDF; padding: 3px">${item.ItemName}</td>
+        //                 <td class="ps-2 align-middle item-category" style="background: #FFFBDF; padding: 3px">${item.ItemGroup}</td>
+        //                 <td class="ps-2 align-middle item-code" hidden>${item.ItemCode}</td>
+        //                 <td class="ps-2 align-middle item-quantity" style="background: #FFFBDF; padding: 3px">${item.Quantity}</td>
+        //                 <td class="ps-2 align-middle t-action" style="background: #FFFBDF; padding: 3px">
+        //                   <button type="button" class="btn btn-sm btn-danger remove-item-button" id="${item.ItemNum}">
+        //                     <i class="bi bi-dash"></i>
+        //                   </button>
+        //                 </td>
+        //               </tr>
+        //             `;
+        //   tbody.append(row);
+        // });
 
-        if (rowCount < 8) {
-          let emptyRowsNeeded = 8 - rowCount;
+        // if (rowCount < 8) {
+        //   let emptyRowsNeeded = 8 - rowCount;
 
-          for (let i = 0; i < emptyRowsNeeded; i++) {
-            let emptyRow = `
-              <tr class="item-row empty-row" style="height: 40px; max-height: 40px">
-                <td style="background: #FFFBDF; padding: 0">&nbsp;</td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-                <td style="background: #FFFBDF; padding: 0"></td>
-              </tr>
-            `;
-            tbody.append(emptyRow);
-          }
-        }
+        //   for (let i = 0; i < emptyRowsNeeded; i++) {
+        //     let emptyRow = `
+        //       <tr class="item-row empty-row" style="height: 40px; max-height: 40px">
+        //         <td style="background: #FFFBDF; padding: 0">&nbsp;</td>
+        //         <td style="background: #FFFBDF; padding: 0"></td>
+        //         <td style="background: #FFFBDF; padding: 0"></td>
+        //         <td style="background: #FFFBDF; padding: 0"></td>
+        //         <td style="background: #FFFBDF; padding: 0"></td>
+        //         <td style="background: #FFFBDF; padding: 0"></td>
+        //       </tr>
+        //     `;
+        //     tbody.append(emptyRow);
+        //   }
+        // }
         $("#totalQuantity").text(totalQty);
       } else {
         // If no data, show empty yellow row again
-        tbody.html(`
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                    <tr style="height:40px; min-height:40px">
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                      <td style="background:#FFFBDF"></td>
-                    </tr>
-                `);
+        // tbody.html(`
+        //             <tr style="height:40px; min-height:40px">
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //             </tr>
+        //             <tr style="height:40px; min-height:40px">
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //             </tr>
+        //             <tr style="height:40px; min-height:40px">
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //             </tr>
+        //             <tr style="height:40px; min-height:40px">
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //             </tr>
+        //             <tr style="height:40px; min-height:40px">
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //             </tr>
+        //             <tr style="height:40px; min-height:40px">
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //             </tr>
+        //             <tr style="height:40px; min-height:40px">
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //             </tr>
+        //             <tr style="height:40px; min-height:40px">
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //               <td style="background:#FFFBDF"></td>
+        //             </tr>
+        //         `);
       }
     },
     error: function (xhr, status, error) {

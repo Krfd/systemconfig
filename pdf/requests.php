@@ -13,6 +13,7 @@ if (!isset($_GET['picklist']) || empty($_SESSION['Uid'])) {
 }
 
 $picklist = $_GET['picklist'];
+$executedBy = $_GET['executedBy'] ?? '';
 $Uid = $_SESSION['Uid'];
 
 try {
@@ -31,7 +32,9 @@ try {
     $docDate = isset($picklistHeader->DocDate)
         ? date("m/d/y", strtotime($picklistHeader->DocDate))
         : "N/A";
-    $executedby = $picklistHeader->Executedby ?? "N/A";
+    $datetimeStr = $picklistHeader->DocDate . ' ' . $picklistHeader->DocTime;
+    $timestamp = date("m/d/y h:i A", strtotime($datetimeStr));
+    $executedby = $executedBy ?? "N/A";
     $printedby = $picklistHeader->Executedby ?? "N/A";
     $itemData = $picklistItems;
 
@@ -42,13 +45,18 @@ try {
 
         function Header()
         {
-            $this->Image('../assets/image/header/header.png', 5, 10, 190);
-            $this->Ln(35);
+            $this->Image('../assets/image/logo/iap_icon.png', 10, 10, 30);
+            $this->SetFont('Arial', 'B', 20);
+            $pageWidth = $this->GetPageWidth();
+            $this->SetX(10);
+            $this->Cell($pageWidth - 10, 20, 'PICKLIST SUMMARY', 0, 1, 'C');
+
+            $this->Ln(10);
         }
 
         function Footer()
         {
-            $this->Image('../assets/image/footer/footer.jpg', 10, 270, 190);
+            // $this->Image('../assets/image/footer/footer.jpg', 10, 270, 190);
             $this->SetTextColor($GLOBALS['textColor'][0], $GLOBALS['textColor'][1], $GLOBALS['textColor'][2]);
             $this->SetY(-15);
             $this->SetFont('Arial', '', 8);
@@ -148,9 +156,6 @@ try {
 
         $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
         $pdf->Ln(3);
-        $pdf->SetFont('Arial', 'B', 20);
-        $pdf->Cell(0, 12, 'PICKLIST SUMMARY', 0, 1, 'C');
-        $pdf->Ln(3);
 
         $pdf->SetFont('Arial', 'B', 9);
 
@@ -226,10 +231,13 @@ try {
         }
     }
 
-    function bottomLeftDetails($pdf, $executedby, $printedby, $branchName, $textColor)
+    // function bottomLeftDetails($pdf, $executedby, $printedby, $branchName, $timestamp, $textColor)
+    function bottomLeftDetails($pdf, $executedby, $printedby, $timestamp, $textColor)
     {
         $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
-        $pdf->SetY(-100);
+        // $pdf->SetY(-100);
+        // $pdf->SetX(10);
+        $pdf->Ln(5); // 5mm gap after table
         $pdf->SetX(10);
 
         // Purpose
@@ -247,14 +255,15 @@ try {
 
         $pdf->SetFont('Arial', '', 9);
         $pdf->Cell(0, 5, $printedby, 0, 1);
-        $pdf->Cell(0, 5, $branchName, 0, 1);
+        $pdf->Cell(0, 5, $timestamp, 0, 1);
 
         $pdf->Ln(3);
     }
 
     headerDetails($pdf, $picklistNum, $docDate);
     renderItemsTable($pdf, $picklistNum, $itemData, $textColor);
-    bottomLeftDetails($pdf, $executedby, $printedby, $branchName, $textColor);
+    // bottomLeftDetails($pdf, $executedby, $printedby, $branchName, $timestamp $textColor);
+    bottomLeftDetails($pdf, $executedby, $printedby, $timestamp, $textColor);
 
     ob_end_clean();
     $pdf->Output('I', $picklist . '.pdf');

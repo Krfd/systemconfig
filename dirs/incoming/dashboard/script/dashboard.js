@@ -273,7 +273,7 @@ function toggleCheckboxes() {
     icon: "question",
     title: "Create picklist on this item(s)?",
     text: "This action cannot be change",
-    confirmButtonText: "Create",
+    confirmButtonText: "Add",
     showCancelButton: true,
     cancelButtonText: "Back",
   }).then((result) => {
@@ -877,6 +877,51 @@ function loadBasket() {
                 // const srn = $(this).data("srn");
                 const PKlistNum = $(this).data("picklist");
 
+                // ORIGINAL
+                // Swal.fire({
+                //   title: "Print this Picklist?",
+                //   icon: "question",
+                //   showCancelButton: true,
+                //   confirmButtonText: "Print",
+                //   confirmButtonColor: "#0d6efd",
+                //   cancelButtonText: "Cancel",
+                // }).then((result) => {
+                //   if (result.isConfirmed) {
+                //     $.post(
+                //       "dirs/incoming/dashboard/actions/save_print_delivery.php",
+                //       { PKlistNum: PKlistNum },
+                //       function (response) {
+                //         if (response.status === "error") {
+                //           Swal.fire({
+                //             icon: "error",
+                //             title: response.message,
+                //             text: "Would you like to proceed for printing?",
+                //             showCancelButton: true,
+                //             confirmButtonText: "Proceed",
+                //             cancelButtonText: "Back",
+                //           }).then((res) => {
+                //             if (res.isConfirmed) {
+                //               window.open(
+                //                 `pdf/requests.php?picklist=${PKlistNum}`,
+                //                 "_blank",
+                //               );
+                //             }
+                //           });
+                //           return;
+                //         }
+
+                //         if (response.status === "success") {
+                //           window.open(
+                //             `pdf/requests.php?picklist=${PKlistNum}`,
+                //             "_blank",
+                //           );
+                //         }
+                //       },
+                //       "json",
+                //     );
+                //   }
+                // });
+
                 Swal.fire({
                   title: "Print this Picklist?",
                   icon: "question",
@@ -886,38 +931,65 @@ function loadBasket() {
                   cancelButtonText: "Cancel",
                 }).then((result) => {
                   if (result.isConfirmed) {
-                    $.post(
-                      "dirs/incoming/dashboard/actions/save_print_delivery.php",
-                      { PKlistNum: PKlistNum },
-                      function (response) {
-                        if (response.status === "error") {
-                          Swal.fire({
-                            icon: "error",
-                            title: response.message,
-                            text: "Would you like to proceed for printing?",
-                            showCancelButton: true,
-                            confirmButtonText: "Proceed",
-                            cancelButtonText: "Back",
-                          }).then((res) => {
-                            if (res.isConfirmed) {
-                              window.open(
-                                `pdf/requests.php?picklist=${PKlistNum}`,
-                                "_blank",
-                              );
-                            }
-                          });
-                          return;
-                        }
-
-                        if (response.status === "success") {
-                          window.open(
-                            `pdf/requests.php?picklist=${PKlistNum}`,
-                            "_blank",
-                          );
+                    // 👉 ASK FOR EXECUTED BY FIRST
+                    Swal.fire({
+                      title: "Executed By",
+                      input: "text",
+                      inputPlaceholder: "Enter your name",
+                      inputAttributes: {
+                        autocapitalize: "off",
+                      },
+                      showCancelButton: true,
+                      confirmButtonText: "Continue",
+                      cancelButtonText: "Cancel",
+                      inputValidator: (value) => {
+                        if (!value) {
+                          return "Executed By is required!";
                         }
                       },
-                      "json",
-                    );
+                    }).then((userInput) => {
+                      if (!userInput.isConfirmed) return;
+
+                      let executedBy = userInput.value;
+
+                      // 👉 PROCEED WITH ORIGINAL LOGIC
+                      $.post(
+                        "dirs/incoming/dashboard/actions/save_print_delivery.php",
+                        {
+                          PKlistNum: PKlistNum,
+                          executedBy: executedBy, // pass to backend
+                        },
+                        function (response) {
+                          const openPrint = () => {
+                            window.open(
+                              `pdf/requests.php?picklist=${PKlistNum}&executedBy=${encodeURIComponent(executedBy)}`,
+                              "_blank",
+                            );
+                          };
+
+                          if (response.status === "error") {
+                            Swal.fire({
+                              icon: "error",
+                              title: response.message,
+                              text: "Would you like to proceed for printing?",
+                              showCancelButton: true,
+                              confirmButtonText: "Proceed",
+                              cancelButtonText: "Back",
+                            }).then((res) => {
+                              if (res.isConfirmed) {
+                                openPrint();
+                              }
+                            });
+                            return;
+                          }
+
+                          if (response.status === "success") {
+                            openPrint();
+                          }
+                        },
+                        "json",
+                      );
+                    });
                   }
                 });
               });

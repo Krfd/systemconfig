@@ -43,9 +43,7 @@ try {
             // $this->Image('assets/image/header/header.png', 5, 10, 190);
             $this->Image('assets/image/logo/iap_icon.png', 10, 10, 30);
             $this->SetFont('Arial', 'B', 20);
-
             $pageWidth = $this->GetPageWidth();
-
             $this->SetX(10);
             $this->Cell($pageWidth - 10, 20, 'STOCK REQUEST', 0, 1, 'C');
 

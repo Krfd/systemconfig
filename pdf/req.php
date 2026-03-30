@@ -41,7 +41,12 @@ try {
         function Header()
         {
             $this->Image('../assets/image/header/header.png', 5, 10, 190);
-            $this->Ln(35);
+            $this->SetFont('Arial', 'B', 20);
+            $pageWidth = $this->GetPageWidth();
+            $this->SetX(10);
+            $this->Cell($pageWidth - 10, 20, 'STOCK REQUEST', 0, 1, 'C');
+
+            $this->Ln(10);
         }
 
         function Footer()
