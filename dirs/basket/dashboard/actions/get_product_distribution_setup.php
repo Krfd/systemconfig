@@ -2,23 +2,27 @@
 require_once "../../../../config/connection.php";
 session_start();
 
-$Userid     = $_GET['Uid'] ?? $_SESSION['Uid'];
+$User         = $_SESSION['Uid'];
+$DRNumber     = $_POST['DRNumber'];
+$PicklistNum  = $_POST['PicklistNum'];
 
 try {
   $conn->beginTransaction();
 
-  $fetch_fordelivery = $conn->prepare("EXEC dbo.[DELIVERY] ?");
-  $fetch_fordelivery->execute([$Userid]);
-  $get_delivery = $fetch_fordelivery->fetchAll(PDO::FETCH_ASSOC);
+  $branch_distribution = $conn->prepare("EXEC dbo.[Product_Distribution_Delivery] ?, ?, ?");
+  $branch_distribution->execute([$DRNumber, $User, $PicklistNum]);
+  $get_branch = $branch_distribution->fetchAll(PDO::FETCH_ASSOC);
 
   $conn->commit();
 
   $response = array(
     "isSuccess" => 'success',
-    "Data" => $get_delivery
+    "Data" => $get_branch
   );
   echo json_encode($response);
+  exit;
 } catch (PDOException $e) {
+  errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
   $conn->rollback();
   $response = array(
     "isSuccess" => 'Failed',
