@@ -272,8 +272,14 @@ function toggleCheckboxes() {
   Swal.fire({
     icon: "question",
     title: "Create picklist on this item(s)?",
-    text: "This action cannot be change",
-    confirmButtonText: "Add",
+    // text: "This action cannot be change",
+    _confirmButtonText: "Add",
+    get confirmButtonText() {
+      return this._confirmButtonText;
+    },
+    set confirmButtonText(value) {
+      this._confirmButtonText = value;
+    },
     showCancelButton: true,
     cancelButtonText: "Back",
   }).then((result) => {

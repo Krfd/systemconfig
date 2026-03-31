@@ -219,7 +219,6 @@ function loadImperialBrands() {
   );
 }
 
-/*Function for reselecting brand to find another model*/
 $("#newBrand").on("change", function () {
   $("#newModel").html('<option value="">Select Model</option>');
   $("#newCategory").val("");
@@ -762,47 +761,6 @@ function branchDelivery() {
   if ($.fn.DataTable.isDataTable("#nonSerializeSummary")) {
     $("#nonSerializeSummary").DataTable().clear().destroy();
   }
-
-  // let exists = false;
-  // let noSerialExists = false;
-
-  // $("#summaryDeliveryTable tbody tr").each(function () {
-  //   let code = $(this).data("itemcode");
-
-  //   if (code == itemCode) {
-  //     exists = true;
-  //     return false; // break loop
-  //   }
-  // });
-
-  // $("#summaryDeliveryTable tbody tr").each(function () {
-  //   let code = $(this).data("itemcode");
-
-  //   if (code == itemCode) {
-  //     noSerialExists = true;
-  //     return false; // break loop
-  //   }
-  // });
-
-  // OR SIMPLY DISABLE THE SAVE BUTTON
-  // if (exists) {
-  //   Swal.fire({
-  //     icon: "error",
-  //     title: "Item already assigned to the branch",
-  //     confirmButtonText: "OKAY",
-  //   });
-  //   return;
-  // }
-
-  // if (noSerialExists) {
-  //   Swal.fire({
-  //     icon: "error",
-  //     title: "Item already assigned to the branch",
-  //     text: "",
-  //     confirmButtonText: "OKAY",
-  //   });
-  //   return;
-  // }
 
   $("#branchToDeliverModal tbody tr").each(function () {
     let branch = $(this).find("td:nth-child(1)").text().trim();
@@ -1412,46 +1370,6 @@ function submitDelivery() {
 
   commitBtn.addEventListener("click", function (e) {
     e.preventDefault();
-
-    // let plateInput = document.getElementById("plate");
-    // let driverInput = document.getElementById("driver");
-    // let deliveryDate = document.getElementById("deldate");
-
-    // // CHECK PLATE
-    // if (plateInput.value.trim() === "") {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Missing Plate Number",
-    //     text: "Enter the truck plate number.",
-    //   }).then(() => {
-    //     plateInput.focus();
-    //   });
-    //   return;
-    // }
-
-    // // CHECK DRIVER
-    // if (driverInput.value.trim() === "") {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Missing Driver",
-    //     text: "Enter the driver's name.",
-    //   }).then(() => {
-    //     driverInput.focus();
-    //   });
-    //   return;
-    // }
-
-    // // CHECK DELIVERY DATE
-    // if (deliveryDate.value.trim() === "") {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Missing Delivery Date",
-    //     text: "Enter a delivery date",
-    //   }).then(() => {
-    //     deliveryDate.focus();
-    //   });
-    //   return;
-    // }
 
     Swal.fire({
       icon: "warning",

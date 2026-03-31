@@ -13,16 +13,14 @@ $(document).ready(function () {
 function loadDashboard() {
   $.post("dirs/basket/dashboard/components/main.php", {}, function (data) {
     $("#basket_content").html(data);
-    // loadDeliveryBasketContent();
-    // $("#deliveryTableDisplay").DataTable({
-    //   pageLength: 50,
-    //   order: [0, "desc"],
-    // });
+    $("#basketTableDashboard").DataTable({
+      pageLength: 50,
+      order: [0, "desc"],
+    });
     loadDeliveryBasket();
   });
 }
 
-/*load Imperial Brands*/
 function loadImperialBrands() {
   $.post(
     "dirs/basket/dashboard/actions/get_iapbrands.php",
@@ -113,36 +111,45 @@ async function loadImperialModel() {
   );
 }
 
+/*Script for selecting model and category*/
+$("#newModel").on("change", function () {
+  const selected = $(this).find(":selected");
+  $("#newCategory").val(selected.data("category") || "");
+  $("#itemcode").val(selected.data("itemcode") || "");
+});
 
+// LOADING BASKET TO LOADING ITEMS
+$(document).on(
+  "dblclick",
+  "#basketTableDashboard tbody .open-picklist",
+  function (e) {
+    e.preventDefault();
+    let $row = $(this).closest("tr");
+    let PickLst_Num = $row.attr("data-picklist");
+    let del_num = $row.attr("data-delivery-num");
+    deliveryPicklistNum = PickLst_Num;
+    deliveryNum = del_num;
 
+    $("#main-content").html(spinner);
+    setTimeout(function () {
+      // loadDeliveryItems(PickLst_Num, del_num);
+    }, 200);
+  },
+);
 
+// PICKLIST BASKET DROPDOWN TO PICKLIST ITEMS
+$(document).on("click", ".dropdown .open-picklisted", function (e) {
+  let Picklist = $(this).closest("tr").attr("data-picklist");
+  let del_num = $(this).closest("tr").attr("data-delivery-num");
 
+  deliveryPicklistNum = Picklist;
+  deliveryNum = del_num;
 
-
-
-// // PICKLIST BASKET TO PICKLIST ITEMS
-// $(document).on("dblclick", "#basketTable tbody .open-picklist", function (e) {
-//   e.preventDefault();
-//   if (!$(this).find(".open-picklist").length) return;
-//   let $row = $(this).closest("tr");
-//   let picklistNum = $row.attr("data-picklist-num");
-//   $("#main-content").html(spinner);
-//   setTimeout(function () {
-//     openPicklist(picklistNum);
-//   }, 200);
-// });
-
-// // PICKLIST ITEMS TO INDIVIDUAL SRN
-// $(document).on("dblclick", "#picklistItemTable tbody tr", function (e) {
-//   e.preventDefault();
-//   if ($(this).hasClass("empty-row")) return;
-//   console.log(``);
-//   let RowNum = $(this).data("rownum");
-//   $("#main-content").html(spinner);
-//   setTimeout(function () {
-//     openPicklistedForm(RowNum);
-//   }, 200);
-// });
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    // loadDeliveryItems(Picklist, del_num);
+  }, 200);
+});
 
 $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
   let serial = $(this).data("serial");
@@ -153,8 +160,6 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
   let model = $(this).find("td:nth-child(2)").text().trim();
   let category = $(this).find("td:nth-child(3)").text().trim();
   let qty = $(this).find("td:nth-child(4)").text().trim();
-
-  // console.log(`PICKLIST NUMBER: ${picklistNumber}`);
 
   // ✅ Prevent modal if row is empty
   if (!brand && !model && !qty) {
@@ -180,10 +185,9 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
     function (length) {
       if (length > 1) {
         $("#assignBranchModal").modal("show");
+      } else {
+        console.log("Single branch");
       }
-      //  else {
-      //   console.log("Single branch");
-      // }
     },
   );
 });
@@ -191,64 +195,95 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
 $(document).on("click", "#summaryTable tbody tr", function (e) {
   e.preventDefault();
   let serial = $(this).data("serial");
-  console.log(`SERIAL : ${serial}`);
+
+  if (!serial) {
+    return;
+  }
 
   let $serialCell = $("#delivery-serial-table tbody td").first();
-  let formattedSerial = serial.split(",").join("<br>");
+  let formattedSerial;
+
+  if (Array.isArray(serial)) {
+    formattedSerial = serial.join("<br>");
+  } else if (typeof serial === "string") {
+    formattedSerial = serial.split(",").join("<br>");
+  } else {
+    formattedSerial = serial; // fallback (number or other)
+  }
+
   $serialCell.html(formattedSerial);
 });
 
 async function loadIAPBranchlist() {
-  $.post("dirs/outgoing/form/actions/get_branchlist.php", {}, function (data) {
-    const response = JSON.parse(data);
-    if ($.trim(response.isSuccess) === "success") {
-      const iapbranch = response.Data;
-      $("#branch").html('<option selected value="">Select Branch</option>');
-      iapbranch.forEach((iapbranch) => {
-        $("#branch").append(
-          $("<option>", {
-            value: iapbranch.Branch,
-            text: iapbranch.Branch,
-          }),
-        );
-      });
-      if (iapbranch.length > 0) {
-        $("#branch").val(iapbranch[0].Branch);
-      }
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "Server under restoring",
-        text: "Please come back later",
-        showConfirmButton: true,
-        confirmButtonText: "OKAY",
-        allowOutsideClick: false,
-      }).then(() => {
-        $.post("dirs/basket/dashboard/basket.php", {}, function (data) {
-          $("#main-content").html(data);
+  $.post(
+    "dirs/basket/dashboard/actions/get_branchlist.php",
+    {},
+    function (data) {
+      const response = JSON.parse(data);
+      if ($.trim(response.isSuccess) === "success") {
+        const iapbranch = response.Data;
+        $("#branch").html('<option selected value="">Select Branch</option>');
+        iapbranch.forEach((iapbranch) => {
+          $("#branch").append(
+            $("<option>", {
+              value: iapbranch.Branch,
+              text: iapbranch.Branch,
+            }),
+          );
         });
-      });
-    }
-  });
+        if (iapbranch.length > 0) {
+          $("#branch").val(iapbranch[0].Branch);
+        }
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Server under restoring",
+          text: "Please come back later",
+          showConfirmButton: true,
+          confirmButtonText: "OKAY",
+          allowOutsideClick: false,
+        }).then(() => {
+          $.post("dirs/basket/dashboard/basket.php", {}, function (data) {
+            $("#main-content").html(data);
+          });
+        });
+      }
+    },
+  );
 }
 
+$(document).on(
+  "click",
+  "#basketTableDashboard .dropdown .assign-branch",
+  function (e) {
+    e.preventDefault();
+    e.stopPropagation();
 
-// CREATE DR FOR PICKLIST
-$(document).on("click", ".dropdown .assign-branch", function (e) {
-  e.preventDefault();
-  e.stopPropagation();
+    let deliveryBasketRow = $(this).closest("tr");
+    let createDeliveryNumber = deliveryBasketRow.attr("data-delivery-num");
+    let picklistDr = deliveryBasketRow.attr("data-picklist");
 
-  let deliveryBasketRow = $(this).closest("tr");
-  let createDeliveryNumber = deliveryBasketRow.attr("data-delivery-num");
-  let picklistDr = deliveryBasketRow.attr("data-picklist");
+    $("#main-content").html(spinner);
+    setTimeout(function () {
+      assignBranch(createDeliveryNumber, picklistDr);
+    }, 200);
+  },
+);
 
+// LOAD DELIVERY BASKET
+function loadDeliveryBasketContent() {
+  if ($.fn.DataTable.isDataTable("#basketTableDashboard")) {
+    $("#basketTableDashboard").DataTable().clear().destroy();
+  }
   $("#main-content").html(spinner);
   setTimeout(function () {
-    assignBranch(createDeliveryNumber, picklistDr);
+    $.post("dirs/basket/dashboard/basket.php", {}, function (data) {
+      $("#main-content").hide().html(data).fadeIn(200);
+      loadDeliveryBasket();
+    });
   }, 200);
-});
+}
 
-// DELIVERY BASKET
 function loadDeliveryBasket() {
   $.post("dirs/basket/dashboard/components/main.php", {}, function (data) {
     $("#basket_content").html(data);
@@ -277,18 +312,18 @@ function loadDeliveryBasket() {
 
           sortedData.forEach((item) => {
             const isDisabled =
-              item.PicklistNumber && item.PicklistNumber.trim() !== ""
+              item.PickList_Num && item.PickList_Num.trim() !== ""
                 ? "disabled"
                 : "";
 
             rows.push([
-              `<input type="checkbox" name="checkbox" id="${item.SeriesNum}" data-rownum="${item.SeriesNum}" 
+              `<input type="checkbox" name="checkbox" id="${item.RowNumOrder}" data-rownum="${item.RowNumOrder}" 
               class="form-check-input checkbox align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
               item.PickList_Num || "",
               item.DocDate || "",
               item.DateModified || "",
               item.ItemCount || "",
-              item.Status,
+              "UNASSIGNED", // item.Status,
               '<div class="dropdown dropstart">' +
                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
                 '<i class="bi bi-three-dots"></i></button>' +
@@ -351,7 +386,7 @@ function loadDeliveryBasket() {
             autoWidth: false,
             order: [[0, "desc"]],
             rowCallback: function (row, data) {
-              $("td", row).css({
+              $("td:not(:first-child)", row).css({
                 background: "#FFFBDF",
                 padding: "3px",
                 height: "40px",
@@ -360,6 +395,9 @@ function loadDeliveryBasket() {
               });
               $("td:eq(1)", row).addClass("text-primary ps-2");
               $("td:eq(1)", row).css("text-align", "start");
+              // $("td:eq(2)", row).css("text-muted");
+              // $("td:eq(3)", row).css("text-muted");
+              // $("td:eq(4)", row).css("text-muted");
 
               $(row).hover(
                 function () {
@@ -376,15 +414,16 @@ function loadDeliveryBasket() {
 
               for (let i = currentRows; i < 8; i++) {
                 let $emptyRow = $(`
-                <tr class="empty-row" style="background: #FFFBDF">
-                  <td colspan="7" style="background: #FFFBDF">&nbsp;</td>
-                </tr>
-              `);
+                  <tr class="empty-row">
+                    <td>&nbsp;</td> <!-- first column (no background) -->
+                    <td colspan="6" style="background: #FFFBDF">&nbsp;</td> <!-- rest -->
+                  </tr>
+                `);
+
                 $emptyRow.css({
                   background: "#FFFBDF",
                   height: "40px",
                   "min-height": "40px",
-                  cursor: "pointer",
                 });
                 $emptyRow.hover(
                   function () {
@@ -410,7 +449,7 @@ function loadDeliveryBasket() {
 }
 
 function toggleDelivery() {
-  const createDeliveryBtn = document.getElementById("createDeliveryBtn");
+  const loadDeliveryBtn = document.getElementById("loadDeliveryBtn");
   const checkedIds = [];
 
   const selectionMode =
@@ -425,11 +464,9 @@ function toggleDelivery() {
 
     $("#basketTableDashboard tbody tr").each(function () {
       const row = $(this);
-      // const srnText = row.find("td:eq(2)").text().trim();
-      // const picklistNo = row.find("td:eq(7)").text().trim();
       const statusText = row.find("td:eq(5)").text().trim().toUpperCase();
 
-      if (statusText === "Unassigned") {
+      if (statusText === "ASSIGNED") {
         availableRows++;
       }
     });
@@ -446,27 +483,15 @@ function toggleDelivery() {
 
     $("#basketTableDashboard tbody tr").each(function () {
       const row = $(this);
-      const srnText = row.find("td:eq(2)").text().trim();
-      const picklistNo = row.find("td:eq(7)").text().trim();
       const statusText = row.find("td:eq(5)").text().trim().toUpperCase();
       const checkbox = row.find(".checkbox");
 
-      const restrictedStatuses = [
-        "CANCELLED",
-        "TERMINATED",
-        "REJECTED",
-        "PROCESSING",
-        "IN TRANSIT",
-      ];
+      const restrictedStatuses = ["UNASSIGNED", "IN TRANSIT"];
 
-      if (srnText.startsWith("SRN")) {
+      if (statusText === "ASSIGNED") {
         checkbox.show();
 
-        if (
-          picklistNo !== "" ||
-          restrictedStatuses.includes(statusText) ||
-          statusText !== "NEW"
-        ) {
+        if (restrictedStatuses.includes(statusText)) {
           checkbox.prop("disabled", true);
         } else {
           checkbox.prop("disabled", false);
@@ -476,8 +501,8 @@ function toggleDelivery() {
       }
     });
 
-    createDeliveryBtn.textContent = "Add to Picklist";
-    createDeliveryBtn.type = "button";
+    loadDeliveryBtn.textContent = "Add Items";
+    loadDeliveryBtn.type = "button";
 
     return;
   }
@@ -489,22 +514,24 @@ function toggleDelivery() {
       confirmButtonText: "OKAY",
     });
     $("#basketTableDashboard tbody .checkbox").hide().prop("checked", false);
-    createDeliveryBtn.textContent = "Create Picklist";
-    createDeliveryBtn.type = "button";
+    loadDeliveryBtn.textContent = "Load Items";
+    loadDeliveryBtn.type = "button";
     return;
   }
 
+  // console.log(`CHECK ID's: ${checkedIds.join(", ")}`);
+  // return;
+
   Swal.fire({
     icon: "question",
-    title: "Create picklist on this item(s)?",
-    text: "This action cannot be change",
-    confirmButtonText: "Create",
+    title: "Create Delivery Request on this item(s)?",
+    confirmButtonText: "Add",
     showCancelButton: true,
     cancelButtonText: "Back",
   }).then((result) => {
     if (result.isConfirmed) {
       $.ajax({
-        url: "dirs/incoming/dashboard/actions/save_createpicklist.php",
+        url: "dirs/basket/dashboard/actions/save_createpicklist.php",
         type: "POST",
         data: { RowNumber: checkedIds },
         dataType: "json",
@@ -518,7 +545,7 @@ function toggleDelivery() {
             $("#basketTableDashboard tbody .checkbox")
               .hide()
               .prop("checked", false);
-            createDeliveryBtn.textContent = "Create Picklist";
+            loadDeliveryBtn.textContent = "Create DR";
             loadIncoming();
           } else {
             Swal.fire({
@@ -541,265 +568,14 @@ function toggleDelivery() {
   });
 }
 
-// function openPicklist(picklistNum) {
-//   $.post(
-//     "dirs/incoming/dashboard/picklistItem.php",
-//     { picklistNum: picklistNum },
-//     function (data) {
-//       $("#main-content").hide().html(data).fadeIn(200);
-
-//       $.ajax({
-//         url: "dirs/incoming/dashboard/actions/get_incomingbreakdown.php",
-//         type: "POST",
-//         dataType: "json",
-//         data: { picklistNum: picklistNum },
-//         success: function (response) {
-//           $("#picklistNumDisplay").text(picklistNum);
-//           let rows = [];
-//           let existingSeries = new Set();
-//           if (response.isSuccess === "success") {
-//             let sortedData = response.Data.sort(
-//               (a, b) => Number(b.BaseNum_SRN || 0) - Number(a.RowNum || 0),
-//             );
-
-//             sortedData.forEach((item) => {
-//               if (existingSeries.has(item.BaseNum_SRN)) {
-//                 return;
-//               }
-
-//               existingSeries.add(item.BaseNum_SRN);
-
-//               rows.push([
-//                 item.BaseNum_SRN || "",
-//                 item.DocDate || "",
-//                 item.ReqBranch || "",
-//               ]);
-//             });
-//             $("#picklistItemTable").DataTable().clear().destroy();
-//             $("#picklistItemTable").DataTable({
-//               data: rows,
-//               columns: [
-//                 { title: "SRN", className: "text-start open-picklisted ps-5" },
-//                 { title: "Date", className: "text-start ps-5" },
-//                 { title: "Requesting Branch", className: "text-start ps-5" },
-//               ],
-//               createdRow: function (row, data, dataIndex) {
-//                 let originalItem = sortedData[dataIndex];
-
-//                 $(row)
-//                   .attr("data-srn", originalItem.BaseNum_SRN)
-//                   .attr("data-rownum", originalItem.RowNum)
-//                   .addClass("picklist-row");
-//               },
-//               paging: true,
-//               searching: true,
-//               info: true,
-//               processing: false,
-//               autoWidth: false,
-//               order: [[0, "desc"]],
-//               rowCallback: function (row, data) {
-//                 $("td", row).css({
-//                   background: "#FFFBDF",
-//                   padding: "3px",
-//                   height: "40px",
-//                   "min-height": "40px",
-//                 });
-//                 $("td:eq(0)", row).addClass("text-primary");
-//                 $("td:eq(2)", row).css("text-align", "start");
-
-//                 $(row).hover(
-//                   function () {
-//                     $(this).css("background", "#FFF4C2");
-//                   },
-//                   function () {
-//                     $(this).css("background", "#FFFBDF");
-//                   },
-//                 );
-//               },
-//               drawCallback: function () {
-//                 let tableBody = $("#picklistItemTable tbody");
-//                 let currentRows = tableBody.find("tr").length;
-
-//                 for (let i = currentRows; i < 8; i++) {
-//                   let $emptyRow = $(`
-//                   <tr class="empty-row" style="background: #FFFBDF">
-//                     <td colspan="3" style="background: #FFFBDF">&nbsp;</td>
-//                   </tr>
-//                 `);
-//                   $emptyRow.css({
-//                     background: "#FFFBDF",
-//                     height: "40px",
-//                     "min-height": "40px",
-//                     cursor: "pointer",
-//                   });
-//                   $emptyRow.hover(
-//                     function () {
-//                       $(this).css("background", "#FFF4C2");
-//                     },
-//                     function () {
-//                       $(this).css("background", "#FFFBDF");
-//                     },
-//                   );
-//                   tableBody.append($emptyRow);
-//                 }
-//               },
-//             });
-//           } else {
-//             console.error(response.Data);
-//           }
-//         },
-//         error: function (xhr, status, error) {
-//           console.error("Error loading outgoing data: ", error);
-//         },
-//       });
-//     },
-//   );
-// }
-
-// DISPLAY PICKLIST
-// function loadPicklistItems() {
-//   $("#main-content").html(spinner);
-//   setTimeout(function () {
-//     $.post(
-//       "dirs/incoming/dashboard/picklistItem.php",
-//       { picklistNum: picklistNumRef },
-//       function (data) {
-//         openPicklist(picklistNumRef);
-//       },
-//     );
-//   }, 200);
-// }
-
-// // CANCEL PICKLIST
-// function cancelPicklist() {
-//   $(document).on("click", ".cancel-picklist", function () {
-//     const picklistId = $(this).data("picklist");
-
-//     Swal.fire({
-//       title: "Are you sure?",
-//       text: "You are about to cancel Picklist " + picklistId,
-//       icon: "warning",
-//       showCancelButton: true,
-//       confirmButtonColor: "#d33",
-//       cancelButtonText: "Back",
-//       confirmButtonText: "Yes, cancel it!",
-//     }).then((result) => {
-//       if (result.isConfirmed) {
-//         Swal.fire(
-//           "Cancelled!",
-//           "Picklist " + picklistId + " has been cancelled.",
-//           "success",
-//         );
-
-//         $(this).closest("tr").remove();
-//       }
-//     });
-//   });
-// }
-
-// // ALREADY HAS A PICKLIST NUMBER
-// function openPicklistedForm(RowNum) {
-//   $("#pageLoader").removeClass("d-none");
-//   $.post(
-//     "dirs/incoming/dashboard/picklistedForm.php",
-//     { RowNum: RowNum },
-//     function (data) {
-//       $("#main-content").hide().html(data).fadeIn(200);
-
-//       $.ajax({
-//         url: "dirs/incoming/dashboard/actions/get_openincoming.php",
-//         type: "POST",
-//         data: { RowNum: RowNum },
-//         dataType: "json",
-//         success: function (response) {
-//           if (response.isSuccess === "success") {
-//             let rowCount = response.Items.length;
-//             let totalQty = 0;
-
-//             let header = response.Data;
-//             let items = response.Items;
-
-//             function selectedValue(selector, value) {
-//               $(selector)
-//                 .empty()
-//                 .append(`<option value="${value}">${value}</option>`);
-//             }
-
-//             selectedValue("#typeOfReq", header.RequestType);
-//             selectedValue("#destination", header.Destination);
-//             selectedValue("#branchWhCode", header.DestinationWhs);
-//             selectedValue("#origin", header.Origin);
-//             selectedValue("#whcode", header.OriginWhs);
-
-//             // ================= HEADER =================
-//             $("#srn").val(header.BaseNum_SRN);
-//             $("#date").val(header.DocDate);
-//             $("#status").val(header.RequestStatus);
-//             $("#purpose").val(header.RequestPurpose);
-//             $("#reqBy").val(header.PrepBy);
-//             $("#remarks").val(header.Remarks);
-
-//             // ================= ITEMS =================
-//             let rows = "";
-
-//             items.forEach(function (item, index) {
-//               let quantity = parseFloat(item.Quantity) || 0;
-//               totalQty += quantity;
-//               rows += `
-//                       <tr style="height: 40px; min-height: 40px">
-//                         <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${index + 1}</td>
-//                         <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Brand}</td>
-//                         <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Model}</td>
-//                         <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Category}</td>
-//                         <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
-//                       </tr>
-//                     `;
-//             });
-
-//             $("#totalIncomingQty").text(totalQty);
-//             $("#openIncomingTable tbody").html(rows);
-
-//             if (rowCount < 8) {
-//               let emptyRowsNeeded = 8 - rowCount;
-
-//               for (let i = 0; i < emptyRowsNeeded; i++) {
-//                 let emptyRow = `
-//                         <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
-//                           <td style="background: #FFFBDF"></td>
-//                           <td style="background: #FFFBDF"></td>
-//                           <td style="background: #FFFBDF"></td>
-//                           <td style="background: #FFFBDF"></td>
-//                           <td style="background: #FFFBDF"></td>
-//                         </tr>
-//                       `;
-//                 $("#openIncomingTable tbody").append(emptyRow);
-//               }
-//               $("#totalIncomingQty").text(totalQty);
-//             }
-//           } else {
-//             alert(response.Data);
-//           }
-//           $("#pageLoader").addClass("d-none");
-//         },
-//         error: function (xhr) {
-//           console.error(xhr.responseText);
-//           $("#pageLoader").addClass("d-none");
-//         },
-//       });
-//     },
-//   ).fail(function () {
-//     $("#pageLoader").addClass("d-none");
-//   });
-// }
-
 function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
   $("#serial-delivery").on("submit", function (e) {
-    e.preventDefault(); 
+    e.preventDefault();
     const serialInput = $("#newSerial");
     const Serial = serialInput.val().trim();
     let lines = Serial.split(/\r?\n/)
-      .map((s) => s.replace(/[\u200B\s]+/g, "").trim()) 
-      .filter(Boolean); 
+      .map((s) => s.replace(/[\u200B\s]+/g, "").trim())
+      .filter(Boolean);
     let latestInput = lines[lines.length - 1] || "";
     let ItemCode = "";
     if (Serial) {
@@ -819,6 +595,7 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
             let existingTotal = parseInt($("#summaryQty").text()) || 0;
             let totalQty = existingTotal;
             let $summaryTbody = $("#summaryTable tbody");
+            let $summaryDeliveryTbody = $("#summaryDeliveryTable tbody");
 
             const groupedItems = {};
 
@@ -841,14 +618,16 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
               let category = item.Category;
               let itemCode = item.ItemCode;
               let qty = item.qty;
-              // 🚫 Skip if any required value is null/empty
               if (!brand || !model || !category || !itemCode) {
                 console.warn("Skipped item due to null/empty value:", item);
-                return; // skip this iteration
+                return;
               }
               totalQty += qty;
-         
+
               let $existingRow = $summaryTbody.find(
+                `tr[data-itemcode="${itemCode}"]`,
+              );
+              let $existingSummaryQty = $summaryDeliveryTbody.find(
                 `tr[data-itemcode="${itemCode}"]`,
               );
               loadPicklistBranches(
@@ -857,6 +636,7 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                 model,
                 category,
                 function (length, branchName) {
+                  console.log(`BRANCH LENGTH: ${length}`);
                   if (length > 1) {
                     rows += `
                         <tr style="height: 40px; min-height: 40px;" data-serial="${latestInput}">
@@ -866,16 +646,14 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${qty}</td>
                         </tr>`;
                     if ($existingRow.length) {
-                      // ✅ Update quantity
                       let currentQty =
                         parseInt($existingRow.find("td:nth-child(4)").text()) ||
                         0;
                       $existingRow.find("td:nth-child(4)").text(currentQty + 1);
 
-                      // ✅ Update badge to Unassigned automatically
                       $existingRow.find("td:nth-child(5)").html(`
-                          <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">
-                              Unassigned
+                          <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">
+                              Assigned
                           </span>
                       `);
 
@@ -889,7 +667,7 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                           <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
                           <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
                           <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">1</td>
+                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${qty}</td>
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
                             <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">Unassigned</span>
                           </td>
@@ -913,16 +691,17 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${qty}</td>
                         </tr>`;
                     if ($existingRow.length) {
-                      // ✅ Update quantity
                       let currentQty =
                         parseInt($existingRow.find("td:nth-child(4)").text()) ||
                         0;
                       $existingRow.find("td:nth-child(4)").text(currentQty + 1);
+                      $existingSummaryQty
+                        .find("td:nth-child(7)")
+                        .text(currentQty + 1);
 
-                      // ✅ Update badge to Unassigned automatically
                       $existingRow.find("td:nth-child(5)").html(`
-                          <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">
-                              Unassigned
+                          <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">
+                              Assigned
                           </span>
                       `);
 
@@ -936,7 +715,7 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
                             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
                             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
-                            <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">1</td>
+                            <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${qty}</td>
                             <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
                               <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">Assigned</span>
                             </td>
@@ -977,7 +756,6 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                         Swal.fire({
                           icon: "error",
                           title: "Item already assigned to the branch",
-                          text: "",
                           confirmButtonText: "OKAY",
                         });
                         return;
@@ -991,15 +769,13 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                           .find("td:nth-child(2)")
                           .text()
                           .trim();
-                        let qty = $(this).find("td:nth-child(3)").text().trim();
+                        let qty = $(this).find("td:nth-child(4)").text().trim();
                         if (!qty || qty === "0") return;
                         rowCount++;
                         let $emptyRow = $(
                           "#summaryDeliveryTable tbody tr.empty-row",
                         ).first();
-                        console.log(
-                          `CATEGORY FOR SUMMARYDELIVERYTABLE: ${category}`,
-                        );
+
                         let newRow = $(`
                               <tr data-itemcode="${itemCode}" style="padding: 3px; height: 40px; min-height: 40px">
                                 <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
@@ -1050,21 +826,15 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
           Swal.fire({
             icon: "error",
             title: "Something went wrong",
-          })
+          });
         },
-         complete: function () {
-          // Re-enable button + hide spinner
-          // document.getElementById("nonSerializeeBtn").prop("disabled", false);
-          $("#nonSerializeBtn").prop("disabled", false);
-          // spinner.addClass("d-none");
-          // $("#main-content").html(spinner)
-          // text.text("Add");
-  }
+        // complete: function () {
+        //   $("#nonSerializeBtn").prop("disabled", false);
+        // },
       });
     }
     serialInput.val(""); // clear after submit
     serialInput.focus();
-    // }
   });
 }
 
@@ -1154,9 +924,6 @@ function branchDelivery() {
         $(this).data("itemcode") == itemCode && $(this).data("branch") == branch
       );
     });
-
-    // let $emptyRow = $("#summaryDeliveryTable tbody tr.empty-row").first();
-    // let $emptySerialRow = $("#nonSerializeSummary tbody tr.empty-row").first();
 
     let newRow = $(`
       <tr data-itemcode="${itemCode}" data-branch="${branch}" style="padding: 3px; height: 40px; min-height: 40px">
@@ -1451,7 +1218,8 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
         dataType: "json",
         success: function (response) {
           if (response.isSuccess === "success") {
-            let item = response.Data[0];
+            // let items = response.Data[0];
+            let items = response.Data;
 
             if (response.Data.length === 0) {
               Swal.fire({
@@ -1463,40 +1231,225 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
               return;
             }
 
+            let rows = [];
             let existingTotal = parseInt($("#summaryQty").text()) || 0;
+            let totalQty = existingTotal;
             let $summaryTbody = $("#summaryTable tbody");
+            let $summaryDeliveryTbody = $("#summaryDeliveryTable tbody");
 
-            // ----------- SUMMARY TABLE ----------
-            // let $existingRow = $summaryTbody.find(
-            //   `tr[data-itemcode="${item.ItemCode}"][data-branch="${branch}"]`,
-            // );
-            let $existingRow = $summaryTbody.find(
-              `tr[data-itemcode="${item.ItemCode}"]`,
-            );
-            if ($existingRow.length) {
-              let currentQty =
-                parseInt($existingRow.find("td:nth-child(3)").text()) || 0;
-              $existingRow.find("td:nth-child(3)").text(currentQty + quantity);
-            } else {
-              let summaryRow = `
-            <tr data-itemcode="${item.ItemCode}" data-deliverynum="${DrNumber}" data-picklist="${picklistDr}" style="height: 40px; cursor: pointer">
-              <td style="background:#FFFBDF">${item.Brand}</td>
-              <td style="background:#FFFBDF">${item.Model}</td>
-              <td style="background:#FFFBDF">${item.Category}</td>
-              <td style="background:#FFFBDF" class="ms-3">${quantity}</td>
-              <td style="background:#FFFBDF">
-                <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">Unassigned</span>
-              </td>
-            </tr>
-            `;
+            const groupedItems = {};
 
-              let $emptySummaryRow = $summaryTbody.find("tr.empty-row").first();
-              if ($emptySummaryRow.length) {
-                $emptySummaryRow.replaceWith(summaryRow);
-              } else {
-                $summaryTbody.append(summaryRow);
+            items.forEach((item) => {
+              if (!item.ItemCode) return;
+
+              if (!groupedItems[item.ItemCode]) {
+                groupedItems[item.ItemCode] = {
+                  ...item,
+                  qty: 0,
+                };
               }
-            }
+
+              groupedItems[item.ItemCode].qty += 1;
+            });
+
+            Object.values(groupedItems).forEach(function (item) {
+              let brand = item.Brand;
+              let model = item.Model;
+              let category = item.Category;
+              let itemCode = item.ItemCode;
+              // let qty = item.qty;
+              if (!brand || !model || !category || !itemCode) {
+                console.warn("Skipped item due to null/empty value:", item);
+                return;
+              }
+              // totalQty += qty;
+              totalQty += quantity;
+
+              let $existingRow = $summaryTbody.find(
+                `tr[data-itemcode="${itemCode}"]`,
+              );
+              let $existingSummaryQty = $summaryDeliveryTbody.find(
+                `tr[data-itemcode="${itemCode}"]`,
+              );
+              loadPicklistBranches(
+                DrNumber,
+                picklistDr,
+                model,
+                category,
+                function (length, branchName) {
+                  console.log(`BRANCH LENGTH: ${length}`);
+                  if (length > 1) {
+                    rows += `
+                        <tr style="height: 40px; min-height: 40px;">
+                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
+                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${model}</td>
+                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${category}</td>
+                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${quantity}</td>
+                        </tr>`;
+                    if ($existingRow.length) {
+                      let currentQty =
+                        parseInt($existingRow.find("td:nth-child(4)").text()) ||
+                        0;
+                      $existingRow
+                        .find("td:nth-child(4)")
+                        .text(currentQty + quantity);
+
+                      $existingRow.find("td:nth-child(5)").html(`
+                          <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">
+                              Assigned
+                          </span>
+                      `);
+
+                      $existingRow.attr("data-itemcode", itemCode);
+                    } else {
+                      let newRow = `
+                        <tr data-itemcode="${itemCode}" data-deliverynum="${DrNumber}" data-picklist="${picklistDr}" style="height: 40px; min-height: 40px;">
+                          <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
+                          <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
+                          <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
+                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${quantity}</td>
+                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
+                            <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">Unassigned</span>
+                          </td>
+                        </tr>
+                      `;
+                      let $emptyRow = $summaryTbody
+                        .find("tr.empty-row")
+                        .first();
+                      if ($emptyRow.length) {
+                        $emptyRow.replaceWith(newRow);
+                      } else {
+                        $summaryTbody.append(newRow);
+                      }
+                    }
+                  } else {
+                    rows += `
+                        <tr style="height: 40px; min-height: 40px;">
+                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
+                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${model}</td>
+                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${category}</td>
+                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${quantity}</td>
+                        </tr>`;
+                    if ($existingRow.length) {
+                      let currentQty =
+                        parseInt($existingRow.find("td:nth-child(4)").text()) ||
+                        0;
+                      // $existingRow.find("td:nth-child(4)").text(currentQty + 1);
+                      $existingRow
+                        .find("td:nth-child(4)")
+                        .text(currentQty + quantity);
+                      $existingSummaryQty
+                        .find("td:nth-child(7)")
+                        .text(currentQty + quantity);
+
+                      $existingRow.find("td:nth-child(5)").html(`
+                          <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">
+                              Assigned
+                          </span>
+                      `);
+                      $existingRow.attr("data-itemcode", itemCode);
+                    } else {
+                      let newRow = `
+                          <tr data-itemcode="${itemCode}" data-deliverynum="${DrNumber}" data-picklist="${picklistDr}" style="height: 40px; min-height: 40px;">
+                            <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
+                            <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
+                            <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
+                            <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${quantity}</td>
+                            <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
+                              <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">Assigned</span>
+                            </td>
+                          </tr>
+                        `;
+                      // Replace first empty row if exists
+                      let $emptyRow = $summaryTbody
+                        .find("tr.empty-row")
+                        .first();
+                      if ($emptyRow.length) {
+                        $emptyRow.replaceWith(newRow);
+                      } else {
+                        $summaryTbody.append(newRow);
+                      }
+                      let rowCount = $("#summaryDeliveryTable tbody tr").filter(
+                        function () {
+                          return (
+                            $(this).find("td:nth-child(2)").text().trim() !== ""
+                          );
+                        },
+                      ).length;
+                      if ($.fn.DataTable.isDataTable("#summaryDeliveryTable")) {
+                        $("#summaryDeliveryTable")
+                          .DataTable()
+                          .clear()
+                          .destroy();
+                      }
+                      let exists = false;
+                      $("#summaryDeliveryTable tbody tr").each(function () {
+                        let code = $(this).data("itemcode");
+                        if (code == itemCode) {
+                          exists = true;
+                          return false; // break loop
+                        }
+                      });
+                      // OR SIMPLY DISABLE THE SAVE BUTTON
+                      if (exists) {
+                        Swal.fire({
+                          icon: "error",
+                          title: "Item already assigned to the branch",
+                          confirmButtonText: "OKAY",
+                        });
+                        return;
+                      }
+                      $("#summaryTable tbody tr").each(function () {
+                        let branch = $(this)
+                          .find("td:nth-child(1)")
+                          .text()
+                          .trim();
+                        let model = $(this)
+                          .find("td:nth-child(2)")
+                          .text()
+                          .trim();
+                        let quantity = $(this)
+                          .find("td:nth-child(4)")
+                          .text()
+                          .trim();
+                        if (!quantity || quantity === "0") return;
+                        rowCount++;
+                        let $emptyRow = $(
+                          "#summaryDeliveryTable tbody tr.empty-row",
+                        ).first();
+
+                        let newRow = $(`
+                              <tr data-itemcode="${itemCode}" style="padding: 3px; height: 40px; min-height: 40px">
+                                <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
+                                <td style="background:#FFFBDF" class="text-primary"></td>
+                                <td style="background:#FFFBDF">${branchName}</td>
+                                <td style="background:#FFFBDF">${brand}</td>
+                                <td style="background:#FFFBDF" class="text-start">${model}</td>
+                                <td style="background:#FFFBDF" class="text-start">${category}</td>
+                                <td style="background:#FFFBDF" class="text-center">${quantity}</td>
+                                <td style="background:#FFFBDF" class="d-none">${itemCode}</td>
+                              </tr>
+                            `);
+                        if ($emptyRow.length) {
+                          $emptyRow.replaceWith(newRow);
+                        } else {
+                          $("#summaryDeliveryTable tbody").append(newRow);
+                        }
+                        newRow.hover(
+                          function () {
+                            $(this).css("background", "#FFF4C2");
+                          },
+                          function () {
+                            $(this).css("background", "#FFFBDF");
+                          },
+                        );
+                      });
+                    }
+                  }
+                  $("#summaryQty").text(totalQty);
+                },
+              );
+            });
 
             // $("#newItemCode").val("");
             $("#newQuantity").val("");
@@ -1662,7 +1615,6 @@ function assignBranch(createDeliveryNumber, picklistDr, previousSerials = []) {
           let header = response.Data;
 
           $("#drno").val(createDeliveryNumber);
-          // $("#srn").val(header.BaseNum_SRN);
           $("#pcklstno").val(picklistDr);
           $("#docdate").val(header.DocumentDate);
           $("#origin").val(header.BDestination);
@@ -1782,9 +1734,8 @@ function submitDelivery() {
 
     Swal.fire({
       icon: "warning",
-      title: "Submit this for delivery?",
-      text: "This action cannot be changed",
-      confirmButtonText: "Submit",
+      title: "Save branch assignment?",
+      confirmButtonText: "Save",
       allowOutsideClick: false,
       showCancelButton: true,
       cancelButtonText: "Back",
@@ -1907,7 +1858,7 @@ function submitDelivery() {
                 title: "Success",
                 text: `Receiving #: ${response.ReceivingNumber}`,
               }).then(() => {
-                loadDeliveryBasketContent();
+                loadDeliveryBasket();
               });
             } else {
               Swal.fire({
@@ -1930,3 +1881,301 @@ function submitDelivery() {
     });
   });
 }
+
+function newDelivery() {
+  $.post("dirs/basket/dashboard/loadingItems.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+
+    $.ajax({
+      url: "dirs/basket/dashboard/actions/get_deliveries.php",
+      type: "POST",
+      dataType: "json",
+      success: function (response) {
+        if (
+          !response ||
+          response.isSuccess !== "success" ||
+          !Array.isArray(response.Data)
+        ) {
+          response = {
+            isSuccess: "success",
+            Data: [],
+          };
+        }
+
+        let rows = [];
+        if (response.isSuccess === "success") {
+          let sortedData = response.Data.sort(
+            (a, b) => Number(b.RowNumOrder || 0) - Number(a.RowNumOrder || 0),
+          );
+
+          sortedData.forEach((item) => {
+            rows.push([
+              "DR10001",
+              // item.PickList_Num || "",
+              item.DocDate || "",
+              item.DateModified || "",
+              item.ItemCount || "",
+              // item.Status || "Partial",
+              "IN TRANSIT",
+              '<div class="dropdown dropstart">' +
+                '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
+                '<i class="bi bi-three-dots"></i></button>' +
+                `<ul class="dropdown-menu">
+                  <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
+                  <li><a class="dropdown-item create-dr" href="#" data-picklist="${item.PickList_Num}">Create Delivery</a></li>
+                </ul>
+              </div>`,
+            ]);
+          });
+
+          if (rows.length === 0) {
+            for (let i = 0; i < 8; i++) {
+              rows.push(["", "", "", "", "", ""]);
+            }
+          }
+
+          if ($.fn.DataTable.isDataTable("#loadingBasketTable")) {
+            $("#loadingBasketTable").DataTable().clear().destroy();
+          }
+
+          $("#loadingBasketTable").DataTable({
+            data: rows,
+            columns: [
+              {
+                title: "Batch Delivery No.",
+              },
+              // {
+              //   title: "Picklist No.",
+              //   className: "text-start open-picklist ps-5",
+              // },
+              { title: "Date Created", className: "text-start ps-2" },
+              { title: "Date Modified", className: "text-start ps-2" },
+              { title: "Quantity", className: "text-start ps-2" },
+              {
+                title: "Status",
+                className: "text-start ps-2",
+                render: function (data, type, row) {
+                  return `<span class="badge bg-primary">${data}</span>`;
+                },
+              },
+              { title: "", orderable: false },
+            ],
+            createdRow: function (row, data, dataIndex) {
+              let originalItem = sortedData[dataIndex];
+
+              if (originalItem) {
+                $(row)
+                  .attr("data-rownum", originalItem.RowNumOrder)
+                  .attr("data-delivery-num", originalItem.Delivery_Num)
+                  .attr("data-picklist", originalItem.PickList_Num);
+              }
+            },
+            paging: true,
+            searching: true,
+            info: true,
+            processing: false,
+            autoWidth: false,
+            order: [[0, "desc"]],
+            rowCallback: function (row, data) {
+              $("td", row).css({
+                background: "#FFFBDF",
+                padding: "3px",
+                height: "40px",
+                "min-height": "40px",
+                cursor: "pointer",
+              });
+              $("td:eq(0)", row).addClass("text-primary ps-2");
+              $("td:eq(1)", row).css("text-secondary");
+              $("td:eq(2)", row).css("text-secondary");
+              $("td:eq(3)", row).css("text-secondary");
+              // $("td:eq(4)", row).css("text-secondary");
+
+              $(row).hover(
+                function () {
+                  $(this).css("background", "#FFF4C2");
+                },
+                function () {
+                  $(this).css("background", "#FFFBDF");
+                },
+              );
+            },
+            drawCallback: function () {
+              let tableBody = $("#loadingBasketTable tbody");
+              let currentRows = tableBody.find("tr").length;
+
+              for (let i = currentRows; i < 8; i++) {
+                let $emptyRow = $(`
+              <tr class="empty-row" style="background: #FFFBDF">
+                <td colspan="6" style="background: #FFFBDF">&nbsp;</td>
+              </tr>
+            `);
+                $emptyRow.css({
+                  background: "#FFFBDF",
+                  height: "40px",
+                  "min-height": "40px",
+                  cursor: "pointer",
+                });
+                $emptyRow.hover(
+                  function () {
+                    $(this).css("background", "#FFF4C2");
+                  },
+                  function () {
+                    $(this).css("background", "#FFFBDF");
+                  },
+                );
+                tableBody.append($emptyRow);
+              }
+            },
+          });
+        } else {
+          console.error(response.Data);
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error("Error loading outgoing data: ", error);
+      },
+    });
+  });
+}
+
+// // LOAD DELIVERY ITEMS
+// function loadDeliveryItems(PickLst_Num, del_num) {
+//   $.post("dirs/basket/dashboard/loadDeliveryItems.php", {}, function (data) {
+//     $("#main-content").html(data);
+
+//     deliveryPicklistNum = PickLst_Num;
+//     deliveryNum = del_num;
+
+//     $.ajax({
+//       url: "dirs/basket/dashboard/actions/get_loading_breakdown.php",
+//       type: "POST",
+//       data: { PickLst_Num: PickLst_Num },
+//       dataType: "json",
+//       success: function (response) {
+//         $("#picklistDeliveryDisplay").text(PickLst_Num);
+//         if (
+//           !response ||
+//           response.isSuccess !== "success" ||
+//           !Array.isArray(response.Data)
+//         ) {
+//           response = {
+//             isSuccess: "success",
+//             Data: [],
+//           };
+//         }
+//         let rows = [];
+//         if (response.isSuccess === "success") {
+//           let sortedData = response.Data.sort(
+//             (a, b) => Number(b.BaseNum_SRN || 0) - Number(a.RowNum || 0),
+//           );
+
+//           sortedData.forEach((item) => {
+//             rows.push([
+//               item.BaseNum_SRN || "",
+//               item.DocDate || "",
+//               item.ReqBranch || "",
+//               item.TotalQty || "",
+//               '<div class="dropdown dropstart">' +
+//                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
+//                 '<i class="bi bi-three-dots"></i></button>' +
+//                 `<ul class="dropdown-menu">
+//                   <li><a class="dropdown-item open-srn" href="#">Open</a></li>
+//                   <li><a class="dropdown-item remove-srn" href="#">Remove</a></li>
+//                 </ul>
+//               </div>`,
+//             ]);
+//           });
+
+//           if (rows.length === 0) {
+//             for (let i = 0; i < 8; i++) {
+//               rows.push(["", "", "", "", ""]);
+//             }
+//           }
+
+//           if ($.fn.DataTable.isDataTable("#deliveryItemsTable")) {
+//             $("#deliveryItemsTable").DataTable().clear().destroy();
+//           }
+
+//           $("#deliveryItemsTable").DataTable({
+//             data: rows,
+//             columns: [
+//               { title: "SRN", className: "text-start ps-5 open-picklist" },
+//               { title: "Date", className: "text-start ps-2" },
+//               { title: "Requesting Branch", className: "text-start ps-2" },
+//               { title: "Quantity", className: "text-start ps-2" },
+//               { title: "", orderable: false },
+//             ],
+//             createdRow: function (row, data, dataIndex) {
+//               let originalItem = sortedData[dataIndex];
+
+//               if (originalItem) {
+//                 $(row)
+//                   .attr("data-srn-num", originalItem.BaseNum_SRN)
+//                   .attr("data-picklist", PickLst_Num)
+//                   .attr("data-delivery-num", del_num);
+//               }
+//             },
+//             paging: true,
+//             searching: true,
+//             info: true,
+//             processing: false,
+//             autoWidth: false,
+//             order: [[0, "desc"]],
+//             rowCallback: function (row, data) {
+//               $("td", row).css({
+//                 background: "#FFFBDF",
+//                 padding: "3px",
+//                 height: "40px",
+//                 "min-height": "40px",
+//                 cursor: "pointer",
+//               });
+//               $("td:eq(0)", row).addClass("text-primary");
+//               $("td:eq(1)", row).css("text-align", "start");
+
+//               $(row).hover(
+//                 function () {
+//                   $(this).css("background", "#FFF4C2");
+//                 },
+//                 function () {
+//                   $(this).css("background", "#FFFBDF");
+//                 },
+//               );
+//             },
+//             drawCallback: function () {
+//               let tableBody = $("#deliveryItemsTable tbody");
+//               let currentRows = tableBody.find("tr").length;
+
+//               for (let i = currentRows; i < 8; i++) {
+//                 let $emptyRow = $(`
+//                 <tr class="empty-row" style="background: #FFFBDF">
+//                   <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
+//                 </tr>
+//               `);
+//                 $emptyRow.css({
+//                   background: "#FFFBDF",
+//                   height: "40px",
+//                   "min-height": "40px",
+//                   cursor: "pointer",
+//                 });
+//                 $emptyRow.hover(
+//                   function () {
+//                     $(this).css("background", "#FFF4C2");
+//                   },
+//                   function () {
+//                     $(this).css("background", "#FFFBDF");
+//                   },
+//                 );
+//                 tableBody.append($emptyRow);
+//               }
+//             },
+//           });
+//         } else {
+//           console.error(response.Data);
+//         }
+//       },
+//       error: function (xhr, status, error) {
+//         console.error("Error loading outgoing data: ", error);
+//       },
+//     });
+//   });
+// }

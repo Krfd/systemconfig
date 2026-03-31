@@ -20,34 +20,34 @@ $RowNum = $_POST['RowNum'] ?? '';
                                 <div class="d-flex flex-column gap-1 col-4">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="srn" class="form-label text-dark-emphasis col-3"><small>SRN:</small></label>
-                                        <input type="text" name="srn" id="srn" class="form-control form-control-sm col" style="background: #FFFBDF" disabled required readonly>
+                                        <input type="text" name="srn" id="srn" class="form-control form-control-sm col" style="background: #f2f2f2" disabled required readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="typeOfReq" class="form-label text-dark-emphasis col-3"><small>Type of Request:</small></label>
-                                        <select name="typeOfReq" id="typeOfReq" class="form-select form-select-sm col" style="background: #FFFBDF" required disabled readonly>
+                                        <select name="typeOfReq" id="typeOfReq" class="form-select form-select-sm col" style="background: #f2f2f2" required disabled readonly>
                                         </select>
                                     </div>
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="destination" class="form-label text-dark-emphasis col-5"><small>Destination:</small></label>
-                                            <select name="destination" id="destination" class="form-select form-select-sm col ms-3" placeholder="Destination" style="background: #FFFBDF" required disabled readonly>
+                                            <select name="destination" id="destination" class="form-select form-select-sm col ms-3" placeholder="Destination" style="background: #f2f2f2" required disabled readonly>
                                             </select>
                                         </div>
                                         <div class="col p-0 d-flex align-items-baseline col">
                                             <label for="branchWhCode" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
-                                            <select name="branchWhCode" id="branchWhCode" class="form-select form-select-sm col" style="background: #FFFBDF" required disabled readonly>
+                                            <select name="branchWhCode" id="branchWhCode" class="form-select form-select-sm col" style="background: #f2f2f2" required disabled readonly>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="input-group col p-0 d-flex align-items-baseline gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
-                                            <select name="origin" id="origin" class="form-select form-select-sm col ms-3" style="background: #FFFBDF" required disabled readonly>
+                                            <select name="origin" id="origin" class="form-select form-select-sm col ms-3" style="background: #f2f2f2" required disabled readonly>
                                             </select>
                                         </div>
                                         <div class="col p-0 d-flex align-items-baseline">
                                             <label for="whcode" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
-                                            <select name="whcode" id="whcode" class="form-select form-select-sm col" style="background: #FFFBDF" required disabled readonly>
+                                            <select name="whcode" id="whcode" class="form-select form-select-sm col" style="background: #f2f2f2" required disabled readonly>
                                             </select>
                                         </div>
                                     </div>
@@ -55,11 +55,11 @@ $RowNum = $_POST['RowNum'] ?? '';
                                 <div class="d-flex flex-column gap-1 col-2">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="date" class="form-label text-dark-emphasis col-4"><small>Date:</small></label>
-                                        <input type="text" name="date" id="date" class="form-control form-control-sm col" style="background: #FFFBDF" required disabled readonly>
+                                        <input type="text" name="date" id="date" class="form-control form-control-sm col" style="background: #f2f2f2" required disabled readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="status" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>
-                                        <input type="text" name="status" id="status" class="form-control form-control-sm col" style="background: #FFFBDF" required disabled readonly>
+                                        <input type="text" name="status" id="status" class="form-control form-control-sm col" style="background: #f2f2f2" required disabled readonly>
                                     </div>
                                 </div>
                             </div>
@@ -92,15 +92,15 @@ $RowNum = $_POST['RowNum'] ?? '';
                                 <div class="d-flex flex-column gap-1 col-4">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="type" class="form-label text-dark-emphasis col-4"><small>Purpose of Request:</small></label>
-                                        <input type="text" name="purpose" id="purpose" class="form-control form-control-sm col" style="background: #FFFBDF" disabled required>
+                                        <input type="text" name="purpose" id="purpose" class="form-control form-control-sm col" style="background: #f2f2f2" disabled required>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="reqBy" class="form-label text-dark-emphasis col-4"><small>Requested by:</small></label>
-                                        <input type="text" name="reqBy" id="reqBy" class="form-control form-control-sm col" style="background: #FFFBDF" disabled readonly required>
+                                        <input type="text" name="reqBy" id="reqBy" class="form-control form-control-sm col" style="background: #f2f2f2" disabled readonly required>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="remarks" class="form-label text-dark-emphasis col-4"><small>Remarks:</small></label>
-                                        <textarea name="remarks" id="remarks" class="form-control form-control-sm col" rows="3" style="background: #FFFBDF; height: auto" disabled></textarea>
+                                        <textarea name="remarks" id="remarks" class="form-control form-control-sm col" rows="3" style="background: #f2f2f2; height: auto" disabled></textarea>
                                     </div>
                                 </div>
                             </div>

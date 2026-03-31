@@ -98,7 +98,13 @@
         } else {
           window.location.assign("index.php");
         }
-
+      } else if (response.isSuccess === "Failed") {
+        Swal.fire({
+          icon: "error",
+          title: "Login failed",
+          text: response.Message,
+          confirmButtonText: "OKAY"
+        })
       } else {
         console.log("Login failed:", response.Message);
       }

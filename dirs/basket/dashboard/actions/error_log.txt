@@ -1,4 +1,0 @@
-[2026-03-30 22:38:06] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [53].  in C:\xampp\htdocs\ishift\config\connection.php on line 18
-[2026-03-30 22:38:06] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [64].  in C:\xampp\htdocs\ishift\config\connection.php on line 18
-[2026-03-30 22:38:06] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishift\dirs\basket\dashboard\actions\get_branch_stock_serial.php on line 16
-[2026-03-30 22:38:06] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishift\dirs\basket\dashboard\actions\get_branch_stock_serial.php on line 16

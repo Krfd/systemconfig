@@ -1,5 +1,5 @@
 <div class="modal fade" tabindex="-1" id="assignBranchModal" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-xl modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title fw-bold text-secondary">Select Branch to deliver</h2>

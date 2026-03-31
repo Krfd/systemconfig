@@ -41,6 +41,10 @@
                                     <input type="hidden" name="drno" id="drno" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                 </div>
                                 <div class="d-flex flex-column gap-1 col-3">
+                                    <!-- <div class="d-flex align-baseline gap-3">
+                                        <label for="deldate" class="form-label text-dark-emphasis col-4"><small>Delivery Date:</small></label>
+                                        <input type="date" name="deldate" id="deldate" class="form-control form-control-sm col" style="background: #FFFBDF">
+                                    </div> -->
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="docdate" class="form-label text-dark-emphasis col-4"><small>Document Date:</small></label>
                                         <input type="text" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
@@ -159,8 +163,9 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div id="totalRowOutside" class="d-flex border-top fw-bold justify-content-end w-100" style="background: #FFFBDF">
-                                <div class=" p-2 text-end">Total Quantity:</div>
+                            <div id="totalRowOutside" class="d-flex border-top fw-bold ms-auto"
+                                style="background:#FFF7BC;">
+                                <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>
                                 <div class="p-2" style="width:120px;" id="summaryQty">0</div>
                             </div>
                             <div class="d-flex justify-content-between align-items-end mt-5">

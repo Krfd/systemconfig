@@ -1,7 +1,7 @@
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-start">
         <div class="d-flex justify-content-start align-items-baseline gap-3">
-            <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadDeliveryBasketContent()">
+            <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadDDashboard()">
                 <i class="bi bi-arrow-left"></i>
             </button>
             <div>

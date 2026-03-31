@@ -26,45 +26,35 @@
                                 <div class="d-flex flex-column gap-1 col-4">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="drno" class="form-label text-dark-emphasis col-3"><small>DR No:</small></label>
-                                        <input type="text" name="drno" id="drno" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                        <input type="text" name="drno" id="drno" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="pcklstno" class="form-label text-dark-emphasis col-3"><small>Picklist No:</small></label>
-                                        <input type="text" name="pcklstno" id="pcklstno" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                        <input type="text" name="pcklstno" id="pcklstno" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                     </div>
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
-                                            <input type="text" id="origin" class="form-control form-control-sm col ms-3" style="background: #FFFBDF" readonly>
+                                            <input type="text" id="origin" class="form-control form-control-sm col ms-3" style="background: #f2f2f2" readonly>
                                         </div>
                                         <div class="col p-0 d-flex align-items-baseline col">
                                             <label for="whcode" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
-                                            <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                            <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                         </div>
                                     </div>
-                                    <!-- <div class="input-group col p-0 d-flex align-items-baseline gap-1">
-                                        <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
-                                            <label for="branchName" class="form-label text-dark-emphasis col-5"><small>Destination:</small></label>
-                                            <input type="text" id="branchName" class="form-control form-control-sm ms-3" style="background: #FFFBDF;" readonly>
-                                        </div>
-                                        <div class="col p-0 d-flex align-items-baseline">
-                                            <label for="branchWhCode" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
-                                            <input type="text" id="branchWhCode" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
-                                        </div>
-                                    </div> -->
                                 </div>
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-baseline gap-3">
                                         <label for="deldate" class="form-label text-dark-emphasis col-4"><small>Delivery Date:</small></label>
-                                        <input type="text" name="deldate" id="deldate" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                        <input type="text" name="deldate" id="deldate" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="docdate" class="form-label text-dark-emphasis col-4"><small>Document Date:</small></label>
-                                        <input type="text" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                        <input type="text" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                     </div>
                                     <div class="d-flex align-baseline gap-3">
                                         <label for="status" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>
-                                        <input type="text" name="status" id="status" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                        <input type="text" name="status" id="status" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -103,25 +93,26 @@
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="prepby" class="form-label text-dark-emphasis col-4"><small>Prepared by:</small></label>
-                                        <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                        <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="plate" class="form-label text-dark-emphasis col-4"><small>Truck Plate No:</small></label>
-                                        <input type="text" name="plate" id="plate" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                        <input type="text" name="plate" id="plate" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="driver" class="form-label text-dark-emphasis col-4"><small>Driver:</small></label>
-                                        <input type="text" name="driver" id="driver" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                        <input type="text" name="driver" id="driver" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                     </div>
                                 </div>
                                 <div class="col-2">
                                     <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
-                                    <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto; resize: horizontal" maxlength="100" readonly>
+                                    <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #f2f2f2; height: auto; resize: horizontal" maxlength="100" readonly>
                                     </textarea>
                                 </div>
                             </div>
                         </form>
                     </div>
+                </div>
             </section>
         </div>
     </div>

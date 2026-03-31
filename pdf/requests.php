@@ -231,39 +231,110 @@ try {
         }
     }
 
-    // function bottomLeftDetails($pdf, $executedby, $printedby, $branchName, $timestamp, $textColor)
-    function bottomLeftDetails($pdf, $executedby, $printedby, $timestamp, $textColor)
+    // function bottomLeftDetails($pdf, $executedby, $printedby, $timestamp, $textColor)
+    // {
+    //     $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
+    //     // $pdf->SetY(-100);
+    //     // $pdf->SetX(10);
+    //     $pdf->Ln(5); // 5mm gap after table
+    //     $pdf->SetX(10);
+
+    //     // Requesting Branch
+    //     $pdf->SetFont('Arial', 'B', 9);
+    //     $pdf->Cell(0, 5, 'Requesting Branch', 0, 1);
+
+    //     $pdf->SetFont('Arial', '', 9);
+    //     $pdf->Cell(0, 5, 'PLAZA - SRNPLZA100000001', 0, 1);
+
+    //     // Purpose
+    //     $pdf->SetFont('Arial', 'B', 9);
+    //     $pdf->Cell(0, 5, 'Executed by', 0, 1);
+
+    //     $pdf->SetFont('Arial', '', 9);
+    //     $pdf->Cell(0, 5, $executedby, 0, 1);
+
+    //     $pdf->Ln(3);
+
+    //     // Requested By
+    //     $pdf->SetFont('Arial', 'B', 9);
+    //     $pdf->Cell(0, 5, 'Printed by', 0, 1);
+
+    //     $pdf->SetFont('Arial', '', 9);
+    //     $pdf->Cell(0, 5, $printedby, 0, 1);
+    //     $pdf->Cell(0, 5, $timestamp, 0, 1);
+
+    //     $pdf->Ln(3);
+    // }
+
+    function bottomLeftDetails($pdf, $executedby, $picklistItems, $printedby, $timestamp, $textColor)
     {
         $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
-        // $pdf->SetY(-100);
-        // $pdf->SetX(10);
-        $pdf->Ln(5); // 5mm gap after table
-        $pdf->SetX(10);
+        $pdf->Ln(5); // gap after table
 
-        // Purpose
+        $leftX = 10;
+        $rightX = 160; // adjust depending on your page width
+
+        $startY = $pdf->GetY();
+
+        /** ---------------- LEFT COLUMN ---------------- **/
+        $pdf->SetXY($leftX, $startY);
+
+        // Requesting Branch
         $pdf->SetFont('Arial', 'B', 9);
-        $pdf->Cell(0, 5, 'Executed by', 0, 1);
+        $pdf->Cell(0, 5, 'Requesting Branch', 0, 1);
+
+        $pdf->SetX($leftX);
+        $pdf->SetFont('Arial', '', 9);
+        $lines = [];
+
+        foreach ($picklistItems as $item) {
+            $branch = $item->ReqBranch ?? '';
+            $srn = $item->BaseNum_SRN ?? '';
+
+            if ($branch || $srn) {
+                $lines[] = "{$branch} - {$srn}";
+            }
+        }
+        $lines = array_unique($lines);
 
         $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell(0, 5, $executedby, 0, 1);
+        foreach ($lines as $line) {
+            $pdf->SetX($leftX);
+            $pdf->Cell(80, 5, $line, 0, 1);
+        }
 
-        $pdf->Ln(3);
+        $pdf->Ln(2);
 
-        // Requested By
+        // Printed By
+        $pdf->SetX($leftX);
         $pdf->SetFont('Arial', 'B', 9);
         $pdf->Cell(0, 5, 'Printed by', 0, 1);
 
+        $pdf->SetX($leftX);
         $pdf->SetFont('Arial', '', 9);
         $pdf->Cell(0, 5, $printedby, 0, 1);
+
+        $pdf->SetX($leftX);
         $pdf->Cell(0, 5, $timestamp, 0, 1);
+
+
+        /** ---------------- RIGHT COLUMN ---------------- **/
+        $pdf->SetXY($rightX, $startY);
+
+        // Executed By
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell(60, 5, 'Executed by', 0, 1);
+
+        $pdf->SetX($rightX);
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->Cell(60, 5, $executedby, 0, 1);
 
         $pdf->Ln(3);
     }
 
     headerDetails($pdf, $picklistNum, $docDate);
     renderItemsTable($pdf, $picklistNum, $itemData, $textColor);
-    // bottomLeftDetails($pdf, $executedby, $printedby, $branchName, $timestamp $textColor);
-    bottomLeftDetails($pdf, $executedby, $printedby, $timestamp, $textColor);
+    bottomLeftDetails($pdf, $executedby, $picklistItems, $printedby, $timestamp, $textColor);
 
     ob_end_clean();
     $pdf->Output('I', $picklist . '.pdf');
