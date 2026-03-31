@@ -7,7 +7,7 @@
         <button class="btn btn-primary" type="button" onclick="toggleDelivery()" id="loadDeliveryBtn">
             Load Items
         </button>
-        <button class="btn btn-primary" type="button" onclick="newDelivery()" id="createDeliveryBtn">
+        <button class="btn btn-primary" type="button" onclick="loadingItems()" id="createDeliveryBtn">
             <i class="bi bi-cart-check"></i>
         </button>
     </div>
