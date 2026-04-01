@@ -17,7 +17,7 @@ function loadDashboard() {
       pageLength: 50,
       order: [0, "desc"],
     });
-    loadDeliveryBasket();
+    loadDeliveryBasket("all", "#basketTableDashboard");
   });
 }
 
@@ -47,7 +47,6 @@ function loadImperialBrands() {
   );
 }
 
-/*Function for reselecting brand to find another model*/
 $("#newBrand").on("change", function () {
   $("#newModel").html('<option value="">Select Model</option>');
   $("#newCategory").val("");
@@ -116,7 +115,7 @@ $("#newModel").on("change", function () {
   $("#itemcode").val(selected.data("itemcode") || "");
 });
 
-// LOADING BASKET TO LOADING ITEMS
+// DASHBOARD TO LOADING BASKET
 $(document).on(
   "dblclick",
   "#basketTableDashboard tbody .open-picklist",
@@ -134,7 +133,6 @@ $(document).on(
     }, 200);
   },
 );
-
 // PICKLIST BASKET DROPDOWN TO PICKLIST ITEMS
 $(document).on("click", ".dropdown .open-picklisted", function (e) {
   let Picklist = $(this).closest("tr").attr("data-picklist");
@@ -206,49 +204,11 @@ $(document).on("click", "#summaryTable tbody tr", function (e) {
   } else if (typeof serial === "string") {
     formattedSerial = serial.split(",").join("<br>");
   } else {
-    formattedSerial = serial; 
+    formattedSerial = serial;
   }
 
   $serialCell.html(formattedSerial);
 });
-
-async function loadIAPBranchlist() {
-  $.post(
-    "dirs/basket/dashboard/actions/get_branchlist.php",
-    {},
-    function (data) {
-      const response = JSON.parse(data);
-      if ($.trim(response.isSuccess) === "success") {
-        const iapbranch = response.Data;
-        $("#branch").html('<option selected value="">Select Branch</option>');
-        iapbranch.forEach((iapbranch) => {
-          $("#branch").append(
-            $("<option>", {
-              value: iapbranch.Branch,
-              text: iapbranch.Branch,
-            }),
-          );
-        });
-        if (iapbranch.length > 0) {
-          $("#branch").val(iapbranch[0].Branch);
-        }
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Server under restoring",
-          text: "Please come back later",
-          showConfirmButton: true,
-          confirmButtonText: "OKAY",
-          allowOutsideClick: false,
-        }).then(() => {
-          $.post("dirs/basket/dashboard/basket.php", {}, function (data) {
-            $("#main-content").html(data);
-          });
-        });
-      }
-    },
-  );
-}
 
 $(document).on(
   "click",
@@ -268,65 +228,88 @@ $(document).on(
   },
 );
 
-// LOAD DELIVERY BASKET
 function loadDeliveryBasketContent() {
   if ($.fn.DataTable.isDataTable("#basketTableDashboard")) {
     $("#basketTableDashboard").DataTable().clear().destroy();
   }
+  let tableId = "#basketTableDashboard";
   $("#main-content").html(spinner);
   setTimeout(function () {
     $.post("dirs/basket/dashboard/basket.php", {}, function (data) {
       $("#main-content").hide().html(data).fadeIn(200);
-      loadDeliveryBasket();
+      loadDeliveryBasket("all", tableId);
     });
   }, 200);
 }
 
-function loadDeliveryBasket() {
-  $.post("dirs/basket/dashboard/components/main.php", {}, function (data) {
-    $("#basket_content").html(data);
+$(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function () {
+  const target = $(this).attr("id");
 
-    $.ajax({
-      url: "dirs/basket/dashboard/actions/get_deliveries.php",
-      type: "POST",
-      dataType: "json",
-      success: function (response) {
-        if (
-          !response ||
-          response.isSuccess !== "success" ||
-          !Array.isArray(response.Data)
-        ) {
-          response = {
-            isSuccess: "success",
-            Data: [],
-          };
+  if (target === "all-tab") {
+    loadDeliveryBasket("all", "#basketTableDashboard");
+  } else if (target === "unassigned-tab") {
+    loadDeliveryBasket("unassigned", "#basketTableUnassigned");
+  } else if (target === "assigned-tab") {
+    loadDeliveryBasket("assigned", "#basketTableAssigned");
+  }
+});
+
+function loadDeliveryBasket(filter = "all", tableId) {
+  // $.post("dirs/basket/dashboard/components/main.php", {}, function (data) {
+  // $("#basket_content").html(data);
+
+  $.ajax({
+    url: "dirs/basket/dashboard/actions/get_deliveries.php",
+    type: "POST",
+    dataType: "json",
+    success: function (response) {
+      if (
+        !response ||
+        response.isSuccess !== "success" ||
+        !Array.isArray(response.Data)
+      ) {
+        response = {
+          isSuccess: "success",
+          Data: [],
+        };
+      }
+
+      let rows = [];
+      if (response.isSuccess === "success") {
+        let filteredData = response.Data;
+        if (filter === "unassigned") {
+          filteredData = response.Data.filter(
+            (item) => !item.PickList_Num || item.PickList_Num.trim() === "",
+          );
+        } else if (filter === "assigned") {
+          filteredData = response.Data.filter(
+            (item) => item.PickList_Num && item.PickList_Num.trim() !== "",
+          );
         }
 
-        let rows = [];
-        if (response.isSuccess === "success") {
-          let sortedData = response.Data.sort(
-            (a, b) => Number(b.RowNumOrder || 0) - Number(a.RowNumOrder || 0),
-          );
+        // let sortedData = response.Data.sort(
+        let sortedData = filteredData.sort(
+          (a, b) => Number(b.RowNumOrder || 0) - Number(a.RowNumOrder || 0),
+        );
 
-          sortedData.forEach((item) => {
-            const isDisabled =
-              item.PickList_Num && item.PickList_Num.trim() !== ""
-                ? "disabled"
-                : "";
+        sortedData.forEach((item) => {
+          const isDisabled =
+            item.PickList_Num && item.PickList_Num.trim() !== ""
+              ? "disabled"
+              : "";
 
-            rows.push([
-              `<input type="checkbox" name="checkbox" id="${item.RowNumOrder}" data-rownum="${item.RowNumOrder}" 
+          rows.push([
+            `<input type="checkbox" name="checkbox" id="${item.RowNumOrder}" data-rownum="${item.RowNumOrder}" 
               class="form-check-input checkbox align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
-              item.PickList_Num || "",
-              item.DocDate || "",
-              item.DateModified || "",
-              item.ItemCount || "",
-              // "UNASSIGNED", // item.Status,
-              item.Status,
-              '<div class="dropdown dropstart">' +
-                '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
-                '<i class="bi bi-three-dots"></i></button>' +
-                `<ul class="dropdown-menu">
+            item.PickList_Num || "",
+            item.DocDate || "",
+            item.DateModified || "",
+            item.ItemCount || "",
+            item.Status,
+            '<div class="dropdown dropstart">' +
+              '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
+              '<i class="bi bi-three-dots"></i></button>' +
+              `<ul class="dropdown-menu">
                   <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
                   ${
                     item.Status !== "IN TRANSIT"
@@ -335,67 +318,99 @@ function loadDeliveryBasket() {
                   }
                 </ul>
               </div>`,
-            ]);
-          });
+          ]);
+        });
 
-          if (rows.length === 0) {
-            for (let i = 0; i < 8; i++) {
-              rows.push(["", "", "", "", "", "", ""]);
-            }
+        if (rows.length === 0) {
+          for (let i = 0; i < 8; i++) {
+            rows.push(["", "", "", "", "", "", ""]);
           }
+        }
 
-          if ($.fn.DataTable.isDataTable("#basketTableDashboard")) {
-            $("#basketTableDashboard").DataTable().clear().destroy();
-          }
+        // if ($.fn.DataTable.isDataTable("#basketTableDashboard")) {
+        //   $("#basketTableDashboard").DataTable().clear().destroy();
+        // }
 
-          $("#basketTableDashboard").DataTable({
-            data: rows,
-            columns: [
-              { title: "", className: "text-center" },
-              {
-                title: "Picklist No.",
-                className: "text-start open-picklist ps-5",
-              },
-              { title: "Date Created", className: "text-start ps-2" },
-              { title: "Date Modified", className: "text-start ps-2" },
-              { title: "Quantity", className: "text-start ps-2" },
-              {
-                title: "Status",
-                className: "text-start ps-2",
-                render: function (data, type, row) {
-                  return `<span class="badge bg-primary">${data}</span>`;
-                },
-              },
-              { title: "", orderable: false },
-            ],
-            createdRow: function (row, data, dataIndex) {
-              let originalItem = sortedData[dataIndex];
+        if ($.fn.DataTable.isDataTable(tableId)) {
+          $(tableId).DataTable().clear().destroy();
+        }
 
-              if (originalItem) {
-                $(row)
-                  .attr("data-rownum", originalItem.RowNumOrder)
-                  .attr("data-delivery-num", originalItem.Delivery_Num)
-                  .attr("data-picklist", originalItem.PickList_Num);
-              }
+        // $("#basketTableDashboard").DataTable({
+        $(tableId).DataTable({
+          data: rows,
+          columns: [
+            { title: "", className: "text-center" },
+            {
+              title: "Picklist No.",
+              className: "text-start open-picklist ps-5",
             },
-            paging: true,
-            searching: true,
-            info: true,
-            processing: false,
-            autoWidth: false,
-            order: [[0, "desc"]],
-            rowCallback: function (row, data) {
-              $("td:not(:first-child)", row).css({
+            { title: "Date Created", className: "text-start ps-2" },
+            { title: "Date Modified", className: "text-start ps-2" },
+            { title: "Quantity", className: "text-start ps-2" },
+            {
+              title: "Status",
+              className: "text-start ps-2",
+              render: function (data, type, row) {
+                return `<span class="badge bg-primary">${data}</span>`;
+              },
+            },
+            { title: "", orderable: false },
+          ],
+          createdRow: function (row, data, dataIndex) {
+            let originalItem = sortedData[dataIndex];
+
+            if (originalItem) {
+              $(row)
+                .attr("data-rownum", originalItem.RowNumOrder)
+                .attr("data-delivery-num", originalItem.Delivery_Num)
+                .attr("data-picklist", originalItem.PickList_Num);
+            }
+          },
+          paging: true,
+          searching: true,
+          info: true,
+          processing: false,
+          autoWidth: false,
+          order: [[0, "desc"]],
+          rowCallback: function (row, data) {
+            $("td:not(:first-child)", row).css({
+              background: "#FFFBDF",
+              padding: "3px",
+              height: "40px",
+              "min-height": "40px",
+              cursor: "pointer",
+            });
+            $("td:eq(1)", row).addClass("text-primary ps-2");
+            $("td:eq(1)", row).css("text-align", "start");
+
+            $(row).hover(
+              function () {
+                $(this).css("background", "#FFF4C2");
+              },
+              function () {
+                $(this).css("background", "#FFFBDF");
+              },
+            );
+          },
+          drawCallback: function () {
+            // let tableBody = $("#basketTableDashboard tbody");
+            let tableBody = $(tableId + " tbody");
+            let currentRows = tableBody.find("tr").length;
+
+            for (let i = currentRows; i < 8; i++) {
+              let $emptyRow = $(`
+                  <tr class="empty-row">
+                    <td>&nbsp;</td>
+                    <td colspan="6" style="background: #FFFBDF">&nbsp;</td>
+                  </tr>
+                `);
+
+              $emptyRow.css({
                 background: "#FFFBDF",
-                padding: "3px",
                 height: "40px",
                 "min-height": "40px",
-                cursor: "pointer",
               });
-              $("td:eq(1)", row).addClass("text-primary ps-2");
-              $("td:eq(1)", row).css("text-align", "start");
-
-              $(row).hover(
+              $emptyRow.hover(
                 function () {
                   $(this).css("background", "#FFF4C2");
                 },
@@ -403,45 +418,19 @@ function loadDeliveryBasket() {
                   $(this).css("background", "#FFFBDF");
                 },
               );
-            },
-            drawCallback: function () {
-              let tableBody = $("#basketTableDashboard tbody");
-              let currentRows = tableBody.find("tr").length;
-
-              for (let i = currentRows; i < 8; i++) {
-                let $emptyRow = $(`
-                  <tr class="empty-row">
-                    <td>&nbsp;</td>
-                    <td colspan="6" style="background: #FFFBDF">&nbsp;</td>
-                  </tr>
-                `);
-
-                $emptyRow.css({
-                  background: "#FFFBDF",
-                  height: "40px",
-                  "min-height": "40px",
-                });
-                $emptyRow.hover(
-                  function () {
-                    $(this).css("background", "#FFF4C2");
-                  },
-                  function () {
-                    $(this).css("background", "#FFFBDF");
-                  },
-                );
-                tableBody.append($emptyRow);
-              }
-            },
-          });
-        } else {
-          console.error(response.Data);
-        }
-      },
-      error: function (xhr, status, error) {
-        console.error("Error loading outgoing data: ", error);
-      },
-    });
+              tableBody.append($emptyRow);
+            }
+          },
+        });
+      } else {
+        console.error(response.Data);
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("Error loading outgoing data: ", error);
+    },
   });
+  // });
 }
 
 // OPEN SRN FROM LOADING ITEMS
@@ -468,7 +457,6 @@ function toggleDelivery() {
     $("#basketTableDashboard tbody .checkbox:visible").length > 0;
   $("#basketTableDashboard tbody .checkbox:checked").each(function () {
     checkedIds.push($(this).data("rownum"));
-    console.log(`Checked RowNum: ${$(this).data("rownum")}`);
   });
 
   if (!selectionMode) {
@@ -505,16 +493,19 @@ function toggleDelivery() {
 
         if (restrictedStatuses.includes(statusText)) {
           checkbox.prop("disabled", true);
+          loadDeliveryBtn.textContent = "Load Items";
+          loadDeliveryBtn.type = "button";
         } else {
           checkbox.prop("disabled", false);
+          loadDeliveryBtn.textContent = "Add Items";
+          loadDeliveryBtn.type = "button";
         }
       } else {
         checkbox.hide();
       }
     });
-
-    loadDeliveryBtn.textContent = "Add Items";
-    loadDeliveryBtn.type = "button";
+    // loadDeliveryBtn.textContent = "Add Items";
+    // loadDeliveryBtn.type = "button";
 
     return;
   }
@@ -530,9 +521,6 @@ function toggleDelivery() {
     loadDeliveryBtn.type = "button";
     return;
   }
-
-  // console.log(`CHECK ID's: ${checkedIds.join(", ")}`);
-  // return;
 
   Swal.fire({
     icon: "question",
@@ -1200,7 +1188,6 @@ function loadPicklistBranches(
             tbody.append(row);
           });
         }
-        // console.log(`BRANCHES LENGTH ${branches.length}`);
         if (callback) callback(length, branches[0].ReqBranch);
       }
     },
@@ -1729,7 +1716,7 @@ function assignBranch(createDeliveryNumber, picklistDr, previousSerials = []) {
           toggler();
           adjustTotalWidth();
           window.addEventListener("resize", adjustTotalWidth);
-          submitDelivery();
+          submitBranchAssignment();
         }
       },
     });
@@ -1737,7 +1724,7 @@ function assignBranch(createDeliveryNumber, picklistDr, previousSerials = []) {
 }
 
 // SUBMIT DELIVERY
-function submitDelivery() {
+function submitBranchAssignment() {
   // FORM SUBMISSION
   let commitBtn = document.getElementById("deliveryBtn");
 
@@ -1870,7 +1857,7 @@ function submitDelivery() {
                 title: "Success",
                 text: `Receiving #: ${response.ReceivingNumber}`,
               }).then(() => {
-                loadDeliveryBasket();
+                loadDeliveryBasketContent();
               });
             } else {
               Swal.fire({
@@ -1923,22 +1910,22 @@ function loadingItems() {
           sortedData.forEach((item) => {
             rows.push([
               "DR10001",
-              // item.PickList_Num || "",
               item.DocDate || "",
               item.DateModified || "",
               item.ItemCount || "",
-              // item.Status || "Partial",
               "IN TRANSIT",
               '<div class="dropdown dropstart">' +
                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
                 '<i class="bi bi-three-dots"></i></button>' +
                 `<ul class="dropdown-menu">
                   <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
-                  <li><a class="dropdown-item create-dr" href="#" data-picklist="${item.PickList_Num}">Create Delivery</a></li>
+                  <li><a class="dropdown-item print-picklist" href="#" data-delivery="${item.PickList_Num}">Print</a></li>
                 </ul>
               </div>`,
             ]);
           });
+
+          // <li><a class="dropdown-item create-dr" href="#" data-picklist="${item.PickList_Num}">Create Delivery</a></li>
 
           if (rows.length === 0) {
             for (let i = 0; i < 8; i++) {
@@ -2261,3 +2248,177 @@ function openDeliveryForm(DeliveryNum, PicklistNumber, RowNum, SRN) {
   });
 }
 
+function formattedDate() {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+
+  document.getElementById("formattedDate").value = `${yyyy}-${mm}-${dd}`;
+}
+
+function createDr() {
+  $("#main-content").html(spinner);
+  $.post("dirs/basket/dashboard/deliveryForm.php", function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+    get_userinfo();
+    loadIAPBranchlist();
+    formattedDate();
+  });
+}
+
+function get_userinfo() {
+  $.post("dirs/basket/dashboard/actions/get_userinfo.php", {}, function (data) {
+    response = JSON.parse(data);
+    if (jQuery.trim(response.isSuccess) == "success") {
+      $("#user-origin").val(response.Data.Branch);
+      $("#prepby").val(response.Data.Fullname);
+      loadOriginWhscodes(response.Data.Branch);
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Server under restoring",
+        text: "Please come back later",
+        showConfirmButton: true,
+        confirmButtonText: "OKAY",
+        allowOutsideClick: false,
+      }).then(() => {
+        $.post("dirs/basket/dashboard/basket.php", {}, function (data) {
+          $("#main-content").html(data);
+        });
+      });
+    }
+  });
+}
+
+async function loadIAPBranchlist() {
+  $.post(
+    "dirs/basket/dashboard/actions/get_branchlist.php",
+    {},
+    function (data) {
+      const response = JSON.parse(data);
+      if ($.trim(response.isSuccess) === "success") {
+        const iapbranch = response.Data;
+        // $("#desForm").html('<option selected value="">BRANCH</option>');
+        iapbranch.forEach((iapbranch) => {
+          $("#desForm").append(
+            $("<option>", {
+              value: iapbranch.Branch,
+              text: iapbranch.Branch,
+            }),
+          );
+        });
+        if (iapbranch.length > 0) {
+          $("#desForm").val(iapbranch[0].Branch);
+          loadDestinationWhscodes(iapbranch[0].Branch);
+          console.log(`BRANCH: ${iapbranch[0].Branch}`);
+        } else {
+          console.warn("First branch is missing or invalid:", iapbranch[0]);
+        }
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Server under restoring",
+          text: "Please come back later",
+          showConfirmButton: true,
+          confirmButtonText: "OKAY",
+          allowOutsideClick: false,
+        }).then(() => {
+          $.post("dirs/basket/dashboard/basket.php", {}, function (data) {
+            $("#main-content").html(data);
+          });
+        });
+      }
+    },
+  );
+}
+
+// ORIGINAL
+$(document).on("change", "#desForm", function () {
+  const selectedBranch = $(this).val();
+  console.log(`SELECTED BRANCH: ${selectedBranch}`);
+  // const selectedText = $(this).find("option:selected").text();
+  loadDestinationWhscodes(selectedBranch);
+});
+
+async function loadOriginWhscodes(Branch) {
+  $.post(
+    "dirs/basket/dashboard/actions/get_destinationwhscode.php",
+    {
+      Branch: Branch,
+    },
+    function (data) {
+      const response = JSON.parse(data);
+      if ($.trim(response.isSuccess) === "success") {
+        const whscode = response.Data;
+        $("#originCodeForm").empty();
+        const selectedWH = whscode.find((w) => w.WhsCode.endsWith("WH"));
+        if (selectedWH) {
+          $("#originCodeForm").append(
+            $("<option>", {
+              value: selectedWH.WhsCode,
+              text: selectedWH.WhsCode,
+              title: selectedWH.WhsName,
+              selected: true,
+            }),
+          );
+        }
+        $("#originCodeForm").prop("disabled", true);
+      } else {
+        console.log(response.Data);
+        Swal.fire({
+          icon: "error",
+          title: "Server under restoring",
+          text: "Please come back later",
+          showConfirmButton: true,
+          confirmButtonText: "OKAY",
+          allowOutsideClick: false,
+        }).then(() => {
+          $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
+            $("#main-content").html(data);
+          });
+        });
+      }
+    },
+  );
+}
+
+function loadDestinationWhscodes(Branch) {
+  console.log("Sending to backend:", Branch);
+  $.post(
+    "dirs/basket/dashboard/actions/get_destinationwhscode.php",
+    {
+      Branch: Branch,
+    },
+    function (data) {
+      const response = JSON.parse(data);
+      if ($.trim(response.isSuccess) === "success") {
+        const whscode = response.Data;
+        $("#desCodeForm").empty();
+        whscode.forEach((whscode) => {
+          $("#desCodeForm").append(
+            $("<option>", {
+              value: whscode.WhsCode,
+              text: whscode.WhsCode,
+              title: whscode.WhsName,
+              selected: whscode.WhsCode.endsWith("WH"),
+            }),
+          );
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Server under restoring",
+          text: "Please come back later",
+          showConfirmButton: true,
+          confirmButtonText: "OKAY",
+          allowOutsideClick: false,
+        }).then(() => {
+          $.post("dirs/basket/dashboard/basket.php", {}, function (data) {
+            $("#main-content").html(data);
+          });
+        });
+      }
+    },
+  );
+}
