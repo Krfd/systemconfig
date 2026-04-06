@@ -3,20 +3,20 @@ require_once "../../../../config/connection.php";
 session_start();
 
 $User = $_SESSION['Uid'];
-$Delivery_Num = $_POST['DeliveryNum'];
+$BatchNumber = $_POST['BatchNumber'];
 
 try {
     $conn->beginTransaction();
 
-    $review_delivery = $conn->prepare("EXEC dbo.[REVIEW_DELIVERY] ?, ?");
-    $review_delivery->execute([$User, $Delivery_Num]);
+    $review_lodingbasket = $conn->prepare("EXEC dbo.[Review_LoadingBasket] ?, ?");
+    $review_lodingbasket->execute([$User, $BatchNumber]);
 
     // First result set (Delivery header)
-    $get_reviewDev = $review_delivery->fetch(PDO::FETCH_ASSOC);
+    $get_reviewDev = $review_lodingbasket->fetch(PDO::FETCH_ASSOC);
 
     // Move to second result set (Delivery items)
-    $review_delivery->nextRowset();
-    $get_items = $review_delivery->fetchAll(PDO::FETCH_ASSOC);
+    $review_lodingbasket->nextRowset();
+    $get_items = $review_lodingbasket->fetchAll(PDO::FETCH_ASSOC);
 
     $conn->commit();
 

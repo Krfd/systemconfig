@@ -14,7 +14,7 @@ try {
     $response = [];
 
     // Validate Pick List Number if Exist then Return
-    $validatePicklist = $conn->prepare("EXEC dbo.[Validate_Record_Picklist] ? ,?");
+    $validatePicklist = $conn->prepare("EXEC dbo.[VALIDATE_PICKLIST_TO_Delivery] ? ,?");
     $validatePicklist->execute([$Userid, $PKlistNum]);
     if ($validatePicklist->fetchColumn() > 0) {
         $conn->rollBack();
@@ -30,31 +30,31 @@ try {
 
     // INSERT EXECUTED BY
     $ins_executer = $conn->prepare("EXEC dbo.[PICKLIST_ExecutedBy] ?, ?, ?");
-    $ins_executer->execute([$Userid, $PKlistNum, $executedBy]);
+    $ins_executer->execute([$Userid, $PKListNum, $executedBy]);
 
     /* -------------------------------------------------
        1. Generate Delivery Number
     ------------------------------------------------- */
-    $stmtDeliveryNum = $conn->prepare("EXEC dbo.[LoadingBasket_Number] ?");
-    $stmtDeliveryNum->execute([$Userid]);
+    // $stmtDeliveryNum = $conn->prepare("EXEC dbo.[DELIVERY_Num_GENERATOR] ?");
+    // $stmtDeliveryNum->execute([$Userid]);
 
-    $deliveryRow = $stmtDeliveryNum->fetch(PDO::FETCH_ASSOC);
+    // $deliveryRow = $stmtDeliveryNum->fetch(PDO::FETCH_ASSOC);
 
-    if (!$deliveryRow) {
-        throw new Exception("Unable to generate batch number.");
-    }
+    // if (!$deliveryRow) {
+    //     throw new Exception("Unable to generate delivery number.");
+    // }
 
-    $BatchNumber = $deliveryRow['BatchNumber'];
+    // $DeliveryNumber = $deliveryRow['DRNumber'];
 
-    /* -------------------------------------------------
-       2. Insert Delivery Mother Record
-    ------------------------------------------------- */
-    $stmtMother = $conn->prepare("EXEC dbo.[LoadingBasket_MOTHER] ?, ?, ?");
-    $stmtMother->execute([
-        $BatchNumber,
-        $PKlistNum,
-        $Userid
-    ]);
+    // /* -------------------------------------------------
+    //    2. Insert Delivery Mother Record
+    // ------------------------------------------------- */
+    // $stmtMother = $conn->prepare("EXEC dbo.[FOR_DELIVERY_MOTHER] ?, ?, ?");
+    // $stmtMother->execute([
+    //     $DeliveryNumber,
+    //     $PKlistNum,
+    //     $Userid
+    // ]);
 
     /* -------------------------------------------------
        3. Fetch All SRN Numbers
@@ -98,13 +98,13 @@ try {
                Insert Delivery Item
             ----------------------------------------- */
             $stmtInsertItem = $conn->prepare(
-                "EXEC dbo.[LoadingBasket_Items] ?, ?, ?, ?, ?, ?, ?, ?"
+                "EXEC dbo.[DELIVERY_ITEMS_CREATE] ?, ?, ?, ?, ?, ?, ?, ?"
             );
 
             $stmtInsertItem->execute([
                 $BaseNum_SRN,
                 $PKlistNum,
-                $BatchNumber,
+                $DeliveryNumber,
                 $Brand,
                 $ItemCode,
                 $Model,
@@ -121,7 +121,7 @@ try {
 
     $response = [
         "status" => "success",
-        "message" => $BatchNumber
+        "message" => $DeliveryNumber
     ];
 
     echo json_encode($response);

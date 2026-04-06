@@ -231,41 +231,6 @@ try {
         }
     }
 
-    // function bottomLeftDetails($pdf, $executedby, $printedby, $timestamp, $textColor)
-    // {
-    //     $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
-    //     // $pdf->SetY(-100);
-    //     // $pdf->SetX(10);
-    //     $pdf->Ln(5); // 5mm gap after table
-    //     $pdf->SetX(10);
-
-    //     // Requesting Branch
-    //     $pdf->SetFont('Arial', 'B', 9);
-    //     $pdf->Cell(0, 5, 'Requesting Branch', 0, 1);
-
-    //     $pdf->SetFont('Arial', '', 9);
-    //     $pdf->Cell(0, 5, 'PLAZA - SRNPLZA100000001', 0, 1);
-
-    //     // Purpose
-    //     $pdf->SetFont('Arial', 'B', 9);
-    //     $pdf->Cell(0, 5, 'Executed by', 0, 1);
-
-    //     $pdf->SetFont('Arial', '', 9);
-    //     $pdf->Cell(0, 5, $executedby, 0, 1);
-
-    //     $pdf->Ln(3);
-
-    //     // Requested By
-    //     $pdf->SetFont('Arial', 'B', 9);
-    //     $pdf->Cell(0, 5, 'Printed by', 0, 1);
-
-    //     $pdf->SetFont('Arial', '', 9);
-    //     $pdf->Cell(0, 5, $printedby, 0, 1);
-    //     $pdf->Cell(0, 5, $timestamp, 0, 1);
-
-    //     $pdf->Ln(3);
-    // }
-
     function bottomLeftDetails($pdf, $executedby, $picklistItems, $printedby, $timestamp, $textColor)
     {
         $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);

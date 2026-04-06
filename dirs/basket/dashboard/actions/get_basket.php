@@ -7,7 +7,7 @@ $Userid     = $_GET['Uid'] ?? $_SESSION['Uid'];
 try {
     $conn->beginTransaction();
 
-    $fetch_fordelivery = $conn->prepare("EXEC dbo.[DELIVERY] ?");
+    $fetch_fordelivery = $conn->prepare("EXEC dbo.[LoadingBaskt_Prep_Delivery] ?");
     $fetch_fordelivery->execute([$Userid]);
     $get_delivery = $fetch_fordelivery->fetchAll(PDO::FETCH_ASSOC);
 

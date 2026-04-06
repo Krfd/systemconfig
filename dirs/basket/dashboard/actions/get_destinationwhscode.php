@@ -3,10 +3,6 @@ require_once "../../../../config/connection.php";
 session_start();
 $Branch = $_POST['Branch'];
 
-// Save Branch to a text file
-$filePath = "branch_log.txt"; // make sure this path is writable
-file_put_contents($filePath, $Branch . PHP_EOL, FILE_APPEND);
-
 try {
   $conn->beginTransaction();
 

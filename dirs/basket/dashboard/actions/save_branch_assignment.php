@@ -5,7 +5,7 @@ session_start();
 $User = $_SESSION['Uid'];
 
 /* ===================== SINGLE VALUES ===================== */
-$DeliveryNum   = $_POST['DeliveryNum'] ?? '';
+$BatchNum   = $_POST['BatchNum'] ?? '';
 $PickListNum   = $_POST['PickListNum'] ?? '';
 $Remarks       = $_POST['Remarks'] ?? '';
 
@@ -33,8 +33,6 @@ $NonModel     = $_POST['NonSerializedModel'] ?? [];
 $NonCategory  = $_POST['NonSerializedCategory'] ?? [];
 $NonQuantity  = $_POST['NonQuantity'] ?? [];
 
-
-
 try {
     $conn->beginTransaction();
 
@@ -47,7 +45,7 @@ try {
     $stmt = $conn->prepare("EXEC dbo.[Receiving_Mother] ?,?,?,?,?");
     $stmt->execute([
         $User,
-        $DeliveryNum,
+        $BatchNum,
         $PickListNum,
         $Receiving_Number,
         $Remarks
@@ -55,7 +53,7 @@ try {
 
     /* ===================== FETCH ORIGIN ===================== */
     $stmt = $conn->prepare("EXEC dbo.[Fetch_Request_Details] ?,?");
-    $stmt->execute([$User, $DeliveryNum]);
+    $stmt->execute([$User, $BatchNum]);
     $details = $stmt->fetchALL(PDO::FETCH_ASSOC);
 
     foreach ($details as $row) {
@@ -67,7 +65,8 @@ try {
     }
 
     /* ===================== SERIALIZED ITEMS ===================== */
-    $stmtSerialized = $conn->prepare("EXEC dbo.[Receiving_IN_Serialized] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?");
+    // $stmtSerialized = $conn->prepare("EXEC dbo.[Receiving_IN_Serialized] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?");
+    $stmtSerialized = $conn->prepare("EXEC dbo.[Receiving_IN_Serialized] ?,?,?,?,?,?,?,?,?,?,?,?,?,?");
 
     foreach ($Serial as $i => $serialVal) {
         $stmtSerialized->execute([
@@ -76,8 +75,8 @@ try {
             $Whscode,
             $BranchRcvd,
             $WhscodeRcvd,
-            $DeliveryNum,
-            $Receiving_Number,
+            $BatchNum,
+            // $Receiving_Number,
             $SRN,
             $serialVal,
             $ItemCode[$i],
@@ -90,7 +89,8 @@ try {
     }
 
     /* ===================== NON-SERIALIZED ITEMS ===================== */
-    $stmtNon = $conn->prepare("EXEC dbo.[Receiving_IN_NoNSerialized] ?,?,?,?,?,?,?,?,?,?,?,?,?");
+    // $stmtNon = $conn->prepare("EXEC dbo.[Receiving_IN_NoNSerialized] ?,?,?,?,?,?,?,?,?,?,?,?,?");
+    $stmtNon = $conn->prepare("EXEC dbo.[Receiving_IN_NoNSerialized] ?,?,?,?,?,?,?,?,?,?,?,?");
 
     foreach ($NonItemCode as $i => $code) {
         $stmtNon->execute([
@@ -99,8 +99,8 @@ try {
             $Whscode,
             $BranchRcvd,
             $WhscodeRcvd,
-            $DeliveryNum,
-            $Receiving_Number,
+            $BatchNum,
+            // $Receiving_Number,
             $SRN,
             $code,
             $NonModel[$i],
@@ -116,7 +116,7 @@ try {
     foreach ($SummaryItemCode as $i => $code) {
         $stmtSummary->execute([
             $User,
-            $DeliveryNum,
+            $BatchNum,
             $Receiving_Number,
             $SummarySerial[$i] ?? null,
             $code,

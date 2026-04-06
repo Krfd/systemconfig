@@ -133,6 +133,7 @@ $(document).on(
     }, 200);
   },
 );
+
 // PICKLIST BASKET DROPDOWN TO PICKLIST ITEMS
 $(document).on("click", ".dropdown .open-picklisted", function (e) {
   let Picklist = $(this).closest("tr").attr("data-picklist");
@@ -210,6 +211,27 @@ $(document).on("click", "#summaryTable tbody tr", function (e) {
   $serialCell.html(formattedSerial);
 });
 
+// BRANCH ASSIGNMENT
+$(document).on(
+  "click",
+  "#basketTableDashboard .dropdown .assign-branch",
+  function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    let basketRow = $(this).closest("tr");
+    let batchNum = basketRow.attr("data-batch");
+    let PicklistNum = basketRow.attr("data-picklist");
+    // let RowNum = deliveryBasketRow.attr("data-rowNum");
+
+    $("#main-content").html(spinner);
+    setTimeout(function () {
+      assignBranch(batchNum, PicklistNum);
+      // createDeliveryForm(DeliveryNum, PicklistNum, RowNum);
+    }, 200);
+  },
+);
+
 $(document).on(
   "click",
   "#loadingBasketTable .dropdown .create-dr",
@@ -220,12 +242,12 @@ $(document).on(
     let deliveryBasketRow = $(this).closest("tr");
     let DeliveryNum = deliveryBasketRow.attr("data-dr");
     let PicklistNum = deliveryBasketRow.attr("data-picklist");
-    let RowNum = deliveryBasketRow.attr("data-rowNum")
+    let RowNum = deliveryBasketRow.attr("data-rowNum");
 
     $("#main-content").html(spinner);
     setTimeout(function () {
       // assignBranch(createDeliveryNumber, picklistDr);
-      createDeliveryForm(DeliveryNum, PicklistNum, RowNum)
+      createDeliveryForm(DeliveryNum, PicklistNum, RowNum);
     }, 200);
   },
 );
@@ -257,11 +279,8 @@ $(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function () {
 });
 
 function loadDeliveryBasket(filter = "all", tableId) {
-  // $.post("dirs/basket/dashboard/components/main.php", {}, function (data) {
-  // $("#basket_content").html(data);
-
   $.ajax({
-    url: "dirs/basket/dashboard/actions/get_deliveries.php",
+    url: "dirs/basket/dashboard/actions/get_basket.php",
     type: "POST",
     dataType: "json",
     success: function (response) {
@@ -300,6 +319,8 @@ function loadDeliveryBasket(filter = "all", tableId) {
               ? "disabled"
               : "";
 
+          console.log(`LOADING BASKET DATA: ${JSON.stringify(sortedData)}`);
+
           rows.push([
             `<input type="checkbox" name="checkbox" id="${item.RowNumOrder}" data-rownum="${item.RowNumOrder}" 
               class="form-check-input checkbox align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
@@ -315,7 +336,7 @@ function loadDeliveryBasket(filter = "all", tableId) {
                   <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
                   ${
                     item.Status !== "IN TRANSIT"
-                      ? `<li><a class="dropdown-item assign-branch" href="#" data-picklist="${item.PickList_Num}">Branch Assignment</a></li>`
+                      ? `<li><a class="dropdown-item assign-branch" href="#" data-picklist="${item.PickList_Num}" data-batch="${item.Batch_Num}">Branch Assignment</a></li>`
                       : ""
                   }
                 </ul>
@@ -360,8 +381,9 @@ function loadDeliveryBasket(filter = "all", tableId) {
             if (originalItem) {
               $(row)
                 .attr("data-rownum", originalItem.RowNumOrder)
-                .attr("data-delivery-num", originalItem.Delivery_Num)
-                .attr("data-picklist", originalItem.PickList_Num);
+                // .attr("data-delivery-num", originalItem.Delivery_Num)
+                .attr("data-picklist", originalItem.PickList_Num)
+                .attr("data-batch", originalItem.Batch_Num);
             }
           },
           paging: true,
@@ -473,7 +495,7 @@ function toggleDelivery() {
       Swal.fire({
         icon: "warning",
         title: "No Available Request(s)",
-        text: "All request(s) are currently unavailable.",
+        // text: "All request(s) are currently unavailable.",
         confirmButtonText: "OKAY",
       });
       return;
@@ -1568,12 +1590,14 @@ function submitBranchDelivery() {
   });
 }
 
-function assignBranch(createDeliveryNumber, picklistDr, previousSerials = []) {
+// function assignBranch(createDeliveryNumber, picklistDr, previousSerials = []) {
+function assignBranch(batchNum, picklistDr, previousSerials = []) {
   $.post("dirs/basket/dashboard/branchAssignment.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
 
     loadImperialBrands();
-    serialDeliveryInput(createDeliveryNumber, picklistDr, previousSerials);
+    // serialDeliveryInput(createDeliveryNumber, picklistDr, previousSerials);
+    serialDeliveryInput(batchNum, picklistDr, previousSerials);
     loadIAPBranchlist();
     summaryData();
 
@@ -1603,15 +1627,15 @@ function assignBranch(createDeliveryNumber, picklistDr, previousSerials = []) {
     });
 
     $.ajax({
-      url: "dirs/basket/dashboard/actions/get_review_deliveries.php",
+      url: "dirs/basket/dashboard/actions/get_review_basket.php",
       type: "POST",
-      data: { DeliveryNum: createDeliveryNumber },
+      data: { BatchNumber: batchNum },
       dataType: "json",
       success: function (response) {
         if (response.isSuccess === "success") {
           let header = response.Data;
 
-          $("#drno").val(createDeliveryNumber);
+          $("#batchnum").val(batchNum);
           $("#pcklstno").val(picklistDr);
           $("#docdate").val(header.DocumentDate);
           $("#origin").val(header.BDestination);
@@ -1697,8 +1721,8 @@ function assignBranch(createDeliveryNumber, picklistDr, previousSerials = []) {
             });
           });
 
-          // addNonSerialize("", createDeliveryNumber, itemCode, picklistDr);
-          addNonSerialize("", createDeliveryNumber, picklistDr);
+          // addNonSerialize("", createDeliveryNumber, picklistDr);
+          addNonSerialize("", batchNum, picklistDr);
           //   }
           // });
 
@@ -1812,7 +1836,7 @@ function submitBranchAssignment() {
 
         let formData = new FormData();
 
-        formData.append("DeliveryNum", $("#drno").val());
+        formData.append("BatchNum", $("#batchnum").val());
         formData.append("PickListNum", $("#pcklstno").val());
         formData.append("Branch", $("#origin").val());
         formData.append("OrginWhscode", $("#whcode").val());
@@ -1842,7 +1866,7 @@ function submitBranchAssignment() {
         console.log("Non-Serialized:", nonSerializeItems);
 
         $.ajax({
-          url: "dirs/basket/dashboard/actions/save_dlvry_to_receiving.php",
+          url: "dirs/basket/dashboard/actions/save_branch_assignment.php",
           type: "POST",
           data: formData,
           processData: false,
@@ -1905,11 +1929,12 @@ function loadingItems() {
             (a, b) => Number(b.RowNumOrder || 0) - Number(a.RowNumOrder || 0),
           );
 
-          console.log(`DELIVERY BASKET SORTED DATA: ${JSON.stringify(sortedData)}`)
+          console.log(
+            `DELIVERY BASKET SORTED DATA: ${JSON.stringify(sortedData)}`,
+          );
 
           sortedData.forEach((item) => {
-            console.log(`PICKLIST NUMBER: ${item.PickList_Num}`)
-            // console.log(`DATA`)
+            console.log(`PICKLIST NUMBER: ${item.PickList_Num}`);
             rows.push([
               "DR10001",
               item.DocDate || "",
@@ -1926,8 +1951,6 @@ function loadingItems() {
               </div>`,
             ]);
           });
-
-          // <li><a class="dropdown-item create-dr" href="#" data-picklist="${item.PickList_Num}">Create Delivery</a></li>
 
           if (rows.length === 0) {
             for (let i = 0; i < 8; i++) {

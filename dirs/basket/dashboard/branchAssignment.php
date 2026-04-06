@@ -38,7 +38,7 @@
                                             <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                         </div>
                                     </div>
-                                    <input type="hidden" name="drno" id="drno" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                    <input type="hidden" name="batchnum" id="batchnum" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                 </div>
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-items-baseline gap-3">
