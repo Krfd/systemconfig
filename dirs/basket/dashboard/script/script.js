@@ -210,68 +210,6 @@ $(document).on("click", "#summaryTable tbody tr", function (e) {
   $serialCell.html(formattedSerial);
 });
 
-<<<<<<< HEAD
-async function loadIAPBranchlist() {
-  $.post(
-    "dirs/basket/dashboard/actions/get_branchlist.php",
-    {},
-    function (data) {
-      const response = JSON.parse(data);
-      if ($.trim(response.isSuccess) === "success") {
-        const iapbranch = response.Data;
-        $("#branch").html('<option selected value="">Select Branch</option>');
-        iapbranch.forEach((iapbranch) => {
-          $("#branch").append(
-            $("<option>", {
-              value: iapbranch.Branch,
-              text: iapbranch.Branch,
-            }),
-          );
-        });
-        if (iapbranch.length > 0) {
-          $("#branch").val(iapbranch[0].Branch);
-        }
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Server under restoring",
-          text: "Please come back later",
-          showConfirmButton: true,
-          confirmButtonText: "OKAY",
-          allowOutsideClick: false,
-        }).then(() => {
-          $.post("dirs/basket/dashboard/basket.php", {}, function (data) {
-            $("#main-content").html(data);
-          });
-        });
-      }
-    },
-  );
-}
-
-// // FROM BASKET TO ASSIGNING BRANCH
-// $(document).on(
-//   "click",
-//   "#basketTableDashboard .dropdown .assign-branch",
-//   function (e) {
-//     e.preventDefault();
-//     e.stopPropagation();
-
-//     let deliveryBasketRow = $(this).closest("tr");
-//     let createDeliveryNumber = deliveryBasketRow.attr("data-delivery-num");
-//     let picklistDr = deliveryBasketRow.attr("data-picklist");
-
-//     $("#main-content").html(spinner);
-//     setTimeout(function () {
-//       assignBranch(createDeliveryNumber, picklistDr);
-//     }, 200);
-//   },
-// );
-
-
-// FROM LOADING BASKET TO CREATE DELIVERY FORM
-=======
->>>>>>> bd035430ccb5f2d2c74b2d4dc14a64b9a64780ee
 $(document).on(
   "click",
   "#loadingBasketTable .dropdown .create-dr",
@@ -292,23 +230,6 @@ $(document).on(
   },
 );
 
-<<<<<<< HEAD
-function createDeliveryForm(DeliveryNum, PicklistNum, RowNum){
-  console.log(`DELIVERY NUMBER: ${DeliveryNum}`)
-  console.log(`PICKLIST NUMBER: ${PicklistNum}`)
-  console.log(`ROW NUMBER: ${RowNum}`)
-  console.log(`SHOULD OPEN DELIVERY FORM`)
-   $.post("dirs/basket/dashboard/deliveryForm.php", {}, function (data) {
-    $("#main-content").hide().html(data).fadeIn(200);
-
-
-
-   })
-}
-
-// LOAD DELIVERY BASKET
-=======
->>>>>>> bd035430ccb5f2d2c74b2d4dc14a64b9a64780ee
 function loadDeliveryBasketContent() {
   if ($.fn.DataTable.isDataTable("#basketTableDashboard")) {
     $("#basketTableDashboard").DataTable().clear().destroy();
@@ -326,24 +247,6 @@ function loadDeliveryBasketContent() {
 $(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function () {
   const target = $(this).attr("id");
 
-<<<<<<< HEAD
-    console.log(`LOAD BASKET`)
-
-    $.ajax({
-      url: "dirs/basket/dashboard/actions/get_deliveries.php",
-      type: "POST",
-      dataType: "json",
-      success: function (response) {
-        if (
-          !response ||
-          response.isSuccess !== "success" ||
-          !Array.isArray(response.Data)
-        ) {
-          response = {
-            isSuccess: "success",
-            Data: [],
-          };
-=======
   if (target === "all-tab") {
     loadDeliveryBasket("all", "#basketTableDashboard");
   } else if (target === "unassigned-tab") {
@@ -384,7 +287,6 @@ function loadDeliveryBasket(filter = "all", tableId) {
           filteredData = response.Data.filter(
             (item) => item.PickList_Num && item.PickList_Num.trim() !== "",
           );
->>>>>>> bd035430ccb5f2d2c74b2d4dc14a64b9a64780ee
         }
 
         // let sortedData = response.Data.sort(
@@ -426,10 +328,6 @@ function loadDeliveryBasket(filter = "all", tableId) {
             rows.push(["", "", "", "", "", "", ""]);
           }
         }
-
-        // if ($.fn.DataTable.isDataTable("#basketTableDashboard")) {
-        //   $("#basketTableDashboard").DataTable().clear().destroy();
-        // }
 
         if ($.fn.DataTable.isDataTable(tableId)) {
           $(tableId).DataTable().clear().destroy();
@@ -2023,21 +1921,13 @@ function loadingItems() {
                 '<i class="bi bi-three-dots"></i></button>' +
                 `<ul class="dropdown-menu">
                   <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
-<<<<<<< HEAD
-                  <li><a class="dropdown-item create-dr" href="#" data-picklist="${item.PickList_Num}" data-dr="${item.Delivery_Num}" data-rowNum="${item.RowNumOrder}">Create Delivery</a></li>
-=======
                   <li><a class="dropdown-item print-picklist" href="#" data-delivery="${item.PickList_Num}">Print</a></li>
->>>>>>> bd035430ccb5f2d2c74b2d4dc14a64b9a64780ee
                 </ul>
               </div>`,
             ]);
           });
 
-<<<<<<< HEAD
-          // console.log(`PICKLIST NUMBER: ${item.PickList_Num}`)
-=======
           // <li><a class="dropdown-item create-dr" href="#" data-picklist="${item.PickList_Num}">Create Delivery</a></li>
->>>>>>> bd035430ccb5f2d2c74b2d4dc14a64b9a64780ee
 
           if (rows.length === 0) {
             for (let i = 0; i < 8; i++) {
