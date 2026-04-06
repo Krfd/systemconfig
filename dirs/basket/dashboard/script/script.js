@@ -250,23 +250,59 @@ async function loadIAPBranchlist() {
   );
 }
 
+// // FROM BASKET TO ASSIGNING BRANCH
+// $(document).on(
+//   "click",
+//   "#basketTableDashboard .dropdown .assign-branch",
+//   function (e) {
+//     e.preventDefault();
+//     e.stopPropagation();
+
+//     let deliveryBasketRow = $(this).closest("tr");
+//     let createDeliveryNumber = deliveryBasketRow.attr("data-delivery-num");
+//     let picklistDr = deliveryBasketRow.attr("data-picklist");
+
+//     $("#main-content").html(spinner);
+//     setTimeout(function () {
+//       assignBranch(createDeliveryNumber, picklistDr);
+//     }, 200);
+//   },
+// );
+
+
+// FROM LOADING BASKET TO CREATE DELIVERY FORM
 $(document).on(
   "click",
-  "#basketTableDashboard .dropdown .assign-branch",
+  "#loadingBasketTable .dropdown .create-dr",
   function (e) {
     e.preventDefault();
     e.stopPropagation();
 
     let deliveryBasketRow = $(this).closest("tr");
-    let createDeliveryNumber = deliveryBasketRow.attr("data-delivery-num");
-    let picklistDr = deliveryBasketRow.attr("data-picklist");
+    let DeliveryNum = deliveryBasketRow.attr("data-dr");
+    let PicklistNum = deliveryBasketRow.attr("data-picklist");
+    let RowNum = deliveryBasketRow.attr("data-rowNum")
 
     $("#main-content").html(spinner);
     setTimeout(function () {
-      assignBranch(createDeliveryNumber, picklistDr);
+      // assignBranch(createDeliveryNumber, picklistDr);
+      createDeliveryForm(DeliveryNum, PicklistNum, RowNum)
     }, 200);
   },
 );
+
+function createDeliveryForm(DeliveryNum, PicklistNum, RowNum){
+  console.log(`DELIVERY NUMBER: ${DeliveryNum}`)
+  console.log(`PICKLIST NUMBER: ${PicklistNum}`)
+  console.log(`ROW NUMBER: ${RowNum}`)
+  console.log(`SHOULD OPEN DELIVERY FORM`)
+   $.post("dirs/basket/dashboard/deliveryForm.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+
+
+
+   })
+}
 
 // LOAD DELIVERY BASKET
 function loadDeliveryBasketContent() {
@@ -285,6 +321,8 @@ function loadDeliveryBasketContent() {
 function loadDeliveryBasket() {
   $.post("dirs/basket/dashboard/components/main.php", {}, function (data) {
     $("#basket_content").html(data);
+
+    console.log(`LOAD BASKET`)
 
     $.ajax({
       url: "dirs/basket/dashboard/actions/get_deliveries.php",
@@ -531,12 +569,9 @@ function toggleDelivery() {
     return;
   }
 
-  // console.log(`CHECK ID's: ${checkedIds.join(", ")}`);
-  // return;
-
   Swal.fire({
     icon: "question",
-    title: "Create Delivery Request on this item(s)?",
+    title: "Add to loading basket the following item(s)?",
     confirmButtonText: "Add",
     showCancelButton: true,
     cancelButtonText: "Back",
@@ -1920,7 +1955,11 @@ function loadingItems() {
             (a, b) => Number(b.RowNumOrder || 0) - Number(a.RowNumOrder || 0),
           );
 
+          console.log(`DELIVERY BASKET SORTED DATA: ${JSON.stringify(sortedData)}`)
+
           sortedData.forEach((item) => {
+            console.log(`PICKLIST NUMBER: ${item.PickList_Num}`)
+            // console.log(`DATA`)
             rows.push([
               "DR10001",
               // item.PickList_Num || "",
@@ -1934,11 +1973,13 @@ function loadingItems() {
                 '<i class="bi bi-three-dots"></i></button>' +
                 `<ul class="dropdown-menu">
                   <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
-                  <li><a class="dropdown-item create-dr" href="#" data-picklist="${item.PickList_Num}">Create Delivery</a></li>
+                  <li><a class="dropdown-item create-dr" href="#" data-picklist="${item.PickList_Num}" data-dr="${item.Delivery_Num}" data-rowNum="${item.RowNumOrder}">Create Delivery</a></li>
                 </ul>
               </div>`,
             ]);
           });
+
+          // console.log(`PICKLIST NUMBER: ${item.PickList_Num}`)
 
           if (rows.length === 0) {
             for (let i = 0; i < 8; i++) {
@@ -2192,72 +2233,74 @@ function loadDeliveryItems(PickLst_Num, del_num) {
   });
 }
 
-// OPEN DELIVERY FORM FROM DELIVERY ITEMS
-function openDeliveryForm(DeliveryNum, PicklistNumber, RowNum, SRN) {
-  $.post("dirs/delivery/dashboard/deliveryForm.php", function (data) {
-    $("#main-content").hide().html(data).fadeIn(200);
+// // OPEN DELIVERY FORM FROM DELIVERY ITEMS
+// function openDeliveryForm(DeliveryNum, PicklistNumber, RowNum, SRN) {
+//   $.post("dirs/delivery/dashboard/deliveryForm.php", function (data) {
+//     $("#main-content").hide().html(data).fadeIn(200);
 
-    $.ajax({
-      url: "dirs/delivery/dashboard/actions/get_review_deliveries.php",
-      type: "POST",
-      // data: { RowNum: RowNum },
-      data: { DeliveryNum: DeliveryNum },
-      dataType: "json",
-      success: function (response) {
-        if (response.isSuccess === "success") {
-          $("#deliverySRN").text(SRN);
-          let rowCount = response.Items.length;
-          // let rowCount = response.DevItems.length;
-          let totalQty = 0;
-          let header = response.Data;
-          let items = response.Items;
-          // let items = response.DevItems;
+//     console.log("opening delivery form")
 
-          $("#drno").val(DeliveryNum);
-          $("#pcklstno").val(PicklistNumber);
-          $("#docdate").val(header.DocDate);
-          $("#origin").val(header.Destination);
-          $("#whcode").val(header.DestinationWhs);
-          $("#branchName").val(header.Destination);
-          $("#branchWhCode").val(header.DestinationWhs);
-          $("#status").val(header.RequestStatus);
-          $("#prepby").val(header.PrepBy);
-          $("#plate").val("N/A");
-          $("#driver").val("N/A");
-          $("#remarks").val(header.Remarks) || "N/A";
-          let rows = "";
-          items.forEach(function (item, index) {
-            let quantity = parseFloat(item.Quantity) || 0;
-            totalQty += quantity;
-            rows += `
-              <tr style="height: 40px; min-height: 40px">
-                <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Brand}</td>
-                <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Model}</td>
-                <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Category}</td>
-                <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
-              </tr>
-            `;
-          });
-          $("#totalQuantity").text(totalQty);
-          // $("#deliveryTable tbody").html(rows);
-          // if (rowCount < 8) {
-          //   let emptyRowsNeeded = 8 - rowCount;
-          //   for (let i = 0; i < emptyRowsNeeded; i++) {
-          //     let emptyRow = `
-          //       <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
-          //         <td style="background: #FFFBDF"></td>
-          //         <td style="background: #FFFBDF"></td>
-          //         <td style="background: #FFFBDF"></td>
-          //         <td style="background: #FFFBDF"></td>
-          //       </tr>
-          //     `;
-          //     $("#deliveryTable tbody").append(emptyRow);
-          //   }
-          //   $("#totalQuantity").text(totalQty);
-          // }
-        }
-      },
-    });
-  });
-}
+//     $.ajax({
+//       url: "dirs/delivery/dashboard/actions/get_review_deliveries.php",
+//       type: "POST",
+//       // data: { RowNum: RowNum },
+//       data: { DeliveryNum: DeliveryNum },
+//       dataType: "json",
+//       success: function (response) {
+//         if (response.isSuccess === "success") {
+//           $("#deliverySRN").text(SRN);
+//           let rowCount = response.Items.length;
+//           // let rowCount = response.DevItems.length;
+//           let totalQty = 0;
+//           let header = response.Data;
+//           let items = response.Items;
+//           // let items = response.DevItems;
+
+//           $("#drno").val(DeliveryNum);
+//           $("#pcklstno").val(PicklistNumber);
+//           $("#docdate").val(header.DocDate);
+//           $("#origin").val(header.Destination);
+//           $("#whcode").val(header.DestinationWhs);
+//           $("#branchName").val(header.Destination);
+//           $("#branchWhCode").val(header.DestinationWhs);
+//           $("#status").val(header.RequestStatus);
+//           $("#prepby").val(header.PrepBy);
+//           $("#plate").val("N/A");
+//           $("#driver").val("N/A");
+//           $("#remarks").val(header.Remarks) || "N/A";
+//           let rows = "";
+//           items.forEach(function (item, index) {
+//             let quantity = parseFloat(item.Quantity) || 0;
+//             totalQty += quantity;
+//             rows += `
+//               <tr style="height: 40px; min-height: 40px">
+//                 <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Brand}</td>
+//                 <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Model}</td>
+//                 <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Category}</td>
+//                 <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
+//               </tr>
+//             `;
+//           });
+//           $("#totalQuantity").text(totalQty);
+//           // $("#deliveryTable tbody").html(rows);
+//           // if (rowCount < 8) {
+//           //   let emptyRowsNeeded = 8 - rowCount;
+//           //   for (let i = 0; i < emptyRowsNeeded; i++) {
+//           //     let emptyRow = `
+//           //       <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+//           //         <td style="background: #FFFBDF"></td>
+//           //         <td style="background: #FFFBDF"></td>
+//           //         <td style="background: #FFFBDF"></td>
+//           //         <td style="background: #FFFBDF"></td>
+//           //       </tr>
+//           //     `;
+//           //     $("#deliveryTable tbody").append(emptyRow);
+//           //   }
+//           //   $("#totalQuantity").text(totalQty);
+//           // }
+//         }
+//       },
+//     });
+//   });
+// }
 

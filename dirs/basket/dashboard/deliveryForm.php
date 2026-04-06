@@ -24,10 +24,15 @@
                         <form method="POST" id="delivery">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="d-flex flex-column gap-1 col-4">
-                                    <div class="d-flex align-items-baseline gap-3">
+                                    <!-- <div class="d-flex align-items-baseline gap-3">
                                         <label for="pcklstno" class="form-label text-dark-emphasis col-3"><small>Picklist No:</small></label>
                                         <input type="text" name="pcklstno" id="pcklstno" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
+                                    </div> -->
+                                    <div class="d-flex align-items-baseline gap-3">
+                                        <label for="drno" class="form-label text-dark-emphasis col-3"><small>Delivery Number:</small></label>
+                                        <input type="text" name="drno" id="drno" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                     </div>
+                                    
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
@@ -38,13 +43,23 @@
                                             <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                         </div>
                                     </div>
-                                    <input type="hidden" name="drno" id="drno" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                    <div class="input-group col p-0 d-flex gap-1">
+                                        <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
+                                            <label for="branchName" class="form-label text-dark-emphasis col-5"><small>Destination:</small></label>
+                                            <input type="text" id="branchName" class="form-control form-control-sm col ms-3" style="background: #FFFBDF">
+                                        </div>
+                                        <div class="col p-0 d-flex align-items-baseline col" hidden>
+                                            <label for="branchWhcode" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
+                                            <input type="text" id="branchWhcode" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                        </div>
+                                    </div>
+                                    <!-- <input type="hidden" name="drno" id="drno" class="form-control form-control-sm col" style="background: #FFFBDF" readonly> -->
                                 </div>
                                 <div class="d-flex flex-column gap-1 col-3">
-                                    <!-- <div class="d-flex align-baseline gap-3">
+                                    <div class="d-flex align-baseline gap-3">
                                         <label for="deldate" class="form-label text-dark-emphasis col-4"><small>Delivery Date:</small></label>
                                         <input type="date" name="deldate" id="deldate" class="form-control form-control-sm col" style="background: #FFFBDF">
-                                    </div> -->
+                                    </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="docdate" class="form-label text-dark-emphasis col-4"><small>Document Date:</small></label>
                                         <input type="text" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
@@ -72,8 +87,8 @@
                                     <button type="button" class="btn btn-sm btn-primary" id="addSerialModalBtn" data-bs-toggle="modal" data-bs-target="#addSerialModal"><i class="bi bi-plus"></i> Insert</button>
                                     <button type="button" class="btn btn-sm btn-primary" id="addDeliveryModalBtn"><i class="bi bi-plus"></i> Add</button>
                                     <button type="button" class="btn btn-sm btn-danger" id="clearDeliveryTableBtn" onclick="clearTable()">Clear</button>
-                                    <button type="button" class="btn btn-sm btn-info" id="deliverySummaryBtn" data-bs-toggle="modal" data-bs-target="#deliverySummary">Delivery</button>
-                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#nonSerializeSummary">NonSerialize</button>
+                                    <!-- <button type="button" class="btn btn-sm btn-info" id="deliverySummaryBtn" data-bs-toggle="modal" data-bs-target="#deliverySummary">Delivery</button> -->
+                                    <!-- <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#nonSerializeSummary">NonSerialize</button> -->
                                 </div>
                             </div>
                             <div class="table-responsive d-flex gap-1 overflow-auto mt-3" style="max-height: 450px">
@@ -168,7 +183,7 @@
                                 <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>
                                 <div class="p-2" style="width:120px;" id="summaryQty">0</div>
                             </div>
-                            <div class="d-flex justify-content-between align-items-end mt-5">
+                            <!-- <div class="d-flex justify-content-between align-items-end mt-5">
                                 <div class="d-flex justify-content-start align-items-end gap-1 col-3">
                                     <div class="d-flex flex-column gap-3">
                                         <div class="col">
@@ -182,6 +197,33 @@
                                     </div>
                                 </div>
                                 <button class="clearfix btn btn-primary float-end" type="submit" id="deliveryBtn">Commit</button>
+                            </div> -->
+
+                            <div class="d-flex justify-content-start align-items-start mt-5 gap-1">
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <div class="d-flex flex-column gap-1 col-3">
+                                        <div class="d-flex align-items-baseline gap-3">
+                                            <label for="prepby" class="form-label text-dark-emphasis col-4"><small>Prepared by:</small></label>
+                                            <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                        </div>
+                                        <div class="d-flex align-items-baseline gap-3">
+                                            <label for="plate" class="form-label text-dark-emphasis col-4"><small>Truck Plate No:</small></label>
+                                            <input type="text" name="plate" id="plate" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                        </div>
+                                        <div class="d-flex align-items-baseline gap-3">
+                                            <label for="driver" class="form-label text-dark-emphasis col-4"><small>Driver:</small></label>
+                                            <input type="text" name="driver" id="driver" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
+                                    <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto; resize: horizontal" readonly>
+                                        Please transfer the following units, ASAP.
+                                    </textarea>
+                                </div>
+                                <button class="clearfix btn btn-primary float-end" type="submit" id="deliveryBtn">Commit</button>
+                                </div>
                             </div>
                         </form>
                     </div>
