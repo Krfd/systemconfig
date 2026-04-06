@@ -17,9 +17,30 @@
   <link rel="stylesheet" type="text/css" href="assets/css/login.css">
   <link rel="stylesheet" href="assets/plugins/datepicker/jquery-ui.structure.min.css">
   <link rel="icon" href="assets/image/logo/iap_icon.png">
+  <!-- <style>
+    #lockScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+  </style> -->
 </head>
 
 <body>
+  <!-- <div id="lockScreen" style="display:none;">
+    <div class="lock-box">
+      <h2>Session Locked</h2>
+      <input type="password" id="password" placeholder="Enter password" />
+      <button onclick="unlock()">Unlock</button>
+    </div>
+  </div> -->
 
   <form id="frm-login">
     <div class="container d-flex justify-content-center align-items-center" style="height: 90vh;">
@@ -110,4 +131,52 @@
       }
     });
   });
+
+
+  // // INACTIVITY
+
+  // let timeout;
+  // const LOCK_TIME = 1 * 10 * 1000; // 5 minutes
+
+  // function resetTimer() {
+  //   clearTimeout(timeout);
+  //   timeout = setTimeout(lockScreen, LOCK_TIME);
+  //   console.log()
+  // }
+
+  // // Events that count as activity
+  // ['mousemove', 'keydown', 'click', 'touchstart'].forEach(event => {
+  //   document.addEventListener(event, resetTimer);
+  // });
+
+  // // Start timer
+  // resetTimer();
+
+  // let isLocked = false;
+
+  // function lockScreen() {
+  //   isLocked = true;
+  //   document.getElementById('lockScreen').style.display = 'flex';
+  // }
+
+  // // When user moves AFTER lock → focus input
+  // document.addEventListener('mousemove', () => {
+  //   if (isLocked) {
+  //     document.getElementById('password').focus();
+  //   }
+  // });
+
+
+  // function unlock() {
+  //   const password = document.getElementById('password').value;
+
+  //   // Replace with real auth call
+  //   if (password === "1234") {
+  //     isLocked = false;
+  //     document.getElementById('lockScreen').style.display = 'none';
+  //     resetTimer();
+  //   } else {
+  //     alert("Incorrect password");
+  //   }
+  // }
 </script>

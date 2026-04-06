@@ -151,7 +151,8 @@ $(document).on("click", ".dropdown .open-picklisted", function (e) {
 $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
   let serial = $(this).data("serial");
   let itemCode = $(this).data("itemcode");
-  let deliveryNumber = $(this).data("deliverynum");
+  // let deliveryNumber = $(this).data("deliverynum");
+  let lbNum = $(this).data("lbnum");
   let picklistNumber = $(this).data("picklist");
   let brand = $(this).find("td:nth-child(1)").text().trim();
   let model = $(this).find("td:nth-child(2)").text().trim();
@@ -175,7 +176,8 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
   $("#assignBranchModal #deliveryQty").text(qty);
 
   loadPicklistBranches(
-    deliveryNumber,
+    // deliveryNumber,
+    lbNum,
     picklistNumber,
     model,
     category,
@@ -214,19 +216,20 @@ $(document).on("click", "#summaryTable tbody tr", function (e) {
 // BRANCH ASSIGNMENT
 $(document).on(
   "click",
-  "#basketTableDashboard .dropdown .assign-branch",
+  // "#basketTableDashboard .dropdown .assign-branch",
+  ".datatables .dropdown .assign-branch",
   function (e) {
     e.preventDefault();
     e.stopPropagation();
 
     let basketRow = $(this).closest("tr");
-    let batchNum = basketRow.attr("data-batch");
+    let lbNum = basketRow.attr("data-lbNum");
     let PicklistNum = basketRow.attr("data-picklist");
     // let RowNum = deliveryBasketRow.attr("data-rowNum");
 
     $("#main-content").html(spinner);
     setTimeout(function () {
-      assignBranch(batchNum, PicklistNum);
+      assignBranch(lbNum, PicklistNum);
       // createDeliveryForm(DeliveryNum, PicklistNum, RowNum);
     }, 200);
   },
@@ -300,15 +303,19 @@ function loadDeliveryBasket(filter = "all", tableId) {
         let filteredData = response.Data;
         if (filter === "unassigned") {
           filteredData = response.Data.filter(
-            (item) => !item.PickList_Num || item.PickList_Num.trim() === "",
+            (item) =>
+              !item.PickList_Num ||
+              item.PickList_Num.trim() === "" ||
+              item.Status === "NEW",
           );
         } else if (filter === "assigned") {
           filteredData = response.Data.filter(
-            (item) => item.PickList_Num && item.PickList_Num.trim() !== "",
+            (item) =>
+              item.PickList_Num &&
+              item.PickList_Num.trim() !== "" &&
+              item.Status === "ASSIGNED",
           );
         }
-
-        // let sortedData = response.Data.sort(
         let sortedData = filteredData.sort(
           (a, b) => Number(b.RowNumOrder || 0) - Number(a.RowNumOrder || 0),
         );
@@ -318,8 +325,6 @@ function loadDeliveryBasket(filter = "all", tableId) {
             item.PickList_Num && item.PickList_Num.trim() !== ""
               ? "disabled"
               : "";
-
-          console.log(`LOADING BASKET DATA: ${JSON.stringify(sortedData)}`);
 
           rows.push([
             `<input type="checkbox" name="checkbox" id="${item.RowNumOrder}" data-rownum="${item.RowNumOrder}" 
@@ -336,7 +341,7 @@ function loadDeliveryBasket(filter = "all", tableId) {
                   <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
                   ${
                     item.Status !== "IN TRANSIT"
-                      ? `<li><a class="dropdown-item assign-branch" href="#" data-picklist="${item.PickList_Num}" data-batch="${item.Batch_Num}">Branch Assignment</a></li>`
+                      ? `<li><a class="dropdown-item assign-branch" href="#" data-picklist="${item.PickList_Num}" data-lbNum="${item.LoadingB_Num}">Branch Assignment</a></li>`
                       : ""
                   }
                 </ul>
@@ -383,7 +388,7 @@ function loadDeliveryBasket(filter = "all", tableId) {
                 .attr("data-rownum", originalItem.RowNumOrder)
                 // .attr("data-delivery-num", originalItem.Delivery_Num)
                 .attr("data-picklist", originalItem.PickList_Num)
-                .attr("data-batch", originalItem.Batch_Num);
+                .attr("data-lbNum", originalItem.LoadingB_Num);
             }
           },
           paging: true,
@@ -526,7 +531,6 @@ function toggleDelivery() {
     });
     // loadDeliveryBtn.textContent = "Add Items";
     // loadDeliveryBtn.type = "button";
-
     return;
   }
 
@@ -544,7 +548,7 @@ function toggleDelivery() {
 
   Swal.fire({
     icon: "question",
-    title: "Add to loading basket the following item(s)?",
+    title: "Add the following item(s) to delivery basket?",
     confirmButtonText: "Add",
     showCancelButton: true,
     cancelButtonText: "Back",
@@ -588,7 +592,7 @@ function toggleDelivery() {
   });
 }
 
-function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
+function serialDeliveryInput(lbNum, PicklistDr, previousSerials) {
   $("#serial-delivery").on("submit", function (e) {
     e.preventDefault();
     const serialInput = $("#newSerial");
@@ -604,7 +608,8 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
         type: "POST",
         data: {
           ItemSerial: latestInput,
-          DrNumber: DeliveryNumber,
+          // DrNumber: DeliveryNumber,
+          lbNum: lbNum,
           ItemCode: ItemCode,
         },
         dataType: "json",
@@ -651,13 +656,14 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                 `tr[data-itemcode="${itemCode}"]`,
               );
               loadPicklistBranches(
-                DeliveryNumber,
+                // DeliveryNumber,
+                lbNum,
                 PicklistDr,
                 model,
                 category,
                 function (length, branchName) {
-                  console.log(`BRANCH LENGTH: ${length}`);
                   if (length > 1) {
+                    console.log(`BRANCHES LENGTH: ${length}`);
                     rows += `
                         <tr style="height: 40px; min-height: 40px;" data-serial="${latestInput}">
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
@@ -671,11 +677,11 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                         0;
                       $existingRow.find("td:nth-child(4)").text(currentQty + 1);
 
-                      $existingRow.find("td:nth-child(5)").html(`
-                          <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">
-                              Assigned
-                          </span>
-                      `);
+                      // $existingRow.find("td:nth-child(5)").html(`
+                      //     <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">
+                      //         Assigned
+                      //     </span>
+                      // `);
 
                       // ✅ Update data attributes if needed
                       $existingRow.attr("data-serial", latestInput);
@@ -683,7 +689,7 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                     } else {
                       // ✅ CREATE NEW ROW
                       let newRow = `
-                        <tr data-itemcode="${itemCode}" data-serialbased="true" data-serial="${latestInput}" data-deliverynum="${DeliveryNumber}" data-picklist="${PicklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
+                        <tr data-itemcode="${itemCode}" data-serialbased="true" data-serial="${latestInput}" data-lbnum="${lbNum}" data-picklist="${PicklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
                           <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
                           <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
                           <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
@@ -719,11 +725,11 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                         .find("td:nth-child(7)")
                         .text(currentQty + 1);
 
-                      $existingRow.find("td:nth-child(5)").html(`
-                          <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">
-                              Assigned
-                          </span>
-                      `);
+                      // $existingRow.find("td:nth-child(5)").html(`
+                      //     <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">
+                      //         Assigned
+                      //     </span>
+                      // `);
 
                       // ✅ Update data attributes if needed
                       $existingRow.attr("data-serial", latestInput);
@@ -731,7 +737,7 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                     } else {
                       // ✅ CREATE NEW ROW
                       let newRow = `
-                          <tr data-itemcode="${itemCode}" data-serial="${latestInput}" data-deliverynum="${DeliveryNumber}" data-picklist="${PicklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
+                          <tr data-itemcode="${itemCode}" data-serial="${latestInput}" data-lbnum="${lbNum}" data-picklist="${PicklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
                             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
                             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
                             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
@@ -861,10 +867,12 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
 function validateBranchAssignment() {
   let totalInput = 0;
 
-  $("#branchToDeliverModal tbody td[contenteditable='true']").each(function () {
-    let val = parseInt($(this).text().trim()) || 0;
-    totalInput += val;
-  });
+  $("#branchAssignmentTable tbody td[contenteditable='true']").each(
+    function () {
+      let val = parseInt($(this).text().trim()) || 0;
+      totalInput += val;
+    },
+  );
 
   let requiredQty = parseInt($("#deliveryQty").text()) || 0;
 
@@ -883,7 +891,7 @@ function validateBranchAssignment() {
   // FORCE NUMERIC INPUT
   $(document).on(
     "keypress",
-    "#branchToDeliverModal td[contenteditable='true']",
+    "#branchAssignmentTable td[contenteditable='true']",
     function (e) {
       if (!/[0-9]/.test(e.key)) {
         e.preventDefault();
@@ -894,7 +902,7 @@ function validateBranchAssignment() {
   // PREVENT EMPTY
   $(document).on(
     "blur",
-    "#branchToDeliverModal td[contenteditable='true']",
+    "#branchAssignmentTable td[contenteditable='true']",
     function () {
       if ($(this).text().trim() === "") {
         $(this).text("0");
@@ -927,7 +935,7 @@ function branchDelivery() {
     $("#nonSerializeSummary").DataTable().clear().destroy();
   }
 
-  $("#branchToDeliverModal tbody tr").each(function () {
+  $("#branchAssignmentTable tbody tr").each(function () {
     let branch = $(this).find("td:nth-child(1)").text().trim();
     let model = $(this).find("td:nth-child(2)").text().trim();
     let category = $(this).find("td:nth-child(3)").text().trim();
@@ -1163,7 +1171,7 @@ function summaryData() {
 }
 
 function resetBranchQuantities() {
-  $("#branchToDeliverModal tbody")
+  $("#branchAssignmentTable tbody")
     .find("td[contenteditable='true']")
     .each(function () {
       $(this).text("");
@@ -1171,7 +1179,8 @@ function resetBranchQuantities() {
 }
 
 function loadPicklistBranches(
-  deliveryNumber,
+  // deliveryNumber,
+  lbNum,
   picklistNumber,
   model,
   category,
@@ -1181,7 +1190,8 @@ function loadPicklistBranches(
     url: "dirs/basket/dashboard/actions/get_product_distribution_setup.php",
     type: "POST",
     data: {
-      DRNumber: deliveryNumber,
+      // DRNumber: deliveryNumber,
+      lbNum: lbNum,
       PicklistNum: picklistNumber,
     },
     dataType: "json",
@@ -1189,7 +1199,7 @@ function loadPicklistBranches(
       if (response.isSuccess === "success") {
         let branches = response.Data;
 
-        let tbody = $("#branchToDeliverModal tbody");
+        let tbody = $("#branchAssignmentTable tbody");
         tbody.empty();
 
         let length = branches.length;
@@ -1208,6 +1218,7 @@ function loadPicklistBranches(
             tbody.append(row);
           });
         }
+        // console.log(`BRANCHES LENGTH: ${length}`);
         if (callback) callback(length, branches[0].ReqBranch);
       }
     },
@@ -1217,7 +1228,8 @@ function loadPicklistBranches(
   });
 }
 
-function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
+// function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
+function addNonSerialize(ItemSerial, lbNum, picklistDr) {
   $("#frm-add-delivery")
     .off("submit")
     .on("submit", function (e) {
@@ -1291,13 +1303,13 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
                 `tr[data-itemcode="${itemCode}"]`,
               );
               loadPicklistBranches(
-                DrNumber,
+                lbNum,
                 picklistDr,
                 model,
                 category,
                 function (length, branchName) {
-                  console.log(`BRANCH LENGTH: ${length}`);
                   if (length > 1) {
+                    // console.log(`ASSIGNED: ${length}`);
                     rows += `
                         <tr style="height: 40px; min-height: 40px;">
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
@@ -1314,15 +1326,13 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
                         .text(currentQty + quantity);
 
                       $existingRow.find("td:nth-child(5)").html(`
-                          <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">
-                              Assigned
-                          </span>
+                          <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">Assigned</span>
                       `);
 
                       $existingRow.attr("data-itemcode", itemCode);
                     } else {
                       let newRow = `
-                        <tr data-itemcode="${itemCode}" data-deliverynum="${DrNumber}" data-picklist="${picklistDr}" style="height: 40px; min-height: 40px;">
+                        <tr data-itemcode="${itemCode}" data-lbnum="${lbNum}" data-picklist="${picklistDr}" style="height: 40px; min-height: 40px;">
                           <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
                           <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
                           <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
@@ -1353,7 +1363,6 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
                       let currentQty =
                         parseInt($existingRow.find("td:nth-child(4)").text()) ||
                         0;
-                      // $existingRow.find("td:nth-child(4)").text(currentQty + 1);
                       $existingRow
                         .find("td:nth-child(4)")
                         .text(currentQty + quantity);
@@ -1369,7 +1378,7 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
                       $existingRow.attr("data-itemcode", itemCode);
                     } else {
                       let newRow = `
-                          <tr data-itemcode="${itemCode}" data-deliverynum="${DrNumber}" data-picklist="${picklistDr}" style="height: 40px; min-height: 40px;">
+                          <tr data-itemcode="${itemCode}" data-lbnum="${lbNum}" data-picklist="${picklistDr}" style="height: 40px; min-height: 40px;">
                             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
                             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
                             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
@@ -1591,21 +1600,21 @@ function submitBranchDelivery() {
 }
 
 // function assignBranch(createDeliveryNumber, picklistDr, previousSerials = []) {
-function assignBranch(batchNum, picklistDr, previousSerials = []) {
+function assignBranch(lbNum, picklistDr, previousSerials = []) {
   $.post("dirs/basket/dashboard/branchAssignment.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
 
     loadImperialBrands();
     // serialDeliveryInput(createDeliveryNumber, picklistDr, previousSerials);
-    serialDeliveryInput(batchNum, picklistDr, previousSerials);
+    serialDeliveryInput(lbNum, picklistDr, previousSerials);
     loadIAPBranchlist();
     summaryData();
 
     $(document)
-      .off("input", "#branchToDeliverModal td[contenteditable='true']")
+      .off("input", "#branchAssignmentTable td[contenteditable='true']")
       .on(
         "input",
-        "#branchToDeliverModal td[contenteditable='true']",
+        "#branchAssignmentTable td[contenteditable='true']",
         function () {
           validateBranchAssignment();
         },
@@ -1629,15 +1638,15 @@ function assignBranch(batchNum, picklistDr, previousSerials = []) {
     $.ajax({
       url: "dirs/basket/dashboard/actions/get_review_basket.php",
       type: "POST",
-      data: { BatchNumber: batchNum },
+      data: { lbNum: lbNum },
       dataType: "json",
       success: function (response) {
         if (response.isSuccess === "success") {
           let header = response.Data;
 
-          $("#batchnum").val(batchNum);
+          $("#lbnum").val(lbNum);
           $("#pcklstno").val(picklistDr);
-          $("#docdate").val(header.DocumentDate);
+          $("#docdate").val(header.DocDate);
           $("#origin").val(header.BDestination);
           $("#whcode").val(header.BWhsDestination);
           $("#status").val(header.Delivery_Status || "NEW");
@@ -1722,7 +1731,7 @@ function assignBranch(batchNum, picklistDr, previousSerials = []) {
           });
 
           // addNonSerialize("", createDeliveryNumber, picklistDr);
-          addNonSerialize("", batchNum, picklistDr);
+          addNonSerialize("", lbNum, picklistDr);
           //   }
           // });
 
@@ -1748,7 +1757,7 @@ function assignBranch(batchNum, picklistDr, previousSerials = []) {
 // SUBMIT DELIVERY
 function submitBranchAssignment() {
   // FORM SUBMISSION
-  let commitBtn = document.getElementById("deliveryBtn");
+  let commitBtn = document.getElementById("branchAssignmentBtn");
 
   commitBtn.addEventListener("click", function (e) {
     e.preventDefault();
@@ -1836,7 +1845,7 @@ function submitBranchAssignment() {
 
         let formData = new FormData();
 
-        formData.append("BatchNum", $("#batchnum").val());
+        formData.append("LoadingB_Num", $("#lbnum").val());
         formData.append("PickListNum", $("#pcklstno").val());
         formData.append("Branch", $("#origin").val());
         formData.append("OrginWhscode", $("#whcode").val());
@@ -1845,6 +1854,7 @@ function submitBranchAssignment() {
         // SERIALIZED
         items.forEach((item, i) => {
           formData.append(`Serial[${i}]`, item.serial);
+          formData.append(`BranchFor[${i}]`, item.branch);
           formData.append(`Brand[${i}]`, item.brand);
           formData.append(`Model[${i}]`, item.model);
           formData.append(`ItemCode[${i}]`, item.itemCode);
@@ -1876,8 +1886,7 @@ function submitBranchAssignment() {
             if (response.isSuccess === "success") {
               Swal.fire({
                 icon: "success",
-                title: "Success",
-                text: `Receiving #: ${response.ReceivingNumber}`,
+                title: "Items has been assigned",
               }).then(() => {
                 loadDeliveryBasketContent();
               });
@@ -1908,7 +1917,8 @@ function loadingItems() {
     $("#main-content").hide().html(data).fadeIn(200);
 
     $.ajax({
-      url: "dirs/basket/dashboard/actions/get_deliveries.php",
+      // url: "dirs/basket/dashboard/actions/get_deliveries.php",
+      url: "dirs/basket/dashboard/actions/get_basket.php",
       type: "POST",
       dataType: "json",
       success: function (response) {
@@ -1929,14 +1939,10 @@ function loadingItems() {
             (a, b) => Number(b.RowNumOrder || 0) - Number(a.RowNumOrder || 0),
           );
 
-          console.log(
-            `DELIVERY BASKET SORTED DATA: ${JSON.stringify(sortedData)}`,
-          );
-
           sortedData.forEach((item) => {
             console.log(`PICKLIST NUMBER: ${item.PickList_Num}`);
             rows.push([
-              "DR10001",
+              "DR10001", // BATCH DELIVERY
               item.DocDate || "",
               item.DateModified || "",
               item.ItemCount || "",
@@ -1947,6 +1953,7 @@ function loadingItems() {
                 `<ul class="dropdown-menu">
                   <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
                   <li><a class="dropdown-item print-picklist" href="#" data-delivery="${item.PickList_Num}">Print</a></li>
+                  <li><a class="dropdown-item create-dr" href="#" data-batch="${item.PickList_Num}">Create DR</a></li>
                 </ul>
               </div>`,
             ]);
@@ -1965,13 +1972,7 @@ function loadingItems() {
           $("#loadingBasketTable").DataTable({
             data: rows,
             columns: [
-              {
-                title: "Batch Delivery No.",
-              },
-              // {
-              //   title: "Picklist No.",
-              //   className: "text-start open-picklist ps-5",
-              // },
+              { title: "Batch Delivery No." },
               { title: "Date Created", className: "text-start ps-2" },
               { title: "Date Modified", className: "text-start ps-2" },
               { title: "Quantity", className: "text-start ps-2" },
@@ -2338,7 +2339,6 @@ async function loadIAPBranchlist() {
         if (iapbranch.length > 0) {
           $("#desForm").val(iapbranch[0].Branch);
           loadDestinationWhscodes(iapbranch[0].Branch);
-          console.log(`BRANCH: ${iapbranch[0].Branch}`);
         } else {
           console.warn("First branch is missing or invalid:", iapbranch[0]);
         }
@@ -2363,8 +2363,6 @@ async function loadIAPBranchlist() {
 // ORIGINAL
 $(document).on("change", "#desForm", function () {
   const selectedBranch = $(this).val();
-  console.log(`SELECTED BRANCH: ${selectedBranch}`);
-  // const selectedText = $(this).find("option:selected").text();
   loadDestinationWhscodes(selectedBranch);
 });
 
@@ -2411,7 +2409,6 @@ async function loadOriginWhscodes(Branch) {
 }
 
 function loadDestinationWhscodes(Branch) {
-  console.log("Sending to backend:", Branch);
   $.post(
     "dirs/basket/dashboard/actions/get_destinationwhscode.php",
     {

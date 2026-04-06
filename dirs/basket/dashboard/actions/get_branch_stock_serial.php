@@ -55,7 +55,7 @@ try {
     /* ==============================
        VALIDATE DELIVERY ITEM (TOP 1)
     ============================== */
-    $stmt = $conn->prepare("EXEC dbo.[VALIDATION_ITM_DELIVERY] ?, ?, ?");
+    $stmt = $conn->prepare("EXEC dbo.[Val_item_Delivery] ?, ?, ?");
     // $stmt->execute([$Branch, $DrNumber, $item['ItemCode']]);
     $stmt->execute([$Branch, $BatchNumber, $item['ItemCode']]);
     $validation = $stmt->fetch(PDO::FETCH_ASSOC);

@@ -38,7 +38,7 @@
                                             <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                         </div>
                                     </div>
-                                    <input type="hidden" name="batchnum" id="batchnum" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                    <input type="hidden" name="lbnum" id="lbnum" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
                                 </div>
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-items-baseline gap-3">
@@ -172,11 +172,11 @@
                                         </div>
                                         <div class="d-flex align-items-baseline col">
                                             <label for="prepby" class="form-label text-dark-emphasis col-5"><small>Prepared by:</small></label>
-                                            <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #f2f2f2" required>
+                                            <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #f2f2f2" readonly required>
                                         </div>
                                     </div>
                                 </div>
-                                <button class="clearfix btn btn-primary float-end" type="submit" id="deliveryBtn">Commit</button>
+                                <button class="clearfix btn btn-primary float-end" type="submit" id="branchAssignmentBtn">Commit</button>
                             </div>
                         </form>
                     </div>

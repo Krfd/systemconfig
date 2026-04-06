@@ -1,4 +1,0 @@
-[2026-04-06 10:38:50] Error: [2] SQLSTATE[42S02]: [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'TO_DELIVERY'. in C:\xampp\htdocs\iShift\dirs\basket\dashboard\actions\get_branch_stock_serial.php on line 58
-[2026-04-06 10:42:00] Error: [2] SQLSTATE[42S02]: [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'TO_DELIVERY'. in C:\xampp\htdocs\iShift\dirs\basket\dashboard\actions\get_product_distribution_setup.php on line 13
-[2026-04-06 10:43:30] Error: [2] SQLSTATE[42S02]: [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'TO_DELIVERY'. in C:\xampp\htdocs\iShift\dirs\basket\dashboard\actions\get_product_distribution_setup.php on line 13
-[2026-04-06 10:43:44] Error: [2] SQLSTATE[42S02]: [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid object name 'TO_DELIVERY'. in C:\xampp\htdocs\iShift\dirs\basket\dashboard\actions\get_product_distribution_setup.php on line 13

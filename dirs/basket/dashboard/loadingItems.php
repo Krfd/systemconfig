@@ -5,7 +5,7 @@
                 <i class="bi bi-arrow-left"></i>
             </button>
             <div class="d-flex justify-content-start align-items-start gap-3">
-                <h3 class="fw-bold text-primary">Loading Basket</h3>
+                <h3 class="fw-bold text-primary">Delivery Basket</h3>
             </div>
         </div>
     </div>

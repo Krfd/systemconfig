@@ -15,7 +15,7 @@
                     <input type="hidden" id="brand">
                     <input type="hidden" id="itemCode">
                     <div class="table-responsive">
-                        <table class="table table-hover datatables" id="branchToDeliverModal">
+                        <table class="table table-hover datatables" id="branchAssignmentTable">
                             <thead class="sticky-top">
                                 <tr>
                                     <th class="text-secondary">Branch</th>

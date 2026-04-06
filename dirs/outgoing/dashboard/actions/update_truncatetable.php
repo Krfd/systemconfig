@@ -15,6 +15,7 @@ try {
     ]);
     exit;
 } catch (PDOException $e) {
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollBack();
     echo "Error: " . $e->getMessage();
 }

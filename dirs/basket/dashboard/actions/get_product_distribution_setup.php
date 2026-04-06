@@ -3,14 +3,14 @@ require_once "../../../../config/connection.php";
 session_start();
 
 $User         = $_SESSION['Uid'];
-$DRNumber     = $_POST['DRNumber'];
+$lbNum     = $_POST['lbNum'];
 $PicklistNum  = $_POST['PicklistNum'];
 
 try {
   $conn->beginTransaction();
 
-  $branch_distribution = $conn->prepare("EXEC dbo.[Product_Distribution_Delivery] ?, ?, ?");
-  $branch_distribution->execute([$DRNumber, $User, $PicklistNum]);
+  $branch_distribution = $conn->prepare("EXEC dbo.[Product_Distribution_LoadingBasket] ?, ?, ?");
+  $branch_distribution->execute([$lbNum, $User, $PicklistNum]);
   $get_branch = $branch_distribution->fetchAll(PDO::FETCH_ASSOC);
 
   $conn->commit();

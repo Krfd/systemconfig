@@ -5,12 +5,11 @@ session_start();
 $User = $_SESSION['Uid'];
 
 /* ===================== SINGLE VALUES ===================== */
-$LoadingB_Num   = $_POST['LoadingB_Num'] ?? '';
+$lbNum   = $_POST['lbNum'] ?? '';
 $PickListNum   = $_POST['PickListNum'] ?? '';
 $Remarks       = $_POST['Remarks'] ?? '';
 
 /* Summary */
-$SummaryBranch     = $_POST['BranchFor'] ?? [];
 $SummaryBrand     = $_POST['SummaryBrand'] ?? [];
 $SummaryModel     = $_POST['SummaryModel'] ?? [];
 $SummaryCategory  = $_POST['SummaryCategory'] ?? [];
@@ -38,45 +37,71 @@ try {
     $conn->beginTransaction();
 
     /* ===================== GENERATE RECEIVING NUMBER ===================== */
-    $stmt = $conn->prepare("EXEC dbo.[Branch_Assignment_NumGenerator] ?");
+    $stmt = $conn->prepare("EXEC dbo.[Receiving_Number_Generator] ?");
     $stmt->execute([$User]);
-    $BA_Number = $stmt->fetch(PDO::FETCH_ASSOC)['BA_Number'];
+    $Receiving_Number = $stmt->fetch(PDO::FETCH_ASSOC)['ReceivingNumber'];
 
     /* ===================== INSERT HEADER ===================== */
-    $stmt = $conn->prepare("EXEC dbo.[BA_Mother] ?,?,?,?,?");
+    $stmt = $conn->prepare("EXEC dbo.[Receiving_Mother] ?,?,?,?,?");
     $stmt->execute([
         $User,
-        $LoadingB_Num,
+        $lbNum,
         $PickListNum,
-        $BA_Number,
+        $Receiving_Number,
         $Remarks
     ]);
 
+    /* ===================== FETCH ORIGIN ===================== */
+    $stmt = $conn->prepare("EXEC dbo.[Fetch_Request_Details] ?,?");
+    $stmt->execute([$User, $lbNum]);
+    $details = $stmt->fetchALL(PDO::FETCH_ASSOC);
+
+    foreach ($details as $row) {
+        $SRN          = $row['BaseNum_SRN'];
+        $Branch       = $row['Orgin_Dstnation'];
+        $Whscode      = $row['Origin_Whscode'];
+        $BranchRcvd   = $row['Brnch_Dstnation'];
+        $WhscodeRcvd  = $row['Dstnation_Whscode'];
+    }
+
     /* ===================== SERIALIZED ITEMS ===================== */
-    $stmtSerialized = $conn->prepare("EXEC dbo.[BA_IN_Serialized] ?,?,?,?,?,?,?,?,?");
+    // $stmtSerialized = $conn->prepare("EXEC dbo.[Receiving_IN_Serialized] ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?");
+    $stmtSerialized = $conn->prepare("EXEC dbo.[Receiving_IN_Serialized] ?,?,?,?,?,?,?,?,?,?,?,?,?,?");
 
     foreach ($Serial as $i => $serialVal) {
         $stmtSerialized->execute([
-            $SummaryBranch[$i],
-            $LoadingB_Num,
-            $BA_Number,
+            $User,
+            $Branch,
+            $Whscode,
+            $BranchRcvd,
+            $WhscodeRcvd,
+            $lbNum,
+            // $Receiving_Number,
+            $SRN,
             $serialVal,
             $ItemCode[$i],
             $Model[$i],
             $Brand[$i],
             $Category[$i],
+            $PickListNum,
             $Quantity[$i]
         ]);
     }
 
     /* ===================== NON-SERIALIZED ITEMS ===================== */
-    $stmtNon = $conn->prepare("EXEC dbo.[BA_IN_NoNSerialized] ?,?,?,?,?,?,?,?");
+    // $stmtNon = $conn->prepare("EXEC dbo.[Receiving_IN_NoNSerialized] ?,?,?,?,?,?,?,?,?,?,?,?,?");
+    $stmtNon = $conn->prepare("EXEC dbo.[Receiving_IN_NoNSerialized] ?,?,?,?,?,?,?,?,?,?,?,?");
 
     foreach ($NonItemCode as $i => $code) {
         $stmtNon->execute([
-            $LoadingB_Num,
-            $BA_Number,
-            $SummaryBranch[$i],
+            $User,
+            $Branch,
+            $Whscode,
+            $BranchRcvd,
+            $WhscodeRcvd,
+            $lbNum,
+            // $Receiving_Number,
+            $SRN,
             $code,
             $NonModel[$i],
             $NonBrand[$i],
@@ -85,11 +110,28 @@ try {
         ]);
     }
 
+    /* ===================== SUMMARY ===================== */
+    $stmtSummary = $conn->prepare("EXEC dbo.[Receiving_IN_Summary] ?,?,?,?,?,?,?,?,?");
+
+    foreach ($SummaryItemCode as $i => $code) {
+        $stmtSummary->execute([
+            $User,
+            $lbNum,
+            $Receiving_Number,
+            $SummarySerial[$i] ?? null,
+            $code,
+            $SummaryModel[$i],
+            $SummaryBrand[$i],
+            $SummaryCategory[$i],
+            $SummaryAllocated[$i]
+        ]);
+    }
+
     $conn->commit();
 
     echo json_encode([
         "isSuccess" => "success",
-        "ReceivingNumber" => $BA_Number
+        "ReceivingNumber" => $Receiving_Number
     ]);
 } catch (PDOException $e) {
     $conn->rollback();
