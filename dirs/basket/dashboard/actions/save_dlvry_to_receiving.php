@@ -7,9 +7,6 @@ $User = $_SESSION['Uid'];
 /* ===================== SINGLE VALUES ===================== */
 $DeliveryNum   = $_POST['DeliveryNum'] ?? '';
 $PickListNum   = $_POST['PickListNum'] ?? '';
-// $DeliveryDate  = $_POST['DeliveryDate'] ?? '';
-// $TruckPlateNum = $_POST['TruckPlateNum'] ?? '';
-// $TruckDriver   = $_POST['TruckDriver'] ?? '';
 $Remarks       = $_POST['Remarks'] ?? '';
 
 /* Summary */
@@ -47,16 +44,12 @@ try {
     $Receiving_Number = $stmt->fetch(PDO::FETCH_ASSOC)['ReceivingNumber'];
 
     /* ===================== INSERT HEADER ===================== */
-    // $stmt = $conn->prepare("EXEC dbo.[Receiving_Mother] ?,?,?,?,?,?,?,?");
     $stmt = $conn->prepare("EXEC dbo.[Receiving_Mother] ?,?,?,?,?");
     $stmt->execute([
         $User,
         $DeliveryNum,
         $PickListNum,
         $Receiving_Number,
-        // $DeliveryDate,
-        // $TruckPlateNum,
-        // $TruckDriver,
         $Remarks
     ]);
 

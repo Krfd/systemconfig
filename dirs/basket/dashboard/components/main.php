@@ -1,4 +1,3 @@
-<!-- <div class="container-fluid px-4"> -->
 <div class="d-flex justify-content-between align-items-start">
     <div class="d-flex justify-content-start align-items-start gap-3">
         <h3 class="fw-bold text-primary">Branch Assignment</h3>
@@ -10,9 +9,82 @@
         <button class="btn btn-primary" type="button" onclick="loadingItems()" id="createDeliveryBtn">
             <i class="bi bi-cart-check"></i>
         </button>
+        <button class="btn btn-primary" type="button" onclick="createDr()" id="createDrButton">
+            <i class="bi bi-plus-lg"></i> Create DR
+        </button>
     </div>
 </div>
-<div class="table-responsive-md">
+<ul class="nav nav-tabs nav-tabs-bordered d-flex mt-5" id="borderedTabJustified" role="tablist">
+    <li class="nav-item flex-fill" role="presentation">
+        <button class="nav-link w-100 active" id="all-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-all" type="button" role="tab" aria-controls="all" aria-selected="true">All</button>
+    </li>
+    <li class="nav-item flex-fill" role="presentation">
+        <button class="nav-link w-100" id="unassigned-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-unassigned" type="button" role="tab" aria-controls="unassigned" aria-selected="false">Unassigned</button>
+    </li>
+    <li class="nav-item flex-fill" role="presentation">
+        <button class="nav-link w-100" id="assigned-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-assigned" type="button" role="tab" aria-controls="assigned" aria-selected="false">Assigned</button>
+    </li>
+</ul>
+<div class="tab-content pt-2" id="borderedTabJustifiedContent">
+    <div class="tab-pane fade show active" id="bordered-justified-all" role="tabpanel" aria-labelledby="all-tab">
+        <div class="table-responsive-md">
+            <table class="table datatables table-hover" id="basketTableDashboard">
+                <thead class="sticky-top">
+                    <tr>
+                        <th></th>
+                        <th class="text-secondary">Picklist No.</th>
+                        <th class="text-secondary">Date Created</th>
+                        <th class="text-secondary">Date Modified</th>
+                        <th class="text-secondary">Quantity</th>
+                        <th class="text-secondary">Status</th>
+                        <th class="text-secondary"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="bordered-justified-unassigned" role="tabpanel" aria-labelledby="unassigned-tab">
+        <div class="table-responsive-md">
+            <table class="table datatables table-hover" id="basketTableUnassigned">
+                <thead class="sticky-top">
+                    <tr>
+                        <th></th>
+                        <th class="text-secondary">Picklist No.</th>
+                        <th class="text-secondary">Date Created</th>
+                        <th class="text-secondary">Date Modified</th>
+                        <th class="text-secondary">Quantity</th>
+                        <th class="text-secondary">Status</th>
+                        <th class="text-secondary"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="bordered-justified-assigned" role="tabpanel" aria-labelledby="assigned-tab">
+        <div class="table-responsive-md">
+            <table class="table datatables table-hover" id="basketTableAssigned">
+                <thead class="sticky-top">
+                    <tr>
+                        <th></th>
+                        <th class="text-secondary">Picklist No.</th>
+                        <th class="text-secondary">Date Created</th>
+                        <th class="text-secondary">Date Modified</th>
+                        <th class="text-secondary">Quantity</th>
+                        <th class="text-secondary">Status</th>
+                        <th class="text-secondary"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- <div class="table-responsive-md">
     <table class="table datatables table-hover" id="basketTableDashboard">
         <thead class="sticky-top">
             <tr>
@@ -28,5 +100,4 @@
         <tbody>
         </tbody>
     </table>
-</div>
-<!-- </div> -->
+</div> -->

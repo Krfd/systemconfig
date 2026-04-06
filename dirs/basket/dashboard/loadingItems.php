@@ -14,7 +14,6 @@
             <thead class="sticky-top">
                 <tr>
                     <th class="text-secondary">Batch Delivery No.</th>
-                    <!-- <th class="text-secondary">Picklist No.</th> -->
                     <th class="text-secondary">Date Created</th>
                     <th class="text-secondary">Date Modified</th>
                     <th class="text-secondary">Quantity</th>

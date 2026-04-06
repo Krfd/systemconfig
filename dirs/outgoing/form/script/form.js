@@ -100,13 +100,11 @@ function get_userinfo() {
   $.post("dirs/outgoing/form/actions/get_userinfo.php", {}, function (data) {
     response = JSON.parse(data);
     if (jQuery.trim(response.isSuccess) == "success") {
-      // $("#user-origin").val(response.Data.Branch);
       $("#desForm").val(response.Data.Branch);
       $("#Status").val(response.Data.Bcode);
       $("#reqByForm").val(response.Data.Fullname);
       loadDestinationWhscodes(response.Data.Branch);
     } else {
-      // alert(jQuery.trim(response.Data));
       console.log(response.Data);
       Swal.fire({
         icon: "error",
