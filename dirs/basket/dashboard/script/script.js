@@ -249,8 +249,8 @@ $(document).on(
 
     $("#main-content").html(spinner);
     setTimeout(function () {
-      // assignBranch(createDeliveryNumber, picklistDr);
-      createDeliveryForm(DeliveryNum, PicklistNum, RowNum);
+      // createDeliveryForm(DeliveryNum, PicklistNum, RowNum);
+      createDr();
     }, 200);
   },
 );
@@ -319,10 +319,11 @@ function loadDeliveryBasket(filter = "all", tableId) {
         let sortedData = filteredData.sort(
           (a, b) => Number(b.RowNumOrder || 0) - Number(a.RowNumOrder || 0),
         );
-
         sortedData.forEach((item) => {
           const isDisabled =
-            item.PickList_Num && item.PickList_Num.trim() !== ""
+            item.BatchNum !== null &&
+            item.BatchNum !== undefined &&
+            item.BatchNum !== ""
               ? "disabled"
               : "";
 
@@ -359,7 +360,6 @@ function loadDeliveryBasket(filter = "all", tableId) {
           $(tableId).DataTable().clear().destroy();
         }
 
-        // $("#basketTableDashboard").DataTable({
         $(tableId).DataTable({
           data: rows,
           columns: [
@@ -386,9 +386,9 @@ function loadDeliveryBasket(filter = "all", tableId) {
             if (originalItem) {
               $(row)
                 .attr("data-rownum", originalItem.RowNumOrder)
-                // .attr("data-delivery-num", originalItem.Delivery_Num)
                 .attr("data-picklist", originalItem.PickList_Num)
-                .attr("data-lbNum", originalItem.LoadingB_Num);
+                .attr("data-lbNum", originalItem.LoadingB_Num)
+                .attr("data-batchnum", originalItem.BatchNum);
             }
           },
           paging: true,
@@ -476,31 +476,55 @@ $(document).on("click", "#deliveryItemsTable tbody .open-srn", function (e) {
 
 function toggleDelivery() {
   const loadDeliveryBtn = document.getElementById("loadDeliveryBtn");
-  const checkedIds = [];
+  const PickListNum = [];
+  const LoadingB_Num = [];
 
   const selectionMode =
     $("#basketTableDashboard tbody .checkbox:visible").length > 0;
+
   $("#basketTableDashboard tbody .checkbox:checked").each(function () {
-    checkedIds.push($(this).data("rownum"));
+    const row = $(this).closest("tr");
+
+    const picklist = row.attr("data-picklist");
+    const lbNum = row.attr("data-lbNum");
+
+    if (picklist && lbNum) {
+      PickListNum.push(picklist);
+      LoadingB_Num.push(lbNum);
+    }
   });
 
+  console.log("PickListNum:", PickListNum);
+  console.log("LoadingB_Num:", LoadingB_Num);
+
+  // ✅ FIRST CLICK (SHOW CHECKBOXES)
   if (!selectionMode) {
     let availableRows = 0;
 
     $("#basketTableDashboard tbody tr").each(function () {
+      // const row = $(this);
+      // const statusText = row.find("td:eq(5)").text().trim().toUpperCase();
+
+      // if (statusText === "ASSIGNED") {
+      //   availableRows++;
+      // }
       const row = $(this);
       const statusText = row.find("td:eq(5)").text().trim().toUpperCase();
+      const batchNum = row.attr("data-batchnum");
 
-      if (statusText === "ASSIGNED") {
+      const hasBatch = batchNum && batchNum !== "null" && batchNum !== "";
+
+      if (statusText === "ASSIGNED" && !hasBatch) {
         availableRows++;
       }
     });
+
+    console.log(`AVAILABLE ROWS: ${availableRows}`);
 
     if (availableRows === 0) {
       Swal.fire({
         icon: "warning",
         title: "No Available Request(s)",
-        // text: "All request(s) are currently unavailable.",
         confirmButtonText: "OKAY",
       });
       return;
@@ -511,36 +535,43 @@ function toggleDelivery() {
       const statusText = row.find("td:eq(5)").text().trim().toUpperCase();
       const checkbox = row.find(".checkbox");
 
+      const batchNum = row.attr("data-batchnum"); // ✅ get batch number
+
       const restrictedStatuses = ["UNASSIGNED", "IN TRANSIT"];
 
       if (statusText === "ASSIGNED") {
         checkbox.show();
 
-        if (restrictedStatuses.includes(statusText)) {
+        // ✅ Disable if has batch number
+        if (batchNum && batchNum !== "null" && batchNum !== "") {
           checkbox.prop("disabled", true);
-          loadDeliveryBtn.textContent = "Load Items";
-          loadDeliveryBtn.type = "button";
+          checkbox.attr("title", "Already has batch delivery number");
+        } else if (restrictedStatuses.includes(statusText)) {
+          checkbox.prop("disabled", true);
         } else {
           checkbox.prop("disabled", false);
-          loadDeliveryBtn.textContent = "Add Items";
-          loadDeliveryBtn.type = "button";
         }
+
+        loadDeliveryBtn.textContent = "Add Items";
+        loadDeliveryBtn.type = "button";
       } else {
         checkbox.hide();
       }
     });
-    // loadDeliveryBtn.textContent = "Add Items";
-    // loadDeliveryBtn.type = "button";
+
     return;
   }
 
-  if (checkedIds.length == 0) {
+  // ✅ SECOND CLICK (PROCESS SELECTION)
+  if (PickListNum.length == 0) {
     Swal.fire({
       icon: "warning",
       title: "Please select at least one item to create a picklist",
       confirmButtonText: "OKAY",
     });
+
     $("#basketTableDashboard tbody .checkbox").hide().prop("checked", false);
+
     loadDeliveryBtn.textContent = "Load Items";
     loadDeliveryBtn.type = "button";
     return;
@@ -555,22 +586,23 @@ function toggleDelivery() {
   }).then((result) => {
     if (result.isConfirmed) {
       $.ajax({
-        url: "dirs/basket/dashboard/actions/save_createpicklist.php",
+        url: "dirs/basket/dashboard/actions/save_create_delivery_batch.php",
         type: "POST",
-        data: { RowNumber: checkedIds },
+        data: { PickListNum: PickListNum, LoadingB_Num: LoadingB_Num },
         dataType: "json",
         success: function (response) {
-          if (response.status === "success") {
+          if (response.isSuccess === "success") {
             Swal.fire({
               icon: "success",
               title: response.message,
               confirmButtonText: "OKAY",
             });
+
             $("#basketTableDashboard tbody .checkbox")
               .hide()
               .prop("checked", false);
+
             loadDeliveryBtn.textContent = "Create DR";
-            loadIncoming();
           } else {
             Swal.fire({
               icon: "error",
@@ -580,7 +612,7 @@ function toggleDelivery() {
             });
           }
         },
-        error: function (xhr) {
+        error: function () {
           Swal.fire({
             icon: "error",
             title: "Server Error",
@@ -608,7 +640,6 @@ function serialDeliveryInput(lbNum, PicklistDr, previousSerials) {
         type: "POST",
         data: {
           ItemSerial: latestInput,
-          // DrNumber: DeliveryNumber,
           lbNum: lbNum,
           ItemCode: ItemCode,
         },
@@ -1917,8 +1948,7 @@ function loadingItems() {
     $("#main-content").hide().html(data).fadeIn(200);
 
     $.ajax({
-      // url: "dirs/basket/dashboard/actions/get_deliveries.php",
-      url: "dirs/basket/dashboard/actions/get_basket.php",
+      url: "dirs/basket/dashboard/actions/get_delivery_basket.php",
       type: "POST",
       dataType: "json",
       success: function (response) {
@@ -1932,21 +1962,19 @@ function loadingItems() {
             Data: [],
           };
         }
-
         let rows = [];
         if (response.isSuccess === "success") {
-          let sortedData = response.Data.sort(
-            (a, b) => Number(b.RowNumOrder || 0) - Number(a.RowNumOrder || 0),
-          );
+          let sortedData = response.Data;
 
-          sortedData.forEach((item) => {
-            console.log(`PICKLIST NUMBER: ${item.PickList_Num}`);
+          // console.log(`DELIVERY BASKET DATA: ${JSON.stringify(sortedData)}`);
+
+          sortedData.forEach((item, index) => {
+            let counter = index + 1;
             rows.push([
-              "DR10001", // BATCH DELIVERY
-              item.DocDate || "",
-              item.DateModified || "",
-              item.ItemCount || "",
-              "IN TRANSIT",
+              "DR1000" + counter,
+              item.BatchNum || "",
+              response.picklistCount || "",
+              item.BatchStatus || "",
               '<div class="dropdown dropstart">' +
                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
                 '<i class="bi bi-three-dots"></i></button>' +
@@ -1961,7 +1989,7 @@ function loadingItems() {
 
           if (rows.length === 0) {
             for (let i = 0; i < 8; i++) {
-              rows.push(["", "", "", "", "", ""]);
+              rows.push(["", "", "", "", ""]);
             }
           }
 
@@ -1972,15 +2000,24 @@ function loadingItems() {
           $("#loadingBasketTable").DataTable({
             data: rows,
             columns: [
-              { title: "Batch Delivery No." },
-              { title: "Date Created", className: "text-start ps-2" },
-              { title: "Date Modified", className: "text-start ps-2" },
-              { title: "Quantity", className: "text-start ps-2" },
+              { title: "Delivery No." },
+              { title: "Batch Delivery No.", className: "text-primary ps-2" },
+              { title: "Picklist Qty", className: "text-start ps-2" },
               {
                 title: "Status",
                 className: "text-start ps-2",
                 render: function (data, type, row) {
-                  return `<span class="badge bg-primary">${data}</span>`;
+                  let status = data ? data.toUpperCase() : "";
+
+                  let badgeClass = "bg-secondary"; // default
+
+                  if (status === "PREPARING") badgeClass = "bg-warning";
+                  else if (status === "IN TRANSIT")
+                    badgeClass = "bg-primary text-white";
+                  else if (status === "DELIVERED") badgeClass = "bg-success";
+                  else if (status === "CANCELLED") badgeClass = "bg-danger";
+
+                  return `<span class="badge ${badgeClass}">${status}</span>`;
                 },
               },
               { title: "", orderable: false },
@@ -1990,8 +2027,8 @@ function loadingItems() {
 
               if (originalItem) {
                 $(row)
-                  .attr("data-rownum", originalItem.RowNumOrder)
-                  .attr("data-delivery-num", originalItem.Delivery_Num)
+                  // .attr("data-rownum", originalItem.RowNumOrder)
+                  .attr("data-delivery-num", originalItem.BatchNum)
                   .attr("data-picklist", originalItem.PickList_Num);
               }
             },
@@ -2291,7 +2328,6 @@ function createDr() {
     $("#main-content").hide().html(data).fadeIn(200);
     get_userinfo();
     loadIAPBranchlist();
-    formattedDate();
   });
 }
 
@@ -2327,7 +2363,6 @@ async function loadIAPBranchlist() {
       const response = JSON.parse(data);
       if ($.trim(response.isSuccess) === "success") {
         const iapbranch = response.Data;
-        // $("#desForm").html('<option selected value="">BRANCH</option>');
         iapbranch.forEach((iapbranch) => {
           $("#desForm").append(
             $("<option>", {
@@ -2336,9 +2371,10 @@ async function loadIAPBranchlist() {
             }),
           );
         });
-        if (iapbranch.length > 0) {
-          $("#desForm").val(iapbranch[0].Branch);
-          loadDestinationWhscodes(iapbranch[0].Branch);
+        if (iapbranch.length > 0 && iapbranch[0].Branch) {
+          const firstBranch = iapbranch[0].Branch;
+          $("#desForm").val(firstBranch);
+          loadDestinationWhscodes(firstBranch);
         } else {
           console.warn("First branch is missing or invalid:", iapbranch[0]);
         }
@@ -2361,10 +2397,21 @@ async function loadIAPBranchlist() {
 }
 
 // ORIGINAL
-$(document).on("change", "#desForm", function () {
-  const selectedBranch = $(this).val();
-  loadDestinationWhscodes(selectedBranch);
-});
+// $(document).on("change", "#desForm", function () {
+//   const selectedBranch = $(this).val();
+//   loadDestinationWhscodes(selectedBranch);
+//   console.log(`SELECTED BRANCH: ${selectedBranch}`);
+// });
+
+$(document)
+  .off("change", "#desForm")
+  .on("change", "#desForm", function () {
+    const selectedBranch = $(this).val();
+
+    if (!selectedBranch) return;
+
+    loadDestinationWhscodes(selectedBranch);
+  });
 
 async function loadOriginWhscodes(Branch) {
   $.post(
@@ -2409,12 +2456,20 @@ async function loadOriginWhscodes(Branch) {
 }
 
 function loadDestinationWhscodes(Branch) {
+  if (!Branch || typeof Branch !== "string" || Branch.trim() === "") {
+    // console.warn("Blocked invalid Branch:", Branch);
+    return;
+  }
+
+  // console.log("VALID CALL:", Branch);
+
   $.post(
     "dirs/basket/dashboard/actions/get_destinationwhscode.php",
     {
       Branch: Branch,
     },
     function (data) {
+      // console.log(`BRANCH: ${Branch}`);
       const response = JSON.parse(data);
       if ($.trim(response.isSuccess) === "success") {
         const whscode = response.Data;
