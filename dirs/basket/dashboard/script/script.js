@@ -474,30 +474,159 @@ $(document).on("click", "#deliveryItemsTable tbody .open-srn", function (e) {
   }, 200);
 });
 
+// function toggleDelivery() {
+//   const loadDeliveryBtn = document.getElementById("loadDeliveryBtn");
+//   const PickListNum = [];
+//   const LoadingB_Num = [];
+
+//   const selectionMode =
+//     $("#basketTableDashboard tbody .checkbox:visible").length > 0;
+
+//   $("#basketTableDashboard tbody .checkbox:checked").each(function () {
+//     const row = $(this).closest("tr");
+
+//     const picklist = row.attr("data-picklist");
+//     const lbNum = row.attr("data-lbNum");
+
+//     if (picklist && lbNum) {
+//       PickListNum.push(picklist);
+//       LoadingB_Num.push(lbNum);
+//     }
+//   });
+
+//   console.log(`PICKLIST NUM: ${PickListNum}`);
+//   console.log(`LOADING NUM: ${LoadingB_Num}`);
+
+//   // ✅ FIRST CLICK (SHOW CHECKBOXES)
+//   if (!selectionMode) {
+//     let availableRows = 0;
+
+//     $("#basketTableDashboard tbody tr").each(function () {
+//       const row = $(this);
+//       const statusText = row.find("td:eq(5)").text().trim().toUpperCase();
+//       const batchNum = row.attr("data-batchnum");
+
+//       const hasBatch = batchNum && batchNum !== "null" && batchNum !== "";
+
+//       if (statusText === "ASSIGNED" && !hasBatch) {
+//         availableRows++;
+//       }
+//     });
+
+//     if (availableRows === 0) {
+//       Swal.fire({
+//         icon: "warning",
+//         title: "No Available Request(s)",
+//         confirmButtonText: "OKAY",
+//       });
+//       return;
+//     }
+
+//     console.log(`AVAILABLE ROWS: ${availableRows}`);
+
+//     $("#basketTableDashboard tbody tr").each(function () {
+//       const row = $(this);
+//       const statusText = row.find("td:eq(5)").text().trim().toUpperCase();
+//       const checkbox = row.find(".checkbox");
+
+//       const batchNum = row.attr("data-batchnum"); // ✅ get batch number
+
+//       const restrictedStatuses = ["UNASSIGNED", "IN TRANSIT"];
+
+//       if (statusText === "ASSIGNED") {
+//         checkbox.show();
+
+//         // ✅ Disable if has batch number
+//         if (batchNum && batchNum !== "null" && batchNum !== "") {
+//           checkbox.prop("disabled", true);
+//           checkbox.attr("title", "Already has batch delivery number");
+//         } else if (restrictedStatuses.includes(statusText)) {
+//           checkbox.prop("disabled", true);
+//         } else {
+//           checkbox.prop("disabled", false);
+//         }
+
+//         loadDeliveryBtn.textContent = "Add Items";
+//         loadDeliveryBtn.type = "button";
+//       } else {
+//         checkbox.hide();
+//       }
+//     });
+
+//     return;
+//   }
+
+//   // ✅ SECOND CLICK (PROCESS SELECTION)
+//   if (PickListNum.length == 0) {
+//     Swal.fire({
+//       icon: "warning",
+//       title: "Please select at least one item to create a picklist",
+//       confirmButtonText: "OKAY",
+//     });
+
+//     $("#basketTableDashboard tbody .checkbox").hide().prop("checked", false);
+
+//     loadDeliveryBtn.textContent = "Load Items";
+//     loadDeliveryBtn.type = "button";
+//     return;
+//   }
+
+//   Swal.fire({
+//     icon: "question",
+//     title: "Add the following item(s) to delivery basket?",
+//     confirmButtonText: "Add",
+//     showCancelButton: true,
+//     cancelButtonText: "Back",
+//   }).then((result) => {
+//     if (result.isConfirmed) {
+//       $.ajax({
+//         url: "dirs/basket/dashboard/actions/save_create_delivery_batch.php",
+//         type: "POST",
+//         data: { PickListNum: PickListNum, LoadingB_Num: LoadingB_Num },
+//         dataType: "json",
+//         success: function (response) {
+//           if (response.isSuccess === "success") {
+//             Swal.fire({
+//               icon: "success",
+//               title: response.message,
+//               confirmButtonText: "OKAY",
+//             });
+
+//             $("#basketTableDashboard tbody .checkbox")
+//               .hide()
+//               .prop("checked", false);
+
+//             loadDeliveryBtn.textContent = "Create DR";
+//           } else {
+//             Swal.fire({
+//               icon: "error",
+//               title: response.message,
+//               confirmButtonText: "OKAY",
+//               confirmButtonColor: "#d33",
+//             });
+//           }
+//         },
+//         error: function () {
+//           Swal.fire({
+//             icon: "error",
+//             title: "Server Error",
+//             text: "Something went wrong while processing the request.",
+//           });
+//         },
+//       });
+//     }
+//   });
+// }
+
 function toggleDelivery() {
   const loadDeliveryBtn = document.getElementById("loadDeliveryBtn");
-  const PickListNum = [];
-  const LoadingB_Num = [];
 
-  const selectionMode =
-    $("#basketTableDashboard tbody .checkbox:visible").length > 0;
+  // ✅ Reliable state tracking (instead of :visible)
+  let selectionMode = $("#basketTableDashboard").data("selectionMode") || false;
 
-  $("#basketTableDashboard tbody .checkbox:checked").each(function () {
-    const row = $(this).closest("tr");
-
-    const picklist = row.attr("data-picklist");
-    const lbNum = row.attr("data-lbNum");
-
-    if (picklist && lbNum) {
-      PickListNum.push(picklist);
-      LoadingB_Num.push(lbNum);
-    }
-  });
-
-  console.log("PickListNum:", PickListNum);
-  console.log("LoadingB_Num:", LoadingB_Num);
-
+  // =========================
   // ✅ FIRST CLICK (SHOW CHECKBOXES)
+  // =========================
   if (!selectionMode) {
     let availableRows = 0;
 
@@ -522,96 +651,185 @@ function toggleDelivery() {
       return;
     }
 
+    console.log("AVAILABLE ROWS:", availableRows);
+
     $("#basketTableDashboard tbody tr").each(function () {
       const row = $(this);
       const statusText = row.find("td:eq(5)").text().trim().toUpperCase();
       const checkbox = row.find(".checkbox");
-
-      const batchNum = row.attr("data-batchnum"); // ✅ get batch number
-
-      const restrictedStatuses = ["UNASSIGNED", "IN TRANSIT"];
+      const batchNum = row.attr("data-batchnum");
 
       if (statusText === "ASSIGNED") {
-        checkbox.show();
+        // ✅ Force display (avoids CSS issues)
+        checkbox.css("display", "inline-block");
 
-        // ✅ Disable if has batch number
+        // ✅ Disable if already has batch
         if (batchNum && batchNum !== "null" && batchNum !== "") {
           checkbox.prop("disabled", true);
           checkbox.attr("title", "Already has batch delivery number");
-        } else if (restrictedStatuses.includes(statusText)) {
-          checkbox.prop("disabled", true);
         } else {
           checkbox.prop("disabled", false);
         }
-
-        loadDeliveryBtn.textContent = "Add Items";
-        loadDeliveryBtn.type = "button";
       } else {
         checkbox.hide();
       }
     });
 
+    // ✅ Update UI
+    loadDeliveryBtn.textContent = "Add Items";
+
+    // ✅ Save state
+    $("#basketTableDashboard").data("selectionMode", true);
+
     return;
   }
 
-  // ✅ SECOND CLICK (PROCESS SELECTION)
-  if (PickListNum.length == 0) {
+  // =========================
+  // ✅ SECOND CLICK (GET SELECTED)
+  // =========================
+  const PickListNum = [];
+  const LoadingB_Num = [];
+
+  $("#basketTableDashboard tbody .checkbox:checked").each(function () {
+    const row = $(this).closest("tr");
+
+    const picklist = row.attr("data-picklist");
+    const lbNum = row.attr("data-lbNum");
+
+    if (picklist && lbNum) {
+      PickListNum.push(picklist);
+      LoadingB_Num.push(lbNum);
+    }
+  });
+
+  console.log("PICKLIST NUM:", PickListNum);
+  console.log("LOADING NUM:", LoadingB_Num);
+  console.log("CHECKED COUNT:", $(".checkbox:checked").length);
+
+  // =========================
+  // ❌ NOTHING SELECTED
+  // =========================
+  if (PickListNum.length === 0) {
     Swal.fire({
       icon: "warning",
-      title: "Please select at least one item to create a picklist",
+      title: "Please select at least one item",
       confirmButtonText: "OKAY",
     });
 
+    // reset UI
     $("#basketTableDashboard tbody .checkbox").hide().prop("checked", false);
 
     loadDeliveryBtn.textContent = "Load Items";
-    loadDeliveryBtn.type = "button";
+    $("#basketTableDashboard").data("selectionMode", false);
+
     return;
   }
 
+  // =========================
+  // ✅ CONFIRM ACTION
+  // =========================
   Swal.fire({
     icon: "question",
-    title: "Add the following item(s) to delivery basket?",
+    title: "Add selected item(s) to delivery basket?",
     confirmButtonText: "Add",
     showCancelButton: true,
     cancelButtonText: "Back",
   }).then((result) => {
     if (result.isConfirmed) {
-      $.ajax({
-        url: "dirs/basket/dashboard/actions/save_create_delivery_batch.php",
-        type: "POST",
-        data: { PickListNum: PickListNum, LoadingB_Num: LoadingB_Num },
-        dataType: "json",
-        success: function (response) {
-          if (response.isSuccess === "success") {
-            Swal.fire({
-              icon: "success",
-              title: response.message,
-              confirmButtonText: "OKAY",
-            });
+      Swal.fire({
+        // title: "Driver",
+        // input: "text",
+        // inputAttributes: {
+        //   autocapitalize: "off",
+        // },
+        html: `
+          <label for="swal-driver">Driver</label>
+          <input id="swal-driver" type="text" class="swal2-input" placeholder="Enter driver name">
 
-            $("#basketTableDashboard tbody .checkbox")
-              .hide()
-              .prop("checked", false);
+          <label for="swal-plate">Plate Number</label>
+          <input id="swal-plate" type="text" class="swal2-input" placeholder="Enter plate number">
+        `,
+        // showCancelButton: true,
+        // confirmButtonText: "Continue",
+        // cancelButtonText: "Cancel",
+        // inputValidator: (value) => {
+        //   if (!value) {
+        //     return "Executed By is required!";
+        //   }
+        // },
+        showCancelButton: true,
+        confirmButtonText: "Continue",
+        cancelButtonText: "Cancel",
+        focusConfirm: false,
+        preConfirm: () => {
+          const driver = document.getElementById("swal-driver").value.trim();
+          const plate = document.getElementById("swal-plate").value.trim();
 
-            loadDeliveryBtn.textContent = "Create DR";
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: response.message,
-              confirmButtonText: "OKAY",
-              confirmButtonColor: "#d33",
-            });
+          if (!driver) {
+            Swal.showValidationMessage("Driver is required!");
+            return false;
           }
+
+          if (!plate) {
+            Swal.showValidationMessage("Plate Number is required!");
+            return false;
+          }
+
+          return { driver, plate };
         },
-        error: function () {
-          Swal.fire({
-            icon: "error",
-            title: "Server Error",
-            text: "Something went wrong while processing the request.",
-          });
-        },
+      }).then((result) => {
+        // let driver = userInput.value;
+
+        if (result.isConfirmed) {
+          const { driver, plate } = result.value;
+
+          console.log("Driver:", driver);
+          console.log("Plate Number:", plate);
+
+          return;
+        }
       });
+
+      // $.ajax({
+      //   url: "dirs/basket/dashboard/actions/save_create_delivery_batch.php",
+      //   type: "POST",
+      //   data: {
+      //     PickListNum: PickListNum,
+      //     LoadingB_Num: LoadingB_Num,
+      //   },
+      //   dataType: "json",
+      //   success: function (response) {
+      //     if (response.isSuccess === "success") {
+      //       // Swal.fire({
+      //       //   icon: "success",
+      //       //   title: response.message,
+      //       //   confirmButtonText: "OKAY",
+      //       // });
+
+      //       $("#basketTableDashboard tbody .checkbox")
+      //         .hide()
+      //         .prop("checked", false);
+
+      //       loadDeliveryBtn.textContent = "Create DR";
+      //       $("#basketTableDashboard").data("selectionMode", false);
+      //       createDr();
+      //     } else {
+      //       Swal.fire({
+      //         icon: "error",
+      //         title: response.message,
+      //         confirmButtonText: "OKAY",
+      //         confirmButtonColor: "#d33",
+      //       });
+      //     }
+      //   },
+      //   error: function () {
+      //     Swal.fire({
+      //       icon: "error",
+      //       title: "Server Error",
+      //       text: "Something went wrong while processing the request.",
+      //     });
+      //   },
+      // });
     }
   });
 }
@@ -1077,9 +1295,10 @@ function clearTable() {
       let row = [];
 
       $("#delivery-serial-table tbody").empty();
-      // $("#deliveryTable tbody").empty();
       $("#summaryTable tbody").empty();
       $("#summaryDeliveryTable tbody").empty();
+
+      // $("#deliveryFormTable tbody").empty();
 
       for (let i = 0; i < 8; i++) {
         row = `
@@ -1094,7 +1313,7 @@ function clearTable() {
         </tr>
         `;
 
-        // $("#deliveryTable tbody").append(row);
+        // $("#deliveryFormTable tbody").append(row);
         $("#summaryTable tbody").append(row);
         $("#summaryDeliveryTable tbody").append(row);
       }
@@ -1334,7 +1553,7 @@ function addNonSerialize(ItemSerial, lbNum, picklistDr) {
                   if (length > 1) {
                     // console.log(`ASSIGNED: ${length}`);
                     rows += `
-                        <tr style="height: 40px; min-height: 40px;">
+                        <tr style="height: 40px; min-height: 40px; cursor: pointer">
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${model}</td>
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${category}</td>
@@ -1355,7 +1574,7 @@ function addNonSerialize(ItemSerial, lbNum, picklistDr) {
                       $existingRow.attr("data-itemcode", itemCode);
                     } else {
                       let newRow = `
-                        <tr data-itemcode="${itemCode}" data-lbnum="${lbNum}" data-picklist="${picklistDr}" style="height: 40px; min-height: 40px;">
+                        <tr data-itemcode="${itemCode}" data-lbnum="${lbNum}" data-picklist="${picklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
                           <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
                           <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
                           <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
@@ -1376,7 +1595,7 @@ function addNonSerialize(ItemSerial, lbNum, picklistDr) {
                     }
                   } else {
                     rows += `
-                        <tr style="height: 40px; min-height: 40px;">
+                        <tr style="height: 40px; min-height: 40px; cursor: pointer">
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${model}</td>
                           <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${category}</td>
@@ -1401,7 +1620,7 @@ function addNonSerialize(ItemSerial, lbNum, picklistDr) {
                       $existingRow.attr("data-itemcode", itemCode);
                     } else {
                       let newRow = `
-                          <tr data-itemcode="${itemCode}" data-lbnum="${lbNum}" data-picklist="${picklistDr}" style="height: 40px; min-height: 40px;">
+                          <tr data-itemcode="${itemCode}" data-lbnum="${lbNum}" data-picklist="${picklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
                             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
                             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
                             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
@@ -1470,7 +1689,7 @@ function addNonSerialize(ItemSerial, lbNum, picklistDr) {
                         ).first();
 
                         let newRow = $(`
-                              <tr data-itemcode="${itemCode}" style="padding: 3px; height: 40px; min-height: 40px">
+                              <tr data-itemcode="${itemCode}" style="padding: 3px; height: 40px; min-height: 40px; cursor: pointer">
                                 <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
                                 <td style="background:#FFFBDF" class="text-primary"></td>
                                 <td style="background:#FFFBDF">${branchName}</td>
@@ -1628,7 +1847,6 @@ function assignBranch(lbNum, picklistDr, previousSerials = []) {
     $("#main-content").hide().html(data).fadeIn(200);
 
     loadImperialBrands();
-    // serialDeliveryInput(createDeliveryNumber, picklistDr, previousSerials);
     serialDeliveryInput(lbNum, picklistDr, previousSerials);
     loadIAPBranchlist();
     summaryData();
@@ -1895,8 +2113,6 @@ function submitBranchAssignment() {
         });
 
         // ================= DEBUG =================
-        console.log("Serialized:", items);
-        console.log("Non-Serialized:", nonSerializeItems);
 
         $.ajax({
           url: "dirs/basket/dashboard/actions/save_branch_assignment.php",
@@ -1958,8 +2174,6 @@ function loadingItems() {
         if (response.isSuccess === "success") {
           let basketData = response.Data;
 
-          // console.log(`DELIVERY BASKET DATA: ${JSON.stringify(sortedData)}`);
-
           // sortedData.forEach((item, index) => {
           //   let counter = index + 1;
           //   rows.push([
@@ -1978,7 +2192,6 @@ function loadingItems() {
           //     </div>`,
           //   ]);
           // });
-          console.log(`BASKET DATA: ${JSON.stringify(basketData)}`)
 
           basketData.forEach((item, index) => {
             rows.push([
@@ -2097,8 +2310,6 @@ function loadingItems() {
 function loadDeliveryItems(PickLst_Num, del_num) {
   $.post("dirs/basket/dashboard/loadDeliveryItems.php", {}, function (data) {
     $("#main-content").html(data);
-
-    console.log(`DELIVERY BASKET BREAKDOWN`)
 
     deliveryPicklistNum = PickLst_Num;
     deliveryNum = del_num;
@@ -2325,15 +2536,35 @@ function deliveryDate() {
   document.getElementById("deldate").value = `${yyyy}-${mm}-${dd}`;
 }
 
+// ORIGINAL
 function createDr() {
   $("#main-content").html(spinner);
   $.post("dirs/basket/dashboard/deliveryForm.php", function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
     get_userinfo();
     loadIAPBranchlist();
-    deliveryDate()
+    deliveryDate();
+
+    const addBtn = document.getElementById("addDeliveryModalBtn");
+    const newItemModal = new bootstrap.Modal(
+      document.getElementById("addDeliveryModal"),
+    );
+
+    addBtn.addEventListener("click", function () {
+      newItemModal.show();
+    });
   });
 }
+
+// function createDelivery() {
+//   $("#main-content").html(spinner);
+//   $.post("dirs/basket/dashboard/deliveryForm.php", function (data) {
+//     $("#main-content").hide().html(data).fadeIn(200);
+//     get_userinfo();
+//     loadIAPBranchlist();
+//     deliveryDate();
+//   });
+// }
 
 function get_userinfo() {
   $.post("dirs/basket/dashboard/actions/get_userinfo.php", {}, function (data) {

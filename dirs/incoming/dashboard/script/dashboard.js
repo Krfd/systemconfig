@@ -478,6 +478,21 @@ $(document).on("click", ".dropdown .open-picklist-items", function (e) {
   }, 200);
 });
 
+$(document).on("click", ".dropdown .enter-actual-qty", function (e) {
+  e.preventDefault();
+
+  let picklistedRow = $(this).closest("tr");
+  let picklistNum = picklistedRow.attr("data-picklist-num");
+  let rowNum = picklistedRow.attr("data-rownum");
+
+  picklistNumRef = picklistNum;
+
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    encodeQty(picklistNum, rowNum);
+  }, 200);
+});
+
 function openPicklist(picklistNum) {
   $.post(
     "dirs/incoming/dashboard/picklistItem.php",
@@ -777,12 +792,13 @@ function loadBasket() {
                 `<ul class="dropdown-menu">
                   <li><a class="dropdown-item open-picklist-items" href="#">Open</a></li>
                   <li>
-                      <a class="dropdown-item print-picklist" 
-                        href="#"
-                        data-picklist="${item.PickLst_Num}">
-                        Print
-                      </a>
-                    </li>
+                    <a class="dropdown-item print-picklist" 
+                      href="#"
+                      data-picklist="${item.PickLst_Num}">
+                      Print
+                    </a>
+                  </li>
+                  <li><a class="dropdown-item enter-actual-qty" href="#">Encode Quantity</a></li>
                 </ul>
               </div>`,
             ]);
@@ -876,51 +892,6 @@ function loadBasket() {
                 // const srn = $(this).data("srn");
                 const PKlistNum = $(this).data("picklist");
 
-                // ORIGINAL
-                // Swal.fire({
-                //   title: "Print this Picklist?",
-                //   icon: "question",
-                //   showCancelButton: true,
-                //   confirmButtonText: "Print",
-                //   confirmButtonColor: "#0d6efd",
-                //   cancelButtonText: "Cancel",
-                // }).then((result) => {
-                //   if (result.isConfirmed) {
-                //     $.post(
-                //       "dirs/incoming/dashboard/actions/save_print_delivery.php",
-                //       { PKlistNum: PKlistNum },
-                //       function (response) {
-                //         if (response.status === "error") {
-                //           Swal.fire({
-                //             icon: "error",
-                //             title: response.message,
-                //             text: "Would you like to proceed for printing?",
-                //             showCancelButton: true,
-                //             confirmButtonText: "Proceed",
-                //             cancelButtonText: "Back",
-                //           }).then((res) => {
-                //             if (res.isConfirmed) {
-                //               window.open(
-                //                 `pdf/requests.php?picklist=${PKlistNum}`,
-                //                 "_blank",
-                //               );
-                //             }
-                //           });
-                //           return;
-                //         }
-
-                //         if (response.status === "success") {
-                //           window.open(
-                //             `pdf/requests.php?picklist=${PKlistNum}`,
-                //             "_blank",
-                //           );
-                //         }
-                //       },
-                //       "json",
-                //     );
-                //   }
-                // });
-
                 Swal.fire({
                   title: "Print this Picklist?",
                   icon: "question",
@@ -1001,6 +972,289 @@ function loadBasket() {
       error: function (xhr, status, error) {
         console.error("Error loading outgoing data: ", error);
       },
+    });
+  });
+}
+
+// ENCODE QTY
+function encodeQty(picklistNum, rowNum) {
+  $.post(
+    "dirs/incoming/dashboard/encodeQty.php",
+    { picklistNum: picklistNum },
+    function (data) {
+      $("#main-content").hide().html(data).fadeIn(200);
+
+      const saveBtn = document.getElementById("");
+      $("#pklist").val(picklistNum);
+
+      $.ajax({
+        url: "dirs/incoming/dashboard/actions/get_openincoming.php",
+        type: "POST",
+        data: { RowNum: rowNum },
+        dataType: "json",
+        success: function (response) {
+          if (response.isSuccess === "success") {
+            // let rowCount = response.Items.length;
+            // let totalQty = 0;
+
+            let header = response.Data;
+            // let items = response.Items;
+
+            // function selectedValue(selector, value) {
+            //   $(selector)
+            //     .empty()
+            //     .append(`<option value="${value}">${value}</option>`);
+            // }
+
+            // selectedValue("#typeOfReq", header.RequestType);
+            // selectedValue("#destination", header.Destination);
+            // selectedValue("#branchWhCode", header.DestinationWhs);
+            // selectedValue("#origin", header.Origin);
+            // selectedValue("#whcode", header.OriginWhs);
+
+            // ================= HEADER =================
+            // $("#srn").val(header.BaseNum_SRN);
+            $("#date").val(header.DocDate);
+            // $("#status").val(header.RequestStatus);
+            // $("#purpose").val(header.RequestPurpose);
+            // $("#reqBy").val(header.PrepBy);
+            // $("#remarks").val(header.Remarks);
+
+            // ================= ITEMS =================
+
+            // let rows = "";
+
+            // items.forEach(function (item, index) {
+            //   let quantity = parseFloat(item.Quantity) || 0;
+            //   totalQty += quantity;
+            //   rows += `
+            //     <tr style="height: 40px; min-height: 40px">
+            //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${index + 1}</td>
+            //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Brand}</td>
+            //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Model}</td>
+            //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Category}</td>
+            //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
+            //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px" contenteditable="true"></td>
+            //     </tr>
+            //   `;
+            // });
+
+            // $("#totalEncodedQty").text(totalQty);
+            // $("#encodeQtyTable tbody").html(rows);
+
+            // if (rowCount < 8) {
+            //   let emptyRowsNeeded = 8 - rowCount;
+
+            //   for (let i = 0; i < emptyRowsNeeded; i++) {
+            //     let emptyRow = `
+            //       <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+            //         <td style="background: #FFFBDF"></td>
+            //         <td style="background: #FFFBDF"></td>
+            //         <td style="background: #FFFBDF"></td>
+            //         <td style="background: #FFFBDF"></td>
+            //         <td style="background: #FFFBDF"></td>
+            //         <td style="background: #FFFBDF"></td>
+            //       </tr>
+            //   `;
+            //     $("#encodeQtyTable tbody").append(emptyRow);
+            //   }
+            //   $("#totalEncodedQty").text(totalQty);
+            // }
+          } else {
+            alert(response.Data);
+          }
+          $("#pageLoader").addClass("d-none");
+        },
+        error: function (xhr) {
+          console.error(xhr.responseText);
+          $("#pageLoader").addClass("d-none");
+        },
+      });
+
+      submitEncodedQty(picklistNum);
+    },
+  ).fail(function () {
+    $("#pageLoader").addClass("d-none");
+  });
+}
+
+function validateNumber(el) {
+  let value = $(el).text().trim();
+
+  // Remove red border if user starts typing
+  if (value !== "") {
+    $(el).removeClass("border border-danger");
+  }
+
+  // Optional: allow only numbers
+  if (!/^\d*$/.test(value)) {
+    $(el).text(value.replace(/\D/g, ""));
+
+    // Move cursor to end
+    let range = document.createRange();
+    let sel = window.getSelection();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+}
+
+function submitEncodedQty(picklistNum) {
+  $("#encodeqty").on("submit", function (e) {
+    e.preventDefault();
+    let isValid = true;
+
+    $(".editable-cell").each(function () {
+      let value = $(this).text().trim();
+
+      // Check if empty
+      if (value === "") {
+        isValid = false;
+        $(this).addClass("border border-danger"); // highlight
+      } else {
+        $(this).removeClass("border border-danger");
+      }
+    });
+
+    if (!isValid) {
+      Swal.fire({
+        icon: "error",
+        title: "Please fill in all Actual quantity fields",
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: "Save actual quantity?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Save",
+      confirmButtonColor: "#0d6efd",
+      cancelButtonText: "Back",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // SAVE DATA
+        let encodedItems = [];
+
+        $("#encodeQtyTable tbody tr").each(function () {
+          let cells = $(this).find("td");
+
+          let item = {
+            index: $(cells[0]).text().trim(),
+            brand: $(cells[1]).text().trim(),
+            model: $(cells[2]).text().trim(),
+            category: $(cells[3]).text().trim(),
+            quantity: $(cells[4]).text().trim(),
+            actualQty: $(cells[5]).text().trim(),
+          };
+
+          if (item.actualQty !== "") {
+            encodedItems.push(item);
+          }
+        });
+
+        Swal.fire({
+          title: "Executed By",
+          input: "text",
+          inputAttributes: {
+            autocapitalize: "off",
+          },
+          showCancelButton: true,
+          confirmButtonText: "Continue",
+          cancelButtonText: "Cancel",
+          inputValidator: (value) => {
+            if (!value) {
+              return "Executed By is required!";
+            }
+          },
+        }).then((userInput) => {
+          if (!userInput.isConfirmed) return;
+
+          let executedBy = userInput.value;
+
+          let formData = new FormData(document.getElementById("encodeqty"));
+          formData.append("picklistNum", $("#pklist").val());
+          formData.append("executedBy", executedBy);
+          formData.append("items", JSON.stringify(encodedItems));
+
+          // $.ajax({
+          //   url: "dirs/incoming/dashboard/save_encoded_qty.php",
+          //   type: "POST",
+          //   data: formData,
+          //   processData: false,
+          //   contentType: false,
+          //   success: function (response) {
+          //     let res =
+          //       typeof response === "string" ? JSON.parse(response) : response;
+
+          //     if (res.status === "success") {
+          //       Swal.fire({
+          //         icon: "success",
+          //         title: "Saved successfully!",
+          //       }).then(() => {
+          window.open(
+            `pdf/requests.php?picklist=${picklistNum}&executedBy=${encodeURIComponent(executedBy)}`,
+            "_blank",
+          );
+          //       });
+          //     } else {
+          //       Swal.fire({
+          //         icon: "error",
+          //         title: "Error",
+          //         text: res.message,
+          //       });
+          //     }
+          //   },
+          // });
+        });
+
+        // Swal.fire({
+        //   title: "Executed By",
+        //   input: "text",
+        //   inputAttributes: {
+        //     autocapitalize: "off",
+        //   },
+        //   showCancelButton: true,
+        //   confirmButtonText: "Continue",
+        //   cancelButtonText: "Cancel",
+        //   inputValidator: (value) => {
+        //     if (!value) {
+        //       return "Executed By is required!";
+        //     }
+        //   },
+        // }).then((userInput) => {
+        //   if (!userInput.isConfirmed) return;
+
+        //   let executedBy = userInput.value;
+
+        //   // $.post(
+        //   //   "dirs/incoming/dashboard/save_encoded_qty.php",
+        //   //   {
+        //   //     picklistNum: picklistNum,
+        //   //     executedBy: executedBy,
+        //   //   },
+        //   //   function (response) {
+        //   const openPrint = () => {
+        //     window.open(
+        //       `pdf/requests.php?picklist=${picklistNum}&executedBy=${encodeURIComponent(executedBy)}`,
+        //       "_blank",
+        //     );
+        //   };
+
+        //   //     if (response.status === "success") {
+        //   openPrint();
+        //   //     } else {
+        //   //       Swal.fire({
+        //   //         icon: "error",
+        //   //         title: "Something went wrong",
+        //   //         text: response.message,
+        //   //       });
+        //   //     }
+        //   //   },
+        //   // );
+        // });
+      }
     });
   });
 }

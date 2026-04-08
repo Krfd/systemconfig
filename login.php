@@ -31,16 +31,60 @@
       z-index: 9999;
     }
   </style> -->
+  <style>
+    .lock-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .lock-box {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      width: 300px;
+    }
+
+    .lock-box input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    .lock-box button {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 
 <body>
-  <!-- <div id="lockScreen" style="display:none;">
+  <!-- RE-AUTHENTICATE USER -->
+  <div id="lockOverlay" class="lock-overlay">
     <div class="lock-box">
       <h2>Session Locked</h2>
-      <input type="password" id="password" placeholder="Enter password" />
-      <button onclick="unlock()">Unlock</button>
+      <p>Please login again to continue</p>
+      <input type="text" id="usernameInput" class="form-control form-control-sm" placeholder="Username" />
+      <input type="password" id="passwordInput" class="form-control form-control-sm" placeholder="Password" />
+      <button type="button" onclick="unlockScreen()" class="btn btn-primary btn-sm">Login</button>
+      <p id="errorMsg" class="error"></p>
     </div>
-  </div> -->
+  </div>
+
 
   <form id="frm-login">
     <div class="container d-flex justify-content-center align-items-center" style="height: 90vh;">
@@ -87,6 +131,7 @@
   <script src="assets/plugins/elevatezoom-plus-master/src/jquery.ez-plus.js"></script>
   <script src="assets/plugins/datepicker/jquery-ui.min.js"></script>
   <script src="assets/js/global-scripts.js"></script>
+  <script src="assets/js/relogin.js"></script>
 </body>
 
 </html>
@@ -131,52 +176,4 @@
       }
     });
   });
-
-
-  // // INACTIVITY
-
-  // let timeout;
-  // const LOCK_TIME = 1 * 10 * 1000; // 5 minutes
-
-  // function resetTimer() {
-  //   clearTimeout(timeout);
-  //   timeout = setTimeout(lockScreen, LOCK_TIME);
-  //   console.log()
-  // }
-
-  // // Events that count as activity
-  // ['mousemove', 'keydown', 'click', 'touchstart'].forEach(event => {
-  //   document.addEventListener(event, resetTimer);
-  // });
-
-  // // Start timer
-  // resetTimer();
-
-  // let isLocked = false;
-
-  // function lockScreen() {
-  //   isLocked = true;
-  //   document.getElementById('lockScreen').style.display = 'flex';
-  // }
-
-  // // When user moves AFTER lock → focus input
-  // document.addEventListener('mousemove', () => {
-  //   if (isLocked) {
-  //     document.getElementById('password').focus();
-  //   }
-  // });
-
-
-  // function unlock() {
-  //   const password = document.getElementById('password').value;
-
-  //   // Replace with real auth call
-  //   if (password === "1234") {
-  //     isLocked = false;
-  //     document.getElementById('lockScreen').style.display = 'none';
-  //     resetTimer();
-  //   } else {
-  //     alert("Incorrect password");
-  //   }
-  // }
 </script>

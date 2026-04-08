@@ -13,13 +13,7 @@
         <table class="table datatables table-hover" id="loadingBasketTable">
             <thead class="sticky-top">
                 <tr>
-                    <!-- <th class="text-secondary">Delivery No.</th> 
-                    <th class="text-secondary">Batch Delivery No.</th>
-                    <th class="text-secondary">Picklist Qty</th>
-                    <th class="text-secondary">Status</th>
-                    <th class="text-secondary"></th> -->
-
-                    <th class="text-secondary">Picklist No.</th> 
+                    <th class="text-secondary">Picklist No.</th>
                     <th class="text-secondary">Delivery Branch</th>
                     <th class="text-secondary">Date Assigned</th>
                     <th class="text-secondary"></th>

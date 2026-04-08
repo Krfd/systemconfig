@@ -61,7 +61,7 @@
                                 </div>
                             </div>
                             <div class="table-responsive overflow-auto mt-3" style="max-height: 450px">
-                                <table class="table table-hover" id="outgoingTable">
+                                <table class="table table-hover" id="deliveryFormTable">
                                     <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary">#</th>
@@ -177,9 +177,6 @@
         </div>
     </div>
 </div>
-<?php
-include("deliveryModal.php")
-?>
 <script>
     $("#desForm").on("change", function() {
         loadDestinationWhscodes();
