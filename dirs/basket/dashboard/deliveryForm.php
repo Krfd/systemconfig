@@ -41,12 +41,12 @@
                                 </div>
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-baseline gap-3">
-                                        <label for="deldate" class="form-label text-dark-emphasis col-4"><small>Delivery Date:</small></label>
-                                        <input type="date" name="deldate" id="deldate" class="form-control form-control-sm col" style="background: #FFFBDF">
+                                        <label for="docdate" class="form-label text-dark-emphasis col-4"><small>Document Date:</small></label>
+                                        <input type="date" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #FFFBDF">
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
-                                        <label for="date" class="form-label text-dark-emphasis col-4"><small>Delivery Date:</small></label>
-                                        <input type="date" name="date" id="deldate" class="form-control form-control-sm col" style="background: #FFFBDF" required>
+                                        <label for="deldate" class="form-label text-dark-emphasis col-4"><small>Delivery Date:</small></label>
+                                        <input type="date" name="deldate" id="deldate" class="form-control form-control-sm col" style="background: #FFFBDF" required>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="statusForm" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>

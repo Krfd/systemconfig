@@ -502,12 +502,6 @@ function toggleDelivery() {
     let availableRows = 0;
 
     $("#basketTableDashboard tbody tr").each(function () {
-      // const row = $(this);
-      // const statusText = row.find("td:eq(5)").text().trim().toUpperCase();
-
-      // if (statusText === "ASSIGNED") {
-      //   availableRows++;
-      // }
       const row = $(this);
       const statusText = row.find("td:eq(5)").text().trim().toUpperCase();
       const batchNum = row.attr("data-batchnum");
@@ -518,8 +512,6 @@ function toggleDelivery() {
         availableRows++;
       }
     });
-
-    console.log(`AVAILABLE ROWS: ${availableRows}`);
 
     if (availableRows === 0) {
       Swal.fire({
@@ -1964,17 +1956,35 @@ function loadingItems() {
         }
         let rows = [];
         if (response.isSuccess === "success") {
-          let sortedData = response.Data;
+          let basketData = response.Data;
 
           // console.log(`DELIVERY BASKET DATA: ${JSON.stringify(sortedData)}`);
 
-          sortedData.forEach((item, index) => {
-            let counter = index + 1;
+          // sortedData.forEach((item, index) => {
+          //   let counter = index + 1;
+          //   rows.push([
+          //     "DR1000" + counter, // picklist no
+          //     item.BatchNum || "", // delivery branch
+          //     response.picklistCount || "", // date assigned or modified
+          //     item.BatchStatus || "", // dropdown or action
+          //     '<div class="dropdown dropstart">' +
+          //       '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
+          //       '<i class="bi bi-three-dots"></i></button>' +
+          //       `<ul class="dropdown-menu">
+          //         <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
+          //         <li><a class="dropdown-item print-picklist" href="#" data-delivery="${item.PickList_Num}">Print</a></li>
+          //         <li><a class="dropdown-item create-dr" href="#" data-batch="${item.PickList_Num}">Create DR</a></li>
+          //       </ul>
+          //     </div>`,
+          //   ]);
+          // });
+          console.log(`BASKET DATA: ${JSON.stringify(basketData)}`)
+
+          basketData.forEach((item, index) => {
             rows.push([
-              "DR1000" + counter,
-              item.BatchNum || "",
-              response.picklistCount || "",
-              item.BatchStatus || "",
+              item.PickList_Num, // picklist no
+              item.BranchPrep || "", // delivery branch
+              item.DocDate || "", // date assigned or modified
               '<div class="dropdown dropstart">' +
                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
                 '<i class="bi bi-three-dots"></i></button>' +
@@ -1989,7 +1999,8 @@ function loadingItems() {
 
           if (rows.length === 0) {
             for (let i = 0; i < 8; i++) {
-              rows.push(["", "", "", "", ""]);
+              // rows.push(["", "", "", "", ""]);
+              rows.push(["", "", "", ""]);
             }
           }
 
@@ -2000,30 +2011,13 @@ function loadingItems() {
           $("#loadingBasketTable").DataTable({
             data: rows,
             columns: [
-              { title: "Delivery No." },
-              { title: "Batch Delivery No.", className: "text-primary ps-2" },
-              { title: "Picklist Qty", className: "text-start ps-2" },
-              {
-                title: "Status",
-                className: "text-start ps-2",
-                render: function (data, type, row) {
-                  let status = data ? data.toUpperCase() : "";
-
-                  let badgeClass = "bg-secondary"; // default
-
-                  if (status === "PREPARING") badgeClass = "bg-warning";
-                  else if (status === "IN TRANSIT")
-                    badgeClass = "bg-primary text-white";
-                  else if (status === "DELIVERED") badgeClass = "bg-success";
-                  else if (status === "CANCELLED") badgeClass = "bg-danger";
-
-                  return `<span class="badge ${badgeClass}">${status}</span>`;
-                },
-              },
+              { title: "Picklist No." }, // Delivery No.
+              { title: "Delivery Branch", className: "text-primary ps-2" }, // Batch Delivery No.
+              { title: "Date Assigned", className: "text-start ps-2" }, // Picklist Qty
               { title: "", orderable: false },
             ],
             createdRow: function (row, data, dataIndex) {
-              let originalItem = sortedData[dataIndex];
+              let originalItem = basketData[dataIndex];
 
               if (originalItem) {
                 $(row)
@@ -2050,7 +2044,6 @@ function loadingItems() {
               $("td:eq(1)", row).css("text-secondary");
               $("td:eq(2)", row).css("text-secondary");
               $("td:eq(3)", row).css("text-secondary");
-              // $("td:eq(4)", row).css("text-secondary");
 
               $(row).hover(
                 function () {
@@ -2104,6 +2097,8 @@ function loadingItems() {
 function loadDeliveryItems(PickLst_Num, del_num) {
   $.post("dirs/basket/dashboard/loadDeliveryItems.php", {}, function (data) {
     $("#main-content").html(data);
+
+    console.log(`DELIVERY BASKET BREAKDOWN`)
 
     deliveryPicklistNum = PickLst_Num;
     deliveryNum = del_num;
@@ -2322,12 +2317,21 @@ function formattedDate() {
   document.getElementById("formattedDate").value = `${yyyy}-${mm}-${dd}`;
 }
 
+function deliveryDate() {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+  document.getElementById("deldate").value = `${yyyy}-${mm}-${dd}`;
+}
+
 function createDr() {
   $("#main-content").html(spinner);
   $.post("dirs/basket/dashboard/deliveryForm.php", function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
     get_userinfo();
     loadIAPBranchlist();
+    deliveryDate()
   });
 }
 

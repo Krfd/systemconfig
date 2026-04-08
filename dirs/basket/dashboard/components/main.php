@@ -9,9 +9,9 @@
         <button class="btn btn-primary" type="button" onclick="loadingItems()" id="createDeliveryBtn">
             <i class="bi bi-cart-check"></i>
         </button>
-        <button class="btn btn-primary" type="button" onclick="createDr()" id="createDrButton">
+        <!-- <button class="btn btn-primary" type="button" onclick="createDr()" id="createDrButton">
             <i class="bi bi-plus-lg"></i> Create DR
-        </button>
+        </button> -->
     </div>
 </div>
 <ul class="nav nav-tabs nav-tabs-bordered d-flex mt-5" id="borderedTabJustified" role="tablist">
