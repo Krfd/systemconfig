@@ -786,6 +786,50 @@ function toggleDelivery() {
           console.log("Driver:", driver);
           console.log("Plate Number:", plate);
 
+          // API FOR LOADING DELIVERY ITEMS FOR DR
+          // save_loading_basket.php
+
+           $.ajax({
+        url: "dirs/basket/dashboard/actions/save_loading_basket.php",
+        type: "POST",
+        data: {
+          PickListNum: PickListNum,
+          LoadingB_Num: LoadingB_Num,
+        },
+        dataType: "json",
+        success: function (response) {
+          if (response.isSuccess === "success") {
+            // Swal.fire({
+            //   icon: "success",
+            //   title: response.message,
+            //   confirmButtonText: "OKAY",
+            // });
+
+            $("#basketTableDashboard tbody .checkbox")
+              .hide()
+              .prop("checked", false);
+
+            loadDeliveryBtn.textContent = "Create DR";
+            $("#basketTableDashboard").data("selectionMode", false);
+            createDr();
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: response.message,
+              confirmButtonText: "OKAY",
+              confirmButtonColor: "#d33",
+            });
+          }
+        },
+        error: function () {
+          Swal.fire({
+            icon: "error",
+            title: "Server Error",
+            text: "Something went wrong while processing the request.",
+          });
+        },
+      });
+
           return;
         }
       });

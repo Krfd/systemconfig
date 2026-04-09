@@ -1,29 +1,34 @@
 <?php
 require_once "../../../../config/connection.php";
 
-session_start();
-
-$Userid = $_SESSION['Uid'];
-$RowNum = $_POST['RowNum'];
+$DocEntry = $_POST['DocEntry'];  
 
 try {
-
-    $stmt = $conn->prepare("EXEC dbo.[OUTGOING_REQUEST] ?, ?");
-    $stmt->execute([$Userid, $RowNum]);
+    $conn->beginTransaction();
+    $stmt = $conn->prepare("EXEC dbo.View_StockRequest_Details ?");
+    $stmt->execute([$DocEntry]);
     $header = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    /*For SRN ITEMS*/
+    
     $stmt->nextRowset();
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $conn->commit();
 
-    echo json_encode([
-        "isSuccess" => "success",
-        "Data" => $header,
+    // Prepare response
+    $response = [
+        "isSuccess" => 'success',
+        "Header" => $header,
         "Items" => $items
-    ]);
+    ];
+
+    echo json_encode($response);
+
 } catch (PDOException $e) {
-    echo json_encode([
-        "isSuccess" => "Failed",
-        "Data" => "<b>Error. Please Contact System Developer.<br/></b>" . $e->getMessage()
-    ]);
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
+    $conn->rollback();
+    $response = [
+        "isSuccess" => 'Failed',
+        "Data" => "<b>Error. Please Contact System Developer. <br/></b>" . $e->getMessage()
+    ];
+    echo json_encode($response);
 }
+?>

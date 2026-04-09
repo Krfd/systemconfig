@@ -1,36 +1,32 @@
 <?php
-require_once "../../../../config/connection.php";
-session_start();
+  require_once "../../../../config/connection.php";
+  session_start();
 
-if (!isset($_SESSION['Uid']) || empty($_SESSION['Uid'])) {
-    echo json_encode([
-        "isSuccess" => "no_session",
-        "Data" => []
-    ]);
-    exit;
-}
-
-$Userid       = $_SESSION['Uid'];
+  $User     = $_SESSION['Uid'];
+  $PicklistNumber = $_POST['PicklistNumber'];
 
 try {
-    $conn->beginTransaction();
+  $conn->beginTransaction();
 
-    $fetch_picklisted = $conn->prepare("EXEC dbo.[PKLISTED_REQUESTS] ?");
-    $fetch_picklisted->execute([$Userid]);
-    $get_picklist = $fetch_picklisted->fetchAll(PDO::FETCH_ASSOC);
+    $fetch_picklist_request = $conn->prepare("EXEC dbo.[PickList_Item_Collected] ?, ?");
+    $fetch_picklist_request->execute([ $User, $PicklistNumber ]);
+    $get_picklist = $fetch_picklist_request->fetchAll(PDO::FETCH_ASSOC);
 
-    $conn->commit();
+  $conn->commit();
 
-    $response = array(
-        "isSuccess" => 'success',
-        "Data" => $get_picklist
-    );
-    echo json_encode($response);
-} catch (PDOException $e) {
-    $conn->rollback();
-    $response = array(
-        "isSuccess" => 'Failed',
-        "Data" => "<b>Error. Please Contact System Developer. <br/></b>" . $e->getMessage()
-    );
-    echo json_encode($response);
+  $response = array(
+    "isSuccess" => 'success',
+    "Data" => $get_picklist
+  );
+  echo json_encode($response);
+
+}catch (PDOException $e){
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
+  $conn->rollback();
+  $response = array(
+    "isSuccess" => 'Failed',
+    "Data" => "<b>Error. Please Contact System Developer. <br/></b>".$e->getMessage()
+  );
+  echo json_encode($response);
 }
+?>

@@ -355,7 +355,7 @@ function cancelOutgoingForm(SRN) {
   }).then((result) => {
     if (result.isConfirmed) {
       $.post(
-        "dirs/outgoing/dashboard/actions/update_cancellation.php",
+        "dirs/outgoing/dashboard/actions/update_stockrequest_action.php",
         {
           SRN: SRN,
         },
@@ -412,7 +412,7 @@ function terminateOutgoingForm(SRN) {
   }).then((result) => {
     if (result.isConfirmed) {
       $.post(
-        "dirs/outgoing/dashboard/actions/update_termination.php",
+        "dirs/outgoing/dashboard/actions/update_stockrequest_action.php",
         {
           SRN: SRN,
         },

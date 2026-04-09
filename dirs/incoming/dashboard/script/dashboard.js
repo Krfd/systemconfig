@@ -1178,35 +1178,35 @@ function submitEncodedQty(picklistNum) {
           formData.append("executedBy", executedBy);
           formData.append("items", JSON.stringify(encodedItems));
 
-          // $.ajax({
-          //   url: "dirs/incoming/dashboard/save_encoded_qty.php",
-          //   type: "POST",
-          //   data: formData,
-          //   processData: false,
-          //   contentType: false,
-          //   success: function (response) {
-          //     let res =
-          //       typeof response === "string" ? JSON.parse(response) : response;
+          $.ajax({
+            url: "dirs/incoming/dashboard/update_actual_qty.php",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+              let res =
+                typeof response === "string" ? JSON.parse(response) : response;
 
-          //     if (res.status === "success") {
-          //       Swal.fire({
-          //         icon: "success",
-          //         title: "Saved successfully!",
-          //       }).then(() => {
-          window.open(
-            `pdf/requests.php?picklist=${picklistNum}&executedBy=${encodeURIComponent(executedBy)}`,
-            "_blank",
-          );
-          //       });
-          //     } else {
-          //       Swal.fire({
-          //         icon: "error",
-          //         title: "Error",
-          //         text: res.message,
-          //       });
-          //     }
-          //   },
-          // });
+              if (res.status === "success") {
+                Swal.fire({
+                  icon: "success",
+                  title: "Saved successfully!",
+                }).then(() => {
+                  window.open(
+                    `pdf/requests.php?picklist=${picklistNum}&executedBy=${encodeURIComponent(executedBy)}`,
+                    "_blank",
+                  );
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: res.message,
+                });
+              }
+            },
+          });
         });
 
         // Swal.fire({

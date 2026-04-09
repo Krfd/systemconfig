@@ -1,0 +1,32 @@
+<?php
+require_once "../../../../config/connection.php";
+session_start();
+
+$User       = $_SESSION['Uid'];
+$ItemNumber = $_POST['ItemNumber'] ?? [];
+$ActualQty  = $_POST['ActualQty'] ?? [];
+$ExecutedBy = $_POST['ExecutedBy'] ?? [];
+$SR_Number  = isset($_POST['SR_Number']) ? (array)$_POST['SR_Number'] : [];
+
+try {
+    $conn->beginTransaction();
+
+    $upd_picklistcollection = $conn->prepare("EXEC dbo.[Apply_Actual_Quantity] ?, ?, ?, ?");
+    foreach ($ItemNumber as $i => $item) {
+        $qty = $ActualQty[$i] ?? 0;
+        $executor = $ExecutedBy[$i] ?? $User;
+        $upd_picklistcollection->execute([$User, $item, $qty, $executor]);
+    }
+
+    $upd_stockrequestStatus = $conn->prepare("EXEC dbo.[Update_Status_RequestingBranch] ?");
+    foreach ($SR_Number as $requestnumber) {
+        $upd_stockrequestStatus->execute([$requestnumber]);
+    }
+
+    $conn->commit();
+    echo "success";
+
+} catch (PDOException $e) {
+    $conn->rollBack();
+    echo "Error: " . $e->getMessage();
+}

@@ -1,30 +1,31 @@
 <?php
-require_once "../../../../config/connection.php";
+  require_once "../../../../config/connection.php";
+  session_start();
 
-session_start();
-header('Content-Type: application/json');
-$Userid       = $_SESSION['Uid'];
+  $User     = $_SESSION['Uid'];
 
 try {
   $conn->beginTransaction();
 
-  $fetch_ongoing = $conn->prepare("EXEC dbo.[OUTGOING] ?");
-  $fetch_ongoing->execute([$Userid]);
-  $get_ongoing = $fetch_ongoing->fetchAll(PDO::FETCH_ASSOC);
+    $fetch_stockrequest_list = $conn->prepare("EXEC dbo.[Monitor_StockRequest_List] ?");
+    $fetch_stockrequest_list->execute([ $User]);
+    $get_stockrequest = $fetch_stockrequest_list->fetchAll(PDO::FETCH_ASSOC);
 
   $conn->commit();
 
   $response = array(
     "isSuccess" => 'success',
-    "Data" => $get_ongoing
+    "Data" => $get_stockrequest
   );
   echo json_encode($response);
-} catch (PDOException $e) {
-  $conn->rollback();
+
+}catch (PDOException $e){
   errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
+  $conn->rollback();
   $response = array(
     "isSuccess" => 'Failed',
-    "Data" => "<b>Error. Please Contact System Developer. <br/></b>" . $e->getMessage()
+    "Data" => "<b>Error. Please Contact System Developer. <br/></b>".$e->getMessage()
   );
   echo json_encode($response);
 }
+?>

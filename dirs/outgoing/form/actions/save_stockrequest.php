@@ -1,68 +1,67 @@
 <?php
-require_once "../../../../config/connection.php";
-session_start();
-header('Content-Type: application/json');
+  require_once "../../../../config/connection.php";
+  session_start();
 
-$Userid          = $_SESSION['Uid'];
-$SRN             = $_POST['srnForm'];
-$TypeofRequest   = $_POST['typeForm'];
-$Destination     = $_POST['desForm'];
-$Destiwhscode    = $_POST['desCodeForm'];
-$Origin          = $_POST['user-origin'];
-$Originwhscode   = $_POST['originCodeForm'];
-$DocDate         = $_POST['date'];
-$DocStatus       = $_POST['statusForm'];
-$items           = json_decode($_POST['items'], true);
-$ReqPurpose      = $_POST['purposeForm'] ?? '';
-$ReqBy           = $_POST['reqByForm'];
-$Remarks         = $_POST['remarksForm'] ?? '';
+  $User  = $_SESSION['Uid'];
 
-try {
+  $SR_Number = $_POST['SR_Number'] ?? '';
+  $OriginBcode = $_POST['OriginBcode'] ?? '';
+  $OriginWhscode = $_POST['OriginWhscode'] ?? '';
+  $BranchDestination = $_POST['BranchDestination'] ?? '';
+  $BranchDestination_Bcode = $_POST['BranchDestination_Bcode'] ?? '';
+  $BranchDestination_Whscode = $_POST['BranchDestination_Whscode'] ?? '';
+
+  $TypeRequest = $_POST['TypeRequest'] ?? '';
+  $EncodeDate = $_POST['EncodeDate'] ?? '';
+  $Remarks = $_POST['Remarks'] ?? '';
+  $PurposeRequest = $_POST['PurposeRequest'] ?? '';
+
+
+  $ItemCode       = $_POST['ItemCode'] ?? [];
+  $ItemName       = $_POST['ItemName'] ?? [];
+  $ItemBrand      = $_POST['ItemBrand'] ?? [];
+  $ItemCategory   = $_POST['ItemCategory'] ?? [];
+  $OrderQty       = $_POST['OrderQty'] ?? 0;
+  
+  try{
+
     $conn->beginTransaction();
 
-    // 1️⃣ Insert SRN Request
-    $ins_stsrequest = $conn->prepare("EXEC dbo.[SRN_SAVEREQUEST] ?,?,?,?,?,?,?,?,?,?,?");
-    $ins_stsrequest->execute([
-        $Userid,
-        $SRN,
-        $TypeofRequest,
-        $Destination,
-        $Destiwhscode,
-        $Origin,
-        $Originwhscode,
-        $DocDate,
-        $DocStatus,
-        $ReqPurpose,
-        $Remarks,
-        $ReqBy
-    ]);
+  /*Stock Request Mother*/
+    $ins_requestmother = $conn->prepare("EXEC dbo.[Create_StockRequest] ?,?,?,?,?,?,?,?,?");
+    $ins_requestmother->execute([
+      $User,
+      $SR_Number,
+      $TypeRequest, 
+      $PurposeRequest,
+      $EncodeDate, 
+      $Remarks,
+      $OriginWhscode, 
+      $BranchDestination,
+      $BranchDestination_Whscode]);
 
-    // 2️⃣ Insert each item
-    $ins_item = $conn->prepare("EXEC dbo.[SRN_ITEMSUBMIT] ?,?,?,?,?,?,?");
-    foreach ($items as $item) {
-        $ins_item->execute([
-            $SRN,
-            $item['brand'],
-            $item['model'],
-            $item['code'],
-            $item['category'],
-            $item['quantity'],
-            $Userid
+    /*Request Stock Transfer Items*/
+    $ins_requestitems = $conn->prepare("EXEC dbo.[Create_StockTransfer_Items] ?,?,?,?,?,?");
+    foreach ($srn_rows as $row) {
+        $ins_requestitems->execute([
+           $SR_Number,$ItemCode, $ItemName,$ItemBrand,$ItemCategory,$OrderQty
         ]);
     }
 
+
+    /*Update total Qty stock transfer Items*/
+    $upd_totalqty = $conn->prepare("EXEC dbo.[Update_TotalQty_Ordered] ?, ?");
+    $upd_totalqty->execute([ $User, $SR_Number]);
+
+
     $conn->commit();
-    echo json_encode(["status" => "success"]);
-    exit;
-} catch (PDOException $e) {
-    if ($conn->inTransaction()) {
-        $conn->rollback();
-    }
+    echo "OK";
+
+  }catch(PDOException $e){
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
-    echo json_encode([
-        "status" => "error",
-        "message" => "Something went wrong. Please contact System Developer."
-        // "message" => $e->getMessage()
-    ]);
-    exit;
-}
+    $conn->rollback();
+    echo "<b>Warning. Please Contact System Developer.<br/></b>".$e;getMessage();
+  }
+?>
+
+
