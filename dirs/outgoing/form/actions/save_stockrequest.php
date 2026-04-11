@@ -1,67 +1,87 @@
 <?php
-  require_once "../../../../config/connection.php";
-  session_start();
+require_once "../../../../config/connection.php";
+session_start();
 
-  $User  = $_SESSION['Uid'];
+$User = $_SESSION['Uid'];
 
-  $SR_Number = $_POST['SR_Number'] ?? '';
-  $OriginBcode = $_POST['OriginBcode'] ?? '';
-  $OriginWhscode = $_POST['OriginWhscode'] ?? '';
-  $BranchDestination = $_POST['BranchDestination'] ?? '';
-  $BranchDestination_Bcode = $_POST['BranchDestination_Bcode'] ?? '';
-  $BranchDestination_Whscode = $_POST['BranchDestination_Whscode'] ?? '';
+// 🔹 Header Inputs
+$RequestType    = $_POST['RequestType'] ?? '';
+$PurposeRequest = $_POST['PurposeForm'] ?? '';
+$OBranch        = $_POST['OBranch'] ?? '';
+$OWhscode       = $_POST['OWhscode'] ?? '';
+$DWhscode       = $_POST['DWhscode'] ?? '';
+$Remarks        = $_POST['Remarks'] ?? '';
 
-  $TypeRequest = $_POST['TypeRequest'] ?? '';
-  $EncodeDate = $_POST['EncodeDate'] ?? '';
-  $Remarks = $_POST['Remarks'] ?? '';
-  $PurposeRequest = $_POST['PurposeRequest'] ?? '';
+// 🔹 Items (optional)
+$ItemNum = $_POST['ItemNum'] ?? [];
+
+try {
+  $conn->beginTransaction();
+
+  // 🔹 1. Generate SR Number
+  $stmtSRN = $conn->prepare("EXEC dbo.[StockReq_Num_Generator] ?");
+  $stmtSRN->execute([$User]);
+  $srnData = $stmtSRN->fetch(PDO::FETCH_ASSOC);
+
+  $SRNumber = $srnData['SRNNumber'] ?? null;
 
 
-  $ItemCode       = $_POST['ItemCode'] ?? [];
-  $ItemName       = $_POST['ItemName'] ?? [];
-  $ItemBrand      = $_POST['ItemBrand'] ?? [];
-  $ItemCategory   = $_POST['ItemCategory'] ?? [];
-  $OrderQty       = $_POST['OrderQty'] ?? 0;
-  
-  try{
 
-    $conn->beginTransaction();
+  // 🔹 Loop each selected ItemNum
+  foreach ($ItemNum as $itemNum) {
 
-  /*Stock Request Mother*/
-    $ins_requestmother = $conn->prepare("EXEC dbo.[Create_StockRequest] ?,?,?,?,?,?,?,?,?");
-    $ins_requestmother->execute([
-      $User,
-      $SR_Number,
-      $TypeRequest, 
-      $PurposeRequest,
-      $EncodeDate, 
-      $Remarks,
-      $OriginWhscode, 
-      $BranchDestination,
-      $BranchDestination_Whscode]);
+    // 🔹 Fetch item details based on ItemNum
+    $stmtItems = $conn->prepare("EXEC dbo.[StockReq_Temp_Items] ?, ?");
+    $stmtItems->execute([$User, $itemNum]);
 
-    /*Request Stock Transfer Items*/
-    $ins_requestitems = $conn->prepare("EXEC dbo.[Create_StockTransfer_Items] ?,?,?,?,?,?");
-    foreach ($srn_rows as $row) {
-        $ins_requestitems->execute([
-           $SR_Number,$ItemCode, $ItemName,$ItemBrand,$ItemCategory,$OrderQty
-        ]);
+    while ($row = $stmtItems->fetch(PDO::FETCH_ASSOC)) {
+
+      $ItemCode     = $row['ItemCode'];
+      $ItemName     = $row['ItemName'];
+      $ItemBrand    = $row['ItemBrand'];
+      $ItemCategory = $row['ItemCategory'];
+      $Order_Qty    = $row['Order_Qty'];
+
+      // 🔹 Insert each item
+      $stmtInsertItem = $conn->prepare("EXEC dbo.[Insert_StockReq_Items] ?,?,?,?,?,?,?");
+      $stmtInsertItem->execute([
+        $User,
+        $SRNumber,
+        $ItemCode,
+        $ItemName,
+        $ItemBrand,
+        $ItemCategory,
+        $Order_Qty
+      ]);
     }
-
-
-    /*Update total Qty stock transfer Items*/
-    $upd_totalqty = $conn->prepare("EXEC dbo.[Update_TotalQty_Ordered] ?, ?");
-    $upd_totalqty->execute([ $User, $SR_Number]);
-
-
-    $conn->commit();
-    echo "OK";
-
-  }catch(PDOException $e){
-    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
-    $conn->rollback();
-    echo "<b>Warning. Please Contact System Developer.<br/></b>".$e;getMessage();
   }
-?>
 
 
+  // 🔹 2. Insert Header
+  $stmtHeader = $conn->prepare("EXEC dbo.[Create_StockRequest] ?,?,?,?,?,?,?,?");
+  $stmtHeader->execute([
+    $User,
+    $SRNumber,
+    $RequestType,
+    $PurposeRequest,
+    $OBranch,
+    $OWhscode,
+    $Remarks,
+    $DWhscode
+  ]);
+
+  $conn->commit();
+
+  echo json_encode([
+    "status" => "success",
+    "SRNumber" => $SRNumber
+  ]);
+} catch (PDOException $e) {
+  errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
+  $conn->rollBack();
+  echo json_encode([
+    "status" => "error",
+    "message" => "Warning. Please contact system developer.",
+    "error" => $e->getMessage()
+  ]);
+}

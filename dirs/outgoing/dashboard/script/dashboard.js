@@ -16,7 +16,6 @@ function loadDashboard() {
   $("#dashboard_content").html(spinner);
   $.post("dirs/outgoing/dashboard/components/main.php", {}, function (data) {
     $("#dashboard_content").html(data);
-    // loadLoginData();
 
     $("#outgoingTableDisplay tbody").html(`
       <tr>
@@ -63,6 +62,8 @@ function loadOutgoing() {
           (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
         );
 
+        console.log(`OUTGOING DATA: ${JSON.stringify(sortedData)}`);
+
         sortedData.forEach((item) => {
           let status = item.RequestStatus
             ? item.RequestStatus.toUpperCase()
@@ -85,11 +86,11 @@ function loadOutgoing() {
 
           rows.push([
             item.RowNum !== undefined ? item.RowNum.toString() : "",
-            item.BaseNum_SRN || "",
+            item.SR_Number || "",
             item.Brnch_Dstnation || "",
             item.Orgin_Dstnation || "",
             statusBadge,
-            item.DocDate || "N/A",
+            item.EncodeDate || "N/A",
 
             '<div class="dropdown">' +
               '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
@@ -98,16 +99,16 @@ function loadOutgoing() {
               '<li><a class="dropdown-item open-item" href="#">Open</a></li>' +
               (item.RequestStatus?.toUpperCase() === "NEW"
                 ? '<li><a class="dropdown-item cancel-outgoing" data-srn="' +
-                  item.BaseNum_SRN +
+                  item.SR_Number +
                   '" href="#">Cancel</a></li>'
                 : "") +
               (item.RequestStatus?.toUpperCase() === "PARTIAL"
                 ? '<li><a class="dropdown-item terminate-item" data-srn="' +
-                  item.BaseNum_SRN +
+                  item.SR_Number +
                   '" href="#">Terminate</a></li>'
                 : "") +
               '<li><a class="dropdown-item" href="pdf.php?srn=' +
-              item.BaseNum_SRN +
+              item.SR_Number +
               '" target="_blank">Print</a></li>' +
               "</ul></div>",
           ]);

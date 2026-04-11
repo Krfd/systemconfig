@@ -13,7 +13,7 @@ if (!isset($_GET['srn'])) {
 try {
     $srn = $_GET['srn'];
 
-    $stmt = $conn->prepare("SELECT * FROM SRN_REQUEST WHERE BaseNum_SRN = ?");
+    $stmt = $conn->prepare("SELECT * FROM Stock_Transfer_Items_3 WHERE SR_Number = ?");
     $stmt->execute([$srn]);
 
     $item = $conn->prepare("SELECT RowNum, ItemBrand, ItemName, ItemGroup, Quantity, DocDate, DocTime FROM SRN_ITM WHERE BaseNum_SRN = ?");
@@ -23,7 +23,6 @@ try {
     $itemData = $item->fetchAll(PDO::FETCH_OBJ);
 
     $status = $srnData->RequestStatus;
-    // $date = date("F d, Y", strtotime($srnData->DocDate));
     $date = isset($srnData->DocDate)
         ? date("m/d/y", strtotime($srnData->DocDate))
         : "N/A";

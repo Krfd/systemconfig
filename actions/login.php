@@ -11,7 +11,7 @@ try {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($user && password_verify($Password, $user['Password'])) {
         $_SESSION['Uid'] = $user['Uid'];
-        $_SESSION['Role'] = $user['Role'];
+        $_SESSION['Role'] = $user['UserRole'];
         echo json_encode([
             "isSuccess" => "OK",
             "Data" => $user
@@ -23,6 +23,7 @@ try {
         ]);
     }
 } catch (PDOException $e) {
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     echo json_encode([
         "isSuccess" => "Error",
         "Message" => $e->getMessage()

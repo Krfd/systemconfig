@@ -45,11 +45,15 @@ function loadIncoming() {
           (a, b) => Number(b.SeriesNum || 0) - Number(a.SeriesNum || 0),
         );
 
+        console.log(`INCOMING DATA: ${JSON.stringify(sortedData)}`);
+
         sortedData.forEach((item) => {
           let status = item.RequestStatus
             ? item.RequestStatus.toUpperCase()
             : "";
           let statusClass = "";
+
+          // console.log(`item status: ${status}`);
 
           if (status === "NEW") {
             statusClass = "bg-primary";
@@ -72,7 +76,7 @@ function loadIncoming() {
           existingSeries.add(item.SeriesNum);
 
           const isDisabled =
-            item.PicklistNumber && item.PicklistNumber.trim() !== ""
+            item.PKList_Number && item.PKList_Number.trim() !== ""
               ? "disabled"
               : "";
 
@@ -80,12 +84,12 @@ function loadIncoming() {
             `<input type="checkbox" name="checkbox" id="${item.SeriesNum}" data-rownum="${item.SeriesNum}" 
             class="form-check-input checkbox align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
             item.SeriesNum || "",
-            item.SRN || "",
+            item.SR_Number || "",
             item.RequestType || "",
             item.Branch || "",
             statusBadge,
-            item.DocDate || "",
-            item.PicklistNumber || "",
+            item.EncodeDate || "",
+            item.PKList_Number || "",
           ]);
         });
 

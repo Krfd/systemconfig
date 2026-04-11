@@ -17,20 +17,6 @@
   <link rel="stylesheet" type="text/css" href="assets/css/login.css">
   <link rel="stylesheet" href="assets/plugins/datepicker/jquery-ui.structure.min.css">
   <link rel="icon" href="assets/image/logo/iap_icon.png">
-  <!-- <style>
-    #lockScreen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-  </style> -->
   <style>
     .lock-overlay {
       position: fixed;
@@ -74,7 +60,7 @@
 
 <body>
   <!-- RE-AUTHENTICATE USER -->
-  <div id="lockOverlay" class="lock-overlay">
+  <!-- <div id="lockOverlay" class="lock-overlay">
     <div class="lock-box">
       <h2>Session Locked</h2>
       <p>Please login again to continue</p>
@@ -83,7 +69,7 @@
       <button type="button" onclick="unlockScreen()" class="btn btn-primary btn-sm">Login</button>
       <p id="errorMsg" class="error"></p>
     </div>
-  </div>
+  </div> -->
 
 
   <form id="frm-login">

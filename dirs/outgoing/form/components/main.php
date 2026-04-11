@@ -112,4 +112,59 @@
     $("#desForm").on("change", function() {
         loadDestinationWhscodes();
     });
+
+    /*Form submit stock request*/
+    $("#frm-request-sts").on("submit", function(e) {
+        e.preventDefault();
+
+        var RequestType = $("#typeForm").val();
+        var PurposeRequest = $("#purposeForm").val();
+        var OBranch = $("#user-origin").val();
+        var OWhscode = $("#originCodeForm").val();
+        var DWhscode = $("#desCodeForm").val();
+        var Remarks = $("#remarksForm").val();
+
+        // 🔹 Collect items
+        var Itemnumber = [];
+        $("td[name='temp-itemnum[]']").each(function() {
+            Itemnumber.push($(this).text().trim());
+        });
+
+        // 🔹 Validation
+        if (Itemnumber.length === 0) {
+            alert("No items selected.");
+            return;
+        }
+
+        if (!RequestType || !OWhscode || !DWhscode) {
+            alert("Please fill required fields.");
+            return;
+        }
+
+        // 🔹 Disable submit (prevent double click)
+        var btn = $(this).find("button[type='submit']");
+        btn.prop("disabled", true);
+
+        $.post(
+            "dirs/outgoing/form/actions/save_stockrequest.php", {
+                RequestType: RequestType,
+                PurposeForm: PurposeRequest,
+                OBranch: OBranch,
+                OWhscode: OWhscode,
+                DWhscode: DWhscode,
+                Remarks: Remarks,
+                ItemNum: Itemnumber,
+            },
+            function(data) {
+                if ($.trim(data) === "success") {
+                    alert("Stock Request Saved!");
+                } else {
+                    alert("Error: " + data);
+                }
+
+                // 🔹 Re-enable button
+                btn.prop("disabled", false);
+            },
+        );
+    });
 </script>

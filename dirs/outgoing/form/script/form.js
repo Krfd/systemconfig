@@ -23,7 +23,7 @@ function loadDashboard() {
     removeItem();
     addItem();
     numberInput();
-    submitReq();
+    // submitReq();
   });
 }
 
@@ -40,12 +40,14 @@ function get_SRN() {
     {},
     function (data) {
       let response = JSON.parse(data);
-      // console.log(`SRN NUMBER RESPONSE: ${response.Data.SRNNumber}`);
       if ($.trim(response.isSuccess) == "success") {
-        let srn = response.Data.SRNNumber;
-        let branchCode = response.Data.BranchCode || "GEN";
+        let srn = response.SRNNumber;
+        let branchCode = response.BranchName || "GEN";
         let newSRN;
         let num;
+
+        console.log(`SRN: ${srn}`);
+
         if (!srn || srn === "") {
           num = 1;
         } else {
@@ -225,7 +227,6 @@ async function loadOriginWhscodes(Branch) {
           );
         });
       } else {
-        // alert($.trim(response.Data));
         console.log(response.Data);
         Swal.fire({
           icon: "error",
@@ -728,87 +729,87 @@ function numberInput() {
   });
 }
 
-function submitReq() {
-  $("#frm-request-sts").on("submit", function (e) {
-    e.preventDefault();
-    let items = [];
-    $("#outgoingTable tbody tr.item-row")
-      .not(".empty-row")
-      .each(function () {
-        let brand = $(this).find(".item-brand").text().trim();
-        let model = $(this).find(".item-model").text().trim();
-        let code = $(this).find(".item-code").text().trim();
-        let category = $(this).find(".item-category").text().trim();
-        let quantity = $(this).find(".item-quantity").text().trim();
+// function submitReq() {
+//   $("#frm-request-sts").on("submit", function (e) {
+//     e.preventDefault();
+//     let items = [];
+//     $("#outgoingTable tbody tr.item-row")
+//       .not(".empty-row")
+//       .each(function () {
+//         let brand = $(this).find(".item-brand").text().trim();
+//         let model = $(this).find(".item-model").text().trim();
+//         let code = $(this).find(".item-code").text().trim();
+//         let category = $(this).find(".item-category").text().trim();
+//         let quantity = $(this).find(".item-quantity").text().trim();
 
-        // Only push if row is not empty
-        if (brand !== "") {
-          items.push({
-            brand: brand,
-            code: code,
-            model: model,
-            category: category,
-            quantity: quantity,
-          });
-        }
-      });
+//         // Only push if row is not empty
+//         if (brand !== "") {
+//           items.push({
+//             brand: brand,
+//             code: code,
+//             model: model,
+//             category: category,
+//             quantity: quantity,
+//           });
+//         }
+//       });
 
-    // ❗ Prevent submit if no real items
-    if (items.length === 0) {
-      e.preventDefault();
-      Swal.fire({
-        icon: "warning",
-        title: "No Items",
-        text: "Please add at least one item before submitting.",
-      });
-      return;
-    }
+//     // ❗ Prevent submit if no real items
+//     if (items.length === 0) {
+//       e.preventDefault();
+//       Swal.fire({
+//         icon: "warning",
+//         title: "No Items",
+//         text: "Please add at least one item before submitting.",
+//       });
+//       return;
+//     }
 
-    let formData = new FormData(document.getElementById("frm-request-sts"));
-    formData.append("items", JSON.stringify(items));
+//     let formData = new FormData(document.getElementById("frm-request-sts"));
+//     formData.append("items", JSON.stringify(items));
 
-    $.ajax({
-      url: "dirs/outgoing/form/actions/save_stockrequest.php",
-      type: "POST",
-      data: formData,
-      processData: false,
-      contentType: false,
-      dataType: "json",
-      success: function (response) {
-        console.log(response);
-        if (response.status === "success") {
-          Swal.fire({
-            icon: "success",
-            title: "Success",
-            text: "Request submitted successfully!",
-          }).then(() => {
-            location.reload();
-          });
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: response.message || "Something went wrong",
-          });
-        }
-      },
-      error: function () {
-        Swal.fire({
-          icon: "error",
-          title: "Server Error",
-        });
-      },
-    });
+//     $.ajax({
+//       url: "dirs/outgoing/form/actions/save_stockrequest.php",
+//       type: "POST",
+//       data: formData,
+//       processData: false,
+//       contentType: false,
+//       dataType: "json",
+//       success: function (response) {
+//         console.log(response);
+//         if (response.status === "success") {
+//           Swal.fire({
+//             icon: "success",
+//             title: "Success",
+//             text: "Request submitted successfully!",
+//           }).then(() => {
+//             location.reload();
+//           });
+//         } else {
+//           Swal.fire({
+//             icon: "error",
+//             title: "Error",
+//             text: response.message || "Something went wrong",
+//           });
+//         }
+//       },
+//       error: function () {
+//         Swal.fire({
+//           icon: "error",
+//           title: "Server Error",
+//         });
+//       },
+//     });
 
-    // Remove old hidden input if exists
-    $("#tableData").remove();
+//     // Remove old hidden input if exists
+//     $("#tableData").remove();
 
-    // Append hidden JSON field
-    $("<input>")
-      .attr("type", "hidden")
-      .attr("name", "tableData")
-      .attr("id", "tableData")
-      .val(JSON.stringify(items))
-      .appendTo("#frm-request-sts");
-  });
-}
+//     // Append hidden JSON field
+//     $("<input>")
+//       .attr("type", "hidden")
+//       .attr("name", "tableData")
+//       .attr("id", "tableData")
+//       .val(JSON.stringify(items))
+//       .appendTo("#frm-request-sts");
+//   });
+// }

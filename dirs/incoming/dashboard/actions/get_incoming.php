@@ -7,7 +7,7 @@ $Uid     = $_SESSION['Uid'];
 try {
   $conn->beginTransaction();
 
-  $fetch_incoming = $conn->prepare("EXEC dbo.[INCOMING_REQ] ?");
+  $fetch_incoming = $conn->prepare("EXEC dbo.[Monitor_StockRequest_List] ?");
   $fetch_incoming->execute([$Uid]);
   $get_incomingrequest = $fetch_incoming->fetchAll(PDO::FETCH_ASSOC);
 

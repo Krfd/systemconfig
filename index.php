@@ -10,7 +10,7 @@ if (!isset($_SESSION['Uid'])) {
 $User = $_SESSION['Uid'];
 
 try {
-    $ua = $conn->prepare("EXEC SESSIONUSER @mUserid = ?");
+    $ua = $conn->prepare("EXEC dbo.[Session_Account] ?");
     $ua->execute([$User]);
     $user = $ua->fetch(PDO::FETCH_ASSOC);
 
@@ -84,7 +84,7 @@ try {
                 </a>
                 <small><?php echo isset($user['Username']) ? $user['Username'] : 'Bonjing!'; ?></small>
                 <br>
-                <span class="badge text-sm bg-primary" id="system-type"><?php echo (isset($user['Role']) ? $user['Role'] : '') . ' - ' . (isset($user['Branch']) ? $user['Branch'] : '') ?></span>
+                <span class="badge text-sm bg-primary" id="system-type"><?php echo (isset($user['UserRole']) ? $user['UserRole'] : '') . ' - ' . (isset($user['Branch']) ? $user['Branch'] : '') ?></span>
             </p>
             <div class="sidebar">
                 <nav id="main-menu" class="mt-2">
@@ -153,18 +153,9 @@ try {
                                 <p>Logout</p>
                             </a>
                         </li>
-                        <!-- <li class="nav-item d-flex align-items-center ms-3 mt-2">
-                            <div class="form-check m-0 ml-1">
-                                <input class="form-check-input" type="checkbox" id="theme-mode" onclick="loadTheme()">
-                                <label class="form-check-label text-white ms-2" for="theme-mode" id="theme-label">Theme</label>
-                            </div>
-                        </li> -->
                     </ul>
                 </nav>
             </div>
-            <!-- <input type="hidden" value="<?php
-                                                // echo $user['Theme']; 
-                                                ?>" id="theme-pref"> -->
             <input type="hidden" value="<?php echo $user['Username']; ?>" id="session-user">
         </aside>
     </div>

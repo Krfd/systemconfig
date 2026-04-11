@@ -1,28 +1,22 @@
 <?php
-	require_once "../config/connection.php";
-	require_once "../config/functions.php";
+require_once "../config/connection.php";
 
-	$Username 	=	$_POST['Username'];
-	$Role 		=	$_POST['Role'];
-	$Password   =	hash_password($_POST['Password']);
-	
-	try{
+$Username     = $_POST['Username'];
+$Password     = $_POST['Password'];
+$Role         = $_POST['Role'];
+$hashedPassword = password_hash($Password, PASSWORD_DEFAULT);
 
-		$conn->beginTransaction();
+try {
 
-		$ins_account = $conn->prepare("INSERT INTO accounts
-			(Username, Role, Password
-				)VALUES(?,?,?)");
-		$ins_account->execute([$Username,$Role, $Password]);
-		
-		$conn->commit();
-		echo "OK";
+	$conn->beginTransaction();
 
-	}catch(PDOException $e){
-		$conn->rollback();
-		echo "<b>Warning. Please Contact System Developer.<br/></b>".$e->getMessage();
-	}
+	$ins_acc_online = $conn->prepare("INSERT INTO UserAccounts (Username, Password, UserRole)
+        VALUES(?,?,?)");
+	$ins_acc_online->execute([$Username, $hashedPassword, $Role]);
 
-
-?>
- 
+	$conn->commit();
+	echo "OK";
+} catch (PDOException $e) {
+	$conn->rollback();
+	echo "<b>Warning. Please Contact System Developer.<br/></b>" . $e->getMessage();
+}
