@@ -16,14 +16,10 @@ function loadDashboard() {
   $.post("dirs/outgoing/form/components/main.php", {}, function (data) {
     $("#form-content").html(data);
     loadImperialBrands();
-    get_userinfo();
-    loadIAPBranchlist();
     get_SRN();
-    formattedDate();
-    removeItem();
-    addItem();
-    numberInput();
-    // submitReq();
+    loadIAPBranches();
+    loadItems();
+    get_userinfo();
   });
 }
 
@@ -40,14 +36,114 @@ function get_SRN() {
     {},
     function (data) {
       let response = JSON.parse(data);
+      if ($.trim(response.isSuccess) === "success") {
+        $("#srnForm").val(response.SRNNumber);
+        $("#desForm").val(response.BranchName);
+        loadDestinationWhscodes(response.BranchName);
+      } else {
+        alert(response.message || "Error occurred");
+      }
+    },
+  );
+}
+
+/*Whscode of branch Destination*/
+function loadDestinationWhscodes(BranchName) {
+  $.post(
+    "dirs/dashboard/actions/get_destinationwhscode.php",
+    {},
+    function (data) {
+      BranchName: BranchName;
+      const response = JSON.parse(data);
+      if ($.trim(response.isSuccess) === "success") {
+        const branches = response.Data;
+        $("#desCodeForm").html(response.Data.WhsCode);
+        branches.forEach((warehousecode) => {
+          $("#desCodeForm").append(
+            $("<option>", {
+              value: warehousecode.WhsCode,
+              text: warehousecode.WhsCode,
+            }),
+          );
+        });
+      } else {
+        alert($.trim(response.Data));
+      }
+    },
+  );
+}
+
+/*IAP All Branch list*/
+function loadIAPBranches() {
+  $.post("dirs/outgoing/form/actions/get_branchlist.php", {}, function (data) {
+    const response = JSON.parse(data);
+    if ($.trim(response.isSuccess) === "success") {
+      const branches = response.Data;
+      $("#user-origin").html(response.Data.Branch);
+      branches.forEach((branch) => {
+        $("#user-origin").append(
+          $("<option>", {
+            value: branch.Branch,
+            text: branch.Branch,
+          }),
+        );
+      });
+    } else {
+      alert($.trim(response.Data));
+    }
+  });
+}
+
+/*Function whscode of desitincation branch*/
+/*function loadDestinationWhscodes(BranchName) {
+  $.post(
+    "dirs/outgoing/form/actions/get_destinationwhscode.php",
+    {
+      BranchName: BranchName,
+    },
+    function (data) {
+      const response = JSON.parse(data);
+      if ($.trim(response.isSuccess) === "success") {
+        const whscode = response.Data;
+        whscode.forEach((whscode) => {
+          $("#desCodeForm").append(
+            $("<option>", {
+              value: whscode.WhsCode,
+              text: whscode.WhsCode,
+              title: whscode.WhsName,
+              selected: whscode.WhsCode.endsWith("WH"),
+            }),
+          );
+        });
+      } else {
+        console.log(response.Data);
+        Swal.fire({
+          icon: "error",
+          title: "Server under restoring",
+          text: "Please come back later",
+          showConfirmButton: true,
+          confirmButtonText: "OKAY",
+          allowOutsideClick: false,
+        }).then(() => {
+          $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
+            $("#main-content").html(data);
+          });
+        });
+      }
+    },
+  );*/
+/*function get_SRN() {
+  $.post(
+    "dirs/outgoing/form/actions/get_srngenerator.php",
+    {},
+    function (data) {
+      let response = JSON.parse(data);
+      // console.log(`SRN NUMBER RESPONSE: ${response.Data.SRNNumber}`);
       if ($.trim(response.isSuccess) == "success") {
-        let srn = response.SRNNumber;
-        let branchCode = response.BranchName || "GEN";
+        let srn = response.Data.SR_Number;
+        let branchCode = response.Data.BranchCode || "GEN";
         let newSRN;
         let num;
-
-        console.log(`SRN: ${srn}`);
-
         if (!srn || srn === "") {
           num = 1;
         } else {
@@ -72,7 +168,7 @@ function get_SRN() {
       }
     },
   );
-}
+}*/
 
 /*load Imperial Brands*/
 function loadImperialBrands() {
@@ -99,7 +195,8 @@ function loadImperialBrands() {
 
 /*Load User Branch Information*/
 function get_userinfo() {
-  $.post("dirs/outgoing/form/actions/get_userinfo.php", {}, function (data) {
+  // $.post("dirs/outgoing/form/actions/get_userinfo.php", {}, function (data) {
+  $.post("dirs/outgoing/form/actions/get_userdetails.php", {}, function (data) {
     response = JSON.parse(data);
     if (jQuery.trim(response.isSuccess) == "success") {
       $("#desForm").val(response.Data.Branch);
@@ -165,40 +262,40 @@ function loadDestinationWhscodes(Branch) {
 }
 
 /*Function Imperial Appliance Plaza Branch List*/
-async function loadIAPBranchlist() {
-  $.post("dirs/outgoing/form/actions/get_branchlist.php", {}, function (data) {
-    const response = JSON.parse(data);
-    if ($.trim(response.isSuccess) === "success") {
-      const iapbranch = response.Data;
-      $("#user-origin").html('<option selected value="">BRANCH</option>');
-      iapbranch.forEach((iapbranch) => {
-        $("#user-origin").append(
-          $("<option>", {
-            value: iapbranch.Branch,
-            text: iapbranch.Branch,
-          }),
-        );
-      });
-      if (iapbranch.length > 0) {
-        $("#user-origin").val(iapbranch[0].Branch);
-        loadOriginWhscodes(iapbranch[0].Branch);
-      }
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "Server under restoring",
-        text: "Please come back later",
-        showConfirmButton: true,
-        confirmButtonText: "OKAY",
-        allowOutsideClick: false,
-      }).then(() => {
-        $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
-          $("#main-content").html(data);
-        });
-      });
-    }
-  });
-}
+// async function loadIAPBranchlist() {
+//   $.post("dirs/outgoing/form/actions/get_branchlist.php", {}, function (data) {
+//     const response = JSON.parse(data);
+//     if ($.trim(response.isSuccess) === "success") {
+//       const iapbranch = response.Data;
+//       $("#user-origin").html('<option selected value="">BRANCH</option>');
+//       iapbranch.forEach((iapbranch) => {
+//         $("#user-origin").append(
+//           $("<option>", {
+//             value: iapbranch.Branch,
+//             text: iapbranch.Branch,
+//           }),
+//         );
+//       });
+//       if (iapbranch.length > 0) {
+//         $("#user-origin").val(iapbranch[0].Branch);
+//         loadOriginWhscodes(iapbranch[0].Branch);
+//       }
+//     } else {
+//       Swal.fire({
+//         icon: "error",
+//         title: "Server under restoring",
+//         text: "Please come back later",
+//         showConfirmButton: true,
+//         confirmButtonText: "OKAY",
+//         allowOutsideClick: false,
+//       }).then(() => {
+//         $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
+//           $("#main-content").html(data);
+//         });
+//       });
+//     }
+//   });
+// }
 
 $(document).on("change", "#user-origin", function () {
   const selectedBranch = $(this).val();
@@ -317,14 +414,10 @@ $("#newModel").on("change", function () {
 });
 
 function loadItems() {
-  let SRN = $("#srnForm").val();
-
   $.ajax({
     url: "dirs/outgoing/form/actions/get_prepitem.php", // your API file
     type: "POST",
-    data: {
-      SRN: SRN,
-    },
+    data: {},
     dataType: "json",
     beforeSend: function () {
       let tbody = $("#outgoingTable tbody");
@@ -338,127 +431,6 @@ function loadItems() {
             </tr>
         `);
     },
-    // ORIGINAL
-    // success: function (response) {
-    //   let tbody = $("#outgoingTable tbody");
-    //   tbody.empty(); // remove yellow placeholder row
-    //   if (response.isSuccess === "success" && response.Data.length > 0) {
-    //     let rowCount = response.Data.length;
-    //     let totalQty = 0;
-
-    //     $.each(response.Data, function (index, item) {
-    //       let quantity = parseFloat(item.Quantity) || 0; // ensure number
-    //       totalQty += quantity;
-
-    //       let row = `<tr class="item-row">
-    //                     <td class="ps-2 align-middle" style="background: #FFFBDF; padding: 3px">${item.DisplayRowNumber}</td>
-    //                     <td class="ps-2 align-middle item-brand" style="background: #FFFBDF; padding: 3px">${item.ItemBrand}</td>
-    //                     <td class="ps-2 align-middle item-model" style="background: #FFFBDF; padding: 3px">${item.ItemName}</td>
-    //                     <td class="ps-2 align-middle item-category" style="background: #FFFBDF; padding: 3px">${item.ItemGroup}</td>
-    //                     <td class="ps-2 align-middle item-code" hidden>${item.ItemCode}</td>
-    //                     <td class="ps-2 align-middle item-quantity text-center" style="background: #FFFBDF; padding: 3px">${item.Quantity}</td>
-    //                     <td class="ps-2 align-middle d-flex gap-1" style="background: #FFFBDF; padding: 3px">
-    //                       <button type="button" class="btn btn-sm btn-danger remove-item-button" id="${item.ItemNum}">
-    //                         <i class="bi bi-dash"></i>
-    //                       </button>
-    //                       <button type="button" class="btn btn-sm btn-primary add-item-button" id="${item.ItemNum}">
-    //                         <i class="bi bi-plus"></i>
-    //                       </button>
-    //                     </td>
-    //                   </tr>
-    //                 `;
-
-    //       tbody.append(row);
-    //     });
-
-    //     if (rowCount < 8) {
-    //       let emptyRowsNeeded = 8 - rowCount;
-
-    //       for (let i = 0; i < emptyRowsNeeded; i++) {
-    //         let emptyRow = `
-    //           <tr class="item-row empty-row" style="height: 40px; max-height: 40px">
-    //             <td style="background: #FFFBDF; padding: 0">&nbsp;</td>
-    //             <td style="background: #FFFBDF; padding: 0"></td>
-    //             <td style="background: #FFFBDF; padding: 0"></td>
-    //             <td style="background: #FFFBDF; padding: 0"></td>
-    //             <td style="background: #FFFBDF; padding: 0"></td>
-    //             <td style="background: #FFFBDF; padding: 0"></td>
-    //           </tr>
-    //         `;
-    //         tbody.append(emptyRow);
-    //       }
-    //     }
-    //     $("#totalQuantity").text(totalQty);
-    //   } else {
-    //     // If no data, show empty yellow row again
-    //     tbody.html(`
-    //                 <tr style="height:40px; min-height:40px">
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                 </tr>
-    //                 <tr style="height:40px; min-height:40px">
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                 </tr>
-    //                 <tr style="height:40px; min-height:40px">
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                 </tr>
-    //                 <tr style="height:40px; min-height:40px">
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                 </tr>
-    //                 <tr style="height:40px; min-height:40px">
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                 </tr>
-    //                 <tr style="height:40px; min-height:40px">
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                 </tr>
-    //                 <tr style="height:40px; min-height:40px">
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                 </tr>
-    //                 <tr style="height:40px; min-height:40px">
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                   <td style="background:#FFFBDF"></td>
-    //                 </tr>
-    //             `);
-    //   }
-    // },
 
     // ACCUMULATES
     success: function (response) {
@@ -486,6 +458,7 @@ function loadItems() {
           } else {
             // Create new row
             let row = `<tr class="item-row">
+                     <td class="ps-2 align-middle d-none" name="temp-itemnum[]">${item.ItemNum}</td>
                     <td class="ps-2 align-middle" style="background: #FFFBDF; padding: 3px">${item.DisplayRowNumber}</td>
                     <td class="ps-2 align-middle item-brand" style="background: #FFFBDF; padding: 3px">${item.ItemBrand}</td>
                     <td class="ps-2 align-middle item-model" style="background: #FFFBDF; padding: 3px">${item.ItemName}</td>
@@ -493,10 +466,10 @@ function loadItems() {
                     <td class="ps-2 align-middle item-code" hidden>${item.ItemCode}</td>
                     <td class="ps-2 align-middle item-quantity text-center" style="background: #FFFBDF; padding: 3px">${item.Quantity}</td>
                     <td class="ps-2 align-middle d-flex gap-1" style="background: #FFFBDF; padding: 3px">
-                        <button type="button" class="btn btn-sm btn-danger remove-item-button" id="${item.ItemNum}">
+                        <button type="button" class="btn btn-sm btn-danger remove-item-button" onclick="reduceItemQty('${item.ItemNum}')">
                             <i class="bi bi-dash"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-primary add-item-button" id="${item.ItemNum}">
+                        <button type="button" class="btn btn-sm btn-primary add-item-button"  onclick="addItemQty('${item.ItemNum}')">
                             <i class="bi bi-plus"></i>
                         </button>
                     </td>
@@ -606,6 +579,40 @@ function loadItems() {
   });
 }
 
+/*Function reduce temporary item qty */
+function reduceItemQty(ItemNum) {
+  $.post(
+    "dirs/outgoing/form/actions/remove_unit.php",
+    {
+      ItemNum: ItemNum,
+    },
+    function (data) {
+      if (jQuery.trim(data) === "success") {
+        loadItems();
+      } else {
+        alert(data);
+      }
+    },
+  );
+}
+
+/*Function add temporary item qty */
+function addItemQty(ItemNum) {
+  $.post(
+    "dirs/outgoing/form/actions/update_add_prepitem_qty.php",
+    {
+      ItemNum: ItemNum,
+    },
+    function (data) {
+      if (jQuery.trim(data) === "success") {
+        loadItems();
+      } else {
+        alert(data);
+      }
+    },
+  );
+}
+
 function removeItem() {
   $(document).off("click", ".remove-item-button");
   $(document).on("click", ".remove-item-button", function () {
@@ -672,8 +679,6 @@ function formattedDate() {
 }
 
 function clearTable() {
-  let SRN = document.getElementById("srnForm").value;
-
   Swal.fire({
     icon: "warning",
     title: "Are your sure to clear this table?",
@@ -684,9 +689,7 @@ function clearTable() {
     if (result.isConfirmed) {
       $.post(
         "dirs/outgoing/form/actions/clear_formTable.php",
-        {
-          SRN: SRN,
-        },
+        {},
         function (data) {
           let res;
           try {
@@ -728,88 +731,3 @@ function numberInput() {
     this.value = this.value.replace(/^0+/, "");
   });
 }
-
-// function submitReq() {
-//   $("#frm-request-sts").on("submit", function (e) {
-//     e.preventDefault();
-//     let items = [];
-//     $("#outgoingTable tbody tr.item-row")
-//       .not(".empty-row")
-//       .each(function () {
-//         let brand = $(this).find(".item-brand").text().trim();
-//         let model = $(this).find(".item-model").text().trim();
-//         let code = $(this).find(".item-code").text().trim();
-//         let category = $(this).find(".item-category").text().trim();
-//         let quantity = $(this).find(".item-quantity").text().trim();
-
-//         // Only push if row is not empty
-//         if (brand !== "") {
-//           items.push({
-//             brand: brand,
-//             code: code,
-//             model: model,
-//             category: category,
-//             quantity: quantity,
-//           });
-//         }
-//       });
-
-//     // ❗ Prevent submit if no real items
-//     if (items.length === 0) {
-//       e.preventDefault();
-//       Swal.fire({
-//         icon: "warning",
-//         title: "No Items",
-//         text: "Please add at least one item before submitting.",
-//       });
-//       return;
-//     }
-
-//     let formData = new FormData(document.getElementById("frm-request-sts"));
-//     formData.append("items", JSON.stringify(items));
-
-//     $.ajax({
-//       url: "dirs/outgoing/form/actions/save_stockrequest.php",
-//       type: "POST",
-//       data: formData,
-//       processData: false,
-//       contentType: false,
-//       dataType: "json",
-//       success: function (response) {
-//         console.log(response);
-//         if (response.status === "success") {
-//           Swal.fire({
-//             icon: "success",
-//             title: "Success",
-//             text: "Request submitted successfully!",
-//           }).then(() => {
-//             location.reload();
-//           });
-//         } else {
-//           Swal.fire({
-//             icon: "error",
-//             title: "Error",
-//             text: response.message || "Something went wrong",
-//           });
-//         }
-//       },
-//       error: function () {
-//         Swal.fire({
-//           icon: "error",
-//           title: "Server Error",
-//         });
-//       },
-//     });
-
-//     // Remove old hidden input if exists
-//     $("#tableData").remove();
-
-//     // Append hidden JSON field
-//     $("<input>")
-//       .attr("type", "hidden")
-//       .attr("name", "tableData")
-//       .attr("id", "tableData")
-//       .val(JSON.stringify(items))
-//       .appendTo("#frm-request-sts");
-//   });
-// }

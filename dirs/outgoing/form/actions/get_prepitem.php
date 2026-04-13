@@ -3,14 +3,12 @@
   session_start();
 
   $Userid     = $_SESSION['Uid'];
-// Append user ID to file
-  $SRN     = $_POST['SRN'];
 
 try {
   $conn->beginTransaction();
 
-    $fetch_prepitem = $conn->prepare("EXEC dbo.[DISPLAY_PREPARED_ITMS] ? ,?");
-    $fetch_prepitem->execute([ $Userid, $SRN]);
+    $fetch_prepitem = $conn->prepare("EXEC dbo.[Stock_Temp_Request] ?");
+    $fetch_prepitem->execute([ $Userid]);
     $get_items = $fetch_prepitem->fetchAll(PDO::FETCH_ASSOC);
 
   $conn->commit();

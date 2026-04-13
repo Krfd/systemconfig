@@ -17,7 +17,7 @@
   <link rel="stylesheet" type="text/css" href="assets/css/login.css">
   <link rel="stylesheet" href="assets/plugins/datepicker/jquery-ui.structure.min.css">
   <link rel="icon" href="assets/image/logo/iap_icon.png">
-  <style>
+  <!-- <style>
     .lock-overlay {
       position: fixed;
       top: 0;
@@ -55,7 +55,7 @@
       color: red;
       margin-top: 10px;
     }
-  </style>
+  </style> -->
 </head>
 
 <body>
@@ -117,7 +117,7 @@
   <script src="assets/plugins/elevatezoom-plus-master/src/jquery.ez-plus.js"></script>
   <script src="assets/plugins/datepicker/jquery-ui.min.js"></script>
   <script src="assets/js/global-scripts.js"></script>
-  <script src="assets/js/relogin.js"></script>
+  <!-- <script src="assets/js/relogin.js"></script> -->
 </body>
 
 </html>

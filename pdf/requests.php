@@ -12,7 +12,7 @@ if (!isset($_GET['picklist']) || empty($_SESSION['Uid'])) {
     return;
 }
 
-$picklist = $_GET['picklist'];
+// $picklist = $_GET['picklist'];
 $executedBy = $_GET['executedBy'] ?? '';
 $Uid = $_SESSION['Uid'];
 

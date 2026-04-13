@@ -1,7 +1,6 @@
 <?php
   require_once "../../../../config/connection.php";
 
-
 try {
   $conn->beginTransaction();
 

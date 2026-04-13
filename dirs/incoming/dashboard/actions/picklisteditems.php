@@ -1,32 +1,30 @@
 <?php
-  require_once "../../../../config/connection.php";
-  session_start();
+require_once "../../../../config/connection.php";
+session_start();
 
-  $User     = $_SESSION['Uid'];
-  $PicklistNumber = $_POST['PicklistNumber'];
+
+$User     = $_SESSION['Uid'];
 
 try {
   $conn->beginTransaction();
 
-    $fetch_picklist_request = $conn->prepare("EXEC dbo.[PickList_Item_Collected] ?, ?");
-    $fetch_picklist_request->execute([ $User, $PicklistNumber ]);
-    $get_picklist = $fetch_picklist_request->fetchAll(PDO::FETCH_ASSOC);
+  $fetch_picklistbasket = $conn->prepare("EXEC dbo.[Monitor_PickListed] ?");
+  $fetch_picklistbasket->execute([$User]);
+  $get_basket = $fetch_picklistbasket->fetchAll(PDO::FETCH_ASSOC);
 
   $conn->commit();
 
   $response = array(
     "isSuccess" => 'success',
-    "Data" => $get_picklist
+    "Data" => $get_basket
   );
   echo json_encode($response);
-
-}catch (PDOException $e){
-    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
+} catch (PDOException $e) {
+  errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
   $conn->rollback();
   $response = array(
     "isSuccess" => 'Failed',
-    "Data" => "<b>Error. Please Contact System Developer. <br/></b>".$e->getMessage()
+    "Data" => "<b>Error. Please Contact System Developer. <br/></b>" . $e->getMessage()
   );
   echo json_encode($response);
 }
-?>

@@ -42,18 +42,14 @@ function loadIncoming() {
       let existingSeries = new Set();
       if (response.isSuccess === "success") {
         let sortedData = response.Data.sort(
-          (a, b) => Number(b.SeriesNum || 0) - Number(a.SeriesNum || 0),
+          (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
         );
-
-        console.log(`INCOMING DATA: ${JSON.stringify(sortedData)}`);
 
         sortedData.forEach((item) => {
           let status = item.RequestStatus
             ? item.RequestStatus.toUpperCase()
             : "";
           let statusClass = "";
-
-          // console.log(`item status: ${status}`);
 
           if (status === "NEW") {
             statusClass = "bg-primary";
@@ -69,11 +65,11 @@ function loadIncoming() {
 
           let statusBadge = `<span class="badge ${statusClass}">${status || ""}</span>`;
 
-          if (existingSeries.has(item.SeriesNum)) {
+          if (existingSeries.has(item.RowNum)) {
             return;
           }
 
-          existingSeries.add(item.SeriesNum);
+          existingSeries.add(item.RowNum);
 
           const isDisabled =
             item.PKList_Number && item.PKList_Number.trim() !== ""
@@ -81,12 +77,12 @@ function loadIncoming() {
               : "";
 
           rows.push([
-            `<input type="checkbox" name="checkbox" id="${item.SeriesNum}" data-rownum="${item.SeriesNum}" 
+            `<input type="checkbox" name="checkbox" id="${item.RowNum}" data-rownum="${item.RowNum}" 
             class="form-check-input checkbox align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
-            item.SeriesNum || "",
+            item.RowNum || "",
             item.SR_Number || "",
-            item.RequestType || "",
-            item.Branch || "",
+            item.TypeRequest || "",
+            item.BranchDestination || "",
             statusBadge,
             item.EncodeDate || "",
             item.PKList_Number || "",
@@ -290,7 +286,8 @@ function toggleCheckboxes() {
           if (response.status === "success") {
             Swal.fire({
               icon: "success",
-              title: response.message,
+              // title: response.message,
+              title: response.PicklistNumber,
               confirmButtonText: "OKAY",
             });
             $("#incomingTableDisplay tbody .checkbox")
@@ -449,6 +446,7 @@ $(document).on("dblclick", "#basketTable tbody .open-picklist", function (e) {
   if (!$(this).find(".open-picklist").length) return;
   let $row = $(this).closest("tr");
   let picklistNum = $row.attr("data-picklist-num");
+  // let docEntry = $row.attr("data-doc-entry");
   $("#main-content").html(spinner);
   setTimeout(function () {
     openPicklist(picklistNum);
@@ -472,6 +470,7 @@ $(document).on("click", ".dropdown .open-picklist-items", function (e) {
 
   let picklistedRow = $(this).closest("tr");
   let picklistNum = picklistedRow.attr("data-picklist-num");
+  // let docEntry = picklistedRow.attr("data-doc-entry");
 
   picklistNumRef = picklistNum;
 
@@ -479,6 +478,7 @@ $(document).on("click", ".dropdown .open-picklist-items", function (e) {
   $("#main-content").html(spinner);
   setTimeout(function () {
     openPicklist(picklistNum);
+    // openPicklist(picklistNum, docEntry);
   }, 200);
 });
 
@@ -497,7 +497,7 @@ $(document).on("click", ".dropdown .enter-actual-qty", function (e) {
   }, 200);
 });
 
-function openPicklist(picklistNum) {
+function openPicklist(picklistNum, docEntry) {
   $.post(
     "dirs/incoming/dashboard/picklistItem.php",
     { picklistNum: picklistNum },
@@ -782,14 +782,16 @@ function loadBasket() {
         let rows = [];
         if (response.isSuccess === "success") {
           let sortedData = response.Data.sort(
-            (a, b) => Number(b.BaseNum_SRN || 0) - Number(a.RowNum || 0),
+            (a, b) =>
+              Number(b.PKList_Number || 0) - Number(a.PKList_Number || 0),
           );
+          console.log(`PICKLIST BASKET DATA: ${JSON.stringify(sortedData)}`);
 
           sortedData.forEach((item) => {
             rows.push([
-              item.PickLst_Num || "",
+              item.PKList_Number || "",
               item.DocDate || "",
-              item.PickedQty || "",
+              item.StockRequest_Qty || "",
               '<div class="dropdown dropstart">' +
                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
                 '<i class="bi bi-three-dots"></i></button>' +
@@ -798,7 +800,7 @@ function loadBasket() {
                   <li>
                     <a class="dropdown-item print-picklist" 
                       href="#"
-                      data-picklist="${item.PickLst_Num}">
+                      data-picklist="${item.PKList_Number}" data-doc-entry="${item.DocEntry}">
                       Print
                     </a>
                   </li>
@@ -834,8 +836,9 @@ function loadBasket() {
 
               if (originalItem) {
                 $(row)
-                  .attr("data-rownum", originalItem.RowNum)
-                  .attr("data-picklist-num", originalItem.PickLst_Num)
+                  .attr("data-rownum", originalItem.PKList_Number)
+                  .attr("data-picklist-num", originalItem.PKList_Number)
+                  // .attr("data-doc-entry", originalItem.DocEntry)
                   .addClass("picklist-row");
               }
             },
@@ -891,10 +894,12 @@ function loadBasket() {
 
               $("#basketTable").on("click", ".print-picklist", function (e) {
                 e.preventDefault();
-                e.stopPropagation(); // prevent dropdown or row click from interfering
+                e.stopPropagation();
 
-                // const srn = $(this).data("srn");
                 const PKlistNum = $(this).data("picklist");
+                const DocEntry = $(this).data("doc-entry");
+
+                console.log(`DOC ENTRY: ${DocEntry}`);
 
                 Swal.fire({
                   title: "Print this Picklist?",
@@ -930,13 +935,13 @@ function loadBasket() {
                       $.post(
                         "dirs/incoming/dashboard/actions/save_print_delivery.php",
                         {
-                          PKlistNum: PKlistNum,
-                          executedBy: executedBy, // pass to backend
+                          ExecutedBy: executedBy,
+                          DocEntry: DocEntry,
                         },
                         function (response) {
                           const openPrint = () => {
                             window.open(
-                              `pdf/requests.php?picklist=${PKlistNum}&executedBy=${encodeURIComponent(executedBy)}`,
+                              `pdf/requests.php?executedBy=${encodeURIComponent(executedBy)}&DocEntry=${DocEntry}`,
                               "_blank",
                             );
                           };

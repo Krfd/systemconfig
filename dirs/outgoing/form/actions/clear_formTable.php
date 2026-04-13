@@ -3,13 +3,12 @@ require_once("../../../../config/connection.php");
 session_start();
 
 $UserId = $_SESSION['Uid'];
-$SRN = $_POST['SRN'];
 
 try {
     $conn->beginTransaction();
 
-    $clearTable = $conn->prepare("EXEC dbo.[ClearReqFormTable] ?, ?");
-    $clearTable->execute([$UserId, $SRN]);
+    $clearTable = $conn->prepare("EXEC dbo.[ClearReqFormTable] ?");
+    $clearTable->execute([$UserId]);
 
     $conn->commit();
 

@@ -29,7 +29,7 @@
                             pattern="[1-9][0-9]*"
                             required>
                     </div>
-                    <input type="hidden" name="itemcode" id="itemcode"><!-- Selected Item code -->
+                    <input type="hidden" name="itemcode" id="itemcode">
                     <div class="modal-footer">
                         <button class="btn btn-success" type="submit" id="outgoingModalBtn">Add</button>
                         <button class="btn btn-danger" type="reset">Clear</button>
@@ -47,14 +47,14 @@
         var Model = $("#newModel").val();
         var ItemNumber = $("#itemcode").val();
         var Category = $("#newCategory").val();
-        var SRN = $("#srnForm").val();
+        // var SRN = $("#srnForm").val();
         var Quantity = $("#newQuantity").val();
         $.post("dirs/outgoing/form/actions/save_orderitm.php", {
             Brand: Brand,
             Model: Model,
             ItemNumber: ItemNumber,
             Category: Category,
-            SRN: SRN,
+            // SRN: SRN,
             Quantity: Quantity,
 
         }, function(data) {

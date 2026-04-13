@@ -25,7 +25,6 @@ try {
 
     $conn->commit();
     echo "success";
-
 } catch (PDOException $e) {
     $conn->rollBack();
     echo "Error: " . $e->getMessage();

@@ -13,24 +13,24 @@ if (!isset($_GET['srn'])) {
 try {
     $srn = $_GET['srn'];
 
-    $stmt = $conn->prepare("SELECT * FROM Stock_Transfer_Items_3 WHERE SR_Number = ?");
+    $stmt = $conn->prepare("SELECT * FROM Stock_Transfer_Header_1 WHERE SR_Number = ?");
     $stmt->execute([$srn]);
 
-    $item = $conn->prepare("SELECT RowNum, ItemBrand, ItemName, ItemGroup, Quantity, DocDate, DocTime FROM SRN_ITM WHERE BaseNum_SRN = ?");
+    $item = $conn->prepare("SELECT * FROM Stock_Transfer_Items_3 WHERE SR_Number = ?");
     $item->execute([$srn]);
 
     $srnData = $stmt->fetch(PDO::FETCH_OBJ);
     $itemData = $item->fetchAll(PDO::FETCH_OBJ);
 
     $status = $srnData->RequestStatus;
-    $date = isset($srnData->DocDate)
-        ? date("m/d/y", strtotime($srnData->DocDate))
+    $date = isset($srnData->RequestDate)
+        ? date("m/d/y", strtotime($srnData->RequestDate))
         : "N/A";
-    $origin = $srnData->Orgin_Dstnation;
-    $purpose = $srnData->RequestPurpose;
-    $requestedBy = $srnData->PrepBy;
+    $origin = $itemData[0]->BranchOrigin;
+    $purpose = $srnData->PurposeRequest;
+    $requestedBy = $srnData->RequestedBy;
     $remarks = empty($srnData->Remarks) ? "N/A" : $srnData->Remarks;
-    $datetimeStr = $srnData->DocDate . ' ' . $srnData->DocTime;
+    $datetimeStr = $date . ' ' . $srnData->RequestTime;
     $timestamp = date("m/d/y h:i A", strtotime($datetimeStr));
     $textColor = [50, 50, 50];
 
@@ -245,12 +245,12 @@ try {
         $totalQty = 0;
 
         foreach ($itemData as $row) {
-            $totalQty += $row->Quantity;
+            $totalQty += $row->Request_Qty;
 
             // Calculate lines for each column
             $brandLines = $pdf->NbLines($headers['Brand'], $row->ItemBrand);
             $modelLines = $pdf->NbLines($headers['Model'], $row->ItemName);
-            $categoryLines = $pdf->NbLines($headers['Category'], $row->ItemGroup);
+            $categoryLines = $pdf->NbLines($headers['Category'], $row->ItemCategory);
 
             $maxLines = max($brandLines, $modelLines, $categoryLines, 1);
             $rowHeight = $lineHeight * $maxLines;
@@ -281,11 +281,11 @@ try {
             $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'], $y);
 
             /* ---------- CATEGORY ---------- */
-            $pdf->MultiCell($headers['Category'], $rowHeight, $row->ItemGroup, 1);
+            $pdf->MultiCell($headers['Category'], $rowHeight, $row->ItemCategory, 1);
             $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'], $y);
 
             /* ---------- QUANTITY ---------- */
-            $pdf->MultiCell($headers['Quantity'], $rowHeight, $row->Quantity, 1, 'C');
+            $pdf->MultiCell($headers['Quantity'], $rowHeight, $row->Request_Qty, 1, 'C');
 
             $i++;
         }

@@ -45,7 +45,7 @@
                             <div class="d-flex flex-column gap-1 col-2">
                                 <div class="d-flex align-items-baseline gap-3">
                                     <label for="date" class="form-label text-dark-emphasis col-4"><small>Date:</small></label>
-                                    <input type="date" name="date" id="formattedDate" class="form-control form-control-sm col" style="background: #FFFBDF" required>
+                                    <input type="date" name="date" id="formattedDate" class="form-control form-control-sm col" style="background: #FFFBDF" value="<?php echo date('Y-m-d'); ?>">
                                 </div>
                                 <div class="d-flex align-items-baseline gap-3">
                                     <label for="statusForm" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>
@@ -145,26 +145,36 @@
         var btn = $(this).find("button[type='submit']");
         btn.prop("disabled", true);
 
-        $.post(
-            "dirs/outgoing/form/actions/save_stockrequest.php", {
-                RequestType: RequestType,
-                PurposeForm: PurposeRequest,
-                OBranch: OBranch,
-                OWhscode: OWhscode,
-                DWhscode: DWhscode,
-                Remarks: Remarks,
-                ItemNum: Itemnumber,
-            },
-            function(data) {
-                if ($.trim(data) === "success") {
-                    alert("Stock Request Saved!");
-                } else {
-                    alert("Error: " + data);
-                }
+        $.post("dirs/outgoing/form/actions/save_stockrequest.php", {
+            RequestType: RequestType,
+            PurposeRequest: PurposeRequest,
+            OBranch: OBranch,
+            OWhscode: OWhscode,
+            DWhscode: DWhscode,
+            Remarks: Remarks,
+            ItemNum: Itemnumber
+        }, function(data) {
 
-                // 🔹 Re-enable button
-                btn.prop("disabled", false);
-            },
-        );
+            var response = JSON.parse(data)
+
+            if (response.status === "success") {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Request submitted successfully!",
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: data.SRNumber + ' has been created',
+                    text: data.message,
+                });
+            }
+            // 🔹 Re-enable button
+            btn.prop("disabled", false);
+        });
+
     });
 </script>

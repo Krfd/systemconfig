@@ -7,15 +7,14 @@ $Brand 			=	$_POST['Brand'];
 $Model 			=	$_POST['Model'];
 $ItemNumber 	=	$_POST['ItemNumber'];
 $Category 		=	$_POST['Category'];
-$SRN 			=	$_POST['SRN'];
 $Quantity 		=	$_POST['Quantity'];
 
 try {
 
 	$conn->beginTransaction();
 
-	$ins_preorder = $conn->prepare("EXEC dbo.[STS_ITEMPREP] ?,?,?,?,?,?,?");
-	$ins_preorder->execute([$Userid, $Brand, $Model, $ItemNumber, $Category, $SRN, $Quantity]);
+	$ins_preorder = $conn->prepare("EXEC dbo.[Create_Stock_Temp_Request] ?,?,?,?,?,?");
+	$ins_preorder->execute([$Userid,$ItemNumber,$Model,$Brand,$Category,$Quantity]);
 
 	$conn->commit();
 	echo "OK";

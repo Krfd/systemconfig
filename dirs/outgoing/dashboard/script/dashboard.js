@@ -62,8 +62,6 @@ function loadOutgoing() {
           (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
         );
 
-        console.log(`OUTGOING DATA: ${JSON.stringify(sortedData)}`);
-
         sortedData.forEach((item) => {
           let status = item.RequestStatus
             ? item.RequestStatus.toUpperCase()
@@ -87,8 +85,8 @@ function loadOutgoing() {
           rows.push([
             item.RowNum !== undefined ? item.RowNum.toString() : "",
             item.SR_Number || "",
-            item.Brnch_Dstnation || "",
-            item.Orgin_Dstnation || "",
+            item.BranchOrigin || "",
+            item.BranchDestination || "",
             statusBadge,
             item.EncodeDate || "N/A",
 
