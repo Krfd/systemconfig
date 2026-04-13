@@ -55,6 +55,45 @@ try {
         .checkbox {
             display: none;
         }
+
+        /* RELOGIN */
+        .lock-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .lock-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            width: 300px;
+        }
+
+        .lock-box input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .lock-box button {
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
     </style>
 </head>
 
@@ -181,6 +220,17 @@ try {
     </footer>
     </div>
 
+    <div id="lockOverlay" class="lock-overlay">
+        <div class="lock-box">
+            <h2>Session Locked</h2>
+            <p>Please login again to continue</p>
+            <input type="text" id="newUsername" class="form-control form-control-sm" placeholder="Username" />
+            <input type="password" id="newPassword" class="form-control form-control-sm" placeholder="Password" />
+            <button type="submit" onclick="unlockScreen()" class="btn btn-primary btn-sm">Login</button>
+            <p id="errorMsg" class="error"></p>
+        </div>
+    </div>
+
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/plugins/sweetalert2/sweetalert2.min.js"></script>
     <script src="assets/plugins/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -200,6 +250,7 @@ try {
     <script src="node_modules/uikit/dist/js/uikit.min.js"></script>
     <script src="node_modules/xlsx/dist/xlsx.full.min.js"></script>
     <script src="assets/js/script.js"></script>
+    <script src="assets/js/relogin.js"></script>
     <?php include 'modal.php'; ?>
     <script>
         $(document).ready(function() {
@@ -215,6 +266,97 @@ try {
             let deliveryNum;
             let summaryTable;
         })
+
+
+        function lockScreen() {
+            localStorage.setItem("isLocked", "true");
+            document.getElementById("lockOverlay").style.display = "flex";
+        }
+
+        async function unlockScreen() {
+            const username = document.getElementById("newUsername").value;
+            const password = document.getElementById("newPassword").value;
+            const errorMsg = document.getElementById("errorMsg");
+
+            console.log(`New Username: ${username}`)
+            console.log(`New Password: ${password}`)
+
+            try {
+                // const response = await fetch("actions/login.php", {
+                //     method: "POST",
+                //     headers: {
+                //         "Content-Type": "application/json",
+                //     },
+                //     body: JSON.stringify({
+                //         Username,
+                //         Password,
+                //     }),
+                // });
+
+                // if (response.ok) {
+                //     console.log(`SHOULD RELOGIN THE USER`)
+                //     const data = await response.json();
+
+                //     // Save new session/token
+                //     localStorage.setItem("authToken", data.token);
+                //     localStorage.removeItem("isLocked");
+
+                //     document.getElementById("lockOverlay").style.display = "none";
+                //     resetTimer();
+                // } else {
+                //     errorMsg.textContent = "Invalid username or password";
+                // }
+
+                $.post("actions/login.php", {
+                    Username: Username,
+                    Password: Password
+                }, function(data) {
+
+                    var response = JSON.parse(data);
+                    if (response.isSuccess === "OK") {
+                        // var sysRole = response.Data.SysRole;
+                        // if (sysRole === "cashier") {
+                        //     window.location.assign("index.php");
+                        // } else if (sysRole === "Admin") {
+                        //     window.location.assign("admin/index.php");
+                        // } else {
+                        //     window.location.assign("index.php");
+                        // }
+                        Swal.fire({
+                            icon: "success",
+                            title: "Authenticated successfully!",
+                            text: "Logging in..."
+                        })
+                    } else if (response.isSuccess === "Failed") {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Login failed",
+                            text: response.Message,
+                            confirmButtonText: "OKAY"
+                        })
+                    } else {
+                        console.log("Login failed:", response.Message);
+                    }
+                });
+            } catch (err) {
+                errorMsg.textContent = "Server error. Try again.";
+            }
+        }
+
+        window.onload = function() {
+            if (localStorage.getItem("isLocked") === "true") {
+                document.getElementById("lockOverlay").style.display = "flex";
+            }
+            resetTimer();
+        };
+
+        // Track activity
+        ["mousemove", "keydown", "click", "touchstart"].forEach((event) => {
+            document.addEventListener(event, resetTimer);
+        });
+
+        // Start timer initially
+        resetTimer();
     </script>
 </body>
 

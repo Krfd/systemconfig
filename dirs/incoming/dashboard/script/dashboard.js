@@ -45,6 +45,8 @@ function loadIncoming() {
           (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
         );
 
+        console.log(`LOAD INCOMING: ${JSON.stringify(sortedData)}`);
+
         sortedData.forEach((item) => {
           let status = item.RequestStatus
             ? item.RequestStatus.toUpperCase()
@@ -286,8 +288,7 @@ function toggleCheckboxes() {
           if (response.status === "success") {
             Swal.fire({
               icon: "success",
-              // title: response.message,
-              title: response.PicklistNumber,
+              title: "Picklist has been created",
               confirmButtonText: "OKAY",
             });
             $("#incomingTableDisplay tbody .checkbox")
@@ -295,6 +296,7 @@ function toggleCheckboxes() {
               .prop("checked", false);
             createPicklistBtn.textContent = "Create Picklist";
             loadIncoming();
+            // console.log(`PICKLIST ON LOAD INCOMING SHOULD BE DISPLAYED`);
           } else {
             Swal.fire({
               icon: "error",

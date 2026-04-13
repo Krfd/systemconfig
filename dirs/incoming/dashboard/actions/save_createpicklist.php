@@ -38,21 +38,25 @@ try {
             $BranchDestination         = $row['BranchDestination'];
             $BranchDestination_Whscode = $row['BranchDestination_Whscode'];
 
-            // 🔹 Insert Picklist Items
-            $stmtInsertItem = $conn->prepare("EXEC dbo.[Pick_List_Item_Collection] ?,?,?,?,?,?,?,?,?,?,?");
-            $stmtInsertItem->execute([
-                $PicklistNumber,
-                $SR_Number,
-                $ItemCode,
-                $ItemName,
-                $ItemBrand,
-                $ItemCategory,
-                $Request_Qty,
-                $BranchOrigin,
-                $BranchOrigin_Whscode,
-                $BranchDestination,
-                $BranchDestination_Whscode
-            ]);
+            try {
+                // 🔹 Insert Picklist Items
+                $stmtInsertItem = $conn->prepare("EXEC dbo.[Picklist_StockReq_Items_Collection] ?,?,?,?,?,?,?,?,?,?,?");
+                $stmtInsertItem->execute([
+                    $PicklistNumber,
+                    $SR_Number,
+                    $ItemCode,
+                    $ItemName,
+                    $ItemBrand,
+                    $ItemCategory,
+                    $Request_Qty,
+                    $BranchOrigin,
+                    $BranchOrigin_Whscode,
+                    $BranchDestination,
+                    $BranchDestination_Whscode
+                ]);
+            } catch (PDOException $e) {
+                errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
+            }
 
             // 🔹 Insert SR record ONLY ONCE per SR
             if (!in_array($SR_Number, $processedSR)) {

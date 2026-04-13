@@ -17,61 +17,9 @@
   <link rel="stylesheet" type="text/css" href="assets/css/login.css">
   <link rel="stylesheet" href="assets/plugins/datepicker/jquery-ui.structure.min.css">
   <link rel="icon" href="assets/image/logo/iap_icon.png">
-  <!-- <style>
-    .lock-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-
-    .lock-box {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      text-align: center;
-      width: 300px;
-    }
-
-    .lock-box input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-    }
-
-    .lock-box button {
-      margin-top: 10px;
-      width: 100%;
-      padding: 10px;
-    }
-
-    .error {
-      color: red;
-      margin-top: 10px;
-    }
-  </style> -->
 </head>
 
 <body>
-  <!-- RE-AUTHENTICATE USER -->
-  <!-- <div id="lockOverlay" class="lock-overlay">
-    <div class="lock-box">
-      <h2>Session Locked</h2>
-      <p>Please login again to continue</p>
-      <input type="text" id="usernameInput" class="form-control form-control-sm" placeholder="Username" />
-      <input type="password" id="passwordInput" class="form-control form-control-sm" placeholder="Password" />
-      <button type="button" onclick="unlockScreen()" class="btn btn-primary btn-sm">Login</button>
-      <p id="errorMsg" class="error"></p>
-    </div>
-  </div> -->
-
-
   <form id="frm-login">
     <div class="container d-flex justify-content-center align-items-center" style="height: 90vh;">
       <div class="login-card p-4 shadow bg-white">
@@ -117,7 +65,6 @@
   <script src="assets/plugins/elevatezoom-plus-master/src/jquery.ez-plus.js"></script>
   <script src="assets/plugins/datepicker/jquery-ui.min.js"></script>
   <script src="assets/js/global-scripts.js"></script>
-  <!-- <script src="assets/js/relogin.js"></script> -->
 </body>
 
 </html>

