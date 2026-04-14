@@ -10,6 +10,13 @@ try {
     $stmt->execute([$Username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($user && password_verify($Password, $user['Password'])) {
+
+        // Destroy old session data
+        session_regenerate_id(true);
+
+        // Clear session completely (optional but safer for relogin)
+        $_SESSION = [];
+
         $_SESSION['Uid'] = $user['Uid'];
         $_SESSION['Role'] = $user['UserRole'];
         echo json_encode([

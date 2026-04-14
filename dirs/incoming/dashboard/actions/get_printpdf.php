@@ -2,30 +2,27 @@
 require_once "../../../../config/connection.php";
 
 $DocEntry = $_POST['DocEntry'];
-
 try {
     $conn->beginTransaction();
-    $stmt = $conn->prepare("EXEC dbo.View_StockRequest_Details ?");
-    $stmt->execute([$DocEntry]);
-    $header = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $stmt->nextRowset();
-    $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $fetch_picklist = $conn->prepare("
+      SELECT DocEntry FROM Pick_List_Header_1 WITH (NOLOCK) WHERE DocEntry = ?
+    ");
+    $fetch_picklist->execute([$DocEntry]);
+    $get_data = $fetch_picklist->fetch(PDO::FETCH_ASSOC);
+
     $conn->commit();
 
-    // Prepare response
-    $response = [
+    $response = array(
         "isSuccess" => 'success',
-        "Header" => $header,
-        "Items" => $items
-    ];
-
+        "Data" => $get_data
+    );
     echo json_encode($response);
 } catch (PDOException $e) {
     $conn->rollback();
-    $response = [
+    $response = array(
         "isSuccess" => 'Failed',
         "Data" => "<b>Error. Please Contact System Developer. <br/></b>" . $e->getMessage()
-    ];
+    );
     echo json_encode($response);
 }

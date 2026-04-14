@@ -5,6 +5,18 @@ session_start();
 $User     = $_SESSION['Uid'];
 $DocEntry = $_POST['DocEntry'] ?? [];
 
+// $logData = [
+//     'User'     => $User,
+//     'DocEntry' => $DocEntry,
+//     'Time'     => date('Y-m-d H:i:s')
+// ];
+
+// file_put_contents(
+//     "debug_input.txt",
+//     print_r($logData, true) . PHP_EOL . str_repeat("-", 40) . PHP_EOL,
+//     FILE_APPEND
+// );
+
 try {
     $conn->beginTransaction();
 
@@ -24,9 +36,7 @@ try {
         // 🔹 Fetch items per DocEntry
         $stmtItems = $conn->prepare("EXEC dbo.[StockReq_H_Picklist] ?");
         $stmtItems->execute([$doc_id]);
-
         while ($row = $stmtItems->fetch(PDO::FETCH_ASSOC)) {
-
             $SR_Number                 = $row['SR_Number'];
             $ItemCode                  = $row['ItemCode'];
             $ItemName                  = $row['ItemName'];
@@ -38,10 +48,26 @@ try {
             $BranchDestination         = $row['BranchDestination'];
             $BranchDestination_Whscode = $row['BranchDestination_Whscode'];
 
+            $logData = [
+                'PicklistNumber'           => $PicklistNumber,
+                'SR_Number'                => $row['SR_Number'],
+                'ItemCode'                 => $row['ItemCode'],
+                'ItemName'                 => $row['ItemName'],
+                'ItemBrand'                => $row['ItemBrand'],
+                'ItemCategory'             => $row['ItemCategory'],
+                'Request_Qty'              => $row['Request_Qty'],
+                'BranchOrigin'             => $row['BranchOrigin'],
+                'BranchOrigin_Whscode'     => $row['BranchOrigin_Whscode'],
+                'BranchDestination'        => $row['BranchDestination'],
+                'BranchDestination_Whscode' => $row['BranchDestination_Whscode'],
+                'Timestamp'                => date('Y-m-d H:i:s')
+            ];
+
             try {
                 // 🔹 Insert Picklist Items
-                $stmtInsertItem = $conn->prepare("EXEC dbo.[Picklist_StockReq_Items_Collection] ?,?,?,?,?,?,?,?,?,?,?");
+                $stmtInsertItem = $conn->prepare("EXEC dbo.[Picklist_StockReq_Items_Collection] ?,?,?,?,?,?,?,?,?,?,?,?");
                 $stmtInsertItem->execute([
+                    $User,
                     $PicklistNumber,
                     $SR_Number,
                     $ItemCode,

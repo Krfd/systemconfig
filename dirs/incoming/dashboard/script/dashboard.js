@@ -45,7 +45,7 @@ function loadIncoming() {
           (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
         );
 
-        console.log(`LOAD INCOMING: ${JSON.stringify(sortedData)}`);
+        // console.log(`INCOMING DATA: ${JSON.stringify(sortedData)}`);
 
         sortedData.forEach((item) => {
           let status = item.RequestStatus
@@ -79,7 +79,7 @@ function loadIncoming() {
               : "";
 
           rows.push([
-            `<input type="checkbox" name="checkbox" id="${item.RowNum}" data-rownum="${item.RowNum}" 
+            `<input type="checkbox" name="checkbox" id="${item.RowNum}" data-rownum="${item.DocEntry}" 
             class="form-check-input checkbox align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
             item.RowNum || "",
             item.SR_Number || "",
@@ -185,12 +185,12 @@ function loadIncoming() {
 
 function toggleCheckboxes() {
   const createPicklistBtn = document.getElementById("createPicklistBtn");
-  const checkedIds = [];
+  const DocEntries = [];
 
   const selectionMode =
     $("#incomingTableDisplay tbody .checkbox:visible").length > 0;
   $("#incomingTableDisplay tbody .checkbox:checked").each(function () {
-    checkedIds.push($(this).data("rownum"));
+    DocEntries.push($(this).data("rownum"));
   });
 
   if (!selectionMode) {
@@ -259,7 +259,7 @@ function toggleCheckboxes() {
     return;
   }
 
-  if (checkedIds.length == 0) {
+  if (DocEntries.length == 0) {
     Swal.fire({
       icon: "warning",
       title: "Please select at least one item to create a picklist",
@@ -270,6 +270,8 @@ function toggleCheckboxes() {
     createPicklistBtn.type = "button";
     return;
   }
+
+  console.log(`CHECK ID's LENGTH : ${DocEntries}`);
 
   Swal.fire({
     icon: "question",
@@ -282,7 +284,9 @@ function toggleCheckboxes() {
       $.ajax({
         url: "dirs/incoming/dashboard/actions/save_createpicklist.php",
         type: "POST",
-        data: { RowNumber: checkedIds },
+        data: {
+          DocEntry: DocEntries,
+        },
         dataType: "json",
         success: function (response) {
           if (response.status === "success") {
@@ -296,7 +300,6 @@ function toggleCheckboxes() {
               .prop("checked", false);
             createPicklistBtn.textContent = "Create Picklist";
             loadIncoming();
-            // console.log(`PICKLIST ON LOAD INCOMING SHOULD BE DISPLAYED`);
           } else {
             Swal.fire({
               icon: "error",
@@ -322,14 +325,14 @@ $(document).on("dblclick", "#incomingTableDisplay tbody tr", function (e) {
   if ($(e.target).closest(".dropdown").length) return;
   if ($("#incomingTableDisplay tbody .checkbox:visible").length > 0) return;
   if ($(this).hasClass("empty-row")) return;
-  let RowNum = $(this).find("td:nth-child(2)").text().trim();
+  let DocEntry = $(this).find("td:nth-child(2)").text().trim();
   $("#main-content").html(spinner);
   setTimeout(function () {
-    openIncoming(RowNum);
+    openIncoming(DocEntry);
   }, 200);
 });
 
-function openIncoming(RowNum) {
+function openIncoming(DocEntry) {
   $("#pageLoader").removeClass("d-none");
   $.post("dirs/incoming/dashboard/form.php", function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
@@ -337,14 +340,14 @@ function openIncoming(RowNum) {
     $.ajax({
       url: "dirs/incoming/dashboard/actions/get_openincoming.php",
       type: "POST",
-      data: { RowNum: RowNum },
+      data: { DocEntry: DocEntry },
       dataType: "json",
       success: function (response) {
         if (response.isSuccess === "success") {
           let rowCount = response.Items.length;
           let totalQty = 0;
 
-          let header = response.Data;
+          let header = response.Header;
           let items = response.Items;
 
           function selectedValue(selector, value) {
@@ -353,33 +356,33 @@ function openIncoming(RowNum) {
               .append(`<option value="${value}">${value}</option>`);
           }
 
-          selectedValue("#typeOfReq", header.RequestType);
-          selectedValue("#destination", header.Destination);
-          selectedValue("#branchWhCode", header.DestinationWhs);
-          selectedValue("#origin", header.Origin);
-          selectedValue("#whcode", header.OriginWhs);
+          selectedValue("#typeOfReq", header.TypeRequest);
+          selectedValue("#destination", header.BranchDestination);
+          selectedValue("#branchWhCode", header.BranchDestination_Whscode);
+          selectedValue("#origin", header.BranchOrigin);
+          selectedValue("#whcode", header.BranchOrigin_Whscode);
 
           // ================= HEADER =================
-          $("#srn").val(header.BaseNum_SRN);
-          $("#date").val(header.DocDate);
+          $("#srn").val(header.SR_Number);
+          $("#date").val(header.EncodeDate);
           $("#status").val(header.RequestStatus);
-          $("#purpose").val(header.RequestPurpose);
-          $("#reqBy").val(header.PrepBy);
+          $("#purpose").val(header.PurposeRequest);
+          $("#reqBy").val(header.RequestedBy);
           $("#remarks").val(header.Remarks);
 
           // ================= ITEMS =================
           let rows = "";
 
           items.forEach(function (item, index) {
-            let quantity = parseFloat(item.Quantity) || 0;
+            let quantity = parseFloat(item.Request_Qty) || 0;
             totalQty += quantity;
             rows += `
                 <tr style="height: 40px; min-height: 40px">
                   <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${index + 1}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Brand}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Model}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Category}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.ItemBrand}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.ItemName}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.ItemCategory}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Request_Qty}</td>
                 </tr>
               `;
           });
@@ -459,7 +462,6 @@ $(document).on("dblclick", "#basketTable tbody .open-picklist", function (e) {
 $(document).on("dblclick", "#picklistItemTable tbody tr", function (e) {
   e.preventDefault();
   if ($(this).hasClass("empty-row")) return;
-  console.log(``);
   let RowNum = $(this).data("rownum");
   $("#main-content").html(spinner);
   setTimeout(function () {
@@ -476,7 +478,6 @@ $(document).on("click", ".dropdown .open-picklist-items", function (e) {
 
   picklistNumRef = picklistNum;
 
-  console.log(`OPENING PICKLIST ITEMS`);
   $("#main-content").html(spinner);
   setTimeout(function () {
     openPicklist(picklistNum);
@@ -787,12 +788,15 @@ function loadBasket() {
             (a, b) =>
               Number(b.PKList_Number || 0) - Number(a.PKList_Number || 0),
           );
-          console.log(`PICKLIST BASKET DATA: ${JSON.stringify(sortedData)}`);
+
+          // console.log(`PICKLIST BASKET DATA: ${JSON.stringify(sortedData)}`);
 
           sortedData.forEach((item) => {
+            const date = new Date(item.DocDate);
+            const formatted = date.toISOString().split("T")[0];
             rows.push([
               item.PKList_Number || "",
-              item.DocDate || "",
+              formatted || "",
               item.StockRequest_Qty || "",
               '<div class="dropdown dropstart">' +
                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
@@ -901,7 +905,7 @@ function loadBasket() {
                 const PKlistNum = $(this).data("picklist");
                 const DocEntry = $(this).data("doc-entry");
 
-                console.log(`DOC ENTRY: ${DocEntry}`);
+                console.log(`PICKLIST ENTRY: ${DocEntry}`);
 
                 Swal.fire({
                   title: "Print this Picklist?",
@@ -913,6 +917,7 @@ function loadBasket() {
                 }).then((result) => {
                   if (result.isConfirmed) {
                     // 👉 ASK FOR EXECUTED BY FIRST
+
                     Swal.fire({
                       title: "Executed By",
                       input: "text",
@@ -987,6 +992,15 @@ function loadBasket() {
   });
 }
 
+function formattedDate() {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+
+  document.getElementById("date").value = `${yyyy}-${mm}-${dd}`;
+}
+
 // ENCODE QTY
 function encodeQty(picklistNum, rowNum) {
   $.post(
@@ -995,82 +1009,64 @@ function encodeQty(picklistNum, rowNum) {
     function (data) {
       $("#main-content").hide().html(data).fadeIn(200);
 
-      const saveBtn = document.getElementById("");
       $("#pklist").val(picklistNum);
 
       $.ajax({
-        url: "dirs/incoming/dashboard/actions/get_openincoming.php",
+        url: "dirs/incoming/dashboard/actions/get_encodeitems.php",
         type: "POST",
-        data: { RowNum: rowNum },
+        data: { PicklistNumber: picklistNum },
         dataType: "json",
         success: function (response) {
           if (response.isSuccess === "success") {
-            // let rowCount = response.Items.length;
-            // let totalQty = 0;
+            let rowCount = response.Data.length;
+            let totalQty = 0;
 
-            let header = response.Data;
-            // let items = response.Items;
+            let items = response.Data;
+            srNumberMap = response.Data.map((item) => item.SR_Number);
+            formattedDate();
+            let rows = "";
 
-            // function selectedValue(selector, value) {
-            //   $(selector)
-            //     .empty()
-            //     .append(`<option value="${value}">${value}</option>`);
-            // }
+            let picklistEntry = "";
 
-            // selectedValue("#typeOfReq", header.RequestType);
-            // selectedValue("#destination", header.Destination);
-            // selectedValue("#branchWhCode", header.DestinationWhs);
-            // selectedValue("#origin", header.Origin);
-            // selectedValue("#whcode", header.OriginWhs);
+            items.forEach(function (item, index) {
+              let itemQty = Math.trunc(Number(item.Req_Item_Qty) || 0);
+              totalQty += itemQty;
+              picklistEntry = item.DocEntry;
+              rows += `
+                <tr style="height: 40px; min-height: 40px" data-docEntry="${item.DocEntry}">
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${index + 1}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Req_ItemBrand}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Req_ItemName}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Req_ItemCategory}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${itemQty}</td>
+                  <td class="align-middle ps-3 editable-cell" style="background:#FFFBDF; padding: 3px" contenteditable="true" onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)"></td>
+                </tr>
+              `;
+            });
 
-            // ================= HEADER =================
-            // $("#srn").val(header.BaseNum_SRN);
-            $("#date").val(header.DocDate);
-            // $("#status").val(header.RequestStatus);
-            // $("#purpose").val(header.RequestPurpose);
-            // $("#reqBy").val(header.PrepBy);
-            // $("#remarks").val(header.Remarks);
+            $("#totalEncodedQty").text(totalQty);
+            $("#encodeQtyTable tbody").html(rows);
 
-            // ================= ITEMS =================
+            if (rowCount < 8) {
+              let emptyRowsNeeded = 8 - rowCount;
 
-            // let rows = "";
+              for (let i = 0; i < emptyRowsNeeded; i++) {
+                let emptyRow = `
+                  <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                  </tr>
+              `;
+                $("#encodeQtyTable tbody").append(emptyRow);
+              }
+              $("#totalEncodedQty").text(totalQty);
+            }
 
-            // items.forEach(function (item, index) {
-            //   let quantity = parseFloat(item.Quantity) || 0;
-            //   totalQty += quantity;
-            //   rows += `
-            //     <tr style="height: 40px; min-height: 40px">
-            //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${index + 1}</td>
-            //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Brand}</td>
-            //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Model}</td>
-            //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Category}</td>
-            //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
-            //       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px" contenteditable="true"></td>
-            //     </tr>
-            //   `;
-            // });
-
-            // $("#totalEncodedQty").text(totalQty);
-            // $("#encodeQtyTable tbody").html(rows);
-
-            // if (rowCount < 8) {
-            //   let emptyRowsNeeded = 8 - rowCount;
-
-            //   for (let i = 0; i < emptyRowsNeeded; i++) {
-            //     let emptyRow = `
-            //       <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
-            //         <td style="background: #FFFBDF"></td>
-            //         <td style="background: #FFFBDF"></td>
-            //         <td style="background: #FFFBDF"></td>
-            //         <td style="background: #FFFBDF"></td>
-            //         <td style="background: #FFFBDF"></td>
-            //         <td style="background: #FFFBDF"></td>
-            //       </tr>
-            //   `;
-            //     $("#encodeQtyTable tbody").append(emptyRow);
-            //   }
-            //   $("#totalEncodedQty").text(totalQty);
-            // }
+            submitEncodedQty(picklistEntry);
           } else {
             alert(response.Data);
           }
@@ -1081,8 +1077,6 @@ function encodeQty(picklistNum, rowNum) {
           $("#pageLoader").addClass("d-none");
         },
       });
-
-      submitEncodedQty(picklistNum);
     },
   ).fail(function () {
     $("#pageLoader").addClass("d-none");
@@ -1111,7 +1105,7 @@ function validateNumber(el) {
   }
 }
 
-function submitEncodedQty(picklistNum) {
+function submitEncodedQty(PicklistEntry) {
   $("#encodeqty").on("submit", function (e) {
     e.preventDefault();
     let isValid = true;
@@ -1171,6 +1165,7 @@ function submitEncodedQty(picklistNum) {
           inputAttributes: {
             autocapitalize: "off",
           },
+          inputPlaceholder: "Enter your name",
           showCancelButton: true,
           confirmButtonText: "Continue",
           cancelButtonText: "Cancel",
@@ -1182,15 +1177,25 @@ function submitEncodedQty(picklistNum) {
         }).then((userInput) => {
           if (!userInput.isConfirmed) return;
 
-          let executedBy = userInput.value;
+          let DocEntry = "";
 
+          let executedBy = userInput.value;
           let formData = new FormData(document.getElementById("encodeqty"));
-          formData.append("picklistNum", $("#pklist").val());
-          formData.append("executedBy", executedBy);
-          formData.append("items", JSON.stringify(encodedItems));
+
+          // single values
+          formData.append("ExecutedBy", executedBy);
+          // formData.append("SR_Number[]", $("#pklist").val());
+          let srnIndex = 0;
+
+          encodedItems.forEach((item) => {
+            formData.append("ItemNumber[]", item.index);
+            formData.append("ActualQty[]", item.actualQty);
+            formData.append("SR_Number[]", srNumberMap[srnIndex]);
+            srnIndex++;
+          });
 
           $.ajax({
-            url: "dirs/incoming/dashboard/update_actual_qty.php",
+            url: "dirs/incoming/dashboard/actions/update_actual_qty.php",
             type: "POST",
             data: formData,
             processData: false,
@@ -1202,10 +1207,10 @@ function submitEncodedQty(picklistNum) {
               if (res.status === "success") {
                 Swal.fire({
                   icon: "success",
-                  title: "Saved successfully!",
+                  title: "Saved successfully",
                 }).then(() => {
                   window.open(
-                    `pdf/requests.php?picklist=${picklistNum}&executedBy=${encodeURIComponent(executedBy)}`,
+                    `pdf/requests.php?DocEntry=${PicklistEntry}&executedBy=${encodeURIComponent(executedBy)}`,
                     "_blank",
                   );
                 });
@@ -1217,54 +1222,16 @@ function submitEncodedQty(picklistNum) {
                 });
               }
             },
+            error: function (xhr) {
+              console.error(xhr.responseText);
+              Swal.fire({
+                icon: "error",
+                title: "Server Error",
+                text: "Please check console for details",
+              });
+            },
           });
         });
-
-        // Swal.fire({
-        //   title: "Executed By",
-        //   input: "text",
-        //   inputAttributes: {
-        //     autocapitalize: "off",
-        //   },
-        //   showCancelButton: true,
-        //   confirmButtonText: "Continue",
-        //   cancelButtonText: "Cancel",
-        //   inputValidator: (value) => {
-        //     if (!value) {
-        //       return "Executed By is required!";
-        //     }
-        //   },
-        // }).then((userInput) => {
-        //   if (!userInput.isConfirmed) return;
-
-        //   let executedBy = userInput.value;
-
-        //   // $.post(
-        //   //   "dirs/incoming/dashboard/save_encoded_qty.php",
-        //   //   {
-        //   //     picklistNum: picklistNum,
-        //   //     executedBy: executedBy,
-        //   //   },
-        //   //   function (response) {
-        //   const openPrint = () => {
-        //     window.open(
-        //       `pdf/requests.php?picklist=${picklistNum}&executedBy=${encodeURIComponent(executedBy)}`,
-        //       "_blank",
-        //     );
-        //   };
-
-        //   //     if (response.status === "success") {
-        //   openPrint();
-        //   //     } else {
-        //   //       Swal.fire({
-        //   //         icon: "error",
-        //   //         title: "Something went wrong",
-        //   //         text: response.message,
-        //   //       });
-        //   //     }
-        //   //   },
-        //   // );
-        // });
       }
     });
   });

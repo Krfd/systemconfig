@@ -25,8 +25,6 @@ try {
 
     $SRNumber = $srnData['SRNNumber'] ?? null;
 
-
-
     // 🔹 Loop each selected ItemNum
     foreach ($ItemNum as $itemNum) {
 

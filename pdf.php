@@ -306,7 +306,7 @@ try {
     /* ---------- OUTPUT ---------- */
 
     ob_end_clean();
-    $pdf->Output('I', 'Hello.pdf');
+    $pdf->Output('I', $srn . '.pdf');
 } catch (PDOException $e) {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     echo "Connection failed: " . $e->getMessage();

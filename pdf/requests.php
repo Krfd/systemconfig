@@ -7,35 +7,36 @@ require_once "../config/connection.php";
 require_once "../assets/plugins/fpdf/fpdf.php";
 session_start();
 
-if (!isset($_GET['picklist']) || empty($_SESSION['Uid'])) {
+if (!isset($_GET['DocEntry']) || empty($_SESSION['Uid'])) {
     Header("Location: dirs/outgoing/dashboard/outgoing.php");
     return;
 }
 
-// $picklist = $_GET['picklist'];
+$DocEntry = $_GET['DocEntry'];
 $executedBy = $_GET['executedBy'] ?? '';
 $Uid = $_SESSION['Uid'];
 
 try {
 
-    $picklistData = $conn->prepare("EXEC dbo.[PRINT_PDF_PICK_LIST] ?, ?");
-    $picklistData->execute([$Uid, $picklist]);
+    $picklistData = $conn->prepare("EXEC dbo.[PDF_Picklist_Items] ?, ?");
+    $picklistData->execute([$Uid, $DocEntry]);
 
     $picklistHeader = $picklistData->fetch(PDO::FETCH_OBJ);
-    $picklistData->nextRowset();
-    $picklistItems = $picklistData->fetchAll(PDO::FETCH_OBJ);
+
     $picklistData->nextRowset();
     $branchData =  $picklistData->fetchAll(PDO::FETCH_OBJ);
 
-    $branchName = $picklistItems[0]->ReqBranch ?? "N/A";
-    $picklistNum = $picklistHeader->PickLst_Num ?? "N/A";
+    $picklistData->nextRowset();
+    $picklistItems = $picklistData->fetchAll(PDO::FETCH_OBJ);
+
+    $branchName = $picklistHeader->Req_Branch ?? "N/A";
+    $picklistNum = $picklistHeader->PKList_Number ?? "N/A";
     $docDate = isset($picklistHeader->DocDate)
         ? date("m/d/y", strtotime($picklistHeader->DocDate))
         : "N/A";
-    $datetimeStr = $picklistHeader->DocDate . ' ' . $picklistHeader->DocTime;
-    $timestamp = date("m/d/y h:i A", strtotime($datetimeStr));
+    $timestamp = date("m/d/y h:i A", strtotime($picklistHeader->DocDate));
     $executedby = $executedBy ?? "N/A";
-    $printedby = $picklistHeader->Executedby ?? "N/A";
+    $printedby = $picklistHeader->CollectedBy ?? "N/A";
     $itemData = $picklistItems;
 
     $textColor = [50, 50, 50];
@@ -172,9 +173,7 @@ try {
 
         /* ---------- TABLE HEADER ---------- */
 
-        // $pdf->SetFillColor(255, 255, 0);
         foreach ($headers as $text => $width) {
-            // $pdf->Cell($width, 6, $text, 1, 0, 'C', true);
             $pdf->Cell($width, 6, $text, 1, 0, 'C');
         }
 
@@ -188,9 +187,9 @@ try {
 
         foreach ($itemData as $row) {
 
-            $brandLines = $pdf->NbLines($headers['Brand'], $row->Brand);
-            $modelLines = $pdf->NbLines($headers['Model'], $row->Model);
-            $categoryLines = $pdf->NbLines($headers['Category'], $row->Category);
+            $brandLines = $pdf->NbLines($headers['Brand'], $row->Req_ItemBrand);
+            $modelLines = $pdf->NbLines($headers['Model'], $row->Req_ItemName);
+            $categoryLines = $pdf->NbLines($headers['Category'], $row->Req_ItemCategory);
 
             $maxLines = max($brandLines, $modelLines, $categoryLines, 1);
             $rowHeight = $lineHeight * $maxLines;
@@ -205,28 +204,27 @@ try {
 
             /* ---------- BRAND ---------- */
 
-            $pdf->MultiCell($headers['Brand'], $rowHeight, $row->Brand, 1);
+            $pdf->MultiCell($headers['Brand'], $rowHeight, $row->Req_ItemBrand, 1);
             $pdf->SetXY($x + $headers['#'] + $headers['Brand'], $y);
 
             /* ---------- MODEL ---------- */
 
-            $pdf->MultiCell($headers['Model'], $rowHeight, $row->Model, 1);
+            $pdf->MultiCell($headers['Model'], $rowHeight, $row->Req_ItemName, 1);
             $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'], $y);
 
             /* ---------- CATEGORY ---------- */
 
-            $pdf->MultiCell($headers['Category'], $lineHeight, $row->Category, 1);
+            $pdf->MultiCell($headers['Category'], $lineHeight, $row->Req_ItemCategory, 1);
             $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'], $y);
 
             /* ---------- QUANTITY ---------- */
 
-            $pdf->MultiCell($headers['Quantity'], $rowHeight, $row->Quantity, 1, 'C');
+            $pdf->MultiCell($headers['Quantity'], $rowHeight, number_format($row->Req_Item_Qty, 0), 1, 'C');
             $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'] + $headers['Quantity'], $y);
 
             /* ---------- ACTUAL QTY ---------- */
 
-            $pdf->MultiCell($headers['Actual Qty'], $rowHeight, '', 1, 'C');
-
+            $pdf->MultiCell($headers['Actual Qty'], $rowHeight, number_format($row->Actual_Item_Qty, 0), 1, 'C');
             $counter++;
         }
     }
@@ -253,8 +251,8 @@ try {
         $lines = [];
 
         foreach ($picklistItems as $item) {
-            $branch = $item->ReqBranch ?? '';
-            $srn = $item->BaseNum_SRN ?? '';
+            $branch = $item->Req_Branch ?? '';
+            $srn = $item->SR_Number ?? '';
 
             if ($branch || $srn) {
                 $lines[] = "{$branch} - {$srn}";
@@ -300,9 +298,8 @@ try {
     headerDetails($pdf, $picklistNum, $docDate);
     renderItemsTable($pdf, $picklistNum, $itemData, $textColor);
     bottomLeftDetails($pdf, $executedby, $picklistItems, $printedby, $timestamp, $textColor);
-
     ob_end_clean();
-    $pdf->Output('I', $picklist . '.pdf');
+    $pdf->Output('I', $picklistNum . '.pdf');
 } catch (PDOException $e) {
     $conn->rollBack();
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());

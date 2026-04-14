@@ -1,6 +1,6 @@
 let timeout;
 // const idleLimit = 5 * 60 * 1000; // 5 minutes
-const idleLimit = 5 * 1000; // 5 minutes
+const idleLimit = 5 * 60 * 1000; // 5 minutes
 
 function resetTimer() {
   clearTimeout(timeout);
@@ -13,9 +13,19 @@ function lockScreen() {
 }
 
 async function unlockScreen() {
-  const username = document.getElementById("usernameInput").value;
-  const password = document.getElementById("passwordInput").value;
+  const username = document.getElementById("newUsername").value;
+  const password = document.getElementById("newPassword").value;
   const errorMsg = document.getElementById("errorMsg");
+
+  // ✅ Validation for empty fields
+  if (!username || !password) {
+    Swal.fire({
+      icon: "error",
+      title: "Please enter a valid input",
+      confirmButtonText: "Try again",
+    });
+    return;
+  }
 
   try {
     const response = await fetch("/actions/login.php", {

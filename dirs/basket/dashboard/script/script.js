@@ -789,46 +789,46 @@ function toggleDelivery() {
           // API FOR LOADING DELIVERY ITEMS FOR DR
           // save_loading_basket.php
 
-           $.ajax({
-        url: "dirs/basket/dashboard/actions/save_loading_basket.php",
-        type: "POST",
-        data: {
-          PickListNum: PickListNum,
-          LoadingB_Num: LoadingB_Num,
-        },
-        dataType: "json",
-        success: function (response) {
-          if (response.isSuccess === "success") {
-            // Swal.fire({
-            //   icon: "success",
-            //   title: response.message,
-            //   confirmButtonText: "OKAY",
-            // });
+          $.ajax({
+            url: "dirs/basket/dashboard/actions/save_loading_basket.php",
+            type: "POST",
+            data: {
+              PickListNum: PickListNum,
+              LoadingB_Num: LoadingB_Num,
+            },
+            dataType: "json",
+            success: function (response) {
+              if (response.isSuccess === "success") {
+                // Swal.fire({
+                //   icon: "success",
+                //   title: response.message,
+                //   confirmButtonText: "OKAY",
+                // });
 
-            $("#basketTableDashboard tbody .checkbox")
-              .hide()
-              .prop("checked", false);
+                $("#basketTableDashboard tbody .checkbox")
+                  .hide()
+                  .prop("checked", false);
 
-            loadDeliveryBtn.textContent = "Create DR";
-            $("#basketTableDashboard").data("selectionMode", false);
-            createDr();
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: response.message,
-              confirmButtonText: "OKAY",
-              confirmButtonColor: "#d33",
-            });
-          }
-        },
-        error: function () {
-          Swal.fire({
-            icon: "error",
-            title: "Server Error",
-            text: "Something went wrong while processing the request.",
+                loadDeliveryBtn.textContent = "Create DR";
+                $("#basketTableDashboard").data("selectionMode", false);
+                createDr();
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: response.message,
+                  confirmButtonText: "OKAY",
+                  confirmButtonColor: "#d33",
+                });
+              }
+            },
+            error: function () {
+              Swal.fire({
+                icon: "error",
+                title: "Server Error",
+                text: "Something went wrong while processing the request.",
+              });
+            },
           });
-        },
-      });
 
           return;
         }
@@ -2580,6 +2580,38 @@ function deliveryDate() {
   document.getElementById("deldate").value = `${yyyy}-${mm}-${dd}`;
 }
 
+// function truckDetails() {
+//   $.post("dirs/basket/dashboard/actions/get_truckdetails.php", function (data) {
+//     console.log(`Fetch truck details`);
+//   });
+// }
+function getDeliveryDetails() {
+  const truckData = {
+    4: ["ABC-123", "DEF-456"],
+    6: ["GHI-789", "JKL-012"],
+    10: ["MNO-345", "PQR-678"],
+  };
+
+  document.getElementById("truckCat").addEventListener("change", function () {
+    const plateSelect = document.getElementById("plate");
+    const selectedCategory = this.value;
+
+    // Clear existing options
+    plateSelect.innerHTML = '<option value="">Select Plate</option>';
+
+    if (truckData[selectedCategory]) {
+      truckData[selectedCategory].forEach((plate) => {
+        const option = document.createElement("option");
+        option.value = plate;
+        option.textContent = plate;
+        plateSelect.appendChild(option);
+      });
+    }
+  });
+
+  console.log(`Hello world!`);
+}
+
 // ORIGINAL
 function createDr() {
   $("#main-content").html(spinner);
@@ -2588,6 +2620,8 @@ function createDr() {
     get_userinfo();
     loadIAPBranchlist();
     deliveryDate();
+    // truckDetails();
+    getDeliveryDetails();
 
     const addBtn = document.getElementById("addDeliveryModalBtn");
     const newItemModal = new bootstrap.Modal(

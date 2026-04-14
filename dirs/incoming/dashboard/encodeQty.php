@@ -49,7 +49,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr style="height: 40px; min-height: 40px">
+                                        <!-- <tr style="height: 40px; min-height: 40px">
                                             <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">1</td>
                                             <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">APPLE</td>
                                             <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">iPhone 16 128GB PINK</td>
@@ -81,6 +81,30 @@
                                                 style="background:#FFFBDF; padding: 3px;"
                                                 contenteditable="true"
                                                 onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)">
+                                        </tr> -->
+                                        <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
                                         </tr>
                                         <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
                                             <td style="background: #FFFBDF"></td>

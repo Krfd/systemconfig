@@ -50,51 +50,6 @@ try {
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/custom.css">
     <link rel="icon" href="assets/image/logo/iap_icon.png">
-
-    <style>
-        .checkbox {
-            display: none;
-        }
-
-        /* RELOGIN */
-        .lock-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .lock-box {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            width: 300px;
-        }
-
-        .lock-box input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-        }
-
-        .lock-box button {
-            margin-top: 10px;
-            width: 100%;
-            padding: 10px;
-        }
-
-        .error {
-            color: red;
-            margin-top: 10px;
-        }
-    </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -224,8 +179,14 @@ try {
         <div class="lock-box">
             <h2>Session Locked</h2>
             <p>Please login again to continue</p>
-            <input type="text" id="newUsername" class="form-control form-control-sm" placeholder="Username" />
-            <input type="password" id="newPassword" class="form-control form-control-sm" placeholder="Password" />
+            <input type="text" id="newUsername" class="form-control" placeholder="Username" />
+            <input type="password" id="newPassword" class="form-control" placeholder="Password" />
+            <div class="col form-check d-flex justify-content-start mt-2 ms-1">
+                <input class="form-check-input" type="checkbox" id="toggle-show-password" onclick="togglePassword()">
+                <label class="form-check-label text-muted ms-2" for="toggle-show-password">
+                    Show Password
+                </label>
+            </div>
             <button type="submit" onclick="unlockScreen()" class="btn btn-primary btn-sm">Login</button>
             <p id="errorMsg" class="error"></p>
         </div>
@@ -250,7 +211,7 @@ try {
     <script src="node_modules/uikit/dist/js/uikit.min.js"></script>
     <script src="node_modules/xlsx/dist/xlsx.full.min.js"></script>
     <script src="assets/js/script.js"></script>
-    <script src="assets/js/relogin.js"></script>
+    <!-- <script src="assets/js/relogin.js"></script> -->
     <?php include 'modal.php'; ?>
     <script>
         $(document).ready(function() {
@@ -265,8 +226,22 @@ try {
             let deliveryPicklistNum;
             let deliveryNum;
             let summaryTable;
+            let srNumberMap = [];
         })
 
+        function togglePassword() {
+            const passwordField = document.getElementById('newPassword');
+            const checkbox = document.getElementById('toggle-show-password');
+            passwordField.type = checkbox.checked ? 'text' : 'password';
+        }
+
+        let timeout;
+        const idleLimit = 5 * 60 * 1000;
+
+        function resetTimer() {
+            clearTimeout(timeout);
+            timeout = setTimeout(lockScreen, idleLimit);
+        }
 
         function lockScreen() {
             localStorage.setItem("isLocked", "true");
@@ -282,50 +257,25 @@ try {
             console.log(`New Password: ${password}`)
 
             try {
-                // const response = await fetch("actions/login.php", {
-                //     method: "POST",
-                //     headers: {
-                //         "Content-Type": "application/json",
-                //     },
-                //     body: JSON.stringify({
-                //         Username,
-                //         Password,
-                //     }),
-                // });
-
-                // if (response.ok) {
-                //     console.log(`SHOULD RELOGIN THE USER`)
-                //     const data = await response.json();
-
-                //     // Save new session/token
-                //     localStorage.setItem("authToken", data.token);
-                //     localStorage.removeItem("isLocked");
-
-                //     document.getElementById("lockOverlay").style.display = "none";
-                //     resetTimer();
-                // } else {
-                //     errorMsg.textContent = "Invalid username or password";
-                // }
-
-                $.post("actions/login.php", {
-                    Username: Username,
-                    Password: Password
+                $.post("actions/relogin.php", {
+                    Username: username,
+                    Password: password
                 }, function(data) {
-
                     var response = JSON.parse(data);
                     if (response.isSuccess === "OK") {
-                        // var sysRole = response.Data.SysRole;
-                        // if (sysRole === "cashier") {
-                        //     window.location.assign("index.php");
-                        // } else if (sysRole === "Admin") {
-                        //     window.location.assign("admin/index.php");
-                        // } else {
-                        //     window.location.assign("index.php");
-                        // }
+                        localStorage.clear();
+
+                        document.getElementById("lockOverlay").style.display = "none";
+                        localStorage.setItem("isLocked", "false");
                         Swal.fire({
                             icon: "success",
-                            title: "Authenticated successfully!",
-                            text: "Logging in..."
+                            title: "Authenticated successfully",
+                            text: "Please wait...",
+                            timer: 2000, // 2 seconds
+                            timerProgressBar: true,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.assign("index.php");
                         })
                     } else if (response.isSuccess === "Failed") {
                         Swal.fire({

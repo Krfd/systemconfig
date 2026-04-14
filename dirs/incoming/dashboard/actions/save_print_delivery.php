@@ -11,8 +11,12 @@ try {
     $upd_picklistrecord->execute([$ExecutedBy, $Docentry]);
 
     $conn->commit();
-    echo "success";
+    $response = array(
+        "status" => "success",
+    );
+    echo json_encode($response);
 } catch (PDOException $e) {
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollBack();
     echo "Error: " . $e->getMessage();
 }

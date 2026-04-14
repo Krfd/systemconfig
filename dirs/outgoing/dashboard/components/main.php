@@ -2,6 +2,7 @@
     <table class="table table-hover datatables col" id="outgoingTableDisplay">
         <thead class="sticky-top">
             <tr>
+                <th></th>
                 <th class="text-secondary text-center">#</th>
                 <th class="text-secondary">SRN</th>
                 <th class="text-secondary">Stock Origin</th>

@@ -83,6 +83,7 @@ function loadOutgoing() {
           let statusBadge = `<span class="badge ${statusClass}">${status || ""}</span>`;
 
           rows.push([
+            item.DocEntry,
             item.RowNum !== undefined ? item.RowNum.toString() : "",
             item.SR_Number || "",
             item.BranchOrigin || "",
@@ -115,7 +116,7 @@ function loadOutgoing() {
 
       if (rows.length === 0) {
         for (let i = 0; i < 8; i++) {
-          rows.push(["", "", "", "", "", "", ""]);
+          rows.push(["", "", "", "", "", "", "", ""]);
         }
       }
 
@@ -127,6 +128,7 @@ function loadOutgoing() {
       $("#outgoingTableDisplay").DataTable({
         data: rows,
         columns: [
+          { title: "DocEntry", visible: false },
           { title: "#", className: "text-center" },
           { title: "SRN" },
           { title: "Stock Origin" },
@@ -144,7 +146,7 @@ function loadOutgoing() {
         language: {
           emptyTable: "", // 🔥 removes "No data available in table"
         },
-        rowCallback: function (row, data) {
+        rowCallback: function (row, data, index) {
           $("td", row).css({
             background: "#FFFBDF",
             padding: "3px",
@@ -152,6 +154,8 @@ function loadOutgoing() {
             "min-height": "40px",
             cursor: "pointer",
           });
+          let docEntry = data[0]; // ✅ index 0 (hidden column)
+          $(row).attr("data-docentry", docEntry);
           $("td:eq(0)", row).css("text-align", "center");
           $("td:eq(1)", row).addClass("text-primary");
           $("td:eq(5)", row).css("text-align", "start");
@@ -173,7 +177,7 @@ function loadOutgoing() {
           for (let i = currentRows; i < 8; i++) {
             let $emptyRow = $(`
               <tr class="empty-row">
-                <td colspan="7" style="background: #FFFBDF">&nbsp;</td>
+                <td colspan="8" style="background: #FFFBDF">&nbsp;</td>
               </tr>
             `);
 
@@ -204,8 +208,9 @@ function loadOutgoing() {
 
 $(document).on("dblclick", "#outgoingTableDisplay tbody tr", function (e) {
   if ($(e.target).closest(".dropdown").length) return;
-  let RowNum = $(this).find("td:first").text().trim();
-  openOutgoingForm(RowNum);
+  let docEntry = $(this).data("docentry");
+  openOutgoingForm(docEntry);
+  // loadOutgoingDetails(docEntry);
 });
 
 // TRIGGER TO OPEN A REQUEST
@@ -213,8 +218,9 @@ $(document).on("click", ".open-item", function (e) {
   e.preventDefault(); // prevent # jump
   e.stopPropagation(); // stop row click behavior
 
-  let RowNum = $(this).closest("tr").find("td:first").text().trim();
-  openOutgoingForm(RowNum);
+  let docEntry = $(this).closest("tr").data("docentry");
+  openOutgoingForm(docEntry);
+  // loadOutgoingDetails(docEntry);
 });
 
 // TRIGGER TO TERMINATE A REQUEST
@@ -233,22 +239,14 @@ function returnOutgoing() {
   window.location.reload();
 }
 
-function openOutgoingForm(rowNum) {
+function openOutgoingForm(DocEntry) {
   $("#main-content").html(spinner);
   setTimeout(function () {
-    openRequest(rowNum);
-    // $.post(
-    //   "dirs/outgoing/requests/components/main.php",
-    //   { RowNum: rowNum }, // send RowNum to view
-    //   function (html) {
-    //     console.log(`OPENING DATA FROM REQUEST DIRECTORY`);
-    //     $("#main-content").html(html);
-    //   },
-    // );
+    openRequest(DocEntry);
   }, 200);
 }
 
-function openRequest(rowNum) {
+function openRequest(DocEntry) {
   $("#main-content").html(spinner);
   $.post("dirs/outgoing/dashboard/request.php", function (data) {
     $("#main-content").html(data);
@@ -256,40 +254,40 @@ function openRequest(rowNum) {
     $.ajax({
       url: "dirs/outgoing/dashboard/actions/get_openrequest.php",
       type: "POST",
-      data: { RowNum: rowNum },
+      data: { DocEntry: DocEntry },
       dataType: "json",
       success: function (response) {
         if (response.isSuccess === "success") {
           let rowCount = response.Items.length;
           let totalQty = 0;
 
-          let header = response.Data;
+          let header = response.Header;
           let items = response.Items;
 
-          $("#srn").val(header.BaseNum_SRN);
-          $("#typeOfReq").val(header.RequestType);
-          $("#destination").val(header.Destination);
-          $("#branchWhCode").val(header.DestinationWhs);
-          $("#origin").val(header.Origin);
-          $("#whcode").val(header.OriginWhs);
+          $("#srn").val(header.SR_Number);
+          $("#typeOfReq").val(header.TypeRequest);
+          $("#destination").val(header.BranchDestination);
+          $("#branchWhCode").val(header.BranchDestination_Whscode);
+          $("#origin").val(header.BranchOrigin);
+          $("#whcode").val(header.BranchOrigin_Whscode);
 
-          $("#date").val(header.DocDate);
+          $("#date").val(header.EncodeDate);
           $("#status").val(header.RequestStatus);
-          $("#purpose").val(header.RequestPurpose);
-          $("#reqBy").val(header.PrepBy);
+          $("#purpose").val(header.PurposeRequest);
+          $("#reqBy").val(header.RequestedBy);
           $("#remarks").val(header.Remarks);
 
           let rows = "";
           items.forEach(function (item, index) {
-            let quantity = parseFloat(item.Quantity) || 0;
+            let quantity = parseFloat(item.Request_Qty) || 0;
             totalQty += quantity;
             rows += `
             <tr>
               <td style="background:#FFFBDF">${index + 1}</td>
-              <td style="background:#FFFBDF">${item.Brand}</td>
-              <td style="background:#FFFBDF">${item.Model}</td>
-              <td style="background:#FFFBDF">${item.Category}</td>
-              <td style="background:#FFFBDF">${item.Quantity}</td>
+              <td style="background:#FFFBDF">${item.ItemBrand}</td>
+              <td style="background:#FFFBDF">${item.ItemName}</td>
+              <td style="background:#FFFBDF">${item.ItemCategory}</td>
+              <td style="background:#FFFBDF">${item.Request_Qty}</td>
             </tr>
             `;
           });
