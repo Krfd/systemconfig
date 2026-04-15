@@ -1028,6 +1028,8 @@ function encodeQty(picklistNum, rowNum) {
 
             let picklistEntry = "";
 
+            console.log(`ITEMS: ${JSON.stringify(items)}`)
+
             items.forEach(function (item, index) {
               let itemQty = Math.trunc(Number(item.Req_Item_Qty) || 0);
               totalQty += itemQty;
