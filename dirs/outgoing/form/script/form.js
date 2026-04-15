@@ -94,82 +94,6 @@ function loadIAPBranches() {
   });
 }
 
-/*Function whscode of desitincation branch*/
-/*function loadDestinationWhscodes(BranchName) {
-  $.post(
-    "dirs/outgoing/form/actions/get_destinationwhscode.php",
-    {
-      BranchName: BranchName,
-    },
-    function (data) {
-      const response = JSON.parse(data);
-      if ($.trim(response.isSuccess) === "success") {
-        const whscode = response.Data;
-        whscode.forEach((whscode) => {
-          $("#desCodeForm").append(
-            $("<option>", {
-              value: whscode.WhsCode,
-              text: whscode.WhsCode,
-              title: whscode.WhsName,
-              selected: whscode.WhsCode.endsWith("WH"),
-            }),
-          );
-        });
-      } else {
-        console.log(response.Data);
-        Swal.fire({
-          icon: "error",
-          title: "Server under restoring",
-          text: "Please come back later",
-          showConfirmButton: true,
-          confirmButtonText: "OKAY",
-          allowOutsideClick: false,
-        }).then(() => {
-          $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
-            $("#main-content").html(data);
-          });
-        });
-      }
-    },
-  );*/
-/*function get_SRN() {
-  $.post(
-    "dirs/outgoing/form/actions/get_srngenerator.php",
-    {},
-    function (data) {
-      let response = JSON.parse(data);
-      // console.log(`SRN NUMBER RESPONSE: ${response.Data.SRNNumber}`);
-      if ($.trim(response.isSuccess) == "success") {
-        let srn = response.Data.SR_Number;
-        let branchCode = response.Data.BranchCode || "GEN";
-        let newSRN;
-        let num;
-        if (!srn || srn === "") {
-          num = 1;
-        } else {
-          num = parseInt(srn.replace(/\D/g, ""), 10) + 1;
-        }
-        newSRN = "SRN" + branchCode + String(num).padStart(8, "0");
-        $("#srnForm").val(newSRN);
-        loadItems();
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Server under restoring",
-          text: "Please come back later",
-          showConfirmButton: true,
-          confirmButtonText: "OKAY",
-          allowOutsideClick: false,
-        }).then(() => {
-          $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
-            $("#main-content").html(data);
-          });
-        });
-      }
-    },
-  );
-}*/
-
 /*load Imperial Brands*/
 function loadImperialBrands() {
   $.post("dirs/outgoing/form/actions/get_iapbrands.php", {}, function (data) {
@@ -195,7 +119,6 @@ function loadImperialBrands() {
 
 /*Load User Branch Information*/
 function get_userinfo() {
-  // $.post("dirs/outgoing/form/actions/get_userinfo.php", {}, function (data) {
   $.post("dirs/outgoing/form/actions/get_userdetails.php", {}, function (data) {
     response = JSON.parse(data);
     if (jQuery.trim(response.isSuccess) == "success") {
@@ -261,42 +184,6 @@ function loadDestinationWhscodes(Branch) {
   );
 }
 
-/*Function Imperial Appliance Plaza Branch List*/
-// async function loadIAPBranchlist() {
-//   $.post("dirs/outgoing/form/actions/get_branchlist.php", {}, function (data) {
-//     const response = JSON.parse(data);
-//     if ($.trim(response.isSuccess) === "success") {
-//       const iapbranch = response.Data;
-//       $("#user-origin").html('<option selected value="">BRANCH</option>');
-//       iapbranch.forEach((iapbranch) => {
-//         $("#user-origin").append(
-//           $("<option>", {
-//             value: iapbranch.Branch,
-//             text: iapbranch.Branch,
-//           }),
-//         );
-//       });
-//       if (iapbranch.length > 0) {
-//         $("#user-origin").val(iapbranch[0].Branch);
-//         loadOriginWhscodes(iapbranch[0].Branch);
-//       }
-//     } else {
-//       Swal.fire({
-//         icon: "error",
-//         title: "Server under restoring",
-//         text: "Please come back later",
-//         showConfirmButton: true,
-//         confirmButtonText: "OKAY",
-//         allowOutsideClick: false,
-//       }).then(() => {
-//         $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
-//           $("#main-content").html(data);
-//         });
-//       });
-//     }
-//   });
-// }
-
 $(document).on("change", "#user-origin", function () {
   const selectedBranch = $(this).val();
   loadOriginWhscodes(selectedBranch);
@@ -313,6 +200,7 @@ async function loadOriginWhscodes(Branch) {
       const response = JSON.parse(data);
       if ($.trim(response.isSuccess) === "success") {
         const whscode = response.Data;
+        console.log(whscode[0].WhsCode);
         $("#originCodeForm").empty();
         whscode.forEach((whscode) => {
           $("#originCodeForm").append(

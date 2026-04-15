@@ -500,7 +500,8 @@ $(document).on("click", ".dropdown .enter-actual-qty", function (e) {
   }, 200);
 });
 
-function openPicklist(picklistNum, docEntry) {
+// function openPicklist(picklistNum, docEntry) {
+function openPicklist(picklistNum) {
   $.post(
     "dirs/incoming/dashboard/picklistItem.php",
     { picklistNum: picklistNum },
@@ -939,6 +940,7 @@ function loadBasket() {
                       let executedBy = userInput.value;
 
                       // 👉 PROCEED WITH ORIGINAL LOGIC
+                      // PRINT ONLY
                       $.post(
                         "dirs/incoming/dashboard/actions/save_print_delivery.php",
                         {
@@ -947,6 +949,24 @@ function loadBasket() {
                         },
                         function (response) {
                           const openPrint = () => {
+                            $.ajax({
+                              url: "dirs/incoming/dashboard/actions/save_loading_basket.php",
+                              type: "POST",
+                              data: { PickListNum: PKlistNum },
+                              dataType: "json",
+                              success: function (response) {
+                                if (response.isSuccess === "success") {
+                                  console.log(
+                                    `PICKLIST SAVED TO LOADING BASKET`,
+                                  );
+                                } else {
+                                  console.log(
+                                    `PICKLIST WAS NOT SAVED TO LOADING BASKET`,
+                                  );
+                                }
+                              },
+                            });
+
                             window.open(
                               `pdf/requests.php?executedBy=${encodeURIComponent(executedBy)}&DocEntry=${DocEntry}`,
                               "_blank",
@@ -1028,7 +1048,7 @@ function encodeQty(picklistNum, rowNum) {
 
             let picklistEntry = "";
 
-            console.log(`ITEMS: ${JSON.stringify(items)}`)
+            // console.log(`ITEMS: ${JSON.stringify(items)}`);
 
             items.forEach(function (item, index) {
               let itemQty = Math.trunc(Number(item.Req_Item_Qty) || 0);
@@ -1068,7 +1088,7 @@ function encodeQty(picklistNum, rowNum) {
               $("#totalEncodedQty").text(totalQty);
             }
 
-            submitEncodedQty(picklistEntry);
+            submitEncodedQty(picklistEntry, picklistNum);
           } else {
             alert(response.Data);
           }
@@ -1107,7 +1127,7 @@ function validateNumber(el) {
   }
 }
 
-function submitEncodedQty(PicklistEntry) {
+function submitEncodedQty(PicklistEntry, picklistNum) {
   $("#encodeqty").on("submit", function (e) {
     e.preventDefault();
     let isValid = true;
@@ -1195,6 +1215,8 @@ function submitEncodedQty(PicklistEntry) {
             formData.append("SR_Number[]", srNumberMap[srnIndex]);
             srnIndex++;
           });
+          // PRINT WITH ACTUAL QUANTITY
+          let PickListNum = picklistNum;
 
           $.ajax({
             url: "dirs/incoming/dashboard/actions/update_actual_qty.php",
@@ -1211,10 +1233,61 @@ function submitEncodedQty(PicklistEntry) {
                   icon: "success",
                   title: "Saved successfully",
                 }).then(() => {
-                  window.open(
-                    `pdf/requests.php?DocEntry=${PicklistEntry}&executedBy=${encodeURIComponent(executedBy)}`,
-                    "_blank",
-                  );
+                  // console.log("openPrint triggered");
+                  const openPrint = () => {
+                    $.ajax({
+                      url: "dirs/incoming/dashboard/actions/save_loading_basket.php",
+                      type: "POST",
+                      data: { PickListNum: PickListNum },
+                      dataType: "json",
+                      success: function (response) {
+                        console.log(`REPONSE: ${response.isSuccess}`);
+                        if (response.isSuccess === "success") {
+                          console.log(`PICKLIST SAVED TO LOADING BASKET`);
+                        } else {
+                          console.log(
+                            `PICKLIST WAS NOT SAVED TO LOADING BASKET`,
+                          );
+                        }
+                      },
+                    });
+
+                    window.open(
+                      `pdf/requests.php?DocEntry=${PicklistEntry}&executedBy=${encodeURIComponent(executedBy)}`,
+                      "_blank",
+                    );
+                  };
+
+                  // const openPrint = () => {
+                  //   $.ajax({
+                  //     url: "dirs/incoming/dashboard/actions/save_loading_basket.php",
+                  //     type: "POST",
+                  //     data: { PickListNum: PickListNum },
+                  //     dataType: "json",
+
+                  //     success: function (response) {
+                  //       console.log("RESPONSE:", response);
+
+                  //       if (response.isSuccess === "success") {
+                  //         console.log("PICKLIST SAVED TO LOADING BASKET");
+                  //       } else {
+                  //         console.log("FAILED");
+                  //       }
+
+                  //       // ✅ OPEN AFTER AJAX COMPLETES
+                  //       window.open(
+                  //         `pdf/requests.php?DocEntry=${PicklistEntry}&executedBy=${encodeURIComponent(executedBy)}`,
+                  //         "_blank",
+                  //       );
+                  //     },
+
+                  //     error: function (xhr, status, error) {
+                  //       console.log("AJAX ERROR:", error);
+                  //       console.log("RAW:", xhr.responseText);
+                  //     },
+                  //   });
+                  // };
+                  openPrint();
                 });
               } else {
                 Swal.fire({

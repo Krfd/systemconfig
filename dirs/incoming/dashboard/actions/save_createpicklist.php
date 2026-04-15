@@ -5,18 +5,6 @@ session_start();
 $User     = $_SESSION['Uid'];
 $DocEntry = $_POST['DocEntry'] ?? [];
 
-// $logData = [
-//     'User'     => $User,
-//     'DocEntry' => $DocEntry,
-//     'Time'     => date('Y-m-d H:i:s')
-// ];
-
-// file_put_contents(
-//     "debug_input.txt",
-//     print_r($logData, true) . PHP_EOL . str_repeat("-", 40) . PHP_EOL,
-//     FILE_APPEND
-// );
-
 try {
     $conn->beginTransaction();
 
@@ -29,6 +17,14 @@ try {
 
     // 🔹 Track inserted SR to avoid duplicates
     $processedSR = [];
+
+    if (!empty($DocEntry)) {
+        $upd_status = $conn->prepare("EXEC dbo.[Update_StockRequestsStatus] ?");
+
+        foreach ($DocEntry as $Doc_id) {
+            $upd_status->execute([$Doc_id]);
+        }
+    }
 
     // 🔹 2. Loop selected DocEntry
     foreach ($DocEntry as $doc_id) {
@@ -48,21 +44,6 @@ try {
             $BranchDestination         = $row['BranchDestination'];
             $BranchDestination_Whscode = $row['BranchDestination_Whscode'];
 
-            $logData = [
-                'PicklistNumber'           => $PicklistNumber,
-                'SR_Number'                => $row['SR_Number'],
-                'ItemCode'                 => $row['ItemCode'],
-                'ItemName'                 => $row['ItemName'],
-                'ItemBrand'                => $row['ItemBrand'],
-                'ItemCategory'             => $row['ItemCategory'],
-                'Request_Qty'              => $row['Request_Qty'],
-                'BranchOrigin'             => $row['BranchOrigin'],
-                'BranchOrigin_Whscode'     => $row['BranchOrigin_Whscode'],
-                'BranchDestination'        => $row['BranchDestination'],
-                'BranchDestination_Whscode' => $row['BranchDestination_Whscode'],
-                'Timestamp'                => date('Y-m-d H:i:s')
-            ];
-
             try {
                 // 🔹 Insert Picklist Items
                 $stmtInsertItem = $conn->prepare("EXEC dbo.[Picklist_StockReq_Items_Collection] ?,?,?,?,?,?,?,?,?,?,?,?");
@@ -75,10 +56,10 @@ try {
                     $ItemBrand,
                     $ItemCategory,
                     $Request_Qty,
-                    $BranchOrigin,
-                    $BranchOrigin_Whscode,
                     $BranchDestination,
-                    $BranchDestination_Whscode
+                    $BranchDestination_Whscode,
+                    $BranchOrigin,
+                    $BranchOrigin_Whscode
                 ]);
             } catch (PDOException $e) {
                 errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
