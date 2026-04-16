@@ -271,7 +271,7 @@ function toggleCheckboxes() {
     return;
   }
 
-  console.log(`CHECK ID's LENGTH : ${DocEntries}`);
+  // console.log(`CHECK ID's LENGTH : ${DocEntries}`);
 
   Swal.fire({
     icon: "question",
@@ -906,7 +906,7 @@ function loadBasket() {
                 const PKlistNum = $(this).data("picklist");
                 const DocEntry = $(this).data("doc-entry");
 
-                console.log(`PICKLIST ENTRY: ${DocEntry}`);
+                // console.log(`PICKLIST ENTRY: ${DocEntry}`);
 
                 Swal.fire({
                   title: "Print this Picklist?",

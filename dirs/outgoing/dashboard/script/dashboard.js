@@ -137,6 +137,7 @@ function loadOutgoing() {
           { title: "Date", className: "text-start" },
           { title: "Actions", orderable: false },
         ],
+        pageLength: 8,
         paging: true,
         searching: true,
         info: true,
@@ -146,6 +147,9 @@ function loadOutgoing() {
         language: {
           emptyTable: "", // 🔥 removes "No data available in table"
         },
+        // language: {
+        //   emptyTable: "No records found",
+        // },
         rowCallback: function (row, data, index) {
           $("td", row).css({
             background: "#FFFBDF",
@@ -154,7 +158,7 @@ function loadOutgoing() {
             "min-height": "40px",
             cursor: "pointer",
           });
-          let docEntry = data[0]; // ✅ index 0 (hidden column)
+          let docEntry = data[0];
           $(row).attr("data-docentry", docEntry);
           $("td:eq(0)", row).css("text-align", "center");
           $("td:eq(1)", row).addClass("text-primary");
@@ -180,7 +184,6 @@ function loadOutgoing() {
                 <td colspan="8" style="background: #FFFBDF">&nbsp;</td>
               </tr>
             `);
-
             $emptyRow.css({
               background: "#FFFBDF",
               height: "40px",

@@ -4,7 +4,6 @@ session_start();
 
 
 $User       = $_SESSION['Uid'] ?? '';
-// $DrNumber   = $_POST['DrNumber'] ?? '';
 $BatchNumber   = $_POST['BatchNumber'] ?? '';
 $ItemSerial = $_POST['ItemSerial'] ?? '';
 $ItemCode   = $_POST['ItemCode'] ?? '';
@@ -14,7 +13,7 @@ try {
     /* ==============================
        USER BRANCH
     ============================== */
-    $stmt = $conn->prepare("EXEC dbo.[SESSIONUSER] ?");
+    $stmt = $conn->prepare("EXEC dbo.[Session_Account] ?");
     $stmt->execute([$User]);
     $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -51,15 +50,6 @@ try {
         ]);
         exit;
     }
-
-    /* ==============================
-       VALIDATE DELIVERY ITEM (TOP 1)
-    ============================== */
-    $stmt = $conn->prepare("EXEC dbo.[Val_item_Delivery] ?, ?, ?");
-    // $stmt->execute([$Branch, $DrNumber, $item['ItemCode']]);
-    $stmt->execute([$Branch, $BatchNumber, $item['ItemCode']]);
-    $validation = $stmt->fetch(PDO::FETCH_ASSOC);
-
 
     /* ==============================
        SUCCESS RESPONSE

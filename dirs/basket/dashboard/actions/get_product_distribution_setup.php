@@ -4,20 +4,33 @@ session_start();
 
 $User         = $_SESSION['Uid'];
 $lbNum     = $_POST['lbNum'];
-$PicklistNum  = $_POST['PicklistNum'];
 
 try {
   $conn->beginTransaction();
 
-  $branch_distribution = $conn->prepare("EXEC dbo.[Product_Distribution_LoadingBasket] ?, ?, ?");
-  $branch_distribution->execute([$lbNum, $User, $PicklistNum]);
+  $branch_distribution = $conn->prepare("EXEC dbo.[Product_Distribution_LoadingBasket] ?, ?");
+  $branch_distribution->execute([$lbNum, $User]);
+
   $get_branch = $branch_distribution->fetchAll(PDO::FETCH_ASSOC);
+
+  $unique = [];
+  $seen = [];
+
+  foreach ($get_branch as $row) {
+    $key = $row['RequestingBranch'];
+
+    if (!isset($seen[$key])) {
+      $seen[$key] = true;
+      $unique[] = $row;
+    }
+  }
 
   $conn->commit();
 
   $response = array(
     "isSuccess" => 'success',
-    "Data" => $get_branch
+    // "Data" => $get_branch
+    "Data" => $unique
   );
   echo json_encode($response);
   exit;
