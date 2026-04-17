@@ -107,7 +107,7 @@ try {
                         <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="basket">
                                 <i class="nav-icon bi bi-cart"></i>
-                                <p>Loading Basket</p>
+                                <p>Branch Assignment</p>
                             </a>
                         </li>
                         <li class="nav-item">

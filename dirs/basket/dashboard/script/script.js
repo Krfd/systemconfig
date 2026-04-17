@@ -21,6 +21,7 @@ function loadDashboard() {
       "#basketTableDashboard",
       "dirs/basket/dashboard/actions/get_all.php",
     );
+    $("#loadDeliveryBtn").prop("disabled", true);
   });
 }
 
@@ -210,46 +211,54 @@ $(document).on("click", "#summaryTable tbody tr", function (e) {
 });
 
 // BRANCH ASSIGNMENT
-$(document).on(
-  "click",
-  // "#basketTableDashboard .dropdown .assign-branch",
-  ".datatables .dropdown .assign-branch",
-  function (e) {
-    e.preventDefault();
-    e.stopPropagation();
+$(document).on("click", ".datatables .dropdown .assign-branch", function (e) {
+  e.preventDefault();
+  e.stopPropagation();
 
-    let basketRow = $(this).closest("tr");
-    let lbNum = basketRow.attr("data-lbNum");
-    let PicklistNum = basketRow.attr("data-picklist");
-    // let RowNum = deliveryBasketRow.attr("data-rowNum");
+  let basketRow = $(this).closest("tr");
+  let lbNum = basketRow.attr("data-lbNum");
+  let PicklistNum = basketRow.attr("data-picklist");
+  // let RowNum = deliveryBasketRow.attr("data-rowNum");
 
-    $("#main-content").html(spinner);
-    setTimeout(function () {
-      assignBranch(lbNum, PicklistNum);
-      // createDeliveryForm(DeliveryNum, PicklistNum, RowNum);
-    }, 200);
-  },
-);
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    assignBranch(lbNum, PicklistNum);
+  }, 200);
+});
 
-$(document).on(
-  "click",
-  "#loadingBasketTable .dropdown .create-dr",
-  function (e) {
-    e.preventDefault();
-    e.stopPropagation();
+// EDIT ASSIGNMENT
+$(document).on("click", ".datatables .dropdown .edit-branch", function (e) {
+  e.preventDefault();
+  e.stopPropagation();
 
-    let deliveryBasketRow = $(this).closest("tr");
-    let DeliveryNum = deliveryBasketRow.attr("data-dr");
-    let PicklistNum = deliveryBasketRow.attr("data-picklist");
-    let RowNum = deliveryBasketRow.attr("data-rowNum");
+  let basketRow = $(this).closest("tr");
+  let lbNum = basketRow.attr("data-lbNum");
+  let PicklistNum = basketRow.attr("data-picklist");
 
-    $("#main-content").html(spinner);
-    setTimeout(function () {
-      // createDeliveryForm(DeliveryNum, PicklistNum, RowNum);
-      createDr();
-    }, 200);
-  },
-);
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    editAssignBranch(lbNum, PicklistNum);
+  }, 200);
+});
+
+// $(document).on(
+//   "click",
+//   "#loadingBasketTable .dropdown .create-dr",
+//   function (e) {
+//     e.preventDefault();
+//     e.stopPropagation();
+
+//     let deliveryBasketRow = $(this).closest("tr");
+//     let DeliveryNum = deliveryBasketRow.attr("data-dr");
+//     let PicklistNum = deliveryBasketRow.attr("data-picklist");
+//     let RowNum = deliveryBasketRow.attr("data-rowNum");
+
+//     $("#main-content").html(spinner);
+//     setTimeout(function () {
+//       createDr();
+//     }, 200);
+//   },
+// );
 
 function loadDeliveryBasketContent() {
   if ($.fn.DataTable.isDataTable("#basketTableDashboard")) {
@@ -260,11 +269,11 @@ function loadDeliveryBasketContent() {
   setTimeout(function () {
     $.post("dirs/basket/dashboard/basket.php", {}, function (data) {
       $("#main-content").hide().html(data).fadeIn(200);
-      // loadDeliveryBasket("all", tableId);
       loadDeliveryBasket(
         "#basketTableDashboard",
         "dirs/basket/dashboard/actions/get_all.php",
       );
+      $("#loadDeliveryBtn").prop("disabled", true);
     });
   }, 200);
 }
@@ -277,11 +286,13 @@ $(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function () {
       "#basketTableDashboard",
       "dirs/basket/dashboard/actions/get_all.php",
     );
+    $("#loadDeliveryBtn").prop("disabled", true);
   } else if (target === "assigned-tab") {
     loadDeliveryBasket(
       "#basketTableAssigned",
       "dirs/basket/dashboard/actions/get_assigned.php",
     );
+    $("#loadDeliveryBtn").prop("disabled", false);
   }
 });
 
@@ -315,7 +326,7 @@ function loadDeliveryBasket(tableId, url) {
 
           rows.push([
             `<input type="checkbox" name="checkbox" id="${item.BatchBasket_Num}" data-rownum="${item.RowNumOrder}" 
-            class="form-check-input checkbox align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
+            class="form-check-input align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
             item.PKList_Number || "",
             item.PickList_Qty || "",
             (() => {
@@ -338,7 +349,24 @@ function loadDeliveryBasket(tableId, url) {
                   <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
                   ${
                     item.LoadingBasket_Status !== "IT"
-                      ? `<li><a class="dropdown-item assign-branch" href="#" data-picklist="${item.PickList_Num}" data-lbNum="${item.LoadingB_Num}">Branch Assignment</a></li>`
+                      ? `
+                    <li>
+                      <a class="dropdown-item ${
+                        item.LoadingBasket_Status === "A"
+                          ? "edit-branch"
+                          : "assign-branch"
+                      }" 
+                        href="#" 
+                        data-picklist="${item.PickList_Num}" 
+                        data-lbNum="${item.BatchBasket_Num}">
+                        ${
+                          item.LoadingBasket_Status === "A"
+                            ? "Edit Assignment"
+                            : "Set Assignment"
+                        }
+                      </a>
+                    </li>
+                  `
                       : ""
                   }
                 </ul>
@@ -369,9 +397,6 @@ function loadDeliveryBasket(tableId, url) {
           ],
           createdRow: function (row, data, dataIndex) {
             let originalItem = sortedData[dataIndex];
-
-            // console.log(`BATCH NUMBER: ${originalItem.BatchBasket_Num}`);
-
             if (originalItem) {
               $(row)
                 .attr("data-rownum", originalItem.BatchBasket_Num)
@@ -470,9 +495,8 @@ function toggleDelivery() {
   const loadDeliveryBtn = document.getElementById("loadDeliveryBtn");
 
   // ✅ Reliable state tracking (instead of :visible)
-  // let selectionMode = $("#basketTableDashboard").data("selectionMode") || false;
   let selectionMode = $("#basketTableAssigned").data("selectionMode") || false;
-
+  let batchContainer = [];
   // =========================
   // ✅ FIRST CLICK (SHOW CHECKBOXES)
   // =========================
@@ -485,21 +509,19 @@ function toggleDelivery() {
 
       if (row.hasClass("empty-row")) return;
 
-      // const statusText = row.find("td:eq(3)").text().trim().toUpperCase();
       const statusText = row.find("td:eq(3) span").text().trim().toUpperCase();
       const batchNum = row.attr("data-batchnum");
-
-      console.log(`STATUS TEXT: ${statusText}`);
-      console.log(`BATCH NUM : ${batchNum}`);
 
       // const hasBatch = batchNum && batchNum !== "null" && batchNum !== "";
       // if (statusText === "UNASSIGNED" && !hasBatch) {
       if (statusText === "ASSIGNED") {
         availableRows++;
+        // batchContainer.push(batchNum);
       }
     });
 
-    console.log(`AVAILABLE ROWS: ${availableRows}`);
+    // console.log(`AVAILABLE ROWS: ${availableRows}`);
+    // console.log(`BATCH CONTAINER: ${batchContainer}`);
 
     if (availableRows === 0) {
       Swal.fire({
@@ -521,16 +543,18 @@ function toggleDelivery() {
       const checkbox = row.find("input[type='checkbox']");
       const batchNum = row.attr("data-batchnum");
 
-      if (statusText === "UNASSIGNED") {
+      if (statusText === "ASSIGNED") {
         checkbox.css("display", "inline-block");
 
         if (batchNum && batchNum !== "null" && batchNum !== "") {
-          checkbox.prop("disabled", true);
-          console.log(`CHECKBOX REMAINS DISABLED`);
+          // checkbox.prop("disabled", true);
+          checkbox.prop("disabled", false);
+          // console.log(`CHECKBOX ENABLED`);
           checkbox.attr("title", "Already has batch delivery number");
         } else {
-          checkbox.prop("disabled", false);
-          console.log(`CHECKBOX ENABLED`);
+          // checkbox.prop("disabled", false);
+          checkbox.prop("disabled", true);
+          // console.log(`CHECKBOX DISABLED`);
         }
       } else {
         checkbox.hide();
@@ -563,6 +587,7 @@ function toggleDelivery() {
     if (picklist && lbNum) {
       PickListNum.push(picklist);
       LoadingB_Num.push(lbNum);
+      batchContainer.push(lbNum);
     }
   });
 
@@ -577,11 +602,9 @@ function toggleDelivery() {
     });
 
     // reset UI
-    // $("#basketTableDashboard tbody .checkbox").hide().prop("checked", false);
     $("#basketTableAssigned tbody .checkbox").hide().prop("checked", false);
 
     loadDeliveryBtn.textContent = "Load Items";
-    // $("#basketTableDashboard").data("selectionMode", false);
     $("#basketTableAssigned").data("selectionMode", false);
 
     return;
@@ -592,137 +615,15 @@ function toggleDelivery() {
   // =========================
   Swal.fire({
     icon: "question",
-    title: "Add selected item(s) to delivery basket?",
+    title: "Add selected item(s) to loading basket?",
     confirmButtonText: "Add",
     showCancelButton: true,
     cancelButtonText: "Back",
   }).then((result) => {
     if (result.isConfirmed) {
-      Swal.fire({
-        html: `
-    <div style="text-align:left;">
-      <div style="margin-bottom:12px;">
-        <label for="swal-driver" style="display:block; margin-bottom:4px;">Driver</label>
-        <input id="swal-driver" type="text" class="swal2-input" style="margin:0; width:100%;" placeholder="Enter driver name">
-      </div>
-
-      <div>
-        <label for="swal-plate" style="display:block; margin-bottom:4px;">Plate Number</label>
-        <input id="swal-plate" type="text" class="swal2-input" style="margin:0; width:100%;" placeholder="Enter plate number">
-      </div>
-    </div>
-  `,
-        showCancelButton: true,
-        confirmButtonText: "Continue",
-        cancelButtonText: "Cancel",
-        focusConfirm: false,
-        preConfirm: () => {
-          const driver = document.getElementById("swal-driver").value.trim();
-          const plate = document.getElementById("swal-plate").value.trim();
-
-          if (!driver) {
-            Swal.showValidationMessage("Driver is required!");
-            return false;
-          }
-
-          if (!plate) {
-            Swal.showValidationMessage("Plate Number is required!");
-            return false;
-          }
-
-          return { driver, plate };
-        },
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const { driver, plate } = result.value;
-
-          // console.log("Driver:", driver);
-          // console.log("Plate Number:", plate);
-
-          // $.ajax({
-          //   url: "dirs/basket/dashboard/actions/save_create_delivery_batch.php",
-          //   type: "POST",
-          //   data: {
-          //     PickListNum: PickListNum,
-          //     LoadingB_Num: LoadingB_Num,
-          //   },
-          //   dataType: "json",
-          //   success: function (response) {
-          //     if (response.isSuccess === "success") {
-          // Swal.fire({
-          //   icon: "success",
-          //   title: response.message,
-          //   confirmButtonText: "OKAY",
-          // });
-
-          // $("#basketTableDashboard tbody .checkbox")
-          //   .hide()
-          //   .prop("checked", false);
-
-          // loadDeliveryBtn.textContent = "Create DR";
-          // $("#basketTableDashboard").data("selectionMode", false);
-          createDr(driver, plate);
-          //     } else {
-          //       Swal.fire({
-          //         icon: "error",
-          //         title: response.message,
-          //         confirmButtonText: "OKAY",
-          //         confirmButtonColor: "#d33",
-          //       });
-          //     }
-          //   },
-          //   error: function () {
-          //     Swal.fire({
-          //       icon: "error",
-          //       title: "Server Error",
-          //       text: "Something went wrong while processing the request.",
-          //     });
-          //   },
-          // });
-          // -----------------------------------------------------------
-        }
-      });
-
-      // $.ajax({
-      //   url: "dirs/basket/dashboard/actions/save_create_delivery_batch.php",
-      //   type: "POST",
-      //   data: {
-      //     PickListNum: PickListNum,
-      //     LoadingB_Num: LoadingB_Num,
-      //   },
-      //   dataType: "json",
-      //   success: function (response) {
-      //     if (response.isSuccess === "success") {
-      //       // Swal.fire({
-      //       //   icon: "success",
-      //       //   title: response.message,
-      //       //   confirmButtonText: "OKAY",
-      //       // });
-
-      //       $("#basketTableDashboard tbody .checkbox")
-      //         .hide()
-      //         .prop("checked", false);
-
-      //       loadDeliveryBtn.textContent = "Create DR";
-      //       $("#basketTableDashboard").data("selectionMode", false);
-      //       createDr();
-      //     } else {
-      //       Swal.fire({
-      //         icon: "error",
-      //         title: response.message,
-      //         confirmButtonText: "OKAY",
-      //         confirmButtonColor: "#d33",
-      //       });
-      //     }
-      //   },
-      //   error: function () {
-      //     Swal.fire({
-      //       icon: "error",
-      //       title: "Server Error",
-      //       text: "Something went wrong while processing the request.",
-      //     });
-      //   },
-      // });
+      console.log(`BATCH CONTAINER: ${batchContainer}`);
+      // createDr();
+      createDr(batchContainer);
     }
   });
 }
@@ -1641,56 +1542,56 @@ function addNonSerialize(ItemSerial, lbNum, picklistDr, allowedItemCodes) {
     });
 }
 
-// BRANCH ASSIGNMENT
-function submitBranchDelivery() {
-  $("#branchDeliveryUnit").on("submit", function (e) {
-    e.preventDefault();
+// // BRANCH ASSIGNMENT
+// function submitBranchDelivery() {
+//   $("#branchDeliveryUnit").on("submit", function (e) {
+//     e.preventDefault();
 
-    let { totalInput, requiredQty } = validateBranchAssignment();
+//     let { totalInput, requiredQty } = validateBranchAssignment();
 
-    if (totalInput > requiredQty) {
-      Swal.fire({
-        icon: "error",
-        title: "Exceeded Quantity",
-        text: "Allocated quantity exceeds the required delivery quantity.",
-        confirmButtonText: "OKAY",
-      });
-      return;
-    }
+//     if (totalInput > requiredQty) {
+//       Swal.fire({
+//         icon: "error",
+//         title: "Exceeded Quantity",
+//         text: "Allocated quantity exceeds the required delivery quantity.",
+//         confirmButtonText: "OKAY",
+//       });
+//       return;
+//     }
 
-    if (totalInput < requiredQty) {
-      Swal.fire({
-        icon: "warning",
-        title: "Incomplete Allocation",
-        text: "Allocated quantity is less than the required delivery quantity.",
-      });
-      return;
-    }
+//     if (totalInput < requiredQty) {
+//       Swal.fire({
+//         icon: "warning",
+//         title: "Incomplete Allocation",
+//         text: "Allocated quantity is less than the required delivery quantity.",
+//       });
+//       return;
+//     }
 
-    // ✅ GET IDENTIFIER
-    let itemCode = $("#assignBranchModal #itemCode").val();
+//     // ✅ GET IDENTIFIER
+//     let itemCode = $("#assignBranchModal #itemCode").val();
 
-    // ✅ FIND MATCHING ROW IN SUMMARY TABLE
-    let $row = $(`#summaryTable tbody tr[data-itemcode="${itemCode}"]`);
+//     // ✅ FIND MATCHING ROW IN SUMMARY TABLE
+//     let $row = $(`#summaryTable tbody tr[data-itemcode="${itemCode}"]`);
 
-    // ✅ UPDATE BADGE
-    $row
-      .find(".badge")
-      .removeClass("bg-warning")
-      .addClass("bg-success text-light")
-      .text("Assigned");
+//     // ✅ UPDATE BADGE
+//     $row
+//       .find(".badge")
+//       .removeClass("bg-warning")
+//       .addClass("bg-success text-light")
+//       .text("Assigned");
 
-    Swal.fire({
-      icon: "success",
-      title: "Valid Allocation",
-      text: "All quantities match the required delivery quantity.",
-      confirmButtonText: "Proceed",
-    }).then(() => {
-      branchDelivery();
-      $("#assignBranchModal").modal("hide");
-    });
-  });
-}
+//     Swal.fire({
+//       icon: "success",
+//       title: "Valid Allocation",
+//       text: "All quantities match the required delivery quantity.",
+//       confirmButtonText: "Proceed",
+//     }).then(() => {
+//       branchDelivery();
+//       $("#assignBranchModal").modal("hide");
+//     });
+//   });
+// }
 
 // BRANCH ASSIGNMENT
 function submitBranchDelivery() {
@@ -1748,7 +1649,6 @@ function assignBranch(lbNum, picklistDr, previousSerials = []) {
     $("#main-content").hide().html(data).fadeIn(200);
 
     loadImperialBrands();
-    // serialDeliveryInput(lbNum, picklistDr, previousSerials);
     loadIAPBranchlist();
     summaryData();
 
@@ -1788,13 +1688,13 @@ function assignBranch(lbNum, picklistDr, previousSerials = []) {
           let items = response.Items;
           let item = items[0] || {};
 
-          for (i = 0; i < items.length; i++) {
-            console.log(`ITEM ID: ${items[i].Item_id}`);
-            console.log(`ITEM CODE: ${items[i].ItemCode}`);
-          }
+          // for (i = 0; i < items.length; i++) {
+          //   console.log(`ITEM ID: ${items[i].Item_id}`);
+          //   console.log(`ITEM CODE: ${items[i].ItemCode}`);
+          // }
 
           let allowedItemCodes = items.map((item) => item.ItemCode);
-          console.log(`ALLOWED ITEM CODES: ${allowedItemCodes}`);
+          // console.log(`ALLOWED ITEM CODES: ${allowedItemCodes}`);
 
           $("#lbnum").val(lbNum);
           $("#pcklstno").val(header.PKList_Number);
@@ -2440,11 +2340,27 @@ function deliveryDate() {
   document.getElementById("deldate").value = `${yyyy}-${mm}-${dd}`;
 }
 
-// function truckDetails() {
-//   $.post("dirs/basket/dashboard/actions/get_truckdetails.php", function (data) {
-//     console.log(`Fetch truck details`);
-//   });
-// }
+function getBatchItems(batchContainer) {
+  $.ajax({
+    url: "dirs/basket/dashboard/actions/get_batchitems.php",
+    type: "POST",
+    data: { BatchNumber: batchContainer },
+    dataType: "json",
+    success: function (response) {
+      let items = response.Data;
+
+      // console.log(`RESPONSE STATUS: ${response.isSuccess}`);
+      // console.log(`BATCH DATA: ${JSON.stringify(items)}`);
+
+      if (response.isSuccess === "success") {
+        items.forEach((item) => {
+          console.log(`ITEM: ${JSON.stringify(item)}`);
+        });
+      }
+    },
+  });
+}
+
 function getDeliveryDetails() {
   const truckData = {
     4: ["ABC-123", "DEF-456"],
@@ -2468,19 +2384,17 @@ function getDeliveryDetails() {
       });
     }
   });
-
-  console.log(`Hello world!`);
 }
 
 // ORIGINAL
-function createDr() {
+function createDr(batchContainer) {
   $("#main-content").html(spinner);
   $.post("dirs/basket/dashboard/deliveryForm.php", function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
     get_userinfo();
     loadIAPBranchlist();
     deliveryDate();
-    // truckDetails();
+    getBatchItems(batchContainer);
     getDeliveryDetails();
 
     const addBtn = document.getElementById("addDeliveryModalBtn");
@@ -2493,16 +2407,6 @@ function createDr() {
     });
   });
 }
-
-// function createDelivery() {
-//   $("#main-content").html(spinner);
-//   $.post("dirs/basket/dashboard/deliveryForm.php", function (data) {
-//     $("#main-content").hide().html(data).fadeIn(200);
-//     get_userinfo();
-//     loadIAPBranchlist();
-//     deliveryDate();
-//   });
-// }
 
 function get_userinfo() {
   $.post("dirs/basket/dashboard/actions/get_userinfo.php", {}, function (data) {
@@ -2634,8 +2538,6 @@ function loadDestinationWhscodes(Branch) {
     return;
   }
 
-  // console.log("VALID CALL:", Branch);
-
   $.post(
     "dirs/basket/dashboard/actions/get_destinationwhscode.php",
     {
@@ -2673,4 +2575,225 @@ function loadDestinationWhscodes(Branch) {
       }
     },
   );
+}
+
+// EDIT BRANCH ASSIGNMENT
+function editAssignBranch(lbNum, picklistDr, previousSerials = []) {
+  $.post("dirs/basket/dashboard/editAssignment.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+
+    loadImperialBrands();
+    loadIAPBranchlist();
+    summaryData();
+
+    $(document)
+      .off("input", "#branchAssignmentTable td[contenteditable='true']")
+      .on(
+        "input",
+        "#branchAssignmentTable td[contenteditable='true']",
+        function () {
+          validateBranchAssignment();
+        },
+      );
+
+    submitBranchDelivery();
+
+    $("#newBrand").on("change", function () {
+      $("#newModel").html('<option value="">Select Model</option>');
+      $("#newCategory").val("");
+      $("#itemcode").val("");
+      loadImperialModel();
+    });
+
+    $("#newModel").on("change", function () {
+      const selected = $(this).find(":selected");
+      $("#newCategory").val(selected.data("category") || "");
+      $("#itemcode").val(selected.data("itemcode") || "");
+    });
+
+    $.ajax({
+      url: "dirs/basket/dashboard/actions/get_loadingbasket.php",
+      type: "POST",
+      data: { BatchNumber: lbNum },
+      dataType: "json",
+      success: function (response) {
+        if (response.isSuccess === "success") {
+          let header = response.Header;
+          let items = response.Items;
+          let item = items[0] || {};
+          let existingEditTotal = parseInt($("#editSummaryQty").text()) || 0;
+          let editTotalQty = 0;
+          let editRowCount = items.length;
+
+          let allowedItemCodes = items.map((item) => item.ItemCode);
+
+          $("#lbnum").val(lbNum);
+          $("#pcklstno").val(header.PKList_Number);
+          $("#docdate").val(header.DocDate.substring(0, 10));
+          $("#origin").val(item.Destination || "");
+          $("#whcode").val(item.DWhscode || "");
+          $("#status").val("NEW");
+          $("#remarks").val(header.Remarks);
+          $("#prepby").val(header.PickedBy);
+
+          // MANUAL OR SCAN
+          function toggler() {
+            const toggler = document.getElementById("serialToggler");
+            const knob = document.querySelector(".switch-knob");
+            const manual = document.querySelector(".switch-track .manual");
+            const scan = document.querySelector(".switch-track .scan");
+            const serialInput = document.getElementById("newSerial");
+
+            function updateKnob() {
+              scan.style.transition = "opacity 0.3s ease";
+              manual.style.transition = "opacity 0.3s ease";
+
+              if (toggler.checked) {
+                toggler.dataset.value = "Scan";
+                knob.style.width = "55px";
+                knob.style.transform = "translateX(8px)";
+                scan.classList.add("text-white");
+                manual.style.opacity = "0";
+                manual.style.pointerEvents = "none";
+                scan.style.opacity = "1";
+                scan.style.pointerEvents = "auto";
+                serialInput.value = "";
+                serialInput.addEventListener("keydown", preventTyping);
+              } else {
+                toggler.dataset.value = "Manual";
+                knob.style.width = "60px";
+                knob.style.transform = "translateX(0px)";
+                manual.classList.add("text-white");
+                scan.style.opacity = "0";
+                scan.style.pointerEvents = "none";
+                manual.style.opacity = "1";
+                manual.style.pointerEvents = "auto";
+                serialInput.removeEventListener("keydown", preventTyping);
+              }
+            }
+
+            function preventTyping(e) {
+              const allowedKeys = ["Enter", "Tab"];
+              if (!allowedKeys.includes(e.key)) {
+                e.preventDefault();
+              }
+            }
+
+            updateKnob();
+
+            toggler.addEventListener("change", updateKnob);
+          }
+
+          // PRESET SUMMARY DATA
+          let editRow = [];
+          let editSummaryTable = $("#editSummaryTable tbody");
+          for (i = 0; i < items.length; i++) {
+            editTotalQty += parseInt(items[i].Deliver_Qty);
+            if (header.LoadingBasket_Status == "A") {
+              editRow = `
+                <tr style="height: 40px; min-height: 40px; cursor: pointer" data-itemCode="${items[i].ItemCode}">
+                  <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemBrand}</td>
+                  <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemName}</td>
+                  <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemCategory}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${items[i].Deliver_Qty}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
+                    <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">Assigned</span>
+                  </td>
+                </tr>`;
+            } else {
+              editRow = `
+                <tr style="height: 40px; min-height: 40px; cursor: pointer" data-itemCode="${items[i].ItemCode}">
+                  <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemBrand}</td>
+                  <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemName}</td>
+                  <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemCategory}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${items[i].Deliver_Qty}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
+                    <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">Unassigned</span>
+                  </td>
+                </tr>`;
+            }
+          }
+
+          $("#editSummaryQty").text(editTotalQty);
+          editSummaryTable.append(editRow);
+
+          for (let j = editRowCount; j < 8; j++) {
+            let editEmptyRow = $(`
+                <tr class="empty-row">
+                  <td colspan="5" style="background:#FFFBDF"></td>
+                </tr>
+              `);
+
+            $(editEmptyRow).css({
+              background: "#FFFBDF",
+              height: "40px",
+            });
+
+            editEmptyRow.hover(
+              function () {
+                $("td:not(:first-child)", this).css("background", "#FFF4C2");
+              },
+              function () {
+                $("td:not(:first-child)", this).css("background", "#FFFBDF");
+              },
+            );
+
+            editSummaryTable.append(editEmptyRow);
+          }
+
+          // FOR NON-SERIALIZE ITEMS
+          const addBtn = document.getElementById("addDeliveryModalBtn");
+          const newItemModal = new bootstrap.Modal(
+            document.getElementById("addDeliveryModal"),
+          );
+
+          let allowNonserialize = false;
+
+          addBtn.addEventListener("click", function () {
+            if (allowNonserialize) {
+              newItemModal.show();
+              return;
+            }
+
+            Swal.fire({
+              title: "Enter non-serialize items?",
+              text: "Please confirm before proceeding.",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonText: "Allow",
+              cancelButtonText: "Cancel",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                allowNonserialize = true;
+                newItemModal.show();
+              }
+            });
+          });
+
+          serialDeliveryInput(
+            lbNum,
+            picklistDr,
+            previousSerials,
+            allowedItemCodes,
+          );
+          addNonSerialize("", lbNum, picklistDr, allowedItemCodes);
+
+          function adjustTotalWidth() {
+            const editSummaryTable =
+              document.getElementById("editSummaryTable");
+            const totalRow = document.getElementById("totalRowOutside");
+
+            if (editSummaryTable && totalRow) {
+              totalRow.style.width = editSummaryTable.offsetWidth + "px";
+            }
+          }
+
+          toggler();
+          adjustTotalWidth();
+          window.addEventListener("resize", adjustTotalWidth);
+          submitBranchAssignment();
+        }
+      },
+    });
+  });
 }

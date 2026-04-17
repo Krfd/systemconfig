@@ -4,30 +4,30 @@ session_start();
 
 $User          = $_SESSION['Uid'];
 $BatchNum      = $_POST['BatchNum'];
+$ItemCode      = $_POST['ItemCode'];
 $TruckCategory = $_POST['TruckCategory'] ?? '';
 $TruckPlate    = $_POST['TruckPlate'] ?? '';
 $Driver        = $_POST['Driver'] ?? '';
 $Remarks       = $_POST['Remarks'] ?? '';
 
-// $Item_id      = $_POST['ItemID'] ?? [];
-$DeliveryQty  = $_POST['DeliveryQty'] ?? [];
+$DeliveryQty  = $_POST['Quantity'] ?? [];
 
-$logData = [
-    "User"          => $User,
-    "BatchNum"      => $BatchNum,
-    "TruckCategory" => $TruckCategory,
-    "TruckPlate"    => $TruckPlate,
-    "Driver"        => $Driver,
-    "Remarks"       => $Remarks,
-    "Item_id"       => $Item_id,
-    "DeliveryQty"   => $DeliveryQty,
-];
+// $logData = [
+//     "User"          => $User,
+//     "BatchNum"      => $BatchNum,
+//     "TruckCategory" => $TruckCategory,
+//     "TruckPlate"    => $TruckPlate,
+//     "Driver"        => $Driver,
+//     "Remarks"       => $Remarks,
+//     "ItemCode"       => $ItemCode,
+//     "Quantity"   => $DeliveryQty,
+// ];
 
-file_put_contents(
-    "loadingbasket_log.txt",
-    "[" . date("Y-m-d H:i:s") . "] " . print_r($logData, true) . PHP_EOL,
-    FILE_APPEND
-);
+// file_put_contents(
+//     "loadingbasket_log.txt",
+//     "[" . date("Y-m-d H:i:s") . "] " . print_r($logData, true) . PHP_EOL,
+//     FILE_APPEND
+// );
 
 try {
 
@@ -43,12 +43,12 @@ try {
         $Remarks
     ]);
 
-    $stmtItems = $conn->prepare("EXEC dbo.[Update_LoadingBasket_Items] ?,?");
+    $stmtItems = $conn->prepare("EXEC dbo.[Update_LoadingBasket_Items] ?,?,?,?");
 
-    foreach ($Item_id as $key => $item) {
-        $itemId = $item;
+    foreach ($ItemCode as $key => $item) {
+        $itemCode = $item;
         $qty    = $DeliveryQty[$key] ?? 0;
-        $stmtItems->execute([$itemId, $qty]);
+        $stmtItems->execute([$User, $BatchNum, $itemCode, $qty]);
     }
 
     $conn->commit();

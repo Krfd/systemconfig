@@ -40,6 +40,7 @@
                                 <table class="table datatables" id="encodeQtyTable">
                                     <thead class="sticky-top">
                                         <tr>
+                                            <th class="text-secondary d-none"></th>
                                             <th class="text-secondary">#</th>
                                             <th class="text-secondary">Brand</th>
                                             <th class="text-secondary">Model</th>
@@ -49,39 +50,6 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!-- <tr style="height: 40px; min-height: 40px">
-                                            <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">1</td>
-                                            <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">APPLE</td>
-                                            <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">iPhone 16 128GB PINK</td>
-                                            <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">PHONE</td>
-                                            <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">3</td>
-                                            <td class="align-middle ps-3 text-secondary editable-cell"
-                                                style="background:#FFFBDF; padding: 3px;"
-                                                contenteditable="true"
-                                                onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)">
-                                        </tr>
-                                        <tr style="height: 40px; min-height: 40px">
-                                            <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">2</td>
-                                            <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">SAMSUNG</td>
-                                            <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">GALAXY J7</td>
-                                            <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">PHONE</td>
-                                            <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">2</td>
-                                            <td class="align-middle ps-3 text-secondary editable-cell"
-                                                style="background:#FFFBDF; padding: 3px;"
-                                                contenteditable="true"
-                                                onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)">
-                                        </tr>
-                                        <tr style="height: 40px; min-height: 40px">
-                                            <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">3</td>
-                                            <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">APPLE</td>
-                                            <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">iPhone 15 128GB BLACK</td>
-                                            <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">PHONE</td>
-                                            <td class="align-middle ps-3 text-secondary" style="background:#FFFBDF; padding: 3px">4</td>
-                                            <td class="align-middle ps-3 text-secondary editable-cell"
-                                                style="background:#FFFBDF; padding: 3px;"
-                                                contenteditable="true"
-                                                onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)">
-                                        </tr> -->
                                         <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
@@ -149,13 +117,6 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- <div id="totalRowOutside" class="d-flex border-top fw-bold"
-                                style="background:#FFFBDF;">
-                                <div class="p-2 flex-grow-1 text-end">
-                                    Total Quantity:
-                                </div>
-                                <div class="p-2" style="width:120px;" id="totalEncodedQty">0</div>
-                            </div> -->
                             <button class="btn btn-primary d-block ms-auto mt-5" type="submit">Save</button>
                         </form>
                     </div>

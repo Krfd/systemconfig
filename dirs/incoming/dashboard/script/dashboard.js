@@ -80,7 +80,7 @@ function loadIncoming() {
 
           rows.push([
             `<input type="checkbox" name="checkbox" id="${item.RowNum}" data-rownum="${item.DocEntry}" 
-            class="form-check-input checkbox align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
+            class="form-check-input align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
             item.RowNum || "",
             item.SR_Number || "",
             item.TypeRequest || "",
@@ -791,8 +791,10 @@ function loadBasket() {
           );
 
           // console.log(`PICKLIST BASKET DATA: ${JSON.stringify(sortedData)}`);
+          // console.log(``);
 
           sortedData.forEach((item) => {
+            // console.log(`PICKLIST DETAILS: ${JSON.stringify(item)}`);
             const date = new Date(item.DocDate);
             const formatted = date.toISOString().split("T")[0];
             rows.push([
@@ -948,30 +950,35 @@ function loadBasket() {
                           DocEntry: DocEntry,
                         },
                         function (response) {
-                          const openPrint = () => {
-                            $.ajax({
-                              url: "dirs/incoming/dashboard/actions/save_loading_basket.php",
-                              type: "POST",
-                              data: { PickListNum: PKlistNum },
-                              dataType: "json",
-                              success: function (response) {
-                                if (response.isSuccess === "success") {
-                                  console.log(
-                                    `PICKLIST SAVED TO LOADING BASKET`,
-                                  );
-                                } else {
-                                  console.log(
-                                    `PICKLIST WAS NOT SAVED TO LOADING BASKET`,
-                                  );
-                                }
-                              },
-                            });
+                          // const openPrint = () => {
+                          //   $.ajax({
+                          //     url: "dirs/incoming/dashboard/actions/save_loading_basket.php",
+                          //     type: "POST",
+                          //     data: { PickListNum: PKlistNum },
+                          //     dataType: "json",
+                          //     success: function (response) {
+                          //       if (response.isSuccess === "success") {
+                          //         console.log(
+                          //           `PICKLIST SAVED TO LOADING BASKET`,
+                          //         );
+                          //       } else {
+                          //         console.log(
+                          //           `PICKLIST WAS NOT SAVED TO LOADING BASKET`,
+                          //         );
+                          //       }
+                          //     },
+                          //   });
 
-                            window.open(
-                              `pdf/requests.php?executedBy=${encodeURIComponent(executedBy)}&DocEntry=${DocEntry}`,
-                              "_blank",
-                            );
-                          };
+                          //   window.open(
+                          //     `pdf/requests.php?executedBy=${encodeURIComponent(executedBy)}&DocEntry=${DocEntry}`,
+                          //     "_blank",
+                          //   );
+                          // };
+
+                          window.open(
+                            `pdf/requests.php?executedBy=${encodeURIComponent(executedBy)}&DocEntry=${DocEntry}`,
+                            "_blank",
+                          );
 
                           if (response.status === "error") {
                             Swal.fire({
@@ -983,7 +990,12 @@ function loadBasket() {
                               cancelButtonText: "Back",
                             }).then((res) => {
                               if (res.isConfirmed) {
-                                openPrint();
+                                // openPrint();
+
+                                window.open(
+                                  `pdf/requests.php?executedBy=${encodeURIComponent(executedBy)}&DocEntry=${DocEntry}`,
+                                  "_blank",
+                                );
                               }
                             });
                             return;
@@ -1048,7 +1060,7 @@ function encodeQty(picklistNum, rowNum) {
 
             let picklistEntry = "";
 
-            // console.log(`ITEMS: ${JSON.stringify(items)}`);
+            console.log(`ITEMS: ${JSON.stringify(items)}`);
 
             items.forEach(function (item, index) {
               let itemQty = Math.trunc(Number(item.Req_Item_Qty) || 0);
@@ -1056,6 +1068,7 @@ function encodeQty(picklistNum, rowNum) {
               picklistEntry = item.DocEntry;
               rows += `
                 <tr style="height: 40px; min-height: 40px" data-docEntry="${item.DocEntry}">
+                  <td class="align-middle ps-3 d-none" style="background:#FFFBDF; padding: 3px">${item.Item_id}</td>
                   <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${index + 1}</td>
                   <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Req_ItemBrand}</td>
                   <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Req_ItemName}</td>
@@ -1075,6 +1088,7 @@ function encodeQty(picklistNum, rowNum) {
               for (let i = 0; i < emptyRowsNeeded; i++) {
                 let emptyRow = `
                   <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+                    <td style="background: #FFFBDF" class="d-none"></td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
                     <td style="background: #FFFBDF"></td>
@@ -1169,11 +1183,11 @@ function submitEncodedQty(PicklistEntry, picklistNum) {
 
           let item = {
             index: $(cells[0]).text().trim(),
-            brand: $(cells[1]).text().trim(),
-            model: $(cells[2]).text().trim(),
-            category: $(cells[3]).text().trim(),
-            quantity: $(cells[4]).text().trim(),
-            actualQty: $(cells[5]).text().trim(),
+            brand: $(cells[2]).text().trim(),
+            model: $(cells[3]).text().trim(),
+            category: $(cells[4]).text().trim(),
+            quantity: $(cells[5]).text().trim(),
+            actualQty: $(cells[6]).text().trim(),
           };
 
           if (item.actualQty !== "") {
@@ -1209,6 +1223,8 @@ function submitEncodedQty(PicklistEntry, picklistNum) {
           // formData.append("SR_Number[]", $("#pklist").val());
           let srnIndex = 0;
 
+          console.log(`ENCODED ITEMS: ${JSON.stringify(encodedItems)}`);
+
           encodedItems.forEach((item) => {
             formData.append("ItemNumber[]", item.index);
             formData.append("ActualQty[]", item.actualQty);
@@ -1233,7 +1249,6 @@ function submitEncodedQty(PicklistEntry, picklistNum) {
                   icon: "success",
                   title: "Saved successfully",
                 }).then(() => {
-                  // console.log("openPrint triggered");
                   const openPrint = () => {
                     $.ajax({
                       url: "dirs/incoming/dashboard/actions/save_loading_basket.php",

@@ -13,7 +13,7 @@
             <i class="bi bi-arrow-left"></i>
         </button>
         <div class="d-flex justify-content-start align-items-start gap-3">
-            <h3 class="fw-bold text-primary">Branch Assignment</h3>
+            <h3 class="fw-bold text-primary">Edit Assignment</h3>
         </div>
     </div>
     <div class="card shadow-sm overflow-auto mt-2" id="dashboard-display">
@@ -21,7 +21,7 @@
             <section class="content">
                 <div class="container-fluid">
                     <div class="row">
-                        <form method="POST" id="delivery">
+                        <form method="POST" id="editDelivery">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="d-flex flex-column gap-1 col-4">
                                     <div class="d-flex align-items-baseline gap-3">
@@ -89,7 +89,7 @@
                                     </tbody>
                                 </table>
                                 <!-- SUMMARY TABLE -->
-                                <table class="table table-hover col" id="summaryTable">
+                                <table class="table table-hover col" id="editSummaryTable">
                                     <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary">Brand</th>
@@ -100,7 +100,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
+                                        <!-- <tr class="empty-row" style="height: 40px; min-height: 40px;">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
@@ -155,13 +155,13 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                        </tr>
+                                        </tr> -->
                                     </tbody>
                                 </table>
                             </div>
                             <div id="totalRowOutside" class="d-flex border-top fw-bold justify-content-end w-100" style="background: #FFFBDF">
                                 <div class=" p-2 text-end">Total Quantity:</div>
-                                <div class="p-2" style="width:120px;" id="summaryQty">0</div>
+                                <div class="p-2" style="width:120px;" id="editSummaryQty">0</div>
                             </div>
                             <div class="d-flex justify-content-between align-items-end mt-5">
                                 <div class="d-flex justify-content-start align-items-end gap-1 col-3">

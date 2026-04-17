@@ -39,7 +39,7 @@ $("#main-menu")
         break;
       case "basket":
         $maintitle = "";
-        $mainbreadcrumb = `<li class="breadcrumb-item active">Loading Basket</li>`;
+        $mainbreadcrumb = `<li class="breadcrumb-item active">Branch Assignment</li>`;
         $file = "dirs/basket/dashboard/basket.php";
         break;
       case "delivery":
