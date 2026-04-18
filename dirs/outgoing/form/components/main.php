@@ -132,12 +132,20 @@
 
         // 🔹 Validation
         if (Itemnumber.length === 0) {
-            alert("No items selected.");
+            // alert("No items selected.");
+            Swal.fire({
+                icon: "error",
+                title: "No Items has been added"
+            })
             return;
         }
 
         if (!RequestType || !OWhscode || !DWhscode) {
-            alert("Please fill required fields.");
+            // alert("Please fill required fields.");
+            Swal.fire({
+                icon: "error",
+                title: "Please fill all the required fields"
+            })
             return;
         }
 

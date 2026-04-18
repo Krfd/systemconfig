@@ -286,11 +286,11 @@ function openRequest(DocEntry) {
             totalQty += quantity;
             rows += `
             <tr>
-              <td style="background:#FFFBDF">${index + 1}</td>
-              <td style="background:#FFFBDF">${item.ItemBrand}</td>
-              <td style="background:#FFFBDF">${item.ItemName}</td>
-              <td style="background:#FFFBDF">${item.ItemCategory}</td>
-              <td style="background:#FFFBDF">${item.Request_Qty}</td>
+              <td style="background:#F2F2F2">${index + 1}</td>
+              <td style="background:#F2F2F2">${item.ItemBrand}</td>
+              <td style="background:#F2F2F2">${item.ItemName}</td>
+              <td style="background:#F2F2F2">${item.ItemCategory}</td>
+              <td style="background:#F2F2F2">${item.Request_Qty}</td>
             </tr>
             `;
           });
@@ -304,11 +304,11 @@ function openRequest(DocEntry) {
             for (let i = 0; i < emptyRows; i++) {
               let emptyRow = `
               <tr class="item-row empty-row" style="height: 50px; min-height: 50px;">
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
+                <td style="background: #F2F2F2"></td>
+                <td style="background: #F2F2F2"></td>
+                <td style="background: #F2F2F2"></td>
+                <td style="background: #F2F2F2"></td>
+                <td style="background: #F2F2F2"></td>
               </tr>
               `;
               $("#openIncomingTable tbody").append(emptyRow);

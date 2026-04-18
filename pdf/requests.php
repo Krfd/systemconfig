@@ -161,12 +161,11 @@ try {
         $pdf->SetFont('Arial', 'B', 9);
 
         /* ---------- FIXED HEADERS ---------- */
-
         $headers = [
             '#' => 10,
-            'Brand' => 30,
-            'Model' => 80,
             'Category' => 30,
+            'Model' => 80,
+            'Brand' => 30,
             'Quantity' => 15,
             'Actual Qty' => 20
         ];
@@ -183,15 +182,40 @@ try {
         $lineHeight = 5;
         $counter = 1;
 
-        /* ---------- TABLE ROWS ---------- */
+        $groupedItems = [];
+
         foreach ($itemData as $row) {
+            $modelRaw = $row->Req_ItemName ?? '';
+            $brandRaw = $row->Req_ItemBrand ?? '';
+            $categoryRaw = $row->Req_ItemCategory ?? '';
+            $quantity = (int)($row->Req_Item_Qty ?? 0);
+            $actual = (int)($row->Actual_Item_Qty ?? 0);
+
+            $key = $modelRaw . '|' . $brandRaw . '|' . $categoryRaw;
+
+            if (!isset($groupedItems[$key])) {
+                $groupedItems[$key] = [
+                    'Model' => $modelRaw,
+                    'Brand' => $brandRaw,
+                    'Category' => $categoryRaw,
+                    'Quantity' => 0,
+                    'Actual' => 0
+                ];
+            }
+
+            $groupedItems[$key]['Quantity'] += $quantity;
+            $groupedItems[$key]['Actual'] += $actual;
+        }
+
+        /* ---------- TABLE ROWS ---------- */
+        foreach ($groupedItems as $row) {
 
             // Step 1: calculate max lines
-            $brandLines = $pdf->NbLines($headers['Brand'], $row->Req_ItemBrand);
-            $modelLines = $pdf->NbLines($headers['Model'], $row->Req_ItemName);
-            $categoryLines = $pdf->NbLines($headers['Category'], $row->Req_ItemCategory);
-            $qtyLines = $pdf->NbLines($headers['Quantity'], number_format($row->Req_Item_Qty ?? 0, 0));
-            $actualLines = $pdf->NbLines($headers['Actual Qty'], $row->Actual_Item_Qty !== null ? number_format($row->Actual_Item_Qty, 0) : '');
+            $categoryLines = $pdf->NbLines($headers['Category'], $row['Category']);
+            $modelLines = $pdf->NbLines($headers['Model'], $row['Model']);
+            $brandLines = $pdf->NbLines($headers['Brand'], $row['Brand']);
+            $qtyLines = $pdf->NbLines($headers['Quantity'], number_format($row['Quantity'] ?? 0, 0));
+            $actualLines = $pdf->NbLines($headers['Actual Qty'], $row['Actual'] !== null ? number_format($row['Actual'], 0) : '');
 
             $maxLines = max($brandLines, $modelLines, $categoryLines, $qtyLines, $actualLines, 1);
             $rowHeight = $lineHeight * $maxLines;
@@ -201,26 +225,35 @@ try {
 
             // Step 2: draw cells with border first
             $pdf->Rect($x, $y, $headers['#'], $rowHeight); // Column #
-            $pdf->Rect($x + $headers['#'], $y, $headers['Brand'], $rowHeight);
-            $pdf->Rect($x + $headers['#'] + $headers['Brand'], $y, $headers['Model'], $rowHeight);
-            $pdf->Rect($x + $headers['#'] + $headers['Brand'] + $headers['Model'], $y, $headers['Category'], $rowHeight);
+            $pdf->Rect($x + $headers['#'], $y, $headers['Category'], $rowHeight);
+            $pdf->Rect($x + $headers['#'] + $headers['Category'], $y, $headers['Model'], $rowHeight);
+            $pdf->Rect($x + $headers['#'] + $headers['Category'] + $headers['Model'], $y, $headers['Brand'], $rowHeight);
             $pdf->Rect($x + $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'], $y, $headers['Quantity'], $rowHeight);
             $pdf->Rect($x + $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'] + $headers['Quantity'], $y, $headers['Actual Qty'], $rowHeight);
 
-            // Step 3: print text inside each cell using MultiCell but with ln=0 so Y doesn’t move
+            // Column #
             $pdf->SetXY($x, $y);
-            $pdf->MultiCell($headers['#'], $lineHeight, $counter, 0, 'C', false);
-            $pdf->SetXY($x + $headers['#'], $y);
-            $pdf->MultiCell($headers['Brand'], $lineHeight, $row->Req_ItemBrand, 0);
-            $pdf->SetXY($x + $headers['#'] + $headers['Brand'], $y);
-            $pdf->MultiCell($headers['Model'], $lineHeight, $row->Req_ItemName, 0);
-            $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'], $y);
-            $pdf->MultiCell($headers['Category'], $lineHeight, $row->Req_ItemCategory, 0);
-            $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'], $y);
-            $pdf->MultiCell($headers['Quantity'], $lineHeight, number_format($row->Req_Item_Qty ?? 0, 0), 0, 'C');
-            $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'] + $headers['Quantity'], $y);
-            $pdf->MultiCell($headers['Actual Qty'], $lineHeight, $row->Actual_Item_Qty !== null ? number_format($row->Actual_Item_Qty, 0) : '', 0, 'C');
+            $pdf->MultiCell($headers['#'], $lineHeight, $counter, 0, 'C');
 
+            // Category
+            $pdf->SetXY($x + $headers['#'], $y);
+            $pdf->MultiCell($headers['Category'], $lineHeight, $row['Category'], 0);
+
+            // Model
+            $pdf->SetXY($x + $headers['#'] + $headers['Category'], $y);
+            $pdf->MultiCell($headers['Model'], $lineHeight, $row['Model'], 0);
+
+            // Brand
+            $pdf->SetXY($x + $headers['#'] + $headers['Category'] + $headers['Model'], $y);
+            $pdf->MultiCell($headers['Brand'], $lineHeight, $row['Brand'], 0);
+
+            // Quantity
+            $pdf->SetXY($x + $headers['#'] + $headers['Category'] + $headers['Model'] + $headers['Brand'], $y);
+            $pdf->MultiCell($headers['Quantity'], $lineHeight, number_format($row['Quantity'] ?? 0, 0), 0, 'C');
+
+            // Actual Qty
+            $pdf->SetXY($x + $headers['#'] + $headers['Category'] + $headers['Model'] + $headers['Brand'] + $headers['Quantity'], $y);
+            $pdf->MultiCell($headers['Actual Qty'], $lineHeight, $row['Actual'] !== null ? number_format($row['Actual'], 0) : '', 0, 'C');
             // Step 4: move Y by full row height
             $pdf->SetY($y + $rowHeight);
 

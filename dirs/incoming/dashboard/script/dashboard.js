@@ -45,8 +45,6 @@ function loadIncoming() {
           (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
         );
 
-        // console.log(`INCOMING DATA: ${JSON.stringify(sortedData)}`);
-
         sortedData.forEach((item) => {
           let status = item.RequestStatus
             ? item.RequestStatus.toUpperCase()
@@ -78,8 +76,10 @@ function loadIncoming() {
               ? "disabled"
               : "";
 
+          // console.log(`INCOMING DOC ENTRY : ${item.DocEntry}`);
+
           rows.push([
-            `<input type="checkbox" name="checkbox" id="${item.RowNum}" data-rownum="${item.DocEntry}" 
+            `<input type="checkbox" name="checkbox" id="${item.RowNum}" data-docentry="${item.DocEntry}" 
             class="form-check-input align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
             item.RowNum || "",
             item.SR_Number || "",
@@ -190,7 +190,7 @@ function toggleCheckboxes() {
   const selectionMode =
     $("#incomingTableDisplay tbody .checkbox:visible").length > 0;
   $("#incomingTableDisplay tbody .checkbox:checked").each(function () {
-    DocEntries.push($(this).data("rownum"));
+    DocEntries.push($(this).data("docentry"));
   });
 
   if (!selectionMode) {
@@ -271,7 +271,7 @@ function toggleCheckboxes() {
     return;
   }
 
-  // console.log(`CHECK ID's LENGTH : ${DocEntries}`);
+  console.log(`CHECK ID's LENGTH : ${DocEntries}`);
 
   Swal.fire({
     icon: "question",
@@ -325,7 +325,7 @@ $(document).on("dblclick", "#incomingTableDisplay tbody tr", function (e) {
   if ($(e.target).closest(".dropdown").length) return;
   if ($("#incomingTableDisplay tbody .checkbox:visible").length > 0) return;
   if ($(this).hasClass("empty-row")) return;
-  let DocEntry = $(this).find("td:nth-child(2)").text().trim();
+  let DocEntry = $(this).find(".checkbox").data("docentry");
   $("#main-content").html(spinner);
   setTimeout(function () {
     openIncoming(DocEntry);
@@ -378,11 +378,11 @@ function openIncoming(DocEntry) {
             totalQty += quantity;
             rows += `
                 <tr style="height: 40px; min-height: 40px">
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${index + 1}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.ItemBrand}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.ItemName}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.ItemCategory}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Request_Qty}</td>
+                  <td class="align-middle ps-3" style="background:#F2F2F2; padding: 3px">${index + 1}</td>
+                  <td class="align-middle ps-3" style="background:#F2F2F2; padding: 3px">${item.ItemBrand}</td>
+                  <td class="align-middle ps-3" style="background:#F2F2F2; padding: 3px">${item.ItemName}</td>
+                  <td class="align-middle ps-3" style="background:#F2F2F2; padding: 3px">${item.ItemCategory}</td>
+                  <td class="align-middle ps-3" style="background:#F2F2F2; padding: 3px">${item.Request_Qty}</td>
                 </tr>
               `;
           });
@@ -396,11 +396,11 @@ function openIncoming(DocEntry) {
             for (let i = 0; i < emptyRowsNeeded; i++) {
               let emptyRow = `
                   <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #F2F2F2"></td>
+                    <td style="background: #F2F2F2"></td>
+                    <td style="background: #F2F2F2"></td>
+                    <td style="background: #F2F2F2"></td>
+                    <td style="background: #F2F2F2"></td>
                   </tr>
               `;
               $("#openIncomingTable tbody").append(emptyRow);
@@ -462,10 +462,12 @@ $(document).on("dblclick", "#basketTable tbody .open-picklist", function (e) {
 $(document).on("dblclick", "#picklistItemTable tbody tr", function (e) {
   e.preventDefault();
   if ($(this).hasClass("empty-row")) return;
-  let RowNum = $(this).data("rownum");
+  // let DocEntry = $(this).data("docentry");
+  let SR_Number = $(this).data("srn");
   $("#main-content").html(spinner);
   setTimeout(function () {
-    openPicklistedForm(RowNum);
+    openPicklistedForm(SR_Number);
+    console.log(`SELECTED SRN: ${SR_Number}`);
   }, 200);
 });
 
@@ -481,7 +483,6 @@ $(document).on("click", ".dropdown .open-picklist-items", function (e) {
   $("#main-content").html(spinner);
   setTimeout(function () {
     openPicklist(picklistNum);
-    // openPicklist(picklistNum, docEntry);
   }, 200);
 });
 
@@ -500,7 +501,6 @@ $(document).on("click", ".dropdown .enter-actual-qty", function (e) {
   }, 200);
 });
 
-// function openPicklist(picklistNum, docEntry) {
 function openPicklist(picklistNum) {
   $.post(
     "dirs/incoming/dashboard/picklistItem.php",
@@ -509,30 +509,33 @@ function openPicklist(picklistNum) {
       $("#main-content").hide().html(data).fadeIn(200);
 
       $.ajax({
-        url: "dirs/incoming/dashboard/actions/get_incomingbreakdown.php",
+        // url: "dirs/incoming/dashboard/actions/get_incomingbreakdown.php",
+        url: "dirs/incoming/dashboard/actions/get_picklist_requests.php",
         type: "POST",
         dataType: "json",
-        data: { picklistNum: picklistNum },
+        data: { PKList_Number: picklistNum },
         success: function (response) {
           $("#picklistNumDisplay").text(picklistNum);
           let rows = [];
           let existingSeries = new Set();
           if (response.isSuccess === "success") {
             let sortedData = response.Data.sort(
-              (a, b) => Number(b.BaseNum_SRN || 0) - Number(a.RowNum || 0),
+              (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
             );
 
             sortedData.forEach((item) => {
-              if (existingSeries.has(item.BaseNum_SRN)) {
+              console.log(`SRN DATA: ${JSON.stringify(item)}`);
+              // console.log(`SRN: ${item.SR_Number}`);
+              if (existingSeries.has(item.SR_Number)) {
                 return;
               }
 
-              existingSeries.add(item.BaseNum_SRN);
+              existingSeries.add(item.SR_Number);
 
               rows.push([
-                item.BaseNum_SRN || "",
-                item.DocDate || "",
-                item.ReqBranch || "",
+                item.SR_Number || "",
+                item.ExecDate || "",
+                item.Req_Branch || "",
               ]);
             });
             $("#picklistItemTable").DataTable().clear().destroy();
@@ -543,12 +546,13 @@ function openPicklist(picklistNum) {
                 { title: "Date", className: "text-start ps-5" },
                 { title: "Requesting Branch", className: "text-start ps-5" },
               ],
-              createdRow: function (row, data, dataIndex) {
-                let originalItem = sortedData[dataIndex];
+              // createdRow: function (row, data, dataIndex) {
+              createdRow: function (row, data) {
+                // let originalItem = sortedData[dataIndex];
 
                 $(row)
-                  .attr("data-srn", originalItem.BaseNum_SRN)
-                  .attr("data-rownum", originalItem.RowNum)
+                  .attr("data-srn", data.SR_Number)
+                  .attr("data-docentry", data.DocEntry)
                   .addClass("picklist-row");
               },
               paging: true,
@@ -558,13 +562,19 @@ function openPicklist(picklistNum) {
               autoWidth: false,
               order: [[0, "desc"]],
               rowCallback: function (row, data) {
+                const isEmpty = !data[0];
                 $("td", row).css({
                   background: "#FFFBDF",
                   padding: "3px",
                   height: "40px",
                   "min-height": "40px",
+                  cursor: isEmpty ? "default" : "pointer",
                 });
-                $("td:eq(0)", row).addClass("text-primary");
+
+                if (!isEmpty) {
+                  $("td:eq(0)", row).addClass("text-primary");
+                }
+
                 $("td:eq(2)", row).css("text-align", "start");
 
                 $(row).hover(
@@ -590,7 +600,6 @@ function openPicklist(picklistNum) {
                     background: "#FFFBDF",
                     height: "40px",
                     "min-height": "40px",
-                    cursor: "pointer",
                   });
                   $emptyRow.hover(
                     function () {
@@ -669,18 +678,18 @@ function loadBasketContent() {
 }
 
 // ALREADY HAS A PICKLIST NUMBER
-function openPicklistedForm(RowNum) {
+function openPicklistedForm(SR_Number) {
   $("#pageLoader").removeClass("d-none");
   $.post(
     "dirs/incoming/dashboard/picklistedForm.php",
-    { RowNum: RowNum },
+    { SR_Number: SR_Number },
     function (data) {
       $("#main-content").hide().html(data).fadeIn(200);
 
       $.ajax({
-        url: "dirs/incoming/dashboard/actions/get_openincoming.php",
+        url: "dirs/incoming/dashboard/actions/get_stock_request_breakdown.php",
         type: "POST",
-        data: { RowNum: RowNum },
+        data: { SR_Number: SR_Number },
         dataType: "json",
         success: function (response) {
           if (response.isSuccess === "success") {
@@ -690,39 +699,42 @@ function openPicklistedForm(RowNum) {
             let header = response.Data;
             let items = response.Items;
 
+            // console.log(`SRN HEADER: ${JSON.stringify(header)}`);
+            // console.log(`SRN ITEM: ${JSON.stringify(items)}`);
+
             function selectedValue(selector, value) {
               $(selector)
                 .empty()
                 .append(`<option value="${value}">${value}</option>`);
             }
 
-            selectedValue("#typeOfReq", header.RequestType);
-            selectedValue("#destination", header.Destination);
-            selectedValue("#branchWhCode", header.DestinationWhs);
-            selectedValue("#origin", header.Origin);
-            selectedValue("#whcode", header.OriginWhs);
+            selectedValue("#typeOfReq", header.TypeRequest);
+            selectedValue("#destination", header.Req_Branch);
+            selectedValue("#branchWhCode", header.Req_Whscode);
+            selectedValue("#origin", header.BranchSetup);
+            selectedValue("#whcode", header.BranchOrigin_Whscode);
 
             // ================= HEADER =================
-            $("#srn").val(header.BaseNum_SRN);
+            $("#srn").val(header.SR_Number);
             $("#date").val(header.DocDate);
             $("#status").val(header.RequestStatus);
-            $("#purpose").val(header.RequestPurpose);
-            $("#reqBy").val(header.PrepBy);
+            $("#purpose").val(header.PurposeRequest);
+            $("#reqBy").val(header.RequestedBy);
             $("#remarks").val(header.Remarks);
 
             // ================= ITEMS =================
             let rows = "";
 
             items.forEach(function (item, index) {
-              let quantity = parseFloat(item.Quantity) || 0;
+              let quantity = Math.trunc(Number(item.Req_Item_Qty) || 0);
               totalQty += quantity;
               rows += `
                       <tr style="height: 40px; min-height: 40px">
-                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${index + 1}</td>
-                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Brand}</td>
-                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Model}</td>
-                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Category}</td>
-                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
+                        <td class="align-middle ps-3" style="background:#F2F2F2; padding: 3px">${index + 1}</td>
+                        <td class="align-middle ps-3" style="background:#F2F2F2; padding: 3px">${item.Req_ItemBrand}</td>
+                        <td class="align-middle ps-3" style="background:#F2F2F2; padding: 3px">${item.Req_ItemName}</td>
+                        <td class="align-middle ps-3" style="background:#F2F2F2; padding: 3px">${item.Req_ItemCategory}</td>
+                        <td class="align-middle ps-3" style="background:#F2F2F2; padding: 3px">${Math.trunc(Number(item.Req_Item_Qty) || 0)}</td>
                       </tr>
                     `;
             });
@@ -736,11 +748,11 @@ function openPicklistedForm(RowNum) {
               for (let i = 0; i < emptyRowsNeeded; i++) {
                 let emptyRow = `
                         <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
-                          <td style="background: #FFFBDF"></td>
-                          <td style="background: #FFFBDF"></td>
-                          <td style="background: #FFFBDF"></td>
-                          <td style="background: #FFFBDF"></td>
-                          <td style="background: #FFFBDF"></td>
+                          <td style="background: #F2F2F2"></td>
+                          <td style="background: #F2F2F2"></td>
+                          <td style="background: #F2F2F2"></td>
+                          <td style="background: #F2F2F2"></td>
+                          <td style="background: #F2F2F2"></td>
                         </tr>
                       `;
                 $("#openIncomingTable tbody").append(emptyRow);
@@ -791,10 +803,8 @@ function loadBasket() {
           );
 
           // console.log(`PICKLIST BASKET DATA: ${JSON.stringify(sortedData)}`);
-          // console.log(``);
 
           sortedData.forEach((item) => {
-            // console.log(`PICKLIST DETAILS: ${JSON.stringify(item)}`);
             const date = new Date(item.DocDate);
             const formatted = date.toISOString().split("T")[0];
             rows.push([
@@ -1051,29 +1061,51 @@ function encodeQty(picklistNum, rowNum) {
         success: function (response) {
           if (response.isSuccess === "success") {
             let rowCount = response.Data.length;
+            let items = response.Data;
+
+            let groupedItems = {};
+
+            items.forEach((item) => {
+              let key = item.Req_ItemName; // ← change if "model" means something else
+
+              let qty = Math.trunc(Number(item.Req_Item_Qty) || 0);
+
+              if (!groupedItems[key]) {
+                groupedItems[key] = {
+                  Item_id: item.Item_id,
+                  Req_ItemBrand: item.Req_ItemBrand,
+                  Req_ItemName: item.Req_ItemName,
+                  Req_ItemCategory: item.Req_ItemCategory,
+                  DocEntry: item.DocEntry,
+                  totalQty: 0,
+                };
+              }
+
+              groupedItems[key].totalQty += qty;
+            });
+
+            let index = 0;
             let totalQty = 0;
 
-            let items = response.Data;
             srNumberMap = response.Data.map((item) => item.SR_Number);
             formattedDate();
             let rows = "";
-
             let picklistEntry = "";
 
-            console.log(`ITEMS: ${JSON.stringify(items)}`);
+            Object.values(groupedItems).forEach((item) => {
+              console.log(`ITEMS: ${JSON.stringify(item)}`);
 
-            items.forEach(function (item, index) {
-              let itemQty = Math.trunc(Number(item.Req_Item_Qty) || 0);
-              totalQty += itemQty;
+              totalQty += item.totalQty;
               picklistEntry = item.DocEntry;
+              index++;
               rows += `
                 <tr style="height: 40px; min-height: 40px" data-docEntry="${item.DocEntry}">
-                  <td class="align-middle ps-3 d-none" style="background:#FFFBDF; padding: 3px">${item.Item_id}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${index + 1}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Req_ItemBrand}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Req_ItemName}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Req_ItemCategory}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${itemQty}</td>
+                  <td class="align-middle ps-3 d-none" style="background: #F2F2F2; padding: 3px">${item.Item_id}</td>
+                  <td class="align-middle ps-3" style="background: #F2F2F2; padding: 3px">${index}</td>
+                  <td class="align-middle ps-3" style="background: #F2F2F2; padding: 3px">${item.Req_ItemBrand}</td>
+                  <td class="align-middle ps-3" style="background: #F2F2F2; padding: 3px">${item.Req_ItemName}</td>
+                  <td class="align-middle ps-3" style="background: #F2F2F2; padding: 3px">${item.Req_ItemCategory}</td>
+                  <td class="align-middle ps-3" style="background: #F2F2F2; padding: 3px">${item.totalQty}</td>
                   <td class="align-middle ps-3 editable-cell" style="background:#FFFBDF; padding: 3px" contenteditable="true" onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)"></td>
                 </tr>
               `;
@@ -1220,7 +1252,6 @@ function submitEncodedQty(PicklistEntry, picklistNum) {
 
           // single values
           formData.append("ExecutedBy", executedBy);
-          // formData.append("SR_Number[]", $("#pklist").val());
           let srnIndex = 0;
 
           console.log(`ENCODED ITEMS: ${JSON.stringify(encodedItems)}`);

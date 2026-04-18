@@ -462,6 +462,22 @@ function loadDeliveryBasket(tableId, url) {
               );
               tableBody.append($emptyRow);
             }
+
+            const selectionMode =
+              $("#basketTableAssigned").data("selectionMode") || false;
+
+            // Target dropdown buttons
+            $(tableId + " tbody tr").each(function () {
+              const dropdownBtn = $(this).find(
+                "button[data-bs-toggle='dropdown']",
+              );
+
+              if (selectionMode) {
+                dropdownBtn.prop("disabled", true).addClass("disabled");
+              } else {
+                dropdownBtn.prop("disabled", false).removeClass("disabled");
+              }
+            });
           },
         });
       } else {
@@ -520,9 +536,6 @@ function toggleDelivery() {
       }
     });
 
-    // console.log(`AVAILABLE ROWS: ${availableRows}`);
-    // console.log(`BATCH CONTAINER: ${batchContainer}`);
-
     if (availableRows === 0) {
       Swal.fire({
         icon: "warning",
@@ -565,11 +578,20 @@ function toggleDelivery() {
     loadDeliveryBtn.textContent = "Add Items";
 
     // ✅ Save state
-    // $("#basketTableDashboard").data("selectionMode", true);
     $("#basketTableAssigned").data("selectionMode", true);
-
+    // updateDropdownState();
     return;
   }
+
+  // function updateDropdownState() {
+  //   const selectionMode =
+  //     $("#basketTableAssigned").data("selectionMode") || false;
+
+  //   $("#basketTableAssigned")
+  //     .find("button[data-bs-toggle='dropdown']")
+  //     .prop("disabled", selectionMode)
+  //     .toggleClass("disabled", selectionMode);
+  // }
 
   // =========================
   // ✅ SECOND CLICK (GET SELECTED)
@@ -2365,26 +2387,25 @@ function getBatchItems(batchContainer) {
     dataType: "json",
     success: function (response) {
       let items = response.Data;
-      let deliveryTable = $("#deliveryFormTable tbody")
+      let deliveryTable = $("#deliveryFormTable tbody");
       let totalQty = 0;
-      let counter = 0
+      let counter = 0;
 
       if (response.isSuccess === "success") {
-
         let groupedItems = {};
 
-      items.forEach(item => {
-        let code = item.ItemCode;
+        items.forEach((item) => {
+          let code = item.ItemCode;
 
-        if (!groupedItems[code]) {
-          groupedItems[code] = {
-            ...item,
-            Deliver_Qty: parseInt(item.Deliver_Qty) || 0
-          };
-        } else {
-          groupedItems[code].Deliver_Qty += parseInt(item.Deliver_Qty) || 0;
-        }
-      });
+          if (!groupedItems[code]) {
+            groupedItems[code] = {
+              ...item,
+              Deliver_Qty: parseInt(item.Deliver_Qty) || 0,
+            };
+          } else {
+            groupedItems[code].Deliver_Qty += parseInt(item.Deliver_Qty) || 0;
+          }
+        });
 
         // items.forEach((item) => {
         Object.values(groupedItems).forEach((item) => {
@@ -2395,12 +2416,13 @@ function getBatchItems(batchContainer) {
           totalQty += item.Deliver_Qty;
 
           let row = `
-            <tr style="height: 40px; min-height:40px; cursor: pointer;" data-itemCode="${item.ItemCode}">
+            <tr class="item-row" style="height: 40px; min-height:40px; cursor: pointer;" data-itemCode="${item.ItemCode}">
               <td class="align-middle ps-3" style="background: #FFFBDF;">${counter}</td>
-              <td class="align-middle ps-3" style="background: #FFFBDF;">${item.ItemBrand}</td>
-              <td class="align-middle ps-3" style="background: #FFFBDF;">${item.Model}</td>
-              <td class="align-middle ps-3" style="background: #FFFBDF;">${item.ItemCategory}</td>
-              <td class="align-middle ps-3 text-center" style="background: #FFFBDF;">${item.Deliver_Qty}</td>
+              <td class="align-middle ps-3 item-brand" style="background: #FFFBDF;">${item.ItemBrand}</td>
+              <td class="align-middle ps-3 item-model" style="background: #FFFBDF;">${item.Model}</td>
+              <td class="d-none item-code">${item.ItemCode}</td>
+              <td class="align-middle ps-3 item-category" style="background: #FFFBDF;">${item.ItemCategory}</td>
+              <td class="align-middle ps-3 text-center item-quantity" style="background: #FFFBDF;">${item.Deliver_Qty}</td>
               <td class="align-middle ps-3" style="background: #FFFBDF;"></td>
             </tr>
           `;
@@ -2411,27 +2433,27 @@ function getBatchItems(batchContainer) {
         $("#delTotalQuantity").text(totalQty);
 
         for (let j = items.length; j <= 8; j++) {
-            let emptyRow = $(`
+          let emptyRow = $(`
               <tr class="empty-row">
                 <td colspan="6" style="background: #FFFBDF"></td>   
-              </tr>`)
+              </tr>`);
 
-              $(emptyRow).css({
-              background: "#FFFBDF",
-              height: "40px",
-            });
+          $(emptyRow).css({
+            background: "#FFFBDF",
+            height: "40px",
+          });
 
-            emptyRow.hover(
-              function () {
-                $("td:not(:first-child)", this).css("background", "#FFF4C2");
-              },
-              function () {
-                $("td:not(:first-child)", this).css("background", "#FFFBDF");
-              },
-            );
+          emptyRow.hover(
+            function () {
+              $("td:not(:first-child)", this).css("background", "#FFF4C2");
+            },
+            function () {
+              $("td:not(:first-child)", this).css("background", "#FFFBDF");
+            },
+          );
 
-            deliveryTable.append(emptyRow);
-          }
+          deliveryTable.append(emptyRow);
+        }
       }
     },
   });
@@ -2442,7 +2464,7 @@ function submitDelivery() {
     e.preventDefault();
 
     let items = [];
-    $("#finalDeliveryTable tbody tr.item-row")
+    $("#deliver tbody tr.item-row")
       .not(".empty-row")
       .each(function () {
         let brand = $(this).find(".item-brand").text().trim();
@@ -2506,10 +2528,10 @@ function submitDelivery() {
     //   `pdf/requests.php?batch=${batch}&branches=${encodeURIComponent(branches)}`,
     //   "_blank",
     // );
-    window.open(
-      `pdf/delivery.php?data=${encodeURIComponent(JSON.stringify(formObject))}`,
-      "_blank",
-    );
+    // window.open(
+    //   `pdf/delivery.php?data=${encodeURIComponent(JSON.stringify(formObject))}`,
+    //   "_blank",
+    // );
     //       });
     //     }
 
@@ -2526,14 +2548,19 @@ function submitDelivery() {
     //     }
     //   },
     // });
+
+    window.open(
+      `pdf/delivery.php?data=${encodeURIComponent(JSON.stringify(formObject))}`,
+      "_blank",
+    );
   });
 }
 
 function getDeliveryDetails() {
   const truckData = {
-    4: ["ABC-123", "DEF-456"],
-    6: ["GHI-789", "JKL-012"],
-    10: ["MNO-345", "PQR-678"],
+    "4 Wheeler": ["ABC-123", "DEF-456"],
+    "6 Wheeler": ["GHI-789", "JKL-012"],
+    "10 Wheeler": ["MNO-345", "PQR-678"],
   };
 
   document.getElementById("truckCat").addEventListener("change", function () {
@@ -2552,8 +2579,6 @@ function getDeliveryDetails() {
       });
     }
   });
-
-  // console.log(`I WAS CALLED`)
 }
 
 // ORIGINAL
@@ -2583,10 +2608,10 @@ function createDr(batchContainer) {
   $.post("dirs/basket/dashboard/createDr.php", function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
     get_userinfo();
-    // loadIAPBranchlist();
     deliveryDate();
     getBatchItems(batchContainer);
     getDeliveryDetails();
+    submitDelivery();
 
     const addBtn = document.getElementById("addDeliveryModalBtn");
     const newItemModal = new bootstrap.Modal(
@@ -2769,222 +2794,222 @@ function loadDestinationWhscodes(Branch) {
 }
 
 // EDIT BRANCH ASSIGNMENT
-function editAssignBranch(lbNum, picklistDr, previousSerials = []) {
-  $.post("dirs/basket/dashboard/editAssignment.php", {}, function (data) {
-    $("#main-content").hide().html(data).fadeIn(200);
+// function editAssignBranch(lbNum, picklistDr, previousSerials = []) {
+//   $.post("dirs/basket/dashboard/editAssignment.php", {}, function (data) {
+//     $("#main-content").hide().html(data).fadeIn(200);
 
-    loadImperialBrands();
-    loadIAPBranchlist();
-    summaryData();
+//     loadImperialBrands();
+//     loadIAPBranchlist();
+//     summaryData();
 
-    $(document)
-      .off("input", "#branchAssignmentTable td[contenteditable='true']")
-      .on(
-        "input",
-        "#branchAssignmentTable td[contenteditable='true']",
-        function () {
-          validateBranchAssignment();
-        },
-      );
+//     $(document)
+//       .off("input", "#branchAssignmentTable td[contenteditable='true']")
+//       .on(
+//         "input",
+//         "#branchAssignmentTable td[contenteditable='true']",
+//         function () {
+//           validateBranchAssignment();
+//         },
+//       );
 
-    submitBranchDelivery();
+//     submitBranchDelivery();
 
-    $("#newBrand").on("change", function () {
-      $("#newModel").html('<option value="">Select Model</option>');
-      $("#newCategory").val("");
-      $("#itemcode").val("");
-      loadImperialModel();
-    });
+//     $("#newBrand").on("change", function () {
+//       $("#newModel").html('<option value="">Select Model</option>');
+//       $("#newCategory").val("");
+//       $("#itemcode").val("");
+//       loadImperialModel();
+//     });
 
-    $("#newModel").on("change", function () {
-      const selected = $(this).find(":selected");
-      $("#newCategory").val(selected.data("category") || "");
-      $("#itemcode").val(selected.data("itemcode") || "");
-    });
+//     $("#newModel").on("change", function () {
+//       const selected = $(this).find(":selected");
+//       $("#newCategory").val(selected.data("category") || "");
+//       $("#itemcode").val(selected.data("itemcode") || "");
+//     });
 
-    $.ajax({
-      url: "dirs/basket/dashboard/actions/get_loadingbasket.php",
-      type: "POST",
-      data: { BatchNumber: lbNum },
-      dataType: "json",
-      success: function (response) {
-        if (response.isSuccess === "success") {
-          let header = response.Header;
-          let items = response.Items;
-          let item = items[0] || {};
-          let existingEditTotal = parseInt($("#editSummaryQty").text()) || 0;
-          let editTotalQty = 0;
-          let editRowCount = items.length;
+//     $.ajax({
+//       url: "dirs/basket/dashboard/actions/get_loadingbasket.php",
+//       type: "POST",
+//       data: { BatchNumber: lbNum },
+//       dataType: "json",
+//       success: function (response) {
+//         if (response.isSuccess === "success") {
+//           let header = response.Header;
+//           let items = response.Items;
+//           let item = items[0] || {};
+//           let existingEditTotal = parseInt($("#editSummaryQty").text()) || 0;
+//           let editTotalQty = 0;
+//           let editRowCount = items.length;
 
-          let allowedItemCodes = items.map((item) => item.ItemCode);
+//           let allowedItemCodes = items.map((item) => item.ItemCode);
 
-          $("#lbnum").val(lbNum);
-          $("#pcklstno").val(header.PKList_Number);
-          $("#docdate").val(header.DocDate.substring(0, 10));
-          $("#origin").val(item.Destination || "");
-          $("#whcode").val(item.DWhscode || "");
-          $("#status").val("NEW");
-          $("#remarks").val(header.Remarks);
-          $("#prepby").val(header.PickedBy);
+//           $("#lbnum").val(lbNum);
+//           $("#pcklstno").val(header.PKList_Number);
+//           $("#docdate").val(header.DocDate.substring(0, 10));
+//           $("#origin").val(item.Destination || "");
+//           $("#whcode").val(item.DWhscode || "");
+//           $("#status").val("NEW");
+//           $("#remarks").val(header.Remarks);
+//           $("#prepby").val(header.PickedBy);
 
-          // MANUAL OR SCAN
-          function toggler() {
-            const toggler = document.getElementById("serialToggler");
-            const knob = document.querySelector(".switch-knob");
-            const manual = document.querySelector(".switch-track .manual");
-            const scan = document.querySelector(".switch-track .scan");
-            const serialInput = document.getElementById("newSerial");
+//           // MANUAL OR SCAN
+//           function toggler() {
+//             const toggler = document.getElementById("serialToggler");
+//             const knob = document.querySelector(".switch-knob");
+//             const manual = document.querySelector(".switch-track .manual");
+//             const scan = document.querySelector(".switch-track .scan");
+//             const serialInput = document.getElementById("newSerial");
 
-            function updateKnob() {
-              scan.style.transition = "opacity 0.3s ease";
-              manual.style.transition = "opacity 0.3s ease";
+//             function updateKnob() {
+//               scan.style.transition = "opacity 0.3s ease";
+//               manual.style.transition = "opacity 0.3s ease";
 
-              if (toggler.checked) {
-                toggler.dataset.value = "Scan";
-                knob.style.width = "55px";
-                knob.style.transform = "translateX(8px)";
-                scan.classList.add("text-white");
-                manual.style.opacity = "0";
-                manual.style.pointerEvents = "none";
-                scan.style.opacity = "1";
-                scan.style.pointerEvents = "auto";
-                serialInput.value = "";
-                serialInput.addEventListener("keydown", preventTyping);
-              } else {
-                toggler.dataset.value = "Manual";
-                knob.style.width = "60px";
-                knob.style.transform = "translateX(0px)";
-                manual.classList.add("text-white");
-                scan.style.opacity = "0";
-                scan.style.pointerEvents = "none";
-                manual.style.opacity = "1";
-                manual.style.pointerEvents = "auto";
-                serialInput.removeEventListener("keydown", preventTyping);
-              }
-            }
+//               if (toggler.checked) {
+//                 toggler.dataset.value = "Scan";
+//                 knob.style.width = "55px";
+//                 knob.style.transform = "translateX(8px)";
+//                 scan.classList.add("text-white");
+//                 manual.style.opacity = "0";
+//                 manual.style.pointerEvents = "none";
+//                 scan.style.opacity = "1";
+//                 scan.style.pointerEvents = "auto";
+//                 serialInput.value = "";
+//                 serialInput.addEventListener("keydown", preventTyping);
+//               } else {
+//                 toggler.dataset.value = "Manual";
+//                 knob.style.width = "60px";
+//                 knob.style.transform = "translateX(0px)";
+//                 manual.classList.add("text-white");
+//                 scan.style.opacity = "0";
+//                 scan.style.pointerEvents = "none";
+//                 manual.style.opacity = "1";
+//                 manual.style.pointerEvents = "auto";
+//                 serialInput.removeEventListener("keydown", preventTyping);
+//               }
+//             }
 
-            function preventTyping(e) {
-              const allowedKeys = ["Enter", "Tab"];
-              if (!allowedKeys.includes(e.key)) {
-                e.preventDefault();
-              }
-            }
+//             function preventTyping(e) {
+//               const allowedKeys = ["Enter", "Tab"];
+//               if (!allowedKeys.includes(e.key)) {
+//                 e.preventDefault();
+//               }
+//             }
 
-            updateKnob();
+//             updateKnob();
 
-            toggler.addEventListener("change", updateKnob);
-          }
+//             toggler.addEventListener("change", updateKnob);
+//           }
 
-          // PRESET SUMMARY DATA
-          let editRow = [];
-          let editSummaryTable = $("#editSummaryTable tbody");
-          for (i = 0; i < items.length; i++) {
-            editTotalQty += parseInt(items[i].Deliver_Qty);
-            if (header.LoadingBasket_Status == "A") {
-              editRow = `
-                <tr style="height: 40px; min-height: 40px; cursor: pointer" data-itemCode="${items[i].ItemCode}">
-                  <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemBrand}</td>
-                  <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemName}</td>
-                  <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemCategory}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${items[i].Deliver_Qty}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
-                    <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">Assigned</span>
-                  </td>
-                </tr>`;
-            } else {
-              editRow = `
-                <tr style="height: 40px; min-height: 40px; cursor: pointer" data-itemCode="${items[i].ItemCode}">
-                  <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemBrand}</td>
-                  <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemName}</td>
-                  <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemCategory}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${items[i].Deliver_Qty}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
-                    <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">Unassigned</span>
-                  </td>
-                </tr>`;
-            }
-          }
+//           // PRESET SUMMARY DATA
+//           let editRow = [];
+//           let editSummaryTable = $("#editSummaryTable tbody");
+//           for (i = 0; i < items.length; i++) {
+//             editTotalQty += parseInt(items[i].Deliver_Qty);
+//             if (header.LoadingBasket_Status == "A") {
+//               editRow = `
+//                 <tr style="height: 40px; min-height: 40px; cursor: pointer" data-itemCode="${items[i].ItemCode}">
+//                   <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemBrand}</td>
+//                   <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemName}</td>
+//                   <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemCategory}</td>
+//                   <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${items[i].Deliver_Qty}</td>
+//                   <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
+//                     <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">Assigned</span>
+//                   </td>
+//                 </tr>`;
+//             } else {
+//               editRow = `
+//                 <tr style="height: 40px; min-height: 40px; cursor: pointer" data-itemCode="${items[i].ItemCode}">
+//                   <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemBrand}</td>
+//                   <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemName}</td>
+//                   <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${items[i].ItemCategory}</td>
+//                   <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${items[i].Deliver_Qty}</td>
+//                   <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
+//                     <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">Unassigned</span>
+//                   </td>
+//                 </tr>`;
+//             }
+//           }
 
-          $("#editSummaryQty").text(editTotalQty);
-          editSummaryTable.append(editRow);
+//           $("#editSummaryQty").text(editTotalQty);
+//           editSummaryTable.append(editRow);
 
-          for (let j = editRowCount; j < 8; j++) {
-            let editEmptyRow = $(`
-                <tr class="empty-row">
-                  <td colspan="5" style="background:#FFFBDF"></td>
-                </tr>
-              `);
+//           for (let j = editRowCount; j < 8; j++) {
+//             let editEmptyRow = $(`
+//                 <tr class="empty-row">
+//                   <td colspan="5" style="background:#FFFBDF"></td>
+//                 </tr>
+//               `);
 
-            $(editEmptyRow).css({
-              background: "#FFFBDF",
-              height: "40px",
-            });
+//             $(editEmptyRow).css({
+//               background: "#FFFBDF",
+//               height: "40px",
+//             });
 
-            editEmptyRow.hover(
-              function () {
-                $("td:not(:first-child)", this).css("background", "#FFF4C2");
-              },
-              function () {
-                $("td:not(:first-child)", this).css("background", "#FFFBDF");
-              },
-            );
+//             editEmptyRow.hover(
+//               function () {
+//                 $("td:not(:first-child)", this).css("background", "#FFF4C2");
+//               },
+//               function () {
+//                 $("td:not(:first-child)", this).css("background", "#FFFBDF");
+//               },
+//             );
 
-            editSummaryTable.append(editEmptyRow);
-          }
+//             editSummaryTable.append(editEmptyRow);
+//           }
 
-          // FOR NON-SERIALIZE ITEMS
-          const addBtn = document.getElementById("addDeliveryModalBtn");
-          const newItemModal = new bootstrap.Modal(
-            document.getElementById("addDeliveryModal"),
-          );
+//           // FOR NON-SERIALIZE ITEMS
+//           const addBtn = document.getElementById("addDeliveryModalBtn");
+//           const newItemModal = new bootstrap.Modal(
+//             document.getElementById("addDeliveryModal"),
+//           );
 
-          let allowNonserialize = false;
+//           let allowNonserialize = false;
 
-          addBtn.addEventListener("click", function () {
-            if (allowNonserialize) {
-              newItemModal.show();
-              return;
-            }
+//           addBtn.addEventListener("click", function () {
+//             if (allowNonserialize) {
+//               newItemModal.show();
+//               return;
+//             }
 
-            Swal.fire({
-              title: "Enter non-serialize items?",
-              text: "Please confirm before proceeding.",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonText: "Allow",
-              cancelButtonText: "Cancel",
-            }).then((result) => {
-              if (result.isConfirmed) {
-                allowNonserialize = true;
-                newItemModal.show();
-              }
-            });
-          });
+//             Swal.fire({
+//               title: "Enter non-serialize items?",
+//               text: "Please confirm before proceeding.",
+//               icon: "warning",
+//               showCancelButton: true,
+//               confirmButtonText: "Allow",
+//               cancelButtonText: "Cancel",
+//             }).then((result) => {
+//               if (result.isConfirmed) {
+//                 allowNonserialize = true;
+//                 newItemModal.show();
+//               }
+//             });
+//           });
 
-          serialDeliveryInput(
-            lbNum,
-            picklistDr,
-            previousSerials,
-            allowedItemCodes,
-          );
-          addNonSerialize("", lbNum, picklistDr, allowedItemCodes);
+//           serialDeliveryInput(
+//             lbNum,
+//             picklistDr,
+//             previousSerials,
+//             allowedItemCodes,
+//           );
+//           addNonSerialize("", lbNum, picklistDr, allowedItemCodes);
 
-          function adjustTotalWidth() {
-            const editSummaryTable =
-              document.getElementById("editSummaryTable");
-            const totalRow = document.getElementById("totalRowOutside");
+//           function adjustTotalWidth() {
+//             const editSummaryTable =
+//               document.getElementById("editSummaryTable");
+//             const totalRow = document.getElementById("totalRowOutside");
 
-            if (editSummaryTable && totalRow) {
-              totalRow.style.width = editSummaryTable.offsetWidth + "px";
-            }
-          }
+//             if (editSummaryTable && totalRow) {
+//               totalRow.style.width = editSummaryTable.offsetWidth + "px";
+//             }
+//           }
 
-          toggler();
-          adjustTotalWidth();
-          window.addEventListener("resize", adjustTotalWidth);
-          submitBranchAssignment();
-        }
-      },
-    });
-  });
-}
+//           toggler();
+//           adjustTotalWidth();
+//           window.addEventListener("resize", adjustTotalWidth);
+//           submitBranchAssignment();
+//         }
+//       },
+//     });
+//   });
+// }

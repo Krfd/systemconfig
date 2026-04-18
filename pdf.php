@@ -39,7 +39,6 @@ try {
 
         function Header()
         {
-            // $this->Image('assets/image/header/header.png', 5, 10, 190);
             $this->Image('assets/image/logo/iap_icon.png', 10, 10, 30);
             $this->SetFont('Arial', 'B', 20);
             $pageWidth = $this->GetPageWidth();
@@ -51,7 +50,6 @@ try {
 
         function Footer()
         {
-            // $this->Image('assets/image/footer/footer.jpg', 10, 270, 190);
             $this->SetTextColor($GLOBALS['textColor'][0], $GLOBALS['textColor'][1], $GLOBALS['textColor'][2]);
             $this->SetY(-15);
             $this->SetFont('Arial', '', 8);
@@ -181,8 +179,6 @@ try {
     function bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $timestamp, $textColor)
     {
         $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
-        // $pdf->SetY(-100);
-        // $pdf->SetX(10);
         $pdf->Ln(5); // 5mm gap after table
         $pdf->SetX(10);
 
@@ -211,12 +207,88 @@ try {
         $pdf->SetFont('Arial', '', 9);
         $pdf->Cell(0, 5, $remarks, 0, 1);
 
-        // $pdf->SetFont('Arial', '', 9);
-        // $pdf->Cell(0, 5, 'Timestamp', 0, 1);
-
         $pdf->SetFont('Arial', '', 9);
         $pdf->Cell(0, 5, $timestamp, 0, 1);
     }
+
+    // function renderItemsTable($pdf, $itemData, $textColor)
+    // {
+    //     /* ---------- TITLE ---------- */
+    //     $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
+    //     $pdf->Ln(3);
+
+    //     $pdf->SetFont('Arial', 'B', 9);
+    //     $headers = [
+    //         '#' => 10,
+    //         'Category' => 40,
+    //         'Model' => 80,
+    //         'Brand' => 35,
+    //         'Quantity' => 20
+    //     ];
+
+    //     // Header row
+    //     foreach ($headers as $text => $width) {
+    //         $pdf->Cell($width, 6, $text, 1, 0, 'C');
+    //     }
+    //     $pdf->Ln();
+    //     $pdf->SetFont('Arial', '', 9);
+
+    //     $lineHeight = 5;
+    //     $i = 1;
+    //     $totalQty = 0;
+
+    //     foreach ($itemData as $row) {
+    //         $totalQty += $row->Request_Qty;
+
+    //         // Calculate lines for each column
+    //         $brandLines = $pdf->NbLines($headers['Brand'], $row->ItemBrand);
+    //         $modelLines = $pdf->NbLines($headers['Model'], $row->ItemName);
+    //         $categoryLines = $pdf->NbLines($headers['Category'], $row->ItemCategory);
+
+    //         $maxLines = max($brandLines, $modelLines, $categoryLines, 1);
+    //         $rowHeight = $lineHeight * $maxLines;
+
+    //         $x = $pdf->GetX();
+    //         $y = $pdf->GetY();
+
+    //         /* ---------- COLUMN # ---------- */
+    //         $pdf->MultiCell($headers['#'], $rowHeight, $i, 1, 'C');
+    //         $pdf->SetXY($x + $headers['#'], $y);
+
+    //         /* ---------- BRAND ---------- */
+    //         $pdf->MultiCell($headers['Brand'], $rowHeight, $row->ItemBrand, 1);
+    //         $pdf->SetXY($x + $headers['#'] + $headers['Brand'], $y);
+
+    //         /* ---------- MODEL ---------- */
+    //         $modelText = $row->ItemName;
+
+    //         // Shrink font if too wide
+    //         if ($pdf->GetStringWidth($modelText) > $headers['Model']) {
+    //             $pdf->SetFont('Arial', '', 8); // shrink font
+    //         } else {
+    //             $pdf->SetFont('Arial', '', 9); // normal font
+    //         }
+
+    //         // Output as a single line cell (no MultiCell)
+    //         $pdf->Cell($headers['Model'], $rowHeight, $modelText, 1);
+    //         $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'], $y);
+
+    //         /* ---------- CATEGORY ---------- */
+    //         $pdf->MultiCell($headers['Category'], $rowHeight, $row->ItemCategory, 1);
+    //         $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'], $y);
+
+    //         /* ---------- QUANTITY ---------- */
+    //         $pdf->MultiCell($headers['Quantity'], $rowHeight, $row->Request_Qty, 1, 'C');
+
+    //         $i++;
+    //     }
+
+    //     // ---------- TOTAL QUANTITY ----------
+    //     $pdf->SetFont('Arial', 'B', 9);
+    //     $labelWidth = $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'];
+    //     $pdf->Cell($labelWidth, 6, 'Total Quantity', 1, 0, 'C');
+    //     $pdf->Cell($headers['Quantity'], 6, $totalQty, 1, 1, 'C');
+    // }
 
     function renderItemsTable($pdf, $itemData, $textColor)
     {
@@ -225,11 +297,13 @@ try {
         $pdf->Ln(3);
 
         $pdf->SetFont('Arial', 'B', 9);
+
+        /* ---------- SWAPPED HEADERS ---------- */
         $headers = [
             '#' => 10,
-            'Brand' => 35,
-            'Model' => 80,
             'Category' => 40,
+            'Model' => 80,
+            'Brand' => 35,
             'Quantity' => 20
         ];
 
@@ -238,6 +312,7 @@ try {
             $pdf->Cell($width, 6, $text, 1, 0, 'C');
         }
         $pdf->Ln();
+
         $pdf->SetFont('Arial', '', 9);
 
         $lineHeight = 5;
@@ -245,54 +320,57 @@ try {
         $totalQty = 0;
 
         foreach ($itemData as $row) {
-            $totalQty += $row->Request_Qty;
 
-            // Calculate lines for each column
-            $brandLines = $pdf->NbLines($headers['Brand'], $row->ItemBrand);
-            $modelLines = $pdf->NbLines($headers['Model'], $row->ItemName);
+            $qty = (int) $row->Request_Qty;
+            $totalQty += $qty;
+
+            // Calculate lines for wrapping
             $categoryLines = $pdf->NbLines($headers['Category'], $row->ItemCategory);
+            $modelLines    = $pdf->NbLines($headers['Model'], $row->ItemName);
+            $brandLines    = $pdf->NbLines($headers['Brand'], $row->ItemBrand);
 
-            $maxLines = max($brandLines, $modelLines, $categoryLines, 1);
+            $maxLines = max($categoryLines, $modelLines, $brandLines, 1);
             $rowHeight = $lineHeight * $maxLines;
 
             $x = $pdf->GetX();
             $y = $pdf->GetY();
 
-            /* ---------- COLUMN # ---------- */
+            /* ---------- # ---------- */
             $pdf->MultiCell($headers['#'], $rowHeight, $i, 1, 'C');
             $pdf->SetXY($x + $headers['#'], $y);
 
-            /* ---------- BRAND ---------- */
-            $pdf->MultiCell($headers['Brand'], $rowHeight, $row->ItemBrand, 1);
-            $pdf->SetXY($x + $headers['#'] + $headers['Brand'], $y);
+            /* ---------- CATEGORY (swapped in) ---------- */
+            $pdf->MultiCell($headers['Category'], $rowHeight, $row->ItemCategory, 1);
+            $pdf->SetXY($x + $headers['#'] + $headers['Category'], $y);
 
             /* ---------- MODEL ---------- */
             $modelText = $row->ItemName;
 
-            // Shrink font if too wide
             if ($pdf->GetStringWidth($modelText) > $headers['Model']) {
-                $pdf->SetFont('Arial', '', 8); // shrink font
+                $pdf->SetFont('Arial', '', 8);
             } else {
-                $pdf->SetFont('Arial', '', 9); // normal font
+                $pdf->SetFont('Arial', '', 9);
             }
 
-            // Output as a single line cell (no MultiCell)
             $pdf->Cell($headers['Model'], $rowHeight, $modelText, 1);
-            $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'], $y);
+            $pdf->SetXY($x + $headers['#'] + $headers['Category'] + $headers['Model'], $y);
 
-            /* ---------- CATEGORY ---------- */
-            $pdf->MultiCell($headers['Category'], $rowHeight, $row->ItemCategory, 1);
-            $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'], $y);
+            /* ---------- BRAND (swapped in) ---------- */
+            $pdf->SetFont('Arial', '', 9); // reset font just in case
+            $pdf->MultiCell($headers['Brand'], $rowHeight, $row->ItemBrand, 1);
+            $pdf->SetXY($x + $headers['#'] + $headers['Category'] + $headers['Model'] + $headers['Brand'], $y);
 
             /* ---------- QUANTITY ---------- */
-            $pdf->MultiCell($headers['Quantity'], $rowHeight, $row->Request_Qty, 1, 'C');
+            $pdf->MultiCell($headers['Quantity'], $rowHeight, $qty, 1, 'C');
 
             $i++;
         }
 
-        // ---------- TOTAL QUANTITY ----------
+        /* ---------- TOTAL QUANTITY ---------- */
         $pdf->SetFont('Arial', 'B', 9);
-        $labelWidth = $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'];
+
+        $labelWidth = $headers['#'] + $headers['Category'] + $headers['Model'] + $headers['Brand'];
+
         $pdf->Cell($labelWidth, 6, 'Total Quantity', 1, 0, 'C');
         $pdf->Cell($headers['Quantity'], 6, $totalQty, 1, 1, 'C');
     }

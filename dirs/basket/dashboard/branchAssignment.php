@@ -96,7 +96,7 @@
                                             <th class="text-secondary">Model</th>
                                             <th class="text-secondary">Category</th>
                                             <th class="text-secondary">Quantity</th>
-                                            <th class="text-secondary">Allocated</th>
+                                            <th class="text-secondary"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
