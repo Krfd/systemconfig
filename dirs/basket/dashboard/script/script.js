@@ -2332,12 +2332,29 @@ function formattedDate() {
   document.getElementById("formattedDate").value = `${yyyy}-${mm}-${dd}`;
 }
 
+// function deliveryDate() {
+//   const today = new Date();
+//   const yyyy = today.getFullYear();
+//   const mm = String(today.getMonth() + 1).padStart(2, "0");
+//   const dd = String(today.getDate()).padStart(2, "0");
+//   document.getElementById("docdate").value = `${yyyy}-${mm}-${dd}`;
+//   document.getElementById("deldate").value = `${yyyy}-${mm}-${dd}`;
+// }
+
 function deliveryDate() {
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, "0");
   const dd = String(today.getDate()).padStart(2, "0");
-  document.getElementById("deldate").value = `${yyyy}-${mm}-${dd}`;
+  const todayStr = `${yyyy}-${mm}-${dd}`;
+
+  // Set default values
+  document.getElementById("docdate").value = todayStr;
+  document.getElementById("deldate").value = todayStr;
+
+  // Disable previous dates
+  document.getElementById("docdate").min = todayStr;
+  document.getElementById("deldate").min = todayStr;
 }
 
 function getBatchItems(batchContainer) {
@@ -2348,16 +2365,167 @@ function getBatchItems(batchContainer) {
     dataType: "json",
     success: function (response) {
       let items = response.Data;
-
-      // console.log(`RESPONSE STATUS: ${response.isSuccess}`);
-      // console.log(`BATCH DATA: ${JSON.stringify(items)}`);
+      let deliveryTable = $("#deliveryFormTable tbody")
+      let totalQty = 0;
+      let counter = 0
 
       if (response.isSuccess === "success") {
-        items.forEach((item) => {
+
+        let groupedItems = {};
+
+      items.forEach(item => {
+        let code = item.ItemCode;
+
+        if (!groupedItems[code]) {
+          groupedItems[code] = {
+            ...item,
+            Deliver_Qty: parseInt(item.Deliver_Qty) || 0
+          };
+        } else {
+          groupedItems[code].Deliver_Qty += parseInt(item.Deliver_Qty) || 0;
+        }
+      });
+
+        // items.forEach((item) => {
+        Object.values(groupedItems).forEach((item) => {
           console.log(`ITEM: ${JSON.stringify(item)}`);
+
+          counter += 1;
+
+          totalQty += item.Deliver_Qty;
+
+          let row = `
+            <tr style="height: 40px; min-height:40px; cursor: pointer;" data-itemCode="${item.ItemCode}">
+              <td class="align-middle ps-3" style="background: #FFFBDF;">${counter}</td>
+              <td class="align-middle ps-3" style="background: #FFFBDF;">${item.ItemBrand}</td>
+              <td class="align-middle ps-3" style="background: #FFFBDF;">${item.Model}</td>
+              <td class="align-middle ps-3" style="background: #FFFBDF;">${item.ItemCategory}</td>
+              <td class="align-middle ps-3 text-center" style="background: #FFFBDF;">${item.Deliver_Qty}</td>
+              <td class="align-middle ps-3" style="background: #FFFBDF;"></td>
+            </tr>
+          `;
+
+          deliveryTable.append(row);
         });
+
+        $("#delTotalQuantity").text(totalQty);
+
+        for (let j = items.length; j <= 8; j++) {
+            let emptyRow = $(`
+              <tr class="empty-row">
+                <td colspan="6" style="background: #FFFBDF"></td>   
+              </tr>`)
+
+              $(emptyRow).css({
+              background: "#FFFBDF",
+              height: "40px",
+            });
+
+            emptyRow.hover(
+              function () {
+                $("td:not(:first-child)", this).css("background", "#FFF4C2");
+              },
+              function () {
+                $("td:not(:first-child)", this).css("background", "#FFFBDF");
+              },
+            );
+
+            deliveryTable.append(emptyRow);
+          }
       }
     },
+  });
+}
+
+function submitDelivery() {
+  $("#deliver").on("submit", function (e) {
+    e.preventDefault();
+
+    let items = [];
+    $("#finalDeliveryTable tbody tr.item-row")
+      .not(".empty-row")
+      .each(function () {
+        let brand = $(this).find(".item-brand").text().trim();
+        let model = $(this).find(".item-model").text().trim();
+        let code = $(this).find(".item-code").text().trim();
+        let category = $(this).find(".item-category").text().trim();
+        let quantity = $(this).find(".item-quantity").text().trim();
+
+        if (brand !== "") {
+          items.push({
+            brand: brand,
+            code: code,
+            model: model,
+            category: category,
+            quantity: quantity,
+          });
+        }
+      });
+
+    if (items.length === 0) {
+      e.preventDefault();
+      Swal.fire({
+        icon: "warning",
+        title: "No Items on the table",
+        text: "Please add at least one item before submitting.",
+      });
+      return;
+    }
+
+    let formData = new FormData(document.getElementById("deliver"));
+    formData.append("items", JSON.stringify(items));
+
+    // let formObject = {};
+
+    // formData.forEach((value, key) => {
+    //   formObject[key] = value;
+    // });
+
+    let formObject = Object.fromEntries(formData.entries());
+
+    // convert items back into array BEFORE sending
+    formObject.items = items;
+
+    // DELIVERY ITEMS
+    // $.ajax({
+    //   url: "", // DELIVERY URL
+    //   type: "POST",
+    //   data: formData,
+    //   processData: false,
+    //   contentType: false,
+    //   dataType: "json",
+    //   success: function (response) {
+    //     console.log(`RESPONSE: ${response}`);
+
+    //     if (response.isSuccess === "success") {
+    //       Swal.fire({
+    //         icon: "success",
+    //         title: "Items has been transferred to IN TRANSIT",
+    //       }).then(() => {
+    // window.open(
+    //   `pdf/requests.php?batch=${batch}&branches=${encodeURIComponent(branches)}`,
+    //   "_blank",
+    // );
+    window.open(
+      `pdf/delivery.php?data=${encodeURIComponent(JSON.stringify(formObject))}`,
+      "_blank",
+    );
+    //       });
+    //     }
+
+    //     if (response.isSuccess === "error") {
+    //       Swal.fire({
+    //         icon: "error",
+    //         title: response.message,
+    //         showConfirmButtonText: true,
+    //         confirmButtonText: "OKAY",
+    //       }).then(() => {
+    //         location.reload();
+    //       });
+    //       return;
+    //     }
+    //   },
+    // });
   });
 }
 
@@ -2384,15 +2552,38 @@ function getDeliveryDetails() {
       });
     }
   });
+
+  // console.log(`I WAS CALLED`)
 }
 
 // ORIGINAL
+// function createDr(batchContainer) {
+//   $("#main-content").html(spinner);
+//   $.post("dirs/basket/dashboard/deliveryForm.php", function (data) {
+//     $("#main-content").hide().html(data).fadeIn(200);
+//     get_userinfo();
+//     loadIAPBranchlist();
+//     deliveryDate();
+//     getBatchItems(batchContainer);
+//     getDeliveryDetails();
+
+//     const addBtn = document.getElementById("addDeliveryModalBtn");
+//     const newItemModal = new bootstrap.Modal(
+//       document.getElementById("addDeliveryModal"),
+//     );
+
+//     addBtn.addEventListener("click", function () {
+//       newItemModal.show();
+//     });
+//   });
+// }
+
 function createDr(batchContainer) {
   $("#main-content").html(spinner);
-  $.post("dirs/basket/dashboard/deliveryForm.php", function (data) {
+  $.post("dirs/basket/dashboard/createDr.php", function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
     get_userinfo();
-    loadIAPBranchlist();
+    // loadIAPBranchlist();
     deliveryDate();
     getBatchItems(batchContainer);
     getDeliveryDetails();

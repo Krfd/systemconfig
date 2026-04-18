@@ -26,7 +26,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="input-group col p-0 d-flex gap-1">
+                                    <!-- <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="desForm" class="form-label text-dark-emphasis col-5"><small>Destination:</small></label>
                                             <select name="desForm" id="desForm" class="form-select form-select-sm col ms-3" style="background: #FFFBDF">
@@ -37,12 +37,12 @@
                                             <select name="desCodeForm" id="desCodeForm" class="form-select form-select-sm col" style="background: #FFFBDF;" readonly required>
                                             </select>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-baseline gap-3">
                                         <label for="docdate" class="form-label text-dark-emphasis col-4"><small>Document Date:</small></label>
-                                        <input type="date" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #FFFBDF">
+                                        <input type="date" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #F2F2F2" readonly required>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="deldate" class="form-label text-dark-emphasis col-4"><small>Delivery Date:</small></label>
@@ -50,18 +50,18 @@
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="statusForm" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>
-                                        <input type="text" name="statusForm" id="statusForm" class="form-control form-control-sm col" style="background: #f2f2f2" readonly required>
+                                        <input type="text" name="statusForm" id="statusForm" class="form-control form-control-sm col" style="background: #f2f2f2" value="NEW" readonly required>
                                     </div>
                                 </div>
                             </div>
-                            <div class="d-flex justify-content-end align-items-baseline gap-3 mt-5">
+                            <!-- <div class="d-flex justify-content-end align-items-baseline gap-3 mt-5">
                                 <div class="d-flex gap-1">
                                     <button type="button" class="btn btn-sm btn-primary" id="addDeliveryModalBtn"><i class="bi bi-plus"></i> Add</button>
                                     <button type="button" class="btn btn-sm btn-danger" id="clearDeliveryTableBtn" onclick="clearTable()">Clear</button>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="table-responsive overflow-auto mt-3" style="max-height: 450px">
-                                <table class="table table-hover" id="deliveryFormTable">
+                                <table class="table table-hover datatables" id="deliveryFormTable">
                                     <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary">#</th>
@@ -73,77 +73,13 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr style="height: 50px; min-height: 50px; cursor: pointer">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
                             <div id="totalRowOutside" class="d-flex border-top fw-bold"
                                 style="background:#FFF7BC;">
                                 <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>
-                                <div class="p-2" style="width:120px;" id="totalQuantity">0</div>
+                                <div class="p-2" style="width:120px;" id="delTotalQuantity">0</div>
                             </div>
                             <div class="d-flex justify-content-start align-items-end mt-5 gap-1">
                                 <!-- <div class="d-flex justify-content-between align-items-end"> -->
@@ -152,13 +88,36 @@
                                         <label for="prepby" class="form-label text-dark-emphasis col-4"><small>Prepared by:</small></label>
                                         <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #F2F2F2" readonly>
                                     </div>
-                                    <div class="d-flex align-items-baseline gap-3">
+                                    <!-- <div class="d-flex align-items-baseline gap-3">
                                         <label for="plate" class="form-label text-dark-emphasis col-4"><small>Truck Plate No:</small></label>
                                         <input type="text" name="plate" id="plate" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
-                                    </div>
-                                    <div class="d-flex align-items-baseline gap-3">
+                                    </div> -->
+                                    <!-- <div class="d-flex align-items-baseline gap-3">
                                         <label for="driver" class="form-label text-dark-emphasis col-4"><small>Driver:</small></label>
                                         <input type="text" name="driver" id="driver" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                    </div> -->
+                                    <div class="d-flex align-items-baseline gap-3">
+                                        <label for="driver" class="form-label text-dark-emphasis col-4"><small>Driver:</small></label>
+                                        <input type="text" name="driver" id="driver" class="form-control form-control-sm col" style="background: #FFFBDF" required>
+                                    </div>
+                                    <div class="d-flex align-items-baseline gap-3">
+                                        <label for="truckCat" class="form-label text-dark-emphasis col-4">
+                                            <small>Truck Category:</small>
+                                        </label>
+                                        <select name="truckCat" id="truckCat" class="form-select form-select-sm col" style="background: #FFFBDF" required>
+                                            <option value="">Select Category</option>
+                                            <option value="4">4 Wheeler</option>
+                                            <option value="6">6 Wheeler</option>
+                                            <option value="10">10 Wheeler</option>
+                                        </select>
+                                    </div>
+                                    <div class="d-flex align-items-baseline gap-3">
+                                        <label for="plate" class="form-label text-dark-emphasis col-4">
+                                            <small>Truck Plate No:</small>
+                                        </label>
+                                        <select name="plate" id="plate" class="form-select form-select-sm col" style="background: #FFFBDF" required>
+                                            <option value="">Select Plate</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <!-- </div> -->
