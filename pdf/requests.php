@@ -204,7 +204,10 @@ try {
             }
 
             $groupedItems[$key]['Quantity'] += $quantity;
-            $groupedItems[$key]['Actual'] += $actual;
+            $groupedItems[$key]['Actual'] = $actual;
+            // if ($groupedItems[$key]['Actual'] === null) {
+            //     $groupedItems[$key]['Actual'] = $actual;
+            // }
         }
 
         /* ---------- TABLE ROWS ---------- */

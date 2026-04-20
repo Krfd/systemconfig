@@ -76,8 +76,6 @@ function loadIncoming() {
               ? "disabled"
               : "";
 
-          // console.log(`INCOMING DOC ENTRY : ${item.DocEntry}`);
-
           rows.push([
             `<input type="checkbox" name="checkbox" id="${item.RowNum}" data-docentry="${item.DocEntry}" 
             class="form-check-input align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
@@ -270,8 +268,6 @@ function toggleCheckboxes() {
     createPicklistBtn.type = "button";
     return;
   }
-
-  console.log(`CHECK ID's LENGTH : ${DocEntries}`);
 
   Swal.fire({
     icon: "question",
@@ -467,7 +463,6 @@ $(document).on("dblclick", "#picklistItemTable tbody tr", function (e) {
   $("#main-content").html(spinner);
   setTimeout(function () {
     openPicklistedForm(SR_Number);
-    console.log(`SELECTED SRN: ${SR_Number}`);
   }, 200);
 });
 
@@ -524,8 +519,6 @@ function openPicklist(picklistNum) {
             );
 
             sortedData.forEach((item) => {
-              console.log(`SRN DATA: ${JSON.stringify(item)}`);
-              // console.log(`SRN: ${item.SR_Number}`);
               if (existingSeries.has(item.SR_Number)) {
                 return;
               }
@@ -699,9 +692,6 @@ function openPicklistedForm(SR_Number) {
             let header = response.Data;
             let items = response.Items;
 
-            // console.log(`SRN HEADER: ${JSON.stringify(header)}`);
-            // console.log(`SRN ITEM: ${JSON.stringify(items)}`);
-
             function selectedValue(selector, value) {
               $(selector)
                 .empty()
@@ -802,8 +792,6 @@ function loadBasket() {
               Number(b.PKList_Number || 0) - Number(a.PKList_Number || 0),
           );
 
-          // console.log(`PICKLIST BASKET DATA: ${JSON.stringify(sortedData)}`);
-
           sortedData.forEach((item) => {
             const date = new Date(item.DocDate);
             const formatted = date.toISOString().split("T")[0];
@@ -857,7 +845,6 @@ function loadBasket() {
                 $(row)
                   .attr("data-rownum", originalItem.PKList_Number)
                   .attr("data-picklist-num", originalItem.PKList_Number)
-                  // .attr("data-doc-entry", originalItem.DocEntry)
                   .addClass("picklist-row");
               }
             },
@@ -917,8 +904,6 @@ function loadBasket() {
 
                 const PKlistNum = $(this).data("picklist");
                 const DocEntry = $(this).data("doc-entry");
-
-                // console.log(`PICKLIST ENTRY: ${DocEntry}`);
 
                 Swal.fire({
                   title: "Print this Picklist?",
@@ -1043,7 +1028,6 @@ function formattedDate() {
   document.getElementById("date").value = `${yyyy}-${mm}-${dd}`;
 }
 
-// ENCODE QTY
 function encodeQty(picklistNum, rowNum) {
   $.post(
     "dirs/incoming/dashboard/encodeQty.php",
@@ -1060,28 +1044,31 @@ function encodeQty(picklistNum, rowNum) {
         dataType: "json",
         success: function (response) {
           if (response.isSuccess === "success") {
-            let rowCount = response.Data.length;
             let items = response.Data;
 
             let groupedItems = {};
 
             items.forEach((item) => {
-              let key = item.Req_ItemName; // ← change if "model" means something else
-
+              let key = item.Req_ItemName;
               let qty = Math.trunc(Number(item.Req_Item_Qty) || 0);
 
               if (!groupedItems[key]) {
                 groupedItems[key] = {
-                  Item_id: item.Item_id,
                   Req_ItemBrand: item.Req_ItemBrand,
                   Req_ItemName: item.Req_ItemName,
                   Req_ItemCategory: item.Req_ItemCategory,
                   DocEntry: item.DocEntry,
                   totalQty: 0,
+                  rows: [], // 🔥 store original rows
                 };
               }
 
               groupedItems[key].totalQty += qty;
+
+              groupedItems[key].rows.push({
+                Item_id: item.Item_id,
+                SR_Number: item.SR_Number,
+              });
             });
 
             let index = 0;
@@ -1092,21 +1079,19 @@ function encodeQty(picklistNum, rowNum) {
             let rows = "";
             let picklistEntry = "";
 
-            Object.values(groupedItems).forEach((item) => {
-              console.log(`ITEMS: ${JSON.stringify(item)}`);
+            let groupedArray = Object.values(groupedItems);
 
-              totalQty += item.totalQty;
+            Object.values(groupedItems).forEach((item) => {
               picklistEntry = item.DocEntry;
               index++;
               rows += `
-                <tr style="height: 40px; min-height: 40px" data-docEntry="${item.DocEntry}">
-                  <td class="align-middle ps-3 d-none" style="background: #F2F2F2; padding: 3px">${item.Item_id}</td>
-                  <td class="align-middle ps-3" style="background: #F2F2F2; padding: 3px">${index}</td>
-                  <td class="align-middle ps-3" style="background: #F2F2F2; padding: 3px">${item.Req_ItemBrand}</td>
-                  <td class="align-middle ps-3" style="background: #F2F2F2; padding: 3px">${item.Req_ItemName}</td>
-                  <td class="align-middle ps-3" style="background: #F2F2F2; padding: 3px">${item.Req_ItemCategory}</td>
-                  <td class="align-middle ps-3" style="background: #F2F2F2; padding: 3px">${item.totalQty}</td>
-                  <td class="align-middle ps-3 editable-cell" style="background:#FFFBDF; padding: 3px" contenteditable="true" onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)"></td>
+                <tr style="height: 40px; min-height: 40px" data-rows='${JSON.stringify(item.rows)}'>
+                  <td class="align-middle ps-3" style="background: #F2F2F2;">${index}</td>
+                  <td class="align-middle ps-3" style="background: #F2F2F2;">${item.Req_ItemBrand}</td>
+                  <td class="align-middle ps-3" style="background: #F2F2F2;">${item.Req_ItemName}</td>
+                  <td class="align-middle ps-3" style="background: #F2F2F2;">${item.Req_ItemCategory}</td>
+                  <td class="align-middle ps-3" style="background: #F2F2F2;">${item.totalQty}</td>
+                  <td class="align-middle ps-3 editable-cell" style="background: #FFFBDF" contenteditable="true" onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)"></td>
                 </tr>
               `;
             });
@@ -1114,18 +1099,19 @@ function encodeQty(picklistNum, rowNum) {
             $("#totalEncodedQty").text(totalQty);
             $("#encodeQtyTable tbody").html(rows);
 
+            let rowCount = groupedArray.length;
             if (rowCount < 8) {
               let emptyRowsNeeded = 8 - rowCount;
 
               for (let i = 0; i < emptyRowsNeeded; i++) {
                 let emptyRow = `
                   <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
-                    <td style="background: #FFFBDF" class="d-none"></td>
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #F2F2F2" class="d-none"></td>
+                    <td style="background: #F2F2F2"></td>
+                    <td style="background: #F2F2F2"></td>
+                    <td style="background: #F2F2F2"></td>
+                    <td style="background: #F2F2F2"></td>
+                    <td style="background: #F2F2F2"></td>
                     <td style="background: #FFFBDF"></td>
                   </tr>
               `;
@@ -1210,21 +1196,39 @@ function submitEncodedQty(PicklistEntry, picklistNum) {
         // SAVE DATA
         let encodedItems = [];
 
+        // $("#encodeQtyTable tbody tr").each(function () {
+        //   let cells = $(this).find("td");
+
+        //   let item = {
+        //     index: $(cells[0]).text().trim(),
+        //     brand: $(cells[2]).text().trim(),
+        //     model: $(cells[3]).text().trim(),
+        //     category: $(cells[4]).text().trim(),
+        //     quantity: $(cells[5]).text().trim(),
+        //     actualQty: $(cells[6]).text().trim(),
+        //   };
+
+        //   if (item.actualQty !== "") {
+        //     encodedItems.push(item);
+        //   }
+        // });
+
         $("#encodeQtyTable tbody tr").each(function () {
           let cells = $(this).find("td");
+          let actualQty = $(cells[5]).text().trim();
 
-          let item = {
-            index: $(cells[0]).text().trim(),
-            brand: $(cells[2]).text().trim(),
-            model: $(cells[3]).text().trim(),
-            category: $(cells[4]).text().trim(),
-            quantity: $(cells[5]).text().trim(),
-            actualQty: $(cells[6]).text().trim(),
-          };
+          let originalRows = $(this).data("rows");
 
-          if (item.actualQty !== "") {
-            encodedItems.push(item);
-          }
+          if (!originalRows || actualQty === "") return;
+
+          // 🔥 distribute qty equally OR fully apply
+          originalRows.forEach((row) => {
+            encodedItems.push({
+              ItemNumber: row.Item_id,
+              ActualQty: actualQty,
+              SR_Number: row.SR_Number,
+            });
+          });
         });
 
         Swal.fire({
@@ -1250,17 +1254,13 @@ function submitEncodedQty(PicklistEntry, picklistNum) {
           let executedBy = userInput.value;
           let formData = new FormData(document.getElementById("encodeqty"));
 
-          // single values
           formData.append("ExecutedBy", executedBy);
           let srnIndex = 0;
 
-          console.log(`ENCODED ITEMS: ${JSON.stringify(encodedItems)}`);
-
           encodedItems.forEach((item) => {
-            formData.append("ItemNumber[]", item.index);
-            formData.append("ActualQty[]", item.actualQty);
-            formData.append("SR_Number[]", srNumberMap[srnIndex]);
-            srnIndex++;
+            formData.append("ItemNumber[]", item.ItemNumber);
+            formData.append("ActualQty[]", item.ActualQty);
+            formData.append("SR_Number[]", item.SR_Number);
           });
           // PRINT WITH ACTUAL QUANTITY
           let PickListNum = picklistNum;
@@ -1289,6 +1289,7 @@ function submitEncodedQty(PicklistEntry, picklistNum) {
                       success: function (response) {
                         console.log(`REPONSE: ${response.isSuccess}`);
                         if (response.isSuccess === "success") {
+                          loadBasketContent();
                           console.log(`PICKLIST SAVED TO LOADING BASKET`);
                         } else {
                           console.log(
