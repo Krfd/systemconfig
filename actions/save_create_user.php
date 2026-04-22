@@ -29,6 +29,7 @@ try {
     $conn->commit();
     echo "OK";
 } catch (PDOException $e) {
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollback();
     echo "<b>Warning. Please Contact System Developer.<br/></b>" . $e->getMessage();
 }

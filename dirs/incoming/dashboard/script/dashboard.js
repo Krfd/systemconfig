@@ -77,21 +77,22 @@ function loadIncoming() {
               : "";
 
           rows.push([
-            `<input type="checkbox" name="checkbox" id="${item.RowNum}" data-docentry="${item.DocEntry}" 
+            `<input type="checkbox" name="checkbox" id="${item.RowNum}" data-srnumber="${item.SR_Number}" data-docentry="${item.DocEntry}" 
             class="form-check-input align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
             item.RowNum || "",
             item.SR_Number || "",
-            item.TypeRequest || "",
+            // item.TypeRequest || "",
             item.BranchDestination || "",
             statusBadge,
             item.EncodeDate || "",
-            item.PKList_Number || "",
+            // item.PKList_Number || "",
           ]);
         });
 
         if (rows.length === 0) {
           for (let i = 0; i < 8; i++) {
-            rows.push(["", "", "", "", "", "", "", ""]);
+            // rows.push(["", "", "", "", "", "", "", ""]);
+            rows.push(["", "", "", "", "", ""]);
           }
         }
 
@@ -106,11 +107,11 @@ function loadIncoming() {
             { title: "", className: "text-center" },
             { title: "#" },
             { title: "SRN" },
-            { title: "Type of Request" },
+            // { title: "Type of Request" },
             { title: "Requesting Branch" },
             { title: "Status" },
-            { title: "Date" },
-            { title: "Picklist No." },
+            { title: "Date", className: "text-start" },
+            // { title: "Picklist No." },
           ],
           pageLength: 50,
           paging: true,
@@ -129,7 +130,8 @@ function loadIncoming() {
               "min-height": "40px",
               cursor: "pointer",
             });
-            $("td:eq(1)", row).addClass("text-center");
+            // $("td:eq(1)", row).addClass("text-center");
+            $("td:eq(1)", row).addClass("text-start ps-3");
             $("td:eq(2)", row).addClass("text-primary");
             $("td:eq(6)", row).addClass("text-start");
 
@@ -151,7 +153,7 @@ function loadIncoming() {
               let $emptyRow = $(`
                 <tr class="empty-row">
                   <td></td>
-                  <td colspan="7" style="background:#FFFBDF"></td>
+                  <td colspan="5" style="background:#FFFBDF"></td>
                 </tr>
               `);
               $($emptyRow).css({
@@ -184,11 +186,13 @@ function loadIncoming() {
 function toggleCheckboxes() {
   const createPicklistBtn = document.getElementById("createPicklistBtn");
   const DocEntries = [];
+  const SRNumbers = [];
 
   const selectionMode =
     $("#incomingTableDisplay tbody .checkbox:visible").length > 0;
   $("#incomingTableDisplay tbody .checkbox:checked").each(function () {
     DocEntries.push($(this).data("docentry"));
+    SRNumbers.push($(this).data("srnumber"));
   });
 
   if (!selectionMode) {
@@ -198,7 +202,7 @@ function toggleCheckboxes() {
       const row = $(this);
       const srnText = row.find("td:eq(2)").text().trim();
       const picklistNo = row.find("td:eq(7)").text().trim();
-      const statusText = row.find("td:eq(5)").text().trim().toUpperCase();
+      const statusText = row.find("td:eq(4)").text().trim().toUpperCase();
 
       if (
         srnText.startsWith("SRN") &&
@@ -223,7 +227,7 @@ function toggleCheckboxes() {
       const row = $(this);
       const srnText = row.find("td:eq(2)").text().trim();
       const picklistNo = row.find("td:eq(7)").text().trim();
-      const statusText = row.find("td:eq(5)").text().trim().toUpperCase();
+      const statusText = row.find("td:eq(4)").text().trim().toUpperCase();
       const checkbox = row.find(".checkbox");
 
       const restrictedStatuses = [
@@ -251,28 +255,316 @@ function toggleCheckboxes() {
       }
     });
 
-    createPicklistBtn.textContent = "Add to Picklist";
+    // createPicklistBtn.textContent = "Add to Picklist";
+    createPicklistBtn.textContent = "Preview";
     createPicklistBtn.type = "button";
 
     return;
   }
 
-  if (DocEntries.length == 0) {
-    Swal.fire({
-      icon: "warning",
-      title: "Please select at least one item to create a picklist",
-      confirmButtonText: "OKAY",
-    });
-    $("#incomingTableDisplay tbody .checkbox").hide().prop("checked", false);
-    createPicklistBtn.textContent = "Create Picklist";
-    createPicklistBtn.type = "button";
-    return;
+  if (selectionMode) {
+    if (DocEntries.length == 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Please select at least one item to create a picklist",
+        confirmButtonText: "OKAY",
+      });
+      $("#incomingTableDisplay tbody .checkbox").hide().prop("checked", false);
+      createPicklistBtn.textContent = "Create Picklist";
+      createPicklistBtn.type = "button";
+      return;
+    }
   }
+
+  // Swal.fire({
+  //   icon: "question",
+  //   title: "Create picklist on this item(s)?",
+  //   confirmButtonText: "Add",
+  //   showCancelButton: true,
+  //   cancelButtonText: "Back",
+  // }).then((result) => {
+  //   if (result.isConfirmed) {
+  //     $.ajax({
+  //       url: "dirs/incoming/dashboard/actions/save_createpicklist.php",
+  //       type: "POST",
+  //       data: {
+  //         DocEntry: DocEntries,
+  //       },
+  //       dataType: "json",
+  //       success: function (response) {
+  //         if (response.status === "success") {
+  //           Swal.fire({
+  //             icon: "success",
+  //             title: "Picklist has been created",
+  //             confirmButtonText: "OKAY",
+  //           });
+  //           $("#incomingTableDisplay tbody .checkbox")
+  //             .hide()
+  //             .prop("checked", false);
+  //           createPicklistBtn.textContent = "Create Picklist";
+  //           loadIncoming();
+  //         } else {
+  //           Swal.fire({
+  //             icon: "error",
+  //             title: response.message,
+  //             confirmButtonText: "OKAY",
+  //             confirmButtonColor: "#d33",
+  //           });
+  //         }
+  //       },
+  //       error: function (xhr) {
+  //         Swal.fire({
+  //           icon: "error",
+  //           title: "Server Error",
+  //           text: "Something went wrong while processing the request.",
+  //         });
+  //       },
+  //     });
+  //   }
+  // });
 
   Swal.fire({
     icon: "question",
-    title: "Create picklist on this item(s)?",
+    title: "Are you sure to add the following item(s)?",
     confirmButtonText: "Add",
+    showCancelButton: true,
+    cancelButtonText: "Back",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // $.ajax({
+      //   url: "dirs/incoming/dashboard/actions/save_createpicklist.php",
+      //   type: "POST",
+      //   data: {
+      //     DocEntry: DocEntries,
+      //   },
+      //   dataType: "json",
+      //   success: function (response) {
+      //     if (response.status === "success") {
+      //       Swal.fire({
+      //         icon: "success",
+      //         title: "Picklist has been created",
+      //         confirmButtonText: "OKAY",
+      //       });
+      //       $("#incomingTableDisplay tbody .checkbox")
+      //         .hide()
+      //         .prop("checked", false);
+      //       createPicklistBtn.textContent = "Create Picklist";
+      //       loadIncoming();
+      //     } else {
+      //       Swal.fire({
+      //         icon: "error",
+      //         title: response.message,
+      //         confirmButtonText: "OKAY",
+      //         confirmButtonColor: "#d33",
+      //       });
+      //     }
+      //   },
+      //   error: function (xhr) {
+      //     Swal.fire({
+      //       icon: "error",
+      //       title: "Server Error",
+      //       text: "Something went wrong while processing the request.",
+      //     });
+      //   },
+      // });
+
+      loadPreview(SRNumbers);
+    }
+  });
+}
+
+function loadPreview(SRNumbers) {
+  $("main-content").html(spinner);
+  $.post("dirs/incoming/dashboard/preview.php", function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+
+    $.ajax({
+      url: "dirs/incoming/dashboard/actions/get_sr_items.php",
+      type: "POST",
+      data: {
+        SR_Number: SRNumbers,
+      },
+      dataType: "json",
+      success: function (response) {
+        if (response.isSuccess === "success") {
+          let previewData = response.Data;
+          let row = "";
+          let previewBody = $("#previewTableDisplay tbody");
+
+          const isDisabled = "";
+
+          previewData.forEach((item, index) => {
+            row += `
+                <tr style="cursor: pointer" data-docentry="${item.DocEntry}">
+                  <td class="ps-5" style="width: 80px; max-width: 80px">
+                    <input type="checkbox" name="checkbox" id="${item.DocEntry}" data-docentry="${item.DocEntry}"
+                    class="form-check-input align-self-center mx-auto checkbox border border-primary" ${isDisabled}>    
+                  </td>
+                  <td class="align-middle ps-3" style="background: #f7f7f7">${index + 1}</td>
+                  <td class="align-middle ps-3" style="background: #f7f7f7">${item.ItemBrand}</td>
+                  <td class="align-middle ps-3" style="background: #f7f7f7">${item.ItemName}</td>
+                  <td class="align-middle ps-3" style="background: #f7f7f7">${item.ItemCategory}</td>
+                </tr>
+              `;
+          });
+
+          previewBody.html(row);
+
+          let tableCount = previewBody;
+          let currentRows = tableCount.find("tr").length;
+
+          for (let i = currentRows; i < 8; i++) {
+            let empty = $(`
+                <tr class="empty-row" style="height: 50px">
+                  <td colspan="5" style="background: #F7F7F7"></td>
+                </tr>
+              `);
+            previewBody.append(empty);
+          }
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: response.message,
+            confirmButtonText: "OKAY",
+            confirmButtonColor: "#d33",
+          });
+        }
+      },
+      error: function (xhr) {
+        Swal.fire({
+          icon: "error",
+          title: "Server Error",
+          text: "Something went wrong while processing the request.",
+        });
+      },
+    });
+  });
+}
+
+function togglePreview() {
+  const previewPicklistBtn = document.getElementById("previewPicklistBtn");
+  const entries = [];
+
+  const selection =
+    $("#previewTableDisplay tbody .checkbox:visible").length > 0;
+  $("#previewTableDisplay tbody .checkbox:checked").each(function () {
+    entries.push($(this).data("docentry"));
+  });
+
+  if (!selection) {
+    let availableItems = 0;
+
+    $("#previewTableDisplay tbody tr").each(function () {
+      const row = $(this);
+
+      if (!row.hasClass("empty-row")) {
+        // if (hasPicklist === "") {
+        availableItems++;
+        // }
+      }
+    });
+
+    if (availableItems === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "No Available Item(s)",
+        text: "All Item(s) are currently unavailable.",
+        confirmButtonText: "OKAY",
+      });
+      return;
+    }
+
+    $("#previewTableDisplay tbody tr").each(function () {
+      const row = $(this);
+      const checkbox = row.find(".checkbox");
+
+      if (checkbox) {
+        checkbox.show();
+
+        // if (picklistNo !== "" || statusText !== "NEW") {
+        //   checkbox.prop("disabled", true);
+        // } else {
+        //   checkbox.prop("disabled", false);
+        // }
+      } else {
+        checkbox.hide();
+      }
+    });
+
+    previewPicklistBtn.textContent = "Add to Picklist";
+    previewPicklistBtn.type = "button";
+
+    return;
+  }
+
+  if (selection) {
+    if (entries.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Please select at least one item to create a picklist",
+        confirmButtonText: "OKAY",
+      });
+      $("#previewTableDisplay tbody .checkbox").hide().prop("checked", false);
+      previewPicklistBtn.textContent = "Preview";
+      previewPicklistBtn.type = "button";
+      return;
+    }
+  }
+
+  // Swal.fire({
+  //   icon: "question",
+  //   title: "Are you sure to add the following item(s)?",
+  //   confirmButtonText: "Add",
+  //   showCancelButton: false,
+  //   cancelButtonText: "Back",
+  // }).then((result) => {
+  //   if (result.isConfirmed) {
+  //     // CREATE PICK LIST HERE
+  //     // $.ajax({
+  //     //   url: "dirs/incoming/dashboard/actions/save_createpicklist.php",
+  //     //   type: "POST",
+  //     //   data: {
+  //     //     DocEntry: DocEntries,
+  //     //   },
+  //     //   dataType: "json",
+  //     //   success: function (response) {
+  //     //     if (response.status === "success") {
+  //     //       Swal.fire({
+  //     //         icon: "success",
+  //     //         title: "Picklist has been created",
+  //     //         confirmButtonText: "OKAY",
+  //     //       });
+  //     //       $("#incomingTableDisplay tbody .checkbox")
+  //     //         .hide()
+  //     //         .prop("checked", false);
+  //     //       createPicklistBtn.textContent = "Create Picklist";
+  //     //       loadIncoming();
+  //     //     } else {
+  //     //       Swal.fire({
+  //     //         icon: "error",
+  //     //         title: response.message,
+  //     //         confirmButtonText: "OKAY",
+  //     //         confirmButtonColor: "#d33",
+  //     //       });
+  //     //     }
+  //     //   },
+  //     //   error: function (xhr) {
+  //     //     Swal.fire({
+  //     //       icon: "error",
+  //     //       title: "Server Error",
+  //     //       text: "Something went wrong while processing the request.",
+  //     //     });
+  //     //   },
+  //     // });
+  //   }
+  // });
+
+  console.log(`ENTRIES: ${entries}`);
+
+  Swal.fire({
+    icon: "question",
+    title: "Create picklist on the following item(s)?",
+    confirmButtonText: "Create",
     showCancelButton: true,
     cancelButtonText: "Back",
   }).then((result) => {
@@ -281,21 +573,22 @@ function toggleCheckboxes() {
         url: "dirs/incoming/dashboard/actions/save_createpicklist.php",
         type: "POST",
         data: {
-          DocEntry: DocEntries,
+          docEntries: entries,
         },
         dataType: "json",
         success: function (response) {
-          if (response.status === "success") {
+          if (response.isSuccess === "success") {
             Swal.fire({
               icon: "success",
               title: "Picklist has been created",
               confirmButtonText: "OKAY",
             });
-            $("#incomingTableDisplay tbody .checkbox")
+
+            $("#previewTableDisplay tbody .checkbox")
               .hide()
               .prop("checked", false);
-            createPicklistBtn.textContent = "Create Picklist";
-            loadIncoming();
+            ((previewPicklistBtn.textContent = "Create Picklist"),
+              loadPreview());
           } else {
             Swal.fire({
               icon: "error",
@@ -308,8 +601,8 @@ function toggleCheckboxes() {
         error: function (xhr) {
           Swal.fire({
             icon: "error",
-            title: "Server Error",
-            text: "Something went wrong while processing the request.",
+            title: "Server error",
+            text: "Something went wrong while processing the picklist.",
           });
         },
       });
@@ -352,7 +645,7 @@ function openIncoming(DocEntry) {
               .append(`<option value="${value}">${value}</option>`);
           }
 
-          selectedValue("#typeOfReq", header.TypeRequest);
+          // selectedValue("#typeOfReq", header.TypeRequest);
           selectedValue("#destination", header.BranchDestination);
           selectedValue("#branchWhCode", header.BranchDestination_Whscode);
           selectedValue("#origin", header.BranchOrigin);
@@ -698,7 +991,7 @@ function openPicklistedForm(SR_Number) {
                 .append(`<option value="${value}">${value}</option>`);
             }
 
-            selectedValue("#typeOfReq", header.TypeRequest);
+            // selectedValue("#typeOfReq", header.TypeRequest);
             selectedValue("#destination", header.Req_Branch);
             selectedValue("#branchWhCode", header.Req_Whscode);
             selectedValue("#origin", header.BranchSetup);
@@ -1248,6 +1541,9 @@ function submitEncodedQty(PicklistEntry, picklistNum) {
           },
         }).then((userInput) => {
           if (!userInput.isConfirmed) return;
+
+          // COUNT THE BRANCH FIRST BEFORE UPDATING
+          // IF SINGLE BRANCH REDIRECT TO LOADING BASKET FOR DELIVERY
 
           let DocEntry = "";
 

@@ -5,7 +5,7 @@ session_start();
 $User = $_SESSION['Uid'];
 
 // 🔹 Header Inputs
-$RequestType    = $_POST['RequestType'] ?? '';
+// $RequestType    = $_POST['RequestType'] ?? '';
 $PurposeRequest = $_POST['PurposeRequest'] ?? '';
 $OBranch        = $_POST['OBranch'] ?? '';
 $OWhscode       = $_POST['OWhscode'] ?? '';
@@ -56,11 +56,12 @@ try {
 
 
     // 🔹 2. Insert Header
-    $stmtHeader = $conn->prepare("EXEC dbo.[Create_StockRequest] ?,?,?,?,?,?,?,?");
+    // $stmtHeader = $conn->prepare("EXEC dbo.[Create_StockRequest] ?,?,?,?,?,?,?,?");
+    $stmtHeader = $conn->prepare("EXEC dbo.[Create_StockRequest] ?,?,?,?,?,?,?");
     $stmtHeader->execute([
         $User,
         $SRNumber,
-        $RequestType,
+        // $RequestType,
         $PurposeRequest,
         $OBranch,
         $OWhscode,

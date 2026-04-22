@@ -268,7 +268,7 @@ function openRequest(DocEntry) {
           let items = response.Items;
 
           $("#srn").val(header.SR_Number);
-          $("#typeOfReq").val(header.TypeRequest);
+          // $("#typeOfReq").val(header.TypeRequest);
           $("#destination").val(header.BranchDestination);
           $("#branchWhCode").val(header.BranchDestination_Whscode);
           $("#origin").val(header.BranchOrigin);

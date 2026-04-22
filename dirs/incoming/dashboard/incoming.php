@@ -4,7 +4,7 @@
             <h3 class="fw-bold text-primary">Incoming</h3>
         </div>
         <div class="d-flex gap-1">
-            <button class="btn btn-primary btn-sm" type="button" onclick="toggleCheckboxes()" id="createPicklistBtn">Create Picklist</button>
+            <button class="btn btn-primary btn-sm" type="button" onclick="toggleCheckboxes()" id="createPicklistBtn">Create List</button>
             <button class="btn btn-primary" type="button" onclick="picklistBasket()">
                 <i class="bi bi-cart"></i>
             </button>

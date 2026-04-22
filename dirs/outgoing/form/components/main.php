@@ -10,14 +10,14 @@
                                     <label for="srnForm" class="form-label text-dark-emphasis col-3"><small>SRN:</small></label>
                                     <input type="text" name="srnForm" id="srnForm" class="form-control form-control-sm col" style="background: #f2f2f2" readonly required>
                                 </div>
-                                <div class="d-flex align-items-baseline gap-3">
+                                <!-- <div class="d-flex align-items-baseline gap-3">
                                     <label for="typeForm" class="form-label text-dark-emphasis col-3"><small>Type of Request:</small></label>
                                     <select name="typeForm" id="typeForm" class="form-select form-select-sm col" style="background: #FFFBDF" required>
                                         <option value="" selected></option>
                                         <option value="STS">STS</option>
                                         <option value="Buffing">BUFFING</option>
                                     </select>
-                                </div>
+                                </div> -->
                                 <div class="input-group col p-0 d-flex gap-1">
                                     <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                         <label for="desForm" class="form-label text-dark-emphasis col-5"><small>Destination:</small></label>
@@ -117,7 +117,7 @@
     $("#frm-request-sts").on("submit", function(e) {
         e.preventDefault();
 
-        var RequestType = $("#typeForm").val();
+        // var RequestType = $("#typeForm").val();
         var PurposeRequest = $("#purposeForm").val();
         var OBranch = $("#user-origin").val();
         var OWhscode = $("#originCodeForm").val();
@@ -140,8 +140,8 @@
             return;
         }
 
-        if (!RequestType || !OWhscode || !DWhscode) {
-            // alert("Please fill required fields.");
+        // if (!RequestType || !OWhscode || !DWhscode) {
+        if (!OWhscode || !DWhscode) {
             Swal.fire({
                 icon: "error",
                 title: "Please fill all the required fields"
@@ -154,7 +154,7 @@
         btn.prop("disabled", true);
 
         $.post("dirs/outgoing/form/actions/save_stockrequest.php", {
-            RequestType: RequestType,
+            // RequestType: RequestType,
             PurposeRequest: PurposeRequest,
             OBranch: OBranch,
             OWhscode: OWhscode,

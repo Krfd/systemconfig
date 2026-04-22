@@ -1832,10 +1832,10 @@ function assignBranch(lbNum, picklistDr, previousSerials = []) {
 
             let row = `
               <tr class="item-row" style="height: 40px; min-height: 40px; cursor: pointer">
-                <td class="align-middle ps-3" style="background: #F2F2F2">${unit.ItemBrand}</td>
-                <td class="align-middle ps-3" style="background: #F2F2F2">${unit.ItemName}</td>
-                <td class="align-middle ps-3" style="background: #F2F2F2">${unit.ItemCategory}</td>
-                <td class="align-middle ps-3" style="background: #F2F2F2">${unit.Deliver_Qty}</td>
+                <td class="align-middle ps-3" style="background: ##f7f7f7">${unit.ItemBrand}</td>
+                <td class="align-middle ps-3" style="background: ##f7f7f7">${unit.ItemName}</td>
+                <td class="align-middle ps-3" style="background: ##f7f7f7">${unit.ItemCategory}</td>
+                <td class="align-middle ps-3" style="background: ##f7f7f7">${unit.Deliver_Qty}</td>
               `;
 
             branches.forEach((branch) => {
@@ -1847,7 +1847,7 @@ function assignBranch(lbNum, picklistDr, previousSerials = []) {
               row += `
                 <td class="align-middle ps-3 text-center"
                     ${isEditable ? 'contenteditable="true"' : ""}
-                    style="background: ${isEditable ? "#FFFBDF" : "#F2F2F2"}"
+                    style="background: ${isEditable ? "#FFFBDF" : "#f7f7f7"}"
                     onfocus="this.style.border='1px solid #ffc107'; this.style.outline='none';"
                     onblur="this.style.border='';">
                     ${val}
