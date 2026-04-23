@@ -46,7 +46,6 @@ function loadIncoming() {
         );
 
         sortedData.forEach((item) => {
-          // console.log(`INCOMING ITEM: ${JSON.stringify(item)}`)
           let status = item.RequestStatus
             ? item.RequestStatus.toUpperCase()
             : "";
@@ -206,15 +205,13 @@ function toggleCheckboxes() {
       const statusText = row.find("td:eq(4)").text().trim().toUpperCase();
 
       if (
-        srnText.startsWith("SRN") 
-        // && picklistNo === "" 
-        // && statusText === "NEW"
+        srnText.startsWith("SRN") &&
+        picklistNo === "" &&
+        statusText === "NEW"
       ) {
         availableRows++;
       }
     });
-
-    console.log(`AVAILABLE ROWS: ${availableRows}`)
 
     if (availableRows === 0) {
       Swal.fire({
@@ -245,10 +242,9 @@ function toggleCheckboxes() {
         checkbox.show();
 
         if (
-          !srnText.startsWith('SRN')
-          // picklistNo !== "" ||
-          // restrictedStatuses.includes(statusText)
-          //  || statusText !== "NEW"
+          picklistNo !== "" ||
+          restrictedStatuses.includes(statusText) ||
+          statusText !== "NEW"
         ) {
           checkbox.prop("disabled", true);
         } else {
@@ -398,7 +394,6 @@ function loadPreview(SRNumbers) {
           const isDisabled = "";
 
           previewData.forEach((item, index) => {
-            console.log(`PREVIEW ITEM: ${JSON.stringify(item)}`)
             row += `
                 <tr style="cursor: pointer" data-docentry="${item.DocEntry}">
                   <td class="ps-5" style="width: 80px; max-width: 80px">
@@ -409,7 +404,6 @@ function loadPreview(SRNumbers) {
                   <td class="align-middle ps-3" style="background: #f7f7f7">${item.ItemBrand}</td>
                   <td class="align-middle ps-3" style="background: #f7f7f7">${item.ItemName}</td>
                   <td class="align-middle ps-3" style="background: #f7f7f7">${item.ItemCategory}</td>
-                  <td class="align-middle ps-3" style="background: #f7f7f7">${item.Request_Qty}</td>
                 </tr>
               `;
           });
@@ -423,7 +417,6 @@ function loadPreview(SRNumbers) {
             let empty = $(`
               <tr class="empty-row" style="height: 50px">
                 <td style="width: 80px; max-width: 80px; background: #f7f7f7"></td>
-                <td style="background: #f7f7f7"></td>
                 <td style="background: #f7f7f7"></td>
                 <td style="background: #f7f7f7"></td>
                 <td style="background: #f7f7f7"></td>
@@ -516,7 +509,7 @@ function togglePreview() {
         confirmButtonText: "OKAY",
       });
       $("#previewTableDisplay tbody .checkbox").hide().prop("checked", false);
-      previewPicklistBtn.textContent = "Add to Picklist";
+      previewPicklistBtn.textContent = "Preview";
       previewPicklistBtn.type = "button";
       return;
     }
@@ -581,7 +574,7 @@ function togglePreview() {
   }).then((result) => {
     if (result.isConfirmed) {
       $.ajax({
-        url: "dirs/incoming/dashboard/actions/save_create_item_picklist.php",
+        url: "dirs/incoming/dashboard/actions/save_createpicklist.php",
         type: "POST",
         data: {
           docEntries: entries,
@@ -598,8 +591,8 @@ function togglePreview() {
             $("#previewTableDisplay tbody .checkbox")
               .hide()
               .prop("checked", false);
-            previewPicklistBtn.textContent = "Create Picklist"
-              // loadPreview();
+            ((previewPicklistBtn.textContent = "Create Picklist"),
+              loadPreview());
           } else {
             Swal.fire({
               icon: "error",
@@ -1097,7 +1090,6 @@ function loadBasket() {
           );
 
           sortedData.forEach((item) => {
-            console.log(`PICKLIST BASKET ITEM: ${JSON.stringify(item)}`)
             const date = new Date(item.DocDate);
             const formatted = date.toISOString().split("T")[0];
             rows.push([
@@ -1241,54 +1233,13 @@ function loadBasket() {
 
                       // 👉 PROCEED WITH ORIGINAL LOGIC
                       // PRINT ONLY
-
-                      Swal.fire({
-                        title: "Printing option",
-                        text: "Do you want to print items by category?",
-                        icon: "question",
-                        showCancelButton: true,
-                        confirmButtonText: "Yes, categorized",
-                        cancelButtonText: "Normal"
-                      }).then((result) => {
-                        const groupByCategory = result.isConfirmed;
-
-                        if (response.status === "error") {
-                          Swal.fire({
-                            icon: "error",
-                            title: response.message,
-                            text: "Would you like to proceed for printing?",
-                            showCancelButton: true,
-                            confirmButtonText: "Proceed",
-                            cancelButtonText: "Back",
-                          }).then((res) => {
-                            if (res.isConfirmed) {
-                              openPrint();
-                            }
-                          });
-                          return;
-                        }
-
-                        if (response.status === "success") {
-                          openPrint();
-                        }
-                      })
-
-                      // $.post(
-                      //   "dirs/incoming/dashboard/actions/save_print_delivery.php",
-                      //   {
-                      //     ExecutedBy: executedBy,
-                      //     DocEntry: DocEntry,
-                      //   },
-                      //   function (response) {
-                          const openPrint = () => {
-                          window.open(
-                            `pdf/requests.php?DocEntry=${DocEntry}` +
-                            `&executedBy=${encodeURIComponent(executedBy)}` +
-                            `&groupByCategory=${groupByCategory ? 1 : 0}`,
-                            "_blank"
-                          );
-                        };
-
+                      $.post(
+                        "dirs/incoming/dashboard/actions/save_print_delivery.php",
+                        {
+                          ExecutedBy: executedBy,
+                          DocEntry: DocEntry,
+                        },
+                        function (response) {
                           // const openPrint = () => {
                           //   $.ajax({
                           //     url: "dirs/incoming/dashboard/actions/save_loading_basket.php",
@@ -1308,10 +1259,16 @@ function loadBasket() {
                           //     },
                           //   });
 
-                          // window.open(
-                          //   `pdf/requests.php?executedBy=${encodeURIComponent(executedBy)}&DocEntry=${DocEntry}`,
-                          //   "_blank",
-                          // );
+                          //   window.open(
+                          //     `pdf/requests.php?executedBy=${encodeURIComponent(executedBy)}&DocEntry=${DocEntry}`,
+                          //     "_blank",
+                          //   );
+                          // };
+
+                          window.open(
+                            `pdf/requests.php?executedBy=${encodeURIComponent(executedBy)}&DocEntry=${DocEntry}`,
+                            "_blank",
+                          );
 
                           if (response.status === "error") {
                             Swal.fire({
@@ -1323,7 +1280,12 @@ function loadBasket() {
                               cancelButtonText: "Back",
                             }).then((res) => {
                               if (res.isConfirmed) {
-                                openPrint();
+                                // openPrint();
+
+                                window.open(
+                                  `pdf/requests.php?executedBy=${encodeURIComponent(executedBy)}&DocEntry=${DocEntry}`,
+                                  "_blank",
+                                );
                               }
                             });
                             return;
@@ -1332,9 +1294,9 @@ function loadBasket() {
                           if (response.status === "success") {
                             openPrint();
                           }
-                      //   },
-                      //   "json",
-                      // );
+                        },
+                        "json",
+                      );
                     });
                   }
                 });
@@ -1600,7 +1562,6 @@ function submitEncodedQty(PicklistEntry, picklistNum) {
             formData.append("ActualQty[]", item.ActualQty);
             formData.append("SR_Number[]", item.SR_Number);
           });
-
           // PRINT WITH ACTUAL QUANTITY
           let PickListNum = picklistNum;
 

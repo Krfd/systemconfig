@@ -15,7 +15,6 @@ if (!isset($_GET['DocEntry']) || empty($_SESSION['Uid'])) {
 $DocEntry = $_GET['DocEntry'];
 $executedBy = $_GET['executedBy'] ?? '';
 $Uid = $_SESSION['Uid'];
-$groupByCategory = isset($_GET['groupByCategory']) && $_GET['groupByCategory'] == 1;
 
 try {
 
@@ -328,25 +327,9 @@ try {
         $pdf->Ln(3);
     }
 
-    // headerDetails($pdf, $picklistNum, $docDate);
-    // renderItemsTable($pdf, $picklistNum, $itemData, $textColor);
-    // bottomLeftDetails($pdf, $executedby, $picklistItems, $printedby, $timestamp, $textColor);
-
-    if ($groupByCategory) {
-        foreach ($categorizedItems as $category => $items) {
-            $pdf->AddPage();
-            // CATEGORY TITLE
-            $pdf->SetFont('Arial', 'B', 12);
-            $pdf->Cell(0, 8, "Category: " . $category, 0, 1);
-            headerDetails($pdf, $picklistNum, $docDate);
-            renderItemsTable($pdf, $picklistNum, $items, $textColor);
-            bottomLeftDetails($pdf, $executedby, $items, $printedby, $timestamp, $textColor);
-        }
-    } else {
-        headerDetails($pdf, $picklistNum, $docDate);
-        renderItemsTable($pdf, $picklistNum, $itemData, $textColor);
-        bottomLeftDetails($pdf, $executedby, $picklistItems, $printedby, $timestamp, $textColor);
-    }
+    headerDetails($pdf, $picklistNum, $docDate);
+    renderItemsTable($pdf, $picklistNum, $itemData, $textColor);
+    bottomLeftDetails($pdf, $executedby, $picklistItems, $printedby, $timestamp, $textColor);
     ob_end_clean();
     $pdf->Output('I', $picklistNum . '.pdf');
 } catch (PDOException $e) {

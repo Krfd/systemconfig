@@ -12,6 +12,7 @@ if (!isset($_GET['srn'])) {
 }
 try {
     $srn = $_GET['srn'];
+    $grouped = isset($_GET['grouped']) && $_GET['grouped'] == 1;
 
     $stmt = $conn->prepare("SELECT * FROM Stock_Transfer_Header_1 WHERE SR_Number = ?");
     $stmt->execute([$srn]);
@@ -36,16 +37,16 @@ try {
 
     class PDF extends FPDF
     {
-
+public $categoryTitle = '';
         function Header()
         {
             $this->Image('assets/image/logo/iap_icon.png', 10, 10, 30);
             $this->SetFont('Arial', 'B', 20);
             $pageWidth = $this->GetPageWidth();
-            $this->SetX(10);
-            $this->Cell($pageWidth - 10, 20, 'STOCK REQUEST', 0, 1, 'C');
 
-            $this->Ln(10);
+            $this->SetX(10);
+            $this->Cell($pageWidth - 10, 20, 'STOCK REQUEST', 0, 0, 'C');
+            $this->Ln(25);
         }
 
         function Footer()
@@ -124,9 +125,9 @@ try {
 
     $pdf = new PDF();
     $pdf->AliasNbPages();
-    $pdf->AddPage();
+    // $pdf->AddPage();
 
-    function headerDetails($pdf, $srn, $status, $date, $origin)
+    function headerDetails($pdf, $srn, $status, $date, $origin, $category = '')
     {
         global $textColor;
 
@@ -171,6 +172,14 @@ try {
         $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
         $pdf->Cell($valueWidth, 5, $date, 0, 1);
 
+        /* ---------- ROW 3 (CATEGORY) ---------- */
+        if (!empty($category)) {
+            $pdf->SetFont('Arial', 'B', 9);
+            $pdf->Cell($labelWidth, 5, 'Category', 0, 0);
+            $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+            $pdf->Cell($valueWidth, 5, $category, 0, 1);
+        }
+
         $pdf->Ln(3);
     }
 
@@ -211,86 +220,7 @@ try {
         $pdf->Cell(0, 5, $timestamp, 0, 1);
     }
 
-    // function renderItemsTable($pdf, $itemData, $textColor)
-    // {
-    //     /* ---------- TITLE ---------- */
-    //     $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
-    //     $pdf->Ln(3);
-
-    //     $pdf->SetFont('Arial', 'B', 9);
-    //     $headers = [
-    //         '#' => 10,
-    //         'Category' => 40,
-    //         'Model' => 80,
-    //         'Brand' => 35,
-    //         'Quantity' => 20
-    //     ];
-
-    //     // Header row
-    //     foreach ($headers as $text => $width) {
-    //         $pdf->Cell($width, 6, $text, 1, 0, 'C');
-    //     }
-    //     $pdf->Ln();
-    //     $pdf->SetFont('Arial', '', 9);
-
-    //     $lineHeight = 5;
-    //     $i = 1;
-    //     $totalQty = 0;
-
-    //     foreach ($itemData as $row) {
-    //         $totalQty += $row->Request_Qty;
-
-    //         // Calculate lines for each column
-    //         $brandLines = $pdf->NbLines($headers['Brand'], $row->ItemBrand);
-    //         $modelLines = $pdf->NbLines($headers['Model'], $row->ItemName);
-    //         $categoryLines = $pdf->NbLines($headers['Category'], $row->ItemCategory);
-
-    //         $maxLines = max($brandLines, $modelLines, $categoryLines, 1);
-    //         $rowHeight = $lineHeight * $maxLines;
-
-    //         $x = $pdf->GetX();
-    //         $y = $pdf->GetY();
-
-    //         /* ---------- COLUMN # ---------- */
-    //         $pdf->MultiCell($headers['#'], $rowHeight, $i, 1, 'C');
-    //         $pdf->SetXY($x + $headers['#'], $y);
-
-    //         /* ---------- BRAND ---------- */
-    //         $pdf->MultiCell($headers['Brand'], $rowHeight, $row->ItemBrand, 1);
-    //         $pdf->SetXY($x + $headers['#'] + $headers['Brand'], $y);
-
-    //         /* ---------- MODEL ---------- */
-    //         $modelText = $row->ItemName;
-
-    //         // Shrink font if too wide
-    //         if ($pdf->GetStringWidth($modelText) > $headers['Model']) {
-    //             $pdf->SetFont('Arial', '', 8); // shrink font
-    //         } else {
-    //             $pdf->SetFont('Arial', '', 9); // normal font
-    //         }
-
-    //         // Output as a single line cell (no MultiCell)
-    //         $pdf->Cell($headers['Model'], $rowHeight, $modelText, 1);
-    //         $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'], $y);
-
-    //         /* ---------- CATEGORY ---------- */
-    //         $pdf->MultiCell($headers['Category'], $rowHeight, $row->ItemCategory, 1);
-    //         $pdf->SetXY($x + $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'], $y);
-
-    //         /* ---------- QUANTITY ---------- */
-    //         $pdf->MultiCell($headers['Quantity'], $rowHeight, $row->Request_Qty, 1, 'C');
-
-    //         $i++;
-    //     }
-
-    //     // ---------- TOTAL QUANTITY ----------
-    //     $pdf->SetFont('Arial', 'B', 9);
-    //     $labelWidth = $headers['#'] + $headers['Brand'] + $headers['Model'] + $headers['Category'];
-    //     $pdf->Cell($labelWidth, 6, 'Total Quantity', 1, 0, 'C');
-    //     $pdf->Cell($headers['Quantity'], 6, $totalQty, 1, 1, 'C');
-    // }
-
-    function renderItemsTable($pdf, $itemData, $textColor)
+    function renderItemsTable($pdf, $itemData, $textColor, $grouped)
     {
         /* ---------- TITLE ---------- */
         $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
@@ -375,12 +305,37 @@ try {
         $pdf->Cell($headers['Quantity'], 6, $totalQty, 1, 1, 'C');
     }
 
-    /* ---------- HEADER ---------- */
+    $groupedItems = [];
 
-    headerDetails($pdf, $srn, $status, $date, $origin);
-    renderItemsTable($pdf, $itemData, $textColor);
-    bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $timestamp, $textColor);
+        foreach ($itemData as $row) {
+            $category = $row->ItemCategory ?? 'Uncategorized';
+            $groupedItems[$category][] = $row;
+        }
 
+        // CATEGORIZED ITEM
+        if ($grouped) {
+            foreach ($groupedItems as $category => $items) {
+                $pdf->categoryTitle = $category;
+                $pdf->AddPage();
+
+                headerDetails($pdf, $srn, $status, $date, $origin, $category);
+
+                $pdf->Ln(2);
+
+                // PASS CORRECT VARIABLE HERE
+                renderItemsTable($pdf, $items, $textColor, false);
+                bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $timestamp, $textColor);
+            }
+        }
+        
+        // NON-CATEGORIZED ITEM
+        else {
+            $pdf->categoryTitle = '';
+            $pdf->AddPage();
+            headerDetails($pdf, $srn, $status, $date, $origin, '');
+            renderItemsTable($pdf, $itemData, $textColor, $grouped);
+            bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $timestamp, $textColor);
+        }
     /* ---------- OUTPUT ---------- */
 
     ob_end_clean();
