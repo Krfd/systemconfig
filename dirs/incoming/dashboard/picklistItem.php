@@ -13,9 +13,11 @@
         <table class="table table-hover datatables" id="picklistItemTable">
             <thead class="sticky-top">
                 <tr>
-                    <th class="text-secondary">SRN</th>
-                    <th class="text-secondary">Date</th>
-                    <th class="text-secondary">Requesting Branch</th>
+                    <th class="text-secondary">#</th>
+                    <th class="text-secondary">Brand</th>
+                    <th class="text-secondary">Model</th>
+                    <th class="text-secondary">Category</th>
+                    <th class="text-secondary">Quantity</th>
                 </tr>
             </thead>
             <tbody>

@@ -37,7 +37,7 @@ try {
 
     class PDF extends FPDF
     {
-public $categoryTitle = '';
+        public $categoryTitle = '';
         function Header()
         {
             $this->Image('assets/image/logo/iap_icon.png', 10, 10, 30);

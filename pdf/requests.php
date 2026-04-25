@@ -1,8 +1,10 @@
 <?php
 
-ob_start();
-error_reporting(0);
-@ini_set('display_errors', 0);
+// ob_start();
+// error_reporting(0);
+// @ini_set('display_errors', 0);
+error_reporting(E_ALL);
+@ini_set('display_errors', 1);
 require_once "../config/connection.php";
 require_once "../assets/plugins/fpdf/fpdf.php";
 session_start();
@@ -37,13 +39,14 @@ try {
         : "N/A";
     $timestamp = date("m/d/y h:i A", strtotime($picklistHeader->DocDate));
     $executedby = $executedBy ?? "N/A";
-    $printedby = $picklistHeader->PickedBy ?? "N/A";
+    $printedby = $picklistHeader->CollectedBy ?? "N/A";
     $itemData = $picklistItems;
 
     $textColor = [50, 50, 50];
 
     class PDF extends FPDF
     {
+        public $categoryTitle;
         function Header()
         {
             $this->Image('../assets/image/logo/iap_icon.png', 10, 10, 30);
@@ -130,9 +133,8 @@ try {
 
     $pdf = new PDF();
     $pdf->AliasNbPages();
-    $pdf->AddPage();
 
-    function headerDetails($pdf, $picklistNum, $docDate)
+    function headerDetails($pdf, $picklistNum, $docDate, $category = '')
     {
         global $textColor;
         $labelWidth = 15;
@@ -146,6 +148,13 @@ try {
         $pdf->Cell($labelWidth, 5, 'Date ', 0, 0);
         $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
         $pdf->Cell(0, 5, $docDate, 0, 1);
+        /* ---------- ROW 3 (CATEGORY) ---------- */
+        if (!empty($category)) {
+            $pdf->SetFont('Arial', 'B', 9);
+            $pdf->Cell($labelWidth, 5, 'Category', 0, 0);
+            $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+            $pdf->Cell(0, 5, $category, 0, 1);
+        }
         $pdf->Ln(1);
     }
 
@@ -328,28 +337,39 @@ try {
         $pdf->Ln(3);
     }
 
-    // headerDetails($pdf, $picklistNum, $docDate);
-    // renderItemsTable($pdf, $picklistNum, $itemData, $textColor);
-    // bottomLeftDetails($pdf, $executedby, $picklistItems, $printedby, $timestamp, $textColor);
+    $categorizedItems = [];
+
+    foreach ($itemData as $item) {
+        $category = $item->Req_ItemCategory ?? 'Uncategorized';
+
+        if (!isset($categorizedItems[$category])) {
+            $categorizedItems[$category] = [];
+        }
+
+        $categorizedItems[$category][] = $item;
+    }
 
     if ($groupByCategory) {
         foreach ($categorizedItems as $category => $items) {
+            $pdf->categoryTitle = $category;
             $pdf->AddPage();
             // CATEGORY TITLE
-            $pdf->SetFont('Arial', 'B', 12);
-            $pdf->Cell(0, 8, "Category: " . $category, 0, 1);
-            headerDetails($pdf, $picklistNum, $docDate);
+            // $pdf->SetFont('Arial', 'B', 12);
+            // $pdf->Cell(0, 8, "Category: " . $category, 0, 1);
+            headerDetails($pdf, $picklistNum, $docDate, $category);
             renderItemsTable($pdf, $picklistNum, $items, $textColor);
             bottomLeftDetails($pdf, $executedby, $items, $printedby, $timestamp, $textColor);
         }
     } else {
-        headerDetails($pdf, $picklistNum, $docDate);
+        $pdf->categoryTitle = '';
+        $pdf->AddPage();
+        headerDetails($pdf, $picklistNum, $docDate, '');
         renderItemsTable($pdf, $picklistNum, $itemData, $textColor);
         bottomLeftDetails($pdf, $executedby, $picklistItems, $printedby, $timestamp, $textColor);
     }
     ob_end_clean();
     $pdf->Output('I', $picklistNum . '.pdf');
 } catch (PDOException $e) {
-    $conn->rollBack();
+    // $conn->rollBack();
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
 }
