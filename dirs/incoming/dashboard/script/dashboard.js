@@ -858,7 +858,7 @@ function openPicklist(picklistNum) {
             );
 
             sortedData.forEach((item) => {
-              console.log(`picklist item: ${JSON.stringify(item)}`)
+              // console.log(`picklist item: ${JSON.stringify(item)}`)
               // if (existingSeries.has(item.SR_Number)) {
               //   return;
               // }
@@ -1276,8 +1276,8 @@ function loadBasket() {
                 const PKlistNum = $(this).data("picklist");
                 const DocEntry = $(this).data("doc-entry");
 
-                console.log(`PRINTING PICKLIST: ${PKlistNum}`)
-                console.log(`PRINTING DOCENTRY: ${DocEntry}`)
+                // console.log(`PRINTING PICKLIST: ${PKlistNum}`)
+                // console.log(`PRINTING DOCENTRY: ${DocEntry}`)
 
                 Swal.fire({
                   title: "Print this Picklist?",
@@ -1401,6 +1401,8 @@ $(document).on("keydown", ".editable-cell", function (e) {
 });
 
 function encodeQty(picklistNum, rowNum) {
+  console.log(`ENCODE PICKLIST NUM: ${picklistNum}`)
+  console.log(`ENCODE ROW NUM: ${rowNum}`)
   $.post(
     "dirs/incoming/dashboard/encodeQty.php",
     { picklistNum: picklistNum },
@@ -1493,6 +1495,7 @@ function encodeQty(picklistNum, rowNum) {
               $("#totalEncodedQty").text(totalQty);
             }
 
+            // submitEncodedQty(picklistEntry, picklistNum, "create");
             submitEncodedQty(picklistEntry, picklistNum);
           } else {
             alert(response.Data);
@@ -1542,12 +1545,17 @@ function validateNumber(el) {
   sel.addRange(range);
 }
 
-function submitEncodedQty(PicklistEntry, picklistNum, mode) {
-  $("#encodeqty").off("submit", "#encodeqty").on("submit", "#encodeqty", function (e) {
+// function submitEncodedQty(PicklistEntry, picklistNum, mode) {
+function submitEncodedQty(PicklistEntry, picklistNum) {
+  $("#encodeqty").off("submit", "#encodeqty", "#editEncodedQty").on("submit", "#encodeqty", "editEncodedQty", function (e) {
+    console.log(`Picklist Entry: ${PicklistEntry}`)
+    console.log(`Picklist Number: ${picklistNum}`)
     e.preventDefault();
+    // let formId = $(this).attr("id")
+    // let formId = mode === "edit" ? "editEncodedQty" : "encodeQtyTable"
     let isValid = true;
 
-    $(".editable-cell").each(function () {
+    $(this).find(".editable-cell").each(function () {
       let value = $(this).text().trim();
 
       // Check if empty
@@ -1621,7 +1629,8 @@ function submitEncodedQty(PicklistEntry, picklistNum, mode) {
           let DocEntry = "";
 
           let executedBy = userInput.value;
-          let formId = mode === "edit" ? "editEncodedQty" : "encodeqty";
+          // let formId = mode === "edit" ? "editEncodedQty" : "encodeqty";
+          let formId = $(this).attr("id")
           let formData = new FormData(document.getElementById(formId));
           // let formData = new FormData(document.getElementById("encodeqty"));
 
@@ -1708,6 +1717,9 @@ function submitEncodedQty(PicklistEntry, picklistNum, mode) {
 
 // UPDATE ACTUAL QUANTITY
 function editEncodedQty(picklistNum, rowNum) {
+  console.log(`PICKLIST NUM: ${picklistNum}`)
+  console.log(`ROW NUM: ${rowNum}`)
+  console.log(``)
   $.post(
     "dirs/incoming/dashboard/editEncodedQty.php",
     { picklistNum: picklistNum },
@@ -1754,7 +1766,7 @@ function editEncodedQty(picklistNum, rowNum) {
             });
 
             let index = 0;
-            let totalQty = 0;
+            // let totalQty = 0;
 
             srNumberMap = response.Data.map((item) => item.SR_Number);
             formattedDate();
@@ -1764,6 +1776,7 @@ function editEncodedQty(picklistNum, rowNum) {
             let groupedArray = Object.values(groupedItems);
 
             Object.values(groupedItems).forEach((item) => {
+              console.log(`EDIT ITEMS: ${JSON.stringify(item)}`)
               picklistEntry = item.DocEntry;
               index++;
               rows += `
@@ -1799,9 +1812,9 @@ function editEncodedQty(picklistNum, rowNum) {
               `;
                 $("#editEncodedQtyTable tbody").append(emptyRow);
               }
-              // $("#totalEncodedQty").text(totalQty);
             }
 
+            // submitEncodedQty(picklistEntry, picklistNum, "edit");
             submitEncodedQty(picklistEntry, picklistNum);
           } else {
             alert(response.Data);
