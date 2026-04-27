@@ -144,10 +144,6 @@ try {
         $pdf->Cell($labelWidth, 5, 'PICKLIST ', 0, 0);
         $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
         $pdf->Cell(0, 5, $picklistNum, 0, 1);
-        $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell($labelWidth, 5, 'Date ', 0, 0);
-        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
-        $pdf->Cell(0, 5, $docDate, 0, 1);
         /* ---------- ROW 3 (CATEGORY) ---------- */
         if (!empty($category)) {
             $pdf->SetFont('Arial', 'B', 9);
@@ -155,6 +151,10 @@ try {
             $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
             $pdf->Cell(0, 5, $category, 0, 1);
         }
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->Cell($labelWidth, 5, 'Date ', 0, 0);
+        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
+        $pdf->Cell(0, 5, $docDate, 0, 1);
         $pdf->Ln(1);
     }
 
@@ -353,9 +353,6 @@ try {
         foreach ($categorizedItems as $category => $items) {
             $pdf->categoryTitle = $category;
             $pdf->AddPage();
-            // CATEGORY TITLE
-            // $pdf->SetFont('Arial', 'B', 12);
-            // $pdf->Cell(0, 8, "Category: " . $category, 0, 1);
             headerDetails($pdf, $picklistNum, $docDate, $category);
             renderItemsTable($pdf, $picklistNum, $items, $textColor);
             bottomLeftDetails($pdf, $executedby, $items, $printedby, $timestamp, $textColor);

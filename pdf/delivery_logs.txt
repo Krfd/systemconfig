@@ -1,0 +1,33 @@
+{
+    "picklist": "PL10003",
+    "user-origin": "NEWSC1",
+    "originCodeForm": "NEWS",
+    "docdate": "2026-04-27",
+    "deldate": "2026-04-27",
+    "statusForm": "NEW",
+    "prepby": "Cee Jay",
+    "driver": "Juan Dela Cruz",
+    "truckCat": "4 Wheeler",
+    "plate": "ABC-123",
+    "remarks": "Deliver within city loop only",
+    "items": [
+        {
+            "brand": "SKYWORTH",
+            "model": "SKYWORTH DIGITAL ANTENNA",
+            "category": "ACCESSORIES",
+            "quantity": "1"
+        },
+        {
+            "brand": "CARRIER",
+            "model": "WCARH019EC",
+            "category": "AIRCON",
+            "quantity": "5"
+        },
+        {
+            "brand": "APPLE",
+            "model": "iPHONE 14 128GB STARLIGHT",
+            "category": "PHONE",
+            "quantity": "1"
+        }
+    ]
+}

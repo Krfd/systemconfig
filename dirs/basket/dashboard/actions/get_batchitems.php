@@ -1,40 +1,29 @@
-  <?php
-    require_once "../../../../config/connection.php";
-    session_start();
+<?php
+require_once "../../../../config/connection.php";
+session_start();
 
-    $User = $_SESSION['Uid'];
-    $BatchNumber = $_POST['BatchNumber'] ?? [];
+$User = $_SESSION['Uid'];
+$PickListNumber     = $_POST['PickListNumber'];
 
-    try {
+try {
+    $conn->beginTransaction();
 
-        $conn->beginTransaction();
-        if (!is_array($BatchNumber)) {
-            $BatchNumber = [$BatchNumber];
-        }
+    $fetch_items = $conn->prepare("EXEC dbo.[PickListItems_WithActualQty] ?, ?");
+    $fetch_items->execute([$User,  $PickListNumber]);
+    $get_fetchitems = $fetch_items->fetchAll(PDO::FETCH_ASSOC);
 
-        $results = [];
-        $stmt = $conn->prepare("EXEC dbo.[Assigned_ItemsQuantity] ?,?");
-        foreach ($BatchNumber as $number) {
-            $stmt->execute([$User, $number]);
-            $data = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($data) {
-                $results[] = $data;
-            }
-        }
+    $conn->commit();
 
-        $conn->commit();
-
-        echo json_encode([
-            "isSuccess" => "success",
-            "Data" => $results
-        ]);
-    } catch (PDOException $e) {
-
-        $conn->rollback();
-
-        echo json_encode([
-            "isSuccess" => "Failed",
-            "Data" => "Error. Please contact system developer."
-        ]);
-    }
-    ?>
+    $response = array(
+        "isSuccess" => 'success',
+        "Data" => $get_fetchitems
+    );
+    echo json_encode($response);
+} catch (PDOException $e) {
+    $conn->rollback();
+    $response = array(
+        "isSuccess" => 'Failed',
+        "Data" => "<b>Error. Please Contact System Developer. <br/></b>" . $e->getMessage()
+    );
+    echo json_encode($response);
+}

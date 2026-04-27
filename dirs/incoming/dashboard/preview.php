@@ -8,7 +8,10 @@
                 <h3 class="fw-bold text-primary">PREVIEW BASKET</h3>
             </div>
         </div>
-        <button class="btn btn-primary" type="button" onclick="togglePreview()" id="previewPicklistBtn">Create Picklist</button>
+        <div class="d-flex gap-1">
+            <button class="btn btn-success d-none" type="button" onclick="selectAll()" id="selectAllBtn">Select All</button>
+            <button class="btn btn-primary" type="button" onclick="togglePreview()" id="previewPicklistBtn">Create Picklist</button>
+        </div>
     </div>
     <div class="table-responsive-md mt-3">
         <table class="table table-hover datatables" id="previewTableDisplay">

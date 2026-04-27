@@ -9,9 +9,9 @@ session_start();
 
 $data = json_decode($_GET['data'], true);
 $itemData = $data['items'] ?? [];
-$jsonData = json_encode($data, JSON_PRETTY_PRINT);
-$file = "delivery_logs.txt";
-file_put_contents($file, $jsonData . PHP_EOL, FILE_APPEND);
+// $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+// $file = "delivery_logs.txt";
+// file_put_contents($file, $jsonData . PHP_EOL, FILE_APPEND);
 $docDate = date("y-m-d");
 $driver = $data['driver'] ?? '';
 $plate  = $data['plate'] ?? '';

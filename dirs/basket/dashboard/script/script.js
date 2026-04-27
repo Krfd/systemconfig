@@ -2071,160 +2071,160 @@ function submitBranchAssignment() {
   });
 }
 
-// function loadingItems() {
-//   $.post("dirs/basket/dashboard/loadingItems.php", {}, function (data) {
-//     $("#main-content").hide().html(data).fadeIn(200);
+function loadingItems() {
+  $.post("dirs/basket/dashboard/loadingItems.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
 
-//     $.ajax({
-//       url: "dirs/basket/dashboard/actions/get_delivery_basket.php",
-//       type: "POST",
-//       dataType: "json",
-//       success: function (response) {
-//         if (
-//           !response ||
-//           response.isSuccess !== "success" ||
-//           !Array.isArray(response.Data)
-//         ) {
-//           response = {
-//             isSuccess: "success",
-//             Data: [],
-//           };
-//         }
-//         let rows = [];
-//         if (response.isSuccess === "success") {
-//           let basketData = response.Data;
+    $.ajax({
+      url: "dirs/basket/dashboard/actions/get_delivery_basket.php",
+      type: "POST",
+      dataType: "json",
+      success: function (response) {
+        if (
+          !response ||
+          response.isSuccess !== "success" ||
+          !Array.isArray(response.Data)
+        ) {
+          response = {
+            isSuccess: "success",
+            Data: [],
+          };
+        }
+        let rows = [];
+        if (response.isSuccess === "success") {
+          let basketData = response.Data;
 
-//           // sortedData.forEach((item, index) => {
-//           //   let counter = index + 1;
-//           //   rows.push([
-//           //     "DR1000" + counter, // picklist no
-//           //     item.BatchNum || "", // delivery branch
-//           //     response.picklistCount || "", // date assigned or modified
-//           //     item.BatchStatus || "", // dropdown or action
-//           //     '<div class="dropdown dropstart">' +
-//           //       '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
-//           //       '<i class="bi bi-three-dots"></i></button>' +
-//           //       `<ul class="dropdown-menu">
-//           //         <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
-//           //         <li><a class="dropdown-item print-picklist" href="#" data-delivery="${item.PickList_Num}">Print</a></li>
-//           //         <li><a class="dropdown-item create-dr" href="#" data-batch="${item.PickList_Num}">Create DR</a></li>
-//           //       </ul>
-//           //     </div>`,
-//           //   ]);
-//           // });
+          // sortedData.forEach((item, index) => {
+          //   let counter = index + 1;
+          //   rows.push([
+          //     "DR1000" + counter, // picklist no
+          //     item.BatchNum || "", // delivery branch
+          //     response.picklistCount || "", // date assigned or modified
+          //     item.BatchStatus || "", // dropdown or action
+          //     '<div class="dropdown dropstart">' +
+          //       '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
+          //       '<i class="bi bi-three-dots"></i></button>' +
+          //       `<ul class="dropdown-menu">
+          //         <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
+          //         <li><a class="dropdown-item print-picklist" href="#" data-delivery="${item.PickList_Num}">Print</a></li>
+          //         <li><a class="dropdown-item create-dr" href="#" data-batch="${item.PickList_Num}">Create DR</a></li>
+          //       </ul>
+          //     </div>`,
+          //   ]);
+          // });
 
-//           basketData.forEach((item, index) => {
-//             rows.push([
-//               item.PickList_Num, // picklist no
-//               item.BranchPrep || "", // delivery branch
-//               item.DocDate || "", // date assigned or modified
-//               '<div class="dropdown dropstart">' +
-//                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
-//                 '<i class="bi bi-three-dots"></i></button>' +
-//                 `<ul class="dropdown-menu">
-//                   <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
-//                   <li><a class="dropdown-item print-picklist" href="#" data-delivery="${item.PickList_Num}">Print</a></li>
-//                   <li><a class="dropdown-item create-dr" href="#" data-batch="${item.PickList_Num}">Create DR</a></li>
-//                 </ul>
-//               </div>`,
-//             ]);
-//           });
+          basketData.forEach((item, index) => {
+            rows.push([
+              item.PickList_Num, // picklist no
+              item.BranchPrep || "", // delivery branch
+              item.DocDate || "", // date assigned or modified
+              '<div class="dropdown dropstart">' +
+                '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
+                '<i class="bi bi-three-dots"></i></button>' +
+                `<ul class="dropdown-menu">
+                  <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
+                  <li><a class="dropdown-item print-picklist" href="#" data-delivery="${item.PickList_Num}">Print</a></li>
+                  <li><a class="dropdown-item create-dr" href="#" data-batch="${item.PickList_Num}">Create DR</a></li>
+                </ul>
+              </div>`,
+            ]);
+          });
 
-//           if (rows.length === 0) {
-//             for (let i = 0; i < 8; i++) {
-//               // rows.push(["", "", "", "", ""]);
-//               rows.push(["", "", "", ""]);
-//             }
-//           }
+          if (rows.length === 0) {
+            for (let i = 0; i < 8; i++) {
+              // rows.push(["", "", "", "", ""]);
+              rows.push(["", "", "", ""]);
+            }
+          }
 
-//           if ($.fn.DataTable.isDataTable("#loadingBasketTable")) {
-//             $("#loadingBasketTable").DataTable().clear().destroy();
-//           }
+          if ($.fn.DataTable.isDataTable("#loadingBasketTable")) {
+            $("#loadingBasketTable").DataTable().clear().destroy();
+          }
 
-//           $("#loadingBasketTable").DataTable({
-//             data: rows,
-//             columns: [
-//               { title: "Picklist No." }, // Delivery No.
-//               { title: "Delivery Branch", className: "text-primary ps-2" }, // Batch Delivery No.
-//               { title: "Date Assigned", className: "text-start ps-2" }, // Picklist Qty
-//               { title: "", orderable: false },
-//             ],
-//             createdRow: function (row, data, dataIndex) {
-//               let originalItem = basketData[dataIndex];
+          $("#loadingBasketTable").DataTable({
+            data: rows,
+            columns: [
+              { title: "Picklist No." }, // Delivery No.
+              { title: "Delivery Branch", className: "text-primary ps-2" }, // Batch Delivery No.
+              { title: "Date Assigned", className: "text-start ps-2" }, // Picklist Qty
+              { title: "", orderable: false },
+            ],
+            createdRow: function (row, data, dataIndex) {
+              let originalItem = basketData[dataIndex];
 
-//               if (originalItem) {
-//                 $(row)
-//                   // .attr("data-rownum", originalItem.RowNumOrder)
-//                   .attr("data-delivery-num", originalItem.BatchNum)
-//                   .attr("data-picklist", originalItem.PickList_Num);
-//               }
-//             },
-//             paging: true,
-//             searching: true,
-//             info: true,
-//             processing: false,
-//             autoWidth: false,
-//             order: [[0, "desc"]],
-//             rowCallback: function (row, data) {
-//               $("td", row).css({
-//                 background: "#FFFBDF",
-//                 padding: "3px",
-//                 height: "40px",
-//                 "min-height": "40px",
-//                 cursor: "pointer",
-//               });
-//               $("td:eq(0)", row).addClass("text-primary ps-2");
-//               $("td:eq(1)", row).css("text-secondary");
-//               $("td:eq(2)", row).css("text-secondary");
-//               $("td:eq(3)", row).css("text-secondary");
+              if (originalItem) {
+                $(row)
+                  // .attr("data-rownum", originalItem.RowNumOrder)
+                  .attr("data-delivery-num", originalItem.BatchNum)
+                  .attr("data-picklist", originalItem.PickList_Num);
+              }
+            },
+            paging: true,
+            searching: true,
+            info: true,
+            processing: false,
+            autoWidth: false,
+            order: [[0, "desc"]],
+            rowCallback: function (row, data) {
+              $("td", row).css({
+                background: "#FFFBDF",
+                padding: "3px",
+                height: "40px",
+                "min-height": "40px",
+                cursor: "pointer",
+              });
+              $("td:eq(0)", row).addClass("text-primary ps-2");
+              $("td:eq(1)", row).css("text-secondary");
+              $("td:eq(2)", row).css("text-secondary");
+              $("td:eq(3)", row).css("text-secondary");
 
-//               $(row).hover(
-//                 function () {
-//                   $(this).css("background", "#FFF4C2");
-//                 },
-//                 function () {
-//                   $(this).css("background", "#FFFBDF");
-//                 },
-//               );
-//             },
-//             drawCallback: function () {
-//               let tableBody = $("#loadingBasketTable tbody");
-//               let currentRows = tableBody.find("tr").length;
+              $(row).hover(
+                function () {
+                  $(this).css("background", "#FFF4C2");
+                },
+                function () {
+                  $(this).css("background", "#FFFBDF");
+                },
+              );
+            },
+            drawCallback: function () {
+              let tableBody = $("#loadingBasketTable tbody");
+              let currentRows = tableBody.find("tr").length;
 
-//               for (let i = currentRows; i < 8; i++) {
-//                 let $emptyRow = $(`
-//               <tr class="empty-row" style="background: #FFFBDF">
-//                 <td colspan="6" style="background: #FFFBDF">&nbsp;</td>
-//               </tr>
-//             `);
-//                 $emptyRow.css({
-//                   background: "#FFFBDF",
-//                   height: "40px",
-//                   "min-height": "40px",
-//                   cursor: "pointer",
-//                 });
-//                 $emptyRow.hover(
-//                   function () {
-//                     $(this).css("background", "#FFF4C2");
-//                   },
-//                   function () {
-//                     $(this).css("background", "#FFFBDF");
-//                   },
-//                 );
-//                 tableBody.append($emptyRow);
-//               }
-//             },
-//           });
-//         } else {
-//           console.error(response.Data);
-//         }
-//       },
-//       error: function (xhr, status, error) {
-//         console.error("Error loading outgoing data: ", error);
-//       },
-//     });
-//   });
-// }
+              for (let i = currentRows; i < 8; i++) {
+                let $emptyRow = $(`
+              <tr class="empty-row" style="background: #FFFBDF">
+                <td colspan="6" style="background: #FFFBDF">&nbsp;</td>
+              </tr>
+            `);
+                $emptyRow.css({
+                  background: "#FFFBDF",
+                  height: "40px",
+                  "min-height": "40px",
+                  cursor: "pointer",
+                });
+                $emptyRow.hover(
+                  function () {
+                    $(this).css("background", "#FFF4C2");
+                  },
+                  function () {
+                    $(this).css("background", "#FFFBDF");
+                  },
+                );
+                tableBody.append($emptyRow);
+              }
+            },
+          });
+        } else {
+          console.error(response.Data);
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error("Error loading outgoing data: ", error);
+      },
+    });
+  });
+}
 
 // LOAD DELIVERY ITEMS
 function loadDeliveryItems(PickLst_Num, del_num) {
@@ -2677,32 +2677,13 @@ function getDeliveryDetails() {
 
 // ORIGINAL
 // function createDr(batchContainer) {
-//   $("#main-content").html(spinner);
-//   $.post("dirs/basket/dashboard/deliveryForm.php", function (data) {
-//     $("#main-content").hide().html(data).fadeIn(200);
-//     get_userinfo();
-//     loadIAPBranchlist();
-//     deliveryDate();
-//     getBatchItems(batchContainer);
-//     getDeliveryDetails();
-
-//     const addBtn = document.getElementById("addDeliveryModalBtn");
-//     const newItemModal = new bootstrap.Modal(
-//       document.getElementById("addDeliveryModal"),
-//     );
-
-//     addBtn.addEventListener("click", function () {
-//       newItemModal.show();
-//     });
-//   });
-// }
-
-function createDr(batchContainer) {
+function createDr() {
   $("#main-content").html(spinner);
   $.post("dirs/basket/dashboard/createDr.php", function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
     get_userinfo();
     deliveryDate();
+    // getBatchItems(batchContainer);
     getBatchItems(batchContainer);
     getDeliveryDetails();
     submitDelivery();
