@@ -59,7 +59,7 @@ function loadIncoming() {
             : "";
           let statusClass = "";
 
-          if (status === "NEW") {
+          if (status === "NEW" || status === "IN TRANSIT") {
             statusClass = "bg-primary";
           } else if (status === "CANCEL" || status === "CANCELLED") {
             statusClass = "bg-warning";
@@ -688,7 +688,7 @@ function openIncoming(DocEntry) {
 
             for (let i = 0; i < emptyRowsNeeded; i++) {
               let emptyRow = `
-                  <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+                  <tr class="item-row empty-row" style="height: 50px; min-height: 50px;">
                     <td style="background: #F7F7F7"></td>
                     <td style="background: #F7F7F7"></td>
                     <td style="background: #F7F7F7"></td>
@@ -805,6 +805,22 @@ $(document).on("click", ".dropdown .edit-actual-qty", function (e) {
   $("#main-content").html(spinner);
   setTimeout(function () {
     editEncodedQty(picklistNum, rowNum);
+  }, 200);
+});
+
+// CREATE DR
+$(document).on("click", ".dropdown .single-dr", function (e) {
+  e.preventDefault();
+
+  let picklistedRow = $(this).closest("tr");
+  // let picklistNum = picklistedRow.attr("data-picklist-num");
+  // let srn = picklistedRow.attr("data-srn")
+  let picklistNum = $(this).data("picklist");
+  let srn = $(this).data("sr-number")
+
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    createDr(picklistNum, srn);
   }, 200);
 });
 
@@ -1000,7 +1016,7 @@ function openPicklistedForm(SR_Number) {
                         <td class="align-middle ps-3" style="background:#F7F7F7">${item.Req_ItemBrand}</td>
                         <td class="align-middle ps-3" style="background:#F7F7F7">${item.Req_ItemName}</td>
                         <td class="align-middle ps-3" style="background:#F7F7F7">${item.Req_ItemCategory}</td>
-                        <td class="align-middle ps-3" style="background:#F7F7F7">${Math.trunc(Number(item.Req_Item_Qty) || 0)}</td>
+                        <td class="align-middle ps-3" style="background:#F7F7F7">${Math.trunc(Number(item.Req_Item_Qty))}</td>
                       </tr>
                     `;
             });
@@ -1078,19 +1094,41 @@ function loadBasket() {
                 ...item,
                 totalQty: 0,
                 allHaveActualQty: true,
+                SR_Numbers: new Set(),
               };
             }
 
             grouped[key].totalQty += Number(item.RequestItemQty || 0);
+
+            if (item.SR_Number) {
+              grouped[key].SR_Numbers.add(item.SR_Number);
+            }
 
             if (item.Actual_Item_Qty == null) {
               grouped[key].allHaveActualQty = false;
             }
           });
 
-          const groupedArray = Object.values(grouped);
+          // const groupedArray = Object.values(grouped);
+
+          const groupedArray = Object.values(grouped).map(item => ({
+            ...item,
+            SR_Numbers: Array.from(item.SR_Numbers) // convert Set → Array
+          }));
 
           groupedArray.forEach((item) => {
+            const isSingleSR = item.SR_Numbers.length === 1
+            // console.log(`PICKLIST BASKET ITEM: ${JSON.stringify(item)}`)
+            const condition = item.allHaveActualQty && isSingleSR;
+
+                // console.log(
+                //   "PK:", item.PKList_Number,
+                //   "| allHaveActualQty:", item.allHaveActualQty,
+                //   "| isSingleSR:", isSingleSR,
+                //   "| condition:", condition
+                // );
+                // console.log(``)
+
             const date = new Date(item.DocDate);
             const formatted = date.toISOString().split("T")[0];
 
@@ -1117,6 +1155,12 @@ function loadBasket() {
                     </a>
                 </li>`;
 
+              const createDr = item.allHaveActualQty && isSingleSR ? `
+                <li>
+                  <a class="dropdown-item single-dr" href="#" data-picklist="${item.PKList_Number}" data-sr-number="${item.SR_Numbers[0]}">Create DR</a>
+                </li>
+              ` : '';
+
             rows.push([
               item.PKList_Number || "",
               formatted || "",
@@ -1128,6 +1172,7 @@ function loadBasket() {
                   <li><a class="dropdown-item open-picklist-items" href="#">Open</a></li>
                   ${printOption}
                   ${actualQtyOption}
+                  ${createDr}
                 </ul>
               </div>`,
             ]);
@@ -1203,8 +1248,8 @@ function loadBasket() {
                 </tr>`);
                 $emptyRow.css({
                   background: "#FFFBDF",
-                  height: "40px",
-                  "min-height": "40px",
+                  height: "50px",
+                  "min-height": "50px",
                 });
                 $emptyRow.hover(
                   function () {
@@ -1381,15 +1426,18 @@ function encodeQty(picklistNum) {
                   Req_ItemCategory: item.Req_ItemCategory,
                   DocEntry: item.DocEntry,
                   totalQty: 0,
+                  branches: new Set(),
                   rows: [], // 🔥 store original rows
                 };
               }
 
               groupedItems[key].totalQty += qty;
+              groupedItems[key].branches.add(item.Req_Branch);
 
               groupedItems[key].rows.push({
                 Item_id: item.Item_id,
                 SR_Number: item.SR_Number,
+                Req_Branch: item.Req_Branch, 
               });
             });
 
@@ -1397,7 +1445,7 @@ function encodeQty(picklistNum) {
 
             // srNumberMap = response.Data.map((item) => item.SR_Number);
             srNumberMap = [
-              ...new Set(response.Data.map((item) => item.SR_Number)),
+              ...new Set(response.Data.map((item) => item.Req_Branch)),
             ];
             formattedDate();
             let rows = "";
@@ -1406,6 +1454,7 @@ function encodeQty(picklistNum) {
             let groupedArray = Object.values(groupedItems);
 
             Object.values(groupedItems).forEach((item) => {
+              console.log(`ENCODE QTY ITEM: ${JSON.stringify(item)}`)
               picklistEntry = item.DocEntry;
               index++;
               rows += `
@@ -1469,17 +1518,22 @@ function handleFocus(el) {
 function validateNumber(el) {
   let value = $(el).text();
 
+  // Keep only numbers
   value = value.replace(/\D/g, "");
 
-  // Limit to max 3 characters
+  // Limit to max 3 digits
   if (value.length > 3) {
     value = value.substring(0, 3);
   }
 
-  // Update text only once
-  $(el).text(value);
+  let numericValue = Number(value);
 
-  // Always move cursor to end
+  // 🔥 Get max (Quantity column in same row)
+  let maxQty = Number(
+    $(el).closest("tr").find("td:nth-child(5)").text()
+  );
+
+  // Move cursor to end
   let range = document.createRange();
   let sel = window.getSelection();
   range.selectNodeContents(el);
@@ -1493,14 +1547,27 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
     .off("submit", "#encodeqty, #editEncodedQty")
     .on("submit", "#encodeqty, #editEncodedQty", function (e) {
       e.preventDefault();
+
       let isValid = true;
+      let hasEmpty = false;
+      let hasExceeded = false;
 
       $(this)
         .find(".editable-cell")
         .each(function () {
           let value = $(this).text().trim();
+          let actual = Number(value);
+
+          let maxQty = Number(
+            $(this).closest("tr").find("td:nth-child(5)").text()
+          );
 
           if (value === "") {
+            hasEmpty = true;
+            isValid = false;
+            $(this).addClass("border border-danger");
+          } else if (actual > maxQty) {
+            hasExceeded = true;
             isValid = false;
             $(this).addClass("border border-danger");
           } else {
@@ -1509,10 +1576,24 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
         });
 
       if (!isValid) {
+        let message = "";
+
+        if (hasEmpty && hasExceeded) {
+          message =
+            "Some fields are empty and some actual quantities exceed the allowed total quantity.";
+        } else if (hasEmpty) {
+          message = "Please fill in all Actual Quantity fields.";
+        } else if (hasExceeded) {
+          message =
+            "Actual quantity must not be greater than its corresponding total quantity.";
+        }
+
         Swal.fire({
           icon: "error",
-          title: "Please fill in all Actual quantity fields",
+          title: "Invalid Input",
+          text: message,
         });
+
         return;
       }
 
@@ -1632,20 +1713,11 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
                           .filter(Boolean);
                       }
 
+                      // console.log(`SR Array : ${srArray}`)
+
                       if (srArray.length === 1) {
                         $("#main-content").html(spinner);
-                        $.post(
-                          "dirs/basket/dashboard/createDr.php",
-                          function (data) {
-                            $("#main-content").hide().html(data).fadeIn(200);
-                            $("#picklist").val(picklistNum);
-                            get_userinfo();
-                            deliveryDate();
-                            getDeliveryDetails();
-                            getBatchItems(picklistNum);
-                            submitDelivery();
-                          },
-                        );
+                        createDr(picklistNum, srArray)
                       }
                     } else {
                       console.log(`SRN MAP : ${srnMap}`);
@@ -1674,6 +1746,23 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
         }
       });
     });
+}
+
+// CREATE DELIVERY
+function createDr(picklistNum, srn) {
+  // console.log(`PICKLIST NUMBER : ${picklistNum}`)
+  $.post(
+    "dirs/basket/dashboard/createDr.php",
+    function (data) {
+      $("#main-content").hide().html(data).fadeIn(200);
+      $("#picklist").val(picklistNum);
+      get_userinfo();
+      deliveryDate();
+      getDeliveryDetails();
+      getBatchItems(picklistNum);
+      submitDelivery(srn);
+    },
+  );
 }
 
 // UPDATE ACTUAL QUANTITY
@@ -1709,6 +1798,7 @@ function editEncodedQty(picklistNum) {
                   Req_ItemCategory: item.Req_ItemCategory,
                   DocEntry: item.DocEntry,
                   totalQty: 0,
+                  branches: new Set(),
                   Actual_Item_Qty: actual_qty,
                   rows: [], // 🔥 store original rows
                 };
@@ -1716,16 +1806,21 @@ function editEncodedQty(picklistNum) {
 
               groupedItems[key].totalQty += qty;
               groupedItems[key].Actual_Item_Qty = actual_qty;
+              groupedItems[key].branches.add(item.Req_Branch);
 
               groupedItems[key].rows.push({
                 Item_id: item.Item_id,
                 SR_Number: item.SR_Number,
+                Req_Branch: item.Req_Branch, 
               });
             });
 
             let index = 0;
 
-            srNumberMap = response.Data.map((item) => item.SR_Number);
+            // srNumberMap = response.Data.map((item) => item.SR_Number);
+            srNumberMap = [
+              ...new Set(response.Data.map((item) => item.Req_Branch)),
+            ];
             formattedDate();
             let rows = "";
             let picklistEntry = "";
@@ -1733,6 +1828,7 @@ function editEncodedQty(picklistNum) {
             let groupedArray = Object.values(groupedItems);
 
             Object.values(groupedItems).forEach((item) => {
+              console.log(`EDIT ENCODE QTY ITEM: ${JSON.stringify(item)}`)
               picklistEntry = item.DocEntry;
               index++;
               rows += `
@@ -1769,7 +1865,7 @@ function editEncodedQty(picklistNum) {
               }
             }
 
-            submitEncodedQty(picklistEntry, picklistNum);
+            submitEncodedQty(picklistEntry, picklistNum, srNumberMap);
           } else {
             alert(response.Data);
           }
@@ -1861,6 +1957,7 @@ function getBatchItems(PicklistNumber) {
     success: function (response) {
       let items = response.Data;
       let deliveryTable = $("#deliveryFormTable tbody");
+      deliveryTable.empty();
       let totalQty = 0;
       let counter = 0;
 
@@ -1888,10 +1985,8 @@ function getBatchItems(PicklistNumber) {
 
           totalQty += qty;
 
-          //  <tr class="item-row" style="height: 40px; min-height:40px; cursor: pointer;" data-itemCode="${item.itemIds}"></tr>
-
-          let row = `
-            <tr class="item-row" style="height: 40px; min-height:40px; cursor: pointer;" data-itemids="${JSON.stringify(item.itemIds)}">
+          let row = $(`
+            <tr class="item-row" style="height: 40px; min-height:40px; cursor: pointer;">
               <td class="align-middle ps-3" style="background: #FFFBDF;">${counter}</td>
               <td class="align-middle ps-3 item-brand" style="background: #FFFBDF;">${item.Brand}</td>
               <td class="align-middle ps-3 item-model" style="background: #FFFBDF;">${item.Model}</td>
@@ -1899,10 +1994,9 @@ function getBatchItems(PicklistNumber) {
               <td class="align-middle ps-3 item-category" style="background: #FFFBDF;">${item.Category}</td>
               <td class="align-middle ps-3 text-center item-quantity" style="background: #FFFBDF;">${qty}</td>
             </tr>
-          `;
+          `);
 
-          // <td class="align-middle ps-3" style="background: #FFFBDF;"></td>;
-
+          row.data("itemids", item.itemIds);
           deliveryTable.append(row);
         });
 
@@ -1935,7 +2029,8 @@ function getBatchItems(PicklistNumber) {
   });
 }
 
-function submitDelivery() {
+function submitDelivery(srn) {
+  // console.log(`BRANCH: ${srn}`)
   $("#deliver").on("submit", function (e) {
     e.preventDefault();
 
@@ -1943,10 +2038,19 @@ function submitDelivery() {
     $("#deliver tbody tr.item-row")
       .not(".empty-row")
       .each(function () {
-        let itemIds = $(this).data("itemids");
+        let itemIds = $(this).data("itemids") || [];
 
-        if (typeof itemIds === "string") {
-          itemIds = JSON.parse(itemIds);
+        try {
+          if (!itemIds) {
+            itemIds = [];
+          } else if (typeof itemIds === "string") {
+            itemIds = JSON.parse(itemIds);
+          } else if (!Array.isArray(itemIds)) {
+            itemIds = [];
+          }
+        } catch (err) {
+          console.error("Invalid JSON in itemIds:", itemIds);
+          itemIds = [];
         }
 
         let brand = $(this).find(".item-brand").text().trim();
@@ -1957,18 +2061,17 @@ function submitDelivery() {
 
         if (brand !== "") {
           items.push({
-            itemIds: itemIds,
-            brand: brand,
-            code: code,
-            model: model,
-            category: category,
-            quantity: quantity,
+            itemIds,
+            brand,
+            code,
+            model,
+            category,
+            quantity,
           });
         }
       });
 
     if (items.length === 0) {
-      e.preventDefault();
       Swal.fire({
         icon: "warning",
         title: "No Items on the table",
@@ -1979,45 +2082,47 @@ function submitDelivery() {
 
     let formData = new FormData(document.getElementById("deliver"));
     formData.append("items", JSON.stringify(items));
+    formData.append("srn", (srn));
 
     let formObject = Object.fromEntries(formData.entries());
-
     formObject.items = items;
+    formObject.srn = srn;
 
-    $.ajax({
-      url: "dirs/basket/dashboard/actions/submit_delivery.php",
-      type: "POST",
-      data: formData,
-      processData: false,
-      contentType: false,
-      dataType: "json",
-      success: function (response) {
-        console.log(`RESPONSE: ${JSON.stringify(response)}`);
+    // 🔥 ASK FIRST BEFORE API CALL
+    Swal.fire({
+      title: "Printing option",
+      text: "Do you want to print items by category?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, categorized",
+      cancelButtonText: "Normal",
+      allowOutsideClick: false,
+    }).then((res) => {
+      const categorized = res.isConfirmed;
 
-        Swal.fire({
-          title: "Printing option",
-          text: "Do you want to print items by category?",
-          icon: "question",
-          showCancelButton: true,
-          confirmButtonText: "Yes, categorized",
-          cancelButtonText: "Normal",
-          allowOutsideClick: false,
-        }).then((res) => {
-          const categorized = res.isConfirmed;
+      $.ajax({
+        url: "dirs/basket/dashboard/actions/submit_delivery.php",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: "json",
+        success: function (response) {
+          console.log(`RESPONSE: ${JSON.stringify(response)}`);
 
           if (response.isSuccess === "success") {
             Swal.fire({
               icon: "success",
               title: "Items has been transferred to IN TRANSIT",
             }).then(() => {
-              const printDelivery = () => {
-                window.open(
-                  `pdf/delivery.php?data=${encodeURIComponent(JSON.stringify(formObject))}`,
-                  "_blank",
-                );
-              };
+              window.open(
+                `pdf/delivery.php?data=${encodeURIComponent(
+                  JSON.stringify(formObject)
+                )}&categorized=${categorized}`,
+                "_blank"
+              );
 
-              printDelivery();
+              loadBasket();
             });
           }
 
@@ -2025,18 +2130,20 @@ function submitDelivery() {
             Swal.fire({
               icon: "error",
               title: response.message,
-              showConfirmButtonText: true,
               confirmButtonText: "OKAY",
             }).then(() => {
               location.reload();
             });
-            return;
           }
-        });
-      },
+        },
+      });
     });
   });
 }
+
+
+
+
 
 // PA UPDATE BRANCH CODE SA LIKOD
 // async function loadOriginWhscodes(Branch) {

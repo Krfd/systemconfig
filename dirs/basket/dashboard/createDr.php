@@ -24,11 +24,11 @@
                                     <div class="input-group col p-0 d-flex align-items-baseline gap-1">
                                         <div class="p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="user-origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
-                                            <input type="text" name="user-origin" id="user-origin" class="form-control form-control-sm col ms-3" style="background: #f7f7f7;" required readonly>
+                                            <input type="text" name="user-origin" id="user-origin" class="form-control form-control-sm col ms-3" style="background: #F7F7F7;" required readonly>
                                         </div>
                                         <div class="col p-0 d-flex align-items-baseline">
                                             <label for="originCodeForm" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
-                                            <select name="originCodeForm" id="originCodeForm" class="form-select form-select-sm col" style="background: #f7f7f7" required>
+                                            <select name="originCodeForm" id="originCodeForm" class="form-select form-select-sm col" style="background: #F7F7F7" required>
                                                 <option value="NEWS" selected>NEWS</option>
                                             </select>
                                         </div>
@@ -37,7 +37,7 @@
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-baseline gap-3">
                                         <label for="docdate" class="form-label text-dark-emphasis col-4"><small>Document Date:</small></label>
-                                        <input type="date" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #F2F2F2" readonly required>
+                                        <input type="date" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #F7F7F7" readonly required>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="deldate" class="form-label text-dark-emphasis col-4"><small>Delivery Date:</small></label>
@@ -45,7 +45,7 @@
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="statusForm" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>
-                                        <input type="text" name="statusForm" id="statusForm" class="form-control form-control-sm col" style="background: #f2f2f2" value="NEW" readonly required>
+                                        <input type="text" name="statusForm" id="statusForm" class="form-control form-control-sm col" style="background: #F7F7F7" value="NEW" readonly required>
                                     </div>
                                 </div>
                             </div>

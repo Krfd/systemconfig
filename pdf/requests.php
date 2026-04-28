@@ -141,7 +141,7 @@ try {
         $colonWidth = 3;
         $pdf->SetTextColor($textColor[0], $textColor[1], $textColor[2]);
         $pdf->SetFont('Arial', 'B', 9);
-        $pdf->Cell($labelWidth, 5, 'PICKLIST ', 0, 0);
+        $pdf->Cell($labelWidth, 5, 'Picklist ', 0, 0);
         $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
         $pdf->Cell(0, 5, $picklistNum, 0, 1);
         /* ---------- ROW 3 (CATEGORY) ---------- */

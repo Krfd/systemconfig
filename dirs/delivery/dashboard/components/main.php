@@ -4,8 +4,9 @@
             <tr>
                 <th class="text-secondary">#</th>
                 <th class="text-secondary">DR No.</th>
-                <th class="text-secondary">Picklist No.</th>
+                <!-- <th class="text-secondary">Picklist No.</th> -->
                 <th class="text-secondary">Status</th>
+                <th class="text-secondary">Driver</th>
                 <th class="text-secondary">Delivery Date</th>
             </tr>
         </thead>

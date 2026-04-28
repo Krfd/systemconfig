@@ -6,7 +6,6 @@ $User = $_SESSION['Uid'];
 
 $PickListNumber  = $_POST['picklist'];
 $TruckCategory   = $_POST['truckCat'];
-$DeliveryDate    = $_POST['deldate'];
 $TruckPlate      = $_POST['plate'];
 $Driver          = $_POST['driver'];
 $Remarks         = $_POST['remarks'];
@@ -30,12 +29,11 @@ try {
     $DRNumber = $get_devnumber['DRNumber'];
 
     // Insert header
-    $ins_loadingHeader = $conn->prepare("EXEC dbo.[CreateDelivery_Header] ?,?,?,?,?,?,?,?,?");
+    $ins_loadingHeader = $conn->prepare("EXEC dbo.[CreateDelivery_Header] ?,?,?,?,?,?,?,?");
     $ins_loadingHeader->execute([
         $User,
         $BatchNumber,
         $DRNumber,
-        $DeliveryDate,
         $PickListNumber,
         $TruckCategory,
         $TruckPlate,

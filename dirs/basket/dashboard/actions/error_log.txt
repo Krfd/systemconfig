@@ -1,0 +1,1 @@
+[2026-04-28 14:15:34] Error: [2] SQLSTATE[42S22]: [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Invalid column name 'BatchBasket_Num'. in C:\xampp\htdocs\iShiftDemo\dirs\basket\dashboard\actions\get_all.php on line 11

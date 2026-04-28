@@ -8,7 +8,7 @@
                             <div class="d-flex flex-column gap-1 col-4">
                                 <div class="d-flex align-items-baseline gap-3">
                                     <label for="srnForm" class="form-label text-dark-emphasis col-3"><small>SRN:</small></label>
-                                    <input type="text" name="srnForm" id="srnForm" class="form-control form-control-sm col" style="background: #f2f2f2" readonly required>
+                                    <input type="text" name="srnForm" id="srnForm" class="form-control form-control-sm col" style="background: #F7F7F7" readonly required>
                                 </div>
                                 <!-- <div class="d-flex align-items-baseline gap-3">
                                     <label for="typeForm" class="form-label text-dark-emphasis col-3"><small>Type of Request:</small></label>
@@ -21,7 +21,7 @@
                                 <div class="input-group col p-0 d-flex gap-1">
                                     <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                         <label for="desForm" class="form-label text-dark-emphasis col-5"><small>Destination:</small></label>
-                                        <input type="text" name="desForm" id="desForm" class="form-control form-control-sm col ms-3" style="background: #f2f2f2;" required readonly>
+                                        <input type="text" name="desForm" id="desForm" class="form-control form-control-sm col ms-3" style="background: #F7F7F7;" required readonly>
                                     </div>
                                     <div class="col p-0 d-flex align-items-baseline">
                                         <label for="desCodeForm" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
@@ -63,7 +63,7 @@
                                 </div>
                                 <div class="d-flex align-items-baseline gap-3">
                                     <label for="statusForm" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>
-                                    <input type="text" name="statusForm" id="statusForm" class="form-control form-control-sm col" value="NEW" style="background: #f2f2f2" readonly required>
+                                    <input type="text" name="statusForm" id="statusForm" class="form-control form-control-sm col" value="NEW" style="background: #F7F7F7" readonly required>
                                 </div>
                             </div>
                         </div>
@@ -96,7 +96,6 @@
                             <div class="d-flex flex-column gap-1 col-4">
                                 <div class="d-flex align-items-baseline gap-3">
                                     <label for="purposeForm" class="form-label text-dark-emphasis col-4"><small>Purpose of Request:</small></label>
-                                    <!-- <input type="text" name="purposeForm" id="purposeForm" class="form-control form-control-sm col" style="background: #FFFBDF" required> -->
                                     <select name="purposeForm" id="purposeForm" class="form-select form-select-sm col" style="background: #FFFBDF" required>
                                         <option value="" selected></option>
                                         <option value="Stock Refill">Stock Refill</option>
@@ -105,7 +104,7 @@
                                 </div>
                                 <div class="d-flex align-items-baseline gap-3">
                                     <label for="reqByForm" class="form-label text-dark-emphasis col-4"><small>Requested by:</small></label>
-                                    <input type="text" name="reqByForm" id="reqByForm" class="form-control form-control-sm col" style="background: #f2f2f2" readonly required>
+                                    <input type="text" name="reqByForm" id="reqByForm" class="form-control form-control-sm col" style="background: #F7F7F7" readonly required>
                                 </div>
                                 <div class="d-flex align-items-baseline gap-3">
                                     <label for="remarksForm" class="form-label text-dark-emphasis col-4"><small>Remarks:</small></label>

@@ -20,6 +20,12 @@ $prepby = $data['prepby'] ?? '';
 $remarks = !empty(trim($data['remarks'] ?? ''))
     ? $data['remarks']
     : 'N/A';
+    $branchNames = $data['srn'] ?? [];
+
+    // ensure array
+if (!is_array($branchNames)) {
+    $branchNames = [$branchNames];
+}
 
 class PDF extends FPDF
 {
@@ -115,7 +121,7 @@ class PDF extends FPDF
     }
 }
 
-$branches = ['VIAC', 'PLAZA', 'GALLERIA'];
+$branches = array_values(array_filter($branchNames));
 $pdf = new PDF();
 $pdf->AliasNbPages();
 $series = 10001;

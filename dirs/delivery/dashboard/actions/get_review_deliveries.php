@@ -3,39 +3,37 @@ require_once "../../../../config/connection.php";
 session_start();
 
 $User = $_SESSION['Uid'];
-// $User = $_POST['Uid'];
-$Delivery_Num = $_POST['DeliveryNum'];
+$DeliveryNumber = $_POST['DeliveryNumber'];
 
 try {
+
     $conn->beginTransaction();
+    $stmt = $conn->prepare("EXEC dbo.Display_ReadyDelivery ?, ?");
+    $stmt->execute([$User, $DeliveryNumber]);
+    $get_header = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $review_delivery = $conn->prepare("EXEC dbo.[REVIEW_DELIVERY] ?, ?");
-    $review_delivery->execute([$User, $Delivery_Num]);
+    $stmt->nextRowset();
 
-    // First result set (Delivery header)
-    $get_reviewDev = $review_delivery->fetch(PDO::FETCH_ASSOC);
-
-    // Move to second result set (Delivery items)
-    $review_delivery->nextRowset();
-    $get_items = $review_delivery->fetchAll(PDO::FETCH_ASSOC);
-
+    $delivery_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $conn->commit();
 
     $response = array(
-        "isSuccess" => 'success',
-        "Data" => $get_reviewDev,
-        "DevItems" => $get_items
+        "isSuccess" => "success",
+        "Header" => $get_header,
+        "Orders" => $delivery_items
     );
 
     echo json_encode($response);
-} catch (PDOException $e) {
 
+} catch (PDOException $e) {
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollback();
 
     $response = array(
-        "isSuccess" => 'Failed',
-        "Data" => "<b>Error. Please Contact System Developer.<br/></b>" . $e->getMessage()
+        "isSuccess" => "failed",
+        "Data" => "<b>Error. Please Contact System Developer.</b><br>" . $e->getMessage()
     );
 
     echo json_encode($response);
 }
+?>

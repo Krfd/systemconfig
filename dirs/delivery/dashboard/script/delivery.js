@@ -35,13 +35,14 @@ $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
 $(document).on("dblclick", "#deliveryTableDisplay tbody tr", function (e) {
   if ($(e.target).closest(".dropdown").length) return;
 
-  let RowNumber = $(this).find("td:nth-child(1)").text().trim();
+  // let RowNumber = $(this).find("td:nth-child(1)").text().trim();
   let DeliveryNum = $(this).find("td:nth-child(2)").text().trim();
-  let PicklistNumber = $(this).find("td:nth-child(3)").text().trim();
+  // let PicklistNumber = $(this).find("td:nth-child(3)").text().trim();
 
   $("#main-content").html(spinner);
   setTimeout(function () {
-    openForm(DeliveryNum, PicklistNumber, RowNumber);
+    // openForm(DeliveryNum, PicklistNumber, RowNumber);
+    openForm(DeliveryNum);
   }, 200);
 });
 
@@ -60,7 +61,11 @@ function loadDelivery() {
         );
 
         sortedData.forEach((item) => {
-          let status = item.Status ? item.Status.toUpperCase() : "";
+
+          console.log(`DELIVERY ITEM: ${JSON.stringify(item)}`)
+          console.log(``)
+
+          let status = item.DocStatus ? item.DocStatus.toUpperCase() : "";
           let statusClass = "";
 
           if (status === "NEW" || status === "IN TRANSIT") {
@@ -77,24 +82,25 @@ function loadDelivery() {
 
           let statusBadge = `<span class="badge ${statusClass}">${status || ""}</span>`;
 
-          if (existingSeries.has(item.Delivery_Num)) {
+          if (existingSeries.has(item.DeliveryNumber)) {
             return;
           }
 
-          existingSeries.add(item.Delivery_Num);
+          existingSeries.add(item.DeliveryNumber);
 
           rows.push([
-            item.RowNumOrder || "",
-            item.Delivery_Num || "",
-            item.PickList_Num || "",
+            item.DocEntry || "",
+            item.DeliveryNumber || "",
+            // item.PickList_Num || "",
             statusBadge,
-            item.Delivery_Date || "",
+            item.Driver,
+            item.DeliveryDate || "",
           ]);
         });
 
         if (rows.length === 0) {
           for (let i = 0; i < 8; i++) {
-            rows.push(["", "", "", "", "", "", ""]);
+            rows.push(["", "", "", ""]);
           }
         }
 
@@ -108,9 +114,10 @@ function loadDelivery() {
           columns: [
             { title: "#", className: "text-center" },
             { title: "DR No." },
-            { title: "Picklist No." },
+            // { title: "Picklist No." },
             { title: "Status" },
-            { title: "Delivery Date" },
+            { title: "Driver" },
+            { title: "Delivery Date", className: "text-start" },
           ],
           pageLength: 50,
           paging: true,
@@ -132,7 +139,8 @@ function loadDelivery() {
 
             $("td:eq(0)", row).addClass("text-center");
             $("td:eq(1)", row).addClass("text-primary");
-            $("td:eq(5)", row).addClass("text-start");
+            $("td:eq(3)", row).addClass("text-start ps-3");
+            $("td:eq(4)", row).addClass("ps-3");
 
             $(row).hover(
               function () {
@@ -1993,48 +2001,67 @@ $(document).on("dblclick", "#deliveryItemsTable tbody tr", function (e) {
 });
 
 // DELIVERY DASHBOARD - FORM
-function openForm(DeliveryNum, PicklistNumber, RowNumber) {
+function openForm(DeliveryNum) {
   $.post("dirs/delivery/dashboard/form.php", function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
     $.ajax({
       url: "dirs/delivery/dashboard/actions/get_review_deliveries.php",
       type: "POST",
-      data: { DeliveryNum: DeliveryNum },
+      data: { DeliveryNumber: DeliveryNum },
       dataType: "json",
       success: function (response) {
         if (response.isSuccess === "success") {
-          let rowCount = response.DevItems.length;
+          let reviewDeliveries = $("#deliveryTable tbody");
+          let rowCount = response.Orders.length;
           let totalQty = 0;
-          let header = response.Data;
-          let items = response.DevItems;
+          let header = response.Header;
+          let items = response.Orders;
+
+          const docDate = new Date(header.DocDate);
+          const formattedDocDate = docDate.toISOString().split('T')[0];
 
           $("#drno").val(DeliveryNum);
-          $("#pcklstno").val(PicklistNumber);
-          $("#docdate").val(header.DocumentDate);
-          $("#origin").val(header.BDestination);
-          $("#whcode").val(header.BWhsDestination);
+          $("#pcklstno").val(header.PickListNumber);
+          $("#docdate").val(formattedDocDate);
+          $("#origin").val(header.BranchSet);
+          // $("#whcode").val(header.BWhsDestination);
+          $("#deldate").val(header.DeliveryDate);
 
-          // $("#branchName").val(header.BOrigin);
+          // $("#branchName").val(header.Origin);
           // $("#branchWhCode").val(header.BWhsOrigin);
-          $("#status").val(header.Delivery_Status);
+          $("#status").val(header.DocStatus);
           $("#prepby").val(header.PreparedBy) || "N/A";
-          $("#plate").val(header.PlateNumber) || "N/A";
-          $("#driver").val(header.Delivery_Personnel) || "N/A";
+          $("#plate").val(header.TruckPlate) || "N/A";
+          $("#driver").val(header.Driver) || "N/A";
           $("#remarks").val(header.Remarks) || "N/A";
           let rows = "";
+          
           items.forEach(function (item, index) {
-            let quantity = parseFloat(item.Quantity) || 0;
+            let quantity = parseFloat(item.Deliver_Qty) || 0;
             totalQty += quantity;
             rows += `
               <tr style="height: 40px; min-height: 40px; cursor: pointer">
-                <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Brand}</td>
-                <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Model}</td>
-                <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Category}</td>
-                <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
+                <td class="align-middle ps-3" style="background:#FFFBDF;">${item.Brand}</td>
+                <td class="align-middle ps-3" style="background:#FFFBDF;">${item.Model}</td>
+                <td class="align-middle ps-3" style="background:#FFFBDF;">${item.Category}</td>
+                <td class="align-middle ps-3" style="background:#FFFBDF;">${item.Deliver_Qty}</td>
               </tr>
             `;
           });
           $("#totalQuantity").text(totalQty);
+          reviewDeliveries.append(rows)
+
+          let currentRows = reviewDeliveries.find("tr").length;
+
+          for (let i = currentRows; i < 8; i++) {
+            let emptyRow = $(`
+                <tr class="empty-row" style="height: 45px; min-height: 45px">
+                  <td colspan="4" style="background: #FFFBDF"></td>
+                </tr>
+              `)
+
+              reviewDeliveries.append(emptyRow)
+          }
         }
       },
     });

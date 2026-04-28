@@ -70,7 +70,7 @@
                                 </div>
                             </div>
                             <div class="table-responsive overflow-auto mt-5" style="max-height: 450px">
-                                <table class="table datatables" id="openIncomingTable">
+                                <table class="table table-hover datatables" id="openIncomingTable">
                                     <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary">#</th>
