@@ -61,9 +61,8 @@ function loadDelivery() {
         );
 
         sortedData.forEach((item) => {
-
-          console.log(`DELIVERY ITEM: ${JSON.stringify(item)}`)
-          console.log(``)
+          console.log(`DELIVERY ITEM: ${JSON.stringify(item)}`);
+          console.log(``);
 
           let status = item.DocStatus ? item.DocStatus.toUpperCase() : "";
           let statusClass = "";
@@ -100,7 +99,7 @@ function loadDelivery() {
 
         if (rows.length === 0) {
           for (let i = 0; i < 8; i++) {
-            rows.push(["", "", "", ""]);
+            rows.push(["", "", "", "", ""]);
           }
         }
 
@@ -2018,7 +2017,7 @@ function openForm(DeliveryNum) {
           let items = response.Orders;
 
           const docDate = new Date(header.DocDate);
-          const formattedDocDate = docDate.toISOString().split('T')[0];
+          const formattedDocDate = docDate.toISOString().split("T")[0];
 
           $("#drno").val(DeliveryNum);
           $("#pcklstno").val(header.PickListNumber);
@@ -2035,7 +2034,7 @@ function openForm(DeliveryNum) {
           $("#driver").val(header.Driver) || "N/A";
           $("#remarks").val(header.Remarks) || "N/A";
           let rows = "";
-          
+
           items.forEach(function (item, index) {
             let quantity = parseFloat(item.Deliver_Qty) || 0;
             totalQty += quantity;
@@ -2049,7 +2048,7 @@ function openForm(DeliveryNum) {
             `;
           });
           $("#totalQuantity").text(totalQty);
-          reviewDeliveries.append(rows)
+          reviewDeliveries.append(rows);
 
           let currentRows = reviewDeliveries.find("tr").length;
 
@@ -2058,9 +2057,9 @@ function openForm(DeliveryNum) {
                 <tr class="empty-row" style="height: 45px; min-height: 45px">
                   <td colspan="4" style="background: #FFFBDF"></td>
                 </tr>
-              `)
+              `);
 
-              reviewDeliveries.append(emptyRow)
+            reviewDeliveries.append(emptyRow);
           }
         }
       },
