@@ -114,12 +114,9 @@ function loadIncoming() {
             { title: "", className: "text-center" },
             { title: "#" },
             { title: "SRN" },
-            // { title: "Type of Request" },
             { title: "Requesting Branch" },
             { title: "Status" },
             { title: "Date", className: "text-start" },
-            // { title: "Picklist No." },
-            // { title: "DocStatus", visible: false }
           ],
           pageLength: 50,
           paging: true,
@@ -138,11 +135,9 @@ function loadIncoming() {
               "min-height": "40px",
               cursor: "pointer",
             });
-            // $("td:eq(1)", row).addClass("text-center");
             $("td:eq(1)", row).addClass("text-start ps-3");
             $("td:eq(2)", row).addClass("text-primary");
             $("td:eq(6)", row).addClass("text-start");
-            // row.setAttribute("data-completed", data[6])
 
             // console.log(`INCOMING DATA STATUS : ${sortedData[index].DocStatus}`)
 
@@ -196,6 +191,7 @@ function loadIncoming() {
 
 function toggleCheckboxes() {
   const createPicklistBtn = document.getElementById("createPicklistBtn");
+  const checkAllBtn = document.getElementById("checkAllBtn");
   const DocEntries = [];
   const SRNumbers = [];
 
@@ -224,8 +220,6 @@ function toggleCheckboxes() {
       }
     });
 
-    // console.log(`AVAILABLE ROWS: ${availableRows}`)
-
     if (availableRows === 0) {
       Swal.fire({
         icon: "warning",
@@ -244,7 +238,6 @@ function toggleCheckboxes() {
       const checkbox = row.find(".checkbox");
 
       const docStatus = checkbox.data("docstatus") || "";
-      // console.log(`ROW DOC STATUS : ${docStatus}`)
       const restrictedStatuses = [
         "CANCELLED",
         "TERMINATED",
@@ -272,9 +265,9 @@ function toggleCheckboxes() {
       }
     });
 
-    // createPicklistBtn.textContent = "Add to Picklist";
     createPicklistBtn.textContent = "Preview";
     createPicklistBtn.type = "button";
+    checkAllBtn.classList.remove("d-none");
 
     return;
   }
@@ -289,6 +282,7 @@ function toggleCheckboxes() {
       $("#incomingTableDisplay tbody .checkbox").hide().prop("checked", false);
       createPicklistBtn.textContent = "Create Picklist";
       createPicklistBtn.type = "button";
+      checkAllBtn.classList.add("d-none");
       return;
     }
   }
@@ -593,6 +587,24 @@ function togglePreview() {
   });
 }
 
+function checkAll() {
+  const checkboxes = $("#incomingTableDisplay tbody .checkbox:visible").not(
+    ":disabled",
+  );
+
+  if (checkboxes.length === 0) return;
+
+  const allChecked = checkboxes.length === checkboxes.filter(":checked").length;
+
+  if (allChecked) {
+    checkboxes.prop("checked", false);
+    $("#checkAllBtn").text("Select All");
+  } else {
+    checkboxes.prop("checked", true);
+    $("#checkAllBtn").text("Deselect All");
+  }
+}
+
 function selectAll() {
   const checkboxes = $("#previewTableDisplay tbody .checkbox:visible").not(
     ":disabled",
@@ -816,7 +828,7 @@ $(document).on("click", ".dropdown .single-dr", function (e) {
   // let picklistNum = picklistedRow.attr("data-picklist-num");
   // let srn = picklistedRow.attr("data-srn")
   let picklistNum = $(this).data("picklist");
-  let srn = $(this).data("sr-number")
+  let srn = $(this).data("sr-number");
 
   $("#main-content").html(spinner);
   setTimeout(function () {
@@ -1111,23 +1123,23 @@ function loadBasket() {
 
           // const groupedArray = Object.values(grouped);
 
-          const groupedArray = Object.values(grouped).map(item => ({
+          const groupedArray = Object.values(grouped).map((item) => ({
             ...item,
-            SR_Numbers: Array.from(item.SR_Numbers) // convert Set → Array
+            SR_Numbers: Array.from(item.SR_Numbers), // convert Set → Array
           }));
 
           groupedArray.forEach((item) => {
-            const isSingleSR = item.SR_Numbers.length === 1
+            const isSingleSR = item.SR_Numbers.length === 1;
             // console.log(`PICKLIST BASKET ITEM: ${JSON.stringify(item)}`)
             const condition = item.allHaveActualQty && isSingleSR;
 
-                // console.log(
-                //   "PK:", item.PKList_Number,
-                //   "| allHaveActualQty:", item.allHaveActualQty,
-                //   "| isSingleSR:", isSingleSR,
-                //   "| condition:", condition
-                // );
-                // console.log(``)
+            // console.log(
+            //   "PK:", item.PKList_Number,
+            //   "| allHaveActualQty:", item.allHaveActualQty,
+            //   "| isSingleSR:", isSingleSR,
+            //   "| condition:", condition
+            // );
+            // console.log(``)
 
             const date = new Date(item.DocDate);
             const formatted = date.toISOString().split("T")[0];
@@ -1155,11 +1167,14 @@ function loadBasket() {
                     </a>
                 </li>`;
 
-              const createDr = item.allHaveActualQty && isSingleSR ? `
+            const createDr =
+              item.allHaveActualQty && isSingleSR
+                ? `
                 <li>
                   <a class="dropdown-item single-dr" href="#" data-picklist="${item.PKList_Number}" data-sr-number="${item.SR_Numbers[0]}">Create DR</a>
                 </li>
-              ` : '';
+              `
+                : "";
 
             rows.push([
               item.PKList_Number || "",
@@ -1437,13 +1452,12 @@ function encodeQty(picklistNum) {
               groupedItems[key].rows.push({
                 Item_id: item.Item_id,
                 SR_Number: item.SR_Number,
-                Req_Branch: item.Req_Branch, 
+                Req_Branch: item.Req_Branch,
               });
             });
 
             let index = 0;
 
-            // srNumberMap = response.Data.map((item) => item.SR_Number);
             srNumberMap = [
               ...new Set(response.Data.map((item) => item.Req_Branch)),
             ];
@@ -1454,7 +1468,7 @@ function encodeQty(picklistNum) {
             let groupedArray = Object.values(groupedItems);
 
             Object.values(groupedItems).forEach((item) => {
-              console.log(`ENCODE QTY ITEM: ${JSON.stringify(item)}`)
+              console.log(`ENCODE QTY ITEM: ${JSON.stringify(item)}`);
               picklistEntry = item.DocEntry;
               index++;
               rows += `
@@ -1529,9 +1543,7 @@ function validateNumber(el) {
   let numericValue = Number(value);
 
   // 🔥 Get max (Quantity column in same row)
-  let maxQty = Number(
-    $(el).closest("tr").find("td:nth-child(5)").text()
-  );
+  let maxQty = Number($(el).closest("tr").find("td:nth-child(5)").text());
 
   // Move cursor to end
   let range = document.createRange();
@@ -1559,7 +1571,7 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
           let actual = Number(value);
 
           let maxQty = Number(
-            $(this).closest("tr").find("td:nth-child(5)").text()
+            $(this).closest("tr").find("td:nth-child(5)").text(),
           );
 
           if (value === "") {
@@ -1702,6 +1714,16 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
                     };
 
                     openPrint();
+
+                    // Swal.fire({
+                    //   icon: "success",
+                    //   title: "Would you like to create DR?",
+                    //   showCancelButton: true,
+                    //   confirmButtonText: "create DR",
+                    //   cancelButtonText: "No",
+                    //   allowOutsideClick: false,
+                    // }).then((drResult) => {
+                    // if (drResult.isConfirmed) {
                     if (srnMap && srnMap.length === 1) {
                       let srArray = [];
                       if (Array.isArray(srNumberMap)) {
@@ -1713,17 +1735,31 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
                           .filter(Boolean);
                       }
 
-                      // console.log(`SR Array : ${srArray}`)
-
-                      if (srArray.length === 1) {
-                        $("#main-content").html(spinner);
-                        createDr(picklistNum, srArray)
-                      }
+                      Swal.fire({
+                        icon: "success",
+                        title: "Would you like to create DR?",
+                        showCancelButton: true,
+                        confirmButtonText: "create DR",
+                        cancelButtonText: "No",
+                        allowOutsideClick: false,
+                      }).then((drResult) => {
+                        if (drResult.isConfirmed) {
+                          if (srArray.length === 1) {
+                            $("#main-content").html(spinner);
+                            createDr(picklistNum, srArray);
+                          }
+                        } else {
+                          loadBasketContent();
+                        }
+                      });
                     } else {
-                      console.log(`SRN MAP : ${srnMap}`);
-                      console.log(`SRN MAP LENGTH : ${srnMap.length}`);
                       loadBasketContent();
                     }
+                    // }
+                    // else {
+                    //   loadBasketContent();
+                    // }
+                    // });
                   });
                 } else {
                   Swal.fire({
@@ -1751,18 +1787,15 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
 // CREATE DELIVERY
 function createDr(picklistNum, srn) {
   // console.log(`PICKLIST NUMBER : ${picklistNum}`)
-  $.post(
-    "dirs/basket/dashboard/createDr.php",
-    function (data) {
-      $("#main-content").hide().html(data).fadeIn(200);
-      $("#picklist").val(picklistNum);
-      get_userinfo();
-      deliveryDate();
-      getDeliveryDetails();
-      getBatchItems(picklistNum);
-      submitDelivery(srn);
-    },
-  );
+  $.post("dirs/basket/dashboard/createDr.php", function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+    $("#picklist").val(picklistNum);
+    get_userinfo();
+    deliveryDate();
+    getDeliveryDetails();
+    getBatchItems(picklistNum);
+    submitDelivery(srn);
+  });
 }
 
 // UPDATE ACTUAL QUANTITY
@@ -1811,13 +1844,12 @@ function editEncodedQty(picklistNum) {
               groupedItems[key].rows.push({
                 Item_id: item.Item_id,
                 SR_Number: item.SR_Number,
-                Req_Branch: item.Req_Branch, 
+                Req_Branch: item.Req_Branch,
               });
             });
 
             let index = 0;
 
-            // srNumberMap = response.Data.map((item) => item.SR_Number);
             srNumberMap = [
               ...new Set(response.Data.map((item) => item.Req_Branch)),
             ];
@@ -1828,7 +1860,7 @@ function editEncodedQty(picklistNum) {
             let groupedArray = Object.values(groupedItems);
 
             Object.values(groupedItems).forEach((item) => {
-              console.log(`EDIT ENCODE QTY ITEM: ${JSON.stringify(item)}`)
+              console.log(`EDIT ENCODE QTY ITEM: ${JSON.stringify(item)}`);
               picklistEntry = item.DocEntry;
               index++;
               rows += `
@@ -2082,7 +2114,7 @@ function submitDelivery(srn) {
 
     let formData = new FormData(document.getElementById("deliver"));
     formData.append("items", JSON.stringify(items));
-    formData.append("srn", (srn));
+    formData.append("srn", srn);
 
     let formObject = Object.fromEntries(formData.entries());
     formObject.items = items;
@@ -2117,9 +2149,9 @@ function submitDelivery(srn) {
             }).then(() => {
               window.open(
                 `pdf/delivery.php?data=${encodeURIComponent(
-                  JSON.stringify(formObject)
+                  JSON.stringify(formObject),
                 )}&categorized=${categorized}`,
-                "_blank"
+                "_blank",
               );
 
               loadBasket();
@@ -2140,10 +2172,6 @@ function submitDelivery(srn) {
     });
   });
 }
-
-
-
-
 
 // PA UPDATE BRANCH CODE SA LIKOD
 // async function loadOriginWhscodes(Branch) {

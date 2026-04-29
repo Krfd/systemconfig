@@ -39,6 +39,7 @@ function get_SRN() {
       if ($.trim(response.isSuccess) === "success") {
         $("#srnForm").val(response.SRNNumber);
         $("#desForm").val(response.BranchName);
+        console.log(`BRANCH NAME: ${response.BranchName}`);
         loadDestinationWhscodes(response.BranchName);
       } else {
         alert(response.message || "Error occurred");

@@ -21,14 +21,12 @@ try {
         "SRNNumber"  => $srnData['SRNNumber'] ?? '',
         "BranchName" => $branch
     ]);
-
 } catch (PDOException $e) {
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollBack();
-
     echo json_encode([
         "isSuccess" => "failed",
         "message"   => "Error. Please contact System Developer.",
-        "error"     => $e->getMessage() 
+        "error"     => $e->getMessage()
     ]);
 }
-?>

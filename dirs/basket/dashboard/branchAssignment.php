@@ -35,7 +35,8 @@
                                         </div>
                                         <div class="col p-0 d-flex align-items-baseline col" hidden>
                                             <label for="whcode" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
-                                            <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
+                                            <!-- <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f2f2f2" readonly> -->
+                                            <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f2f2f2" value="NEWWHS" readonly>
                                         </div>
                                     </div>
                                     <input type="hidden" name="lbnum" id="lbnum" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
@@ -70,28 +71,23 @@
                                 </div>
 
                                 <!-- ✅ RIGHT SIDE (everything else) -->
-                                <div class="d-flex ms-auto">
-
+                                <div class="d-flex ms-auto" id="branchTotalsContainer">
                                     <div class="d-flex">
                                         <div class="p-2 text-end">Total Quantity:</div>
                                         <div class="p-2" style="width:120px;" id="summaryQty">0</div>
                                     </div>
-
                                     <div class="d-flex">
                                         <div class="p-2 text-end">Total:</div>
                                         <div class="p-2" style="width:120px;" id="total1">0</div>
                                     </div>
-
                                     <div class="d-flex">
                                         <div class="p-2 text-end">Total:</div>
                                         <div class="p-2" style="width:120px;" id="total2">0</div>
                                     </div>
-
                                     <div class="d-flex">
                                         <div class="p-2 text-end">Total:</div>
                                         <div class="p-2" style="width:120px;" id="total3">0</div>
                                     </div>
-
                                 </div>
                             </div>
                             <div class="d-flex justify-content-between align-items-end mt-5">
@@ -111,6 +107,7 @@
                             </div>
                         </form>
                     </div>
+                </div>
             </section>
         </div>
     </div>

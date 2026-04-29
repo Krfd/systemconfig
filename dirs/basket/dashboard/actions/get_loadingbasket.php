@@ -2,29 +2,25 @@
 require_once "../../../../config/connection.php";
 session_start();
 
-$User        = $_SESSION['Uid'];
-$BatchNumber = $_POST['BatchNumber'] ?? null;
+$User = $_SESSION['Uid'];
+$PicklistNUmber = $_POST['picklist'];
 
 try {
+
     $conn->beginTransaction();
+    $stmt = $conn->prepare("EXEC dbo.ReviewPicklist_details ?, ?");
+    $stmt->execute([$User, $PicklistNUmber]);
+    $get_header = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $fetch_loadingbasket = $conn->prepare("EXEC dbo.[View_LoadingBasket] ?,?");
-    $fetch_loadingbasket->execute([$User, $BatchNumber]);
-    $header = $fetch_loadingbasket->fetch(PDO::FETCH_ASSOC);
+    $stmt->nextRowset();
 
-    /* Items */
-    $items = [];
-
-    if ($fetch_loadingbasket->nextRowset()) {
-        $items = $fetch_loadingbasket->fetchAll(PDO::FETCH_ASSOC);
-    }
-
+    $picklist_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $conn->commit();
 
     $response = array(
         "isSuccess" => "success",
-        "Header"    => $header,
-        "Items"     => $items
+        "Header" => $get_header,
+        "Orders" => $picklist_items
     );
 
     echo json_encode($response);
@@ -32,8 +28,8 @@ try {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollback();
     $response = array(
-        "isSuccess" => "Failed",
-        "Data" => "<b>Error. Please Contact System Developer.<br/></b>" . $e->getMessage()
+        "isSuccess" => "failed",
+        "Data" => "<b>Error. Please Contact System Developer.</b><br>" . $e->getMessage()
     );
 
     echo json_encode($response);
