@@ -370,8 +370,8 @@ function loadDeliveryBasket(tableId, url) {
             (() => {
               let status = item.PickListStatus || "";
 
-              if (status === "UA") status = "UNASSIGNED";
-              else if (status === "A") status = "ASSIGNED";
+              if (status === "NEW") status = "UNASSIGNED";
+              // else if (status === "A") status = "ASSIGNED";
 
               let badgeClass = "primary";
 
@@ -553,6 +553,7 @@ $(document).on("click", "#deliveryItemsTable tbody .open-srn", function (e) {
 
 function toggleDelivery() {
   const loadDeliveryBtn = document.getElementById("loadDeliveryBtn");
+  const selectAllBtn = document.getElementById("selectAllBtn")
 
   // ✅ Reliable state tracking (instead of :visible)
   let selectionMode = $("#basketTableAssigned").data("selectionMode") || false;
@@ -586,6 +587,7 @@ function toggleDelivery() {
         title: "No Available Request(s)",
         confirmButtonText: "OKAY",
       });
+      selectAllBtn.classList.add("d-none")
       return;
     }
 
@@ -614,10 +616,13 @@ function toggleDelivery() {
         //   checkbox.prop("disabled", true);
         //   // console.log(`CHECKBOX DISABLED`);
         // }
+        
       } else {
         checkbox.hide();
       }
     });
+
+    selectAllBtn.classList.remove("d-none")
 
     // ✅ Update UI
     loadDeliveryBtn.textContent = "Add Items";

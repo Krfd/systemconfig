@@ -3,15 +3,15 @@
         <h3 class="fw-bold text-primary">Branch Assignment</h3>
     </div>
     <div class="d-flex gap-1">
+        <button class="btn btn-success d-none" type="button" onclick="selectAll()" id="selectAllBtn">
+            Select All
+        </button>
         <button class="btn btn-primary" type="button" onclick="toggleDelivery()" id="loadDeliveryBtn">
             Load Items
         </button>
         <button class="btn btn-primary" type="button" onclick="loadingItems()" id="createDeliveryBtn">
             <i class="bi bi-cart-check"></i>
         </button>
-        <!-- <button class="btn btn-primary" type="button" onclick="createDr()" id="createDrButton">
-            <i class="bi bi-plus-lg"></i> Create DR
-        </button> -->
     </div>
 </div>
 <ul class="nav nav-tabs nav-tabs-bordered d-flex mt-5" id="borderedTabJustified" role="tablist">
