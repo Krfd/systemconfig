@@ -106,20 +106,28 @@ try {
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="basket">
-                                <i class="nav-icon bi bi-cart"></i>
+                                <!-- <i class="nav-icon bi bi-cart"></i> -->
+                                <i class="bi bi-card-checklist"></i>
                                 <p>Branch Assignment</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" name="menu" menucode="load">
+                                <!-- <i class="nav-icon bi bi-truck"></i> -->
+                                <i class="nav-icon bi bi-cart"></i>
+                                <p>Loading Basket</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="delivery">
                                 <i class="nav-icon bi bi-truck"></i>
-                                <p>Delivery</p>
+                                <p>Stock Delivery Form</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="receiving">
                                 <i class="nav-icon bi bi-box"></i>
-                                <p>Receiving</p>
+                                <p>Stock Receiving</p>
                             </a>
                         </li>
                         <li class="nav-item">

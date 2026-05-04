@@ -1321,27 +1321,27 @@ function loadBasket() {
                     // 👉 PROCEED WITH ORIGINAL LOGIC
                     // PRINT ONLY
 
-                    Swal.fire({
-                      title: "Printing option",
-                      text: "Do you want to print items by category?",
-                      icon: "question",
-                      showCancelButton: true,
-                      confirmButtonText: "Yes, categorized",
-                      cancelButtonText: "Normal",
-                      allowOutsideClick: false,
-                    }).then((response) => {
-                      const groupByCategory = response.isConfirmed;
+                    // Swal.fire({
+                    //   title: "Printing option",
+                    //   text: "Do you want to print items by category?",
+                    //   icon: "question",
+                    //   showCancelButton: true,
+                    //   confirmButtonText: "Yes, categorized",
+                    //   cancelButtonText: "Normal",
+                    //   allowOutsideClick: false,
+                    // }).then((response) => {
+                    const groupByCategory = response.isConfirmed;
 
-                      const openPrint = () => {
-                        window.open(
-                          `pdf/requests.php?DocEntry=${DocEntry}` +
-                            `&executedBy=${encodeURIComponent(executedBy)}` +
-                            `&groupByCategory=${groupByCategory ? 1 : 0}`,
-                          "_blank",
-                        );
-                      };
-                      openPrint();
-                    });
+                    const openPrint = () => {
+                      window.open(
+                        `pdf/requests.php?DocEntry=${DocEntry}` +
+                          `&executedBy=${encodeURIComponent(executedBy)}` +
+                          `&groupByCategory=${groupByCategory ? 1 : 0}`,
+                        "_blank",
+                      );
+                    };
+                    openPrint();
+                    // });
                   });
                 }
               });
@@ -1694,73 +1694,60 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
                 if (res.status === "success") {
                   const DocEntry = PicklistEntry;
 
-                  Swal.fire({
-                    title: "Printing option",
-                    text: "Do you want to print items by category?",
-                    icon: "question",
-                    showCancelButton: true,
-                    confirmButtonText: "Yes, categorized",
-                    cancelButtonText: "Normal",
-                    allowOutsideClick: false,
-                  }).then((swalResult) => {
-                    const groupByCategory = swalResult.isConfirmed; // ✅ correct place
-                    const openPrint = () => {
-                      window.open(
-                        `pdf/requests.php?DocEntry=${DocEntry}` +
-                          `&executedBy=${encodeURIComponent(executedBy)}` +
-                          `&groupByCategory=${groupByCategory ? 1 : 0}`,
-                        "_blank",
-                      );
-                    };
+                  // Swal.fire({
+                  //   title: "Printing option",
+                  //   text: "Do you want to print items by category?",
+                  //   icon: "question",
+                  //   showCancelButton: true,
+                  //   confirmButtonText: "Yes, categorized",
+                  //   cancelButtonText: "Normal",
+                  //   allowOutsideClick: false,
+                  // }).then((swalResult) => {
+                  const groupByCategory = swalResult.isConfirmed; // ✅ correct place
+                  const openPrint = () => {
+                    window.open(
+                      `pdf/requests.php?DocEntry=${DocEntry}` +
+                        `&executedBy=${encodeURIComponent(executedBy)}` +
+                        `&groupByCategory=${groupByCategory ? 1 : 0}`,
+                      "_blank",
+                    );
+                  };
 
-                    openPrint();
+                  openPrint();
 
-                    // Swal.fire({
-                    //   icon: "success",
-                    //   title: "Would you like to create DR?",
-                    //   showCancelButton: true,
-                    //   confirmButtonText: "create DR",
-                    //   cancelButtonText: "No",
-                    //   allowOutsideClick: false,
-                    // }).then((drResult) => {
-                    // if (drResult.isConfirmed) {
-                    if (srnMap && srnMap.length === 1) {
-                      let srArray = [];
-                      if (Array.isArray(srNumberMap)) {
-                        srArray = srNumberMap;
-                      } else if (typeof srNumberMap === "string") {
-                        srArray = srNumberMap
-                          .split(",")
-                          .map((s) => s.trim())
-                          .filter(Boolean);
-                      }
-
-                      Swal.fire({
-                        icon: "success",
-                        title: "Would you like to create DR?",
-                        showCancelButton: true,
-                        confirmButtonText: "create DR",
-                        cancelButtonText: "No",
-                        allowOutsideClick: false,
-                      }).then((drResult) => {
-                        if (drResult.isConfirmed) {
-                          if (srArray.length === 1) {
-                            $("#main-content").html(spinner);
-                            createDr(picklistNum, srArray);
-                          }
-                        } else {
-                          loadBasketContent();
-                        }
-                      });
-                    } else {
-                      loadBasketContent();
+                  if (srnMap && srnMap.length === 1) {
+                    let srArray = [];
+                    if (Array.isArray(srNumberMap)) {
+                      srArray = srNumberMap;
+                    } else if (typeof srNumberMap === "string") {
+                      srArray = srNumberMap
+                        .split(",")
+                        .map((s) => s.trim())
+                        .filter(Boolean);
                     }
-                    // }
-                    // else {
-                    //   loadBasketContent();
-                    // }
-                    // });
-                  });
+
+                    Swal.fire({
+                      icon: "success",
+                      title: "Would you like to create DR?",
+                      showCancelButton: true,
+                      confirmButtonText: "create DR",
+                      cancelButtonText: "No",
+                      allowOutsideClick: false,
+                    }).then((drResult) => {
+                      if (drResult.isConfirmed) {
+                        if (srArray.length === 1) {
+                          $("#main-content").html(spinner);
+                          createDr(picklistNum, srArray);
+                        }
+                      } else {
+                        loadBasketContent();
+                      }
+                    });
+                  } else {
+                    loadBasketContent();
+                  }
+
+                  // });
                 } else {
                   Swal.fire({
                     icon: "error",

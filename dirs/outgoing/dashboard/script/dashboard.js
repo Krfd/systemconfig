@@ -54,22 +54,23 @@ $(document).on("click", ".print-pdf", function (e) {
 
   let srn = $(this).data("srn");
 
-  Swal.fire({
-    title: "Print Options",
-    text: "Print categorized by item category?",
-    icon: "question",
-    showCancelButton: true,
-    confirmButtonText: "Yes, categorize it",
-    cancelButtonText: "No, print normally"
-  }).then((result) => {
-    let url = "pdf.php?srn=" + srn;
+  // Swal.fire({
+  //   title: "Print Options",
+  //   text: "Print categorized by item category?",
+  //   icon: "question",
+  //   showCancelButton: true,
+  //   confirmButtonText: "Yes, categorize it",
+  //   cancelButtonText: "No, print normally",
+  //   allowOutsideClick: false,
+  // }).then((result) => {
+  let url = "pdf.php?srn=" + srn;
 
-    if (result.isConfirmed) {
-      url += "&grouped=1";
-    }
+  // if (result.isConfirmed) {
+  //   url += "&grouped=1";
+  // }
 
-    window.open(url, "_blank");
-  });
+  window.open(url, "_blank");
+  // });
 });
 
 function loadOutgoing() {
@@ -129,7 +130,9 @@ function loadOutgoing() {
                   item.SR_Number +
                   '" href="#">Terminate</a></li>'
                 : "") +
-              '<li><a class="dropdown-item print-pdf" href="#" target="_blank" data-srn="'+item.SR_Number+'">Print</a></li>' +
+              '<li><a class="dropdown-item print-pdf" href="#" target="_blank" data-srn="' +
+              item.SR_Number +
+              '">Print</a></li>' +
               "</ul></div>",
           ]);
         });

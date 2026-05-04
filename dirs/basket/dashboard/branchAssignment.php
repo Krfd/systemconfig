@@ -63,13 +63,11 @@
                             <div id="totalRowOutside"
                                 class="d-flex border-top fw-bold align-items-center w-100"
                                 style="background: #f2f2f2">
-
                                 <!-- ✅ LEFT SIDE (Balance) -->
                                 <div class="d-flex">
                                     <div class="p-2 text-end">Balance:</div>
                                     <div class="p-2" style="width:120px;" id="balanceQty">0</div>
                                 </div>
-
                                 <!-- ✅ RIGHT SIDE (everything else) -->
                                 <div class="d-flex ms-auto" id="branchTotalsContainer">
                                     <div class="d-flex">

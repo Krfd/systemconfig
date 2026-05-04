@@ -42,14 +42,19 @@ $("#main-menu")
         $mainbreadcrumb = `<li class="breadcrumb-item active">Branch Assignment</li>`;
         $file = "dirs/basket/dashboard/basket.php";
         break;
+      case "load":
+        $maintitle = "";
+        $mainbreadcrumb = `<li class="breadcrumb-item active">Loading Basket</li>`;
+        $file = "dirs/load/dashboard/load.php";
+        break;
       case "delivery":
         $maintitle = "";
-        $mainbreadcrumb = `<li class="breadcrumb-item active">Delivery</li>`;
+        $mainbreadcrumb = `<li class="breadcrumb-item active">Stock Delivery Form</li>`;
         $file = "dirs/delivery/dashboard/delivery.php";
         break;
       case "receiving":
         $maintitle = "";
-        $mainbreadcrumb = `<li class="breadcrumb-item active">Receiving</li>`;
+        $mainbreadcrumb = `<li class="breadcrumb-item active">Stock Receiving</li>`;
         $file = "dirs/receiving/dashboard/received.php";
         break;
       case "monitoring":

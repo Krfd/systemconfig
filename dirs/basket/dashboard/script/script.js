@@ -233,18 +233,31 @@ $(document).on("click", ".datatables .dropdown .assign-branch", function (e) {
 });
 
 // EDIT ASSIGNMENT
-$(document).on("click", ".datatables .dropdown .edit-branch", function (e) {
+// $(document).on("click", ".datatables .dropdown .edit-branch", function (e) {
+//   e.preventDefault();
+//   e.stopPropagation();
+
+//   let basketRow = $(this).closest("tr");
+//   // let lbNum = basketRow.attr("data-lbNum");
+//   let picklist = basketRow.attr("data-picklist");
+//   let branches = basketRow.attr("data-branches");
+
+//   $("#main-content").html(spinner);
+//   setTimeout(function () {
+//     editAssignBranch(picklist, branches);
+//   }, 200);
+// });
+
+$(document).on("click", ".edit-branch", function (e) {
   e.preventDefault();
   e.stopPropagation();
 
-  let basketRow = $(this).closest("tr");
-  // let lbNum = basketRow.attr("data-lbNum");
-  let picklist = basketRow.attr("data-picklist");
-  let branches = basketRow.attr("data-branches");
+  let picklist = $(this).data("picklist");
+  let branches = $(this).data("branches");
 
   $("#main-content").html(spinner);
+
   setTimeout(function () {
-    // editAssignBranch(lbNum, PicklistNum);
     editAssignBranch(picklist, branches);
   }, 200);
 });
@@ -279,7 +292,6 @@ function loadDeliveryBasketContent() {
       $("#main-content").hide().html(data).fadeIn(200);
       loadDeliveryBasket(
         "#basketTableDashboard",
-        // "dirs/basket/dashboard/actions/get_all.php",
         "dirs/incoming/dashboard/actions/picklisteditems.php",
       );
       $("#loadDeliveryBtn").prop("disabled", true);
@@ -293,14 +305,12 @@ $(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function () {
   if (target === "unassigned-tab") {
     loadDeliveryBasket(
       "#basketTableDashboard",
-      // "dirs/basket/dashboard/actions/get_all.php",
       "dirs/incoming/dashboard/actions/picklisteditems.php",
     );
     $("#loadDeliveryBtn").prop("disabled", true);
   } else if (target === "assigned-tab") {
     loadDeliveryBasket(
       "#basketTableAssigned",
-      // "dirs/basket/dashboard/actions/get_assigned.php",
       "dirs/incoming/dashboard/actions/picklisteditems.php",
     );
     $("#loadDeliveryBtn").prop("disabled", false);
@@ -331,9 +341,7 @@ function loadDeliveryBasket(tableId, url) {
       let grouped = {};
 
       sortedData.forEach((item) => {
-        // console.log(`REQUESTING BRANCH: ${item.Req_Branch}`);
-        // console.log(``);
-        // let key = item.DocEntry || "0";
+        // console.log(`PICKLIST :  ${JSON.stringify(item)}`);
         let key = item.PKList_Number;
 
         if (!grouped[key]) {
@@ -371,6 +379,7 @@ function loadDeliveryBasket(tableId, url) {
               let status = item.PickListStatus || "";
 
               if (status === "NEW") status = "UNASSIGNED";
+              if (status === "PROCESSING") status = "ASSIGNED";
               // else if (status === "A") status = "ASSIGNED";
 
               let badgeClass = "primary";
@@ -390,7 +399,7 @@ function loadDeliveryBasket(tableId, url) {
                       ? `
                     <li>
                       <a class="dropdown-item ${
-                        item.PickListStatus === "A"
+                        item.PickListStatus === "PROCESSING"
                           ? "edit-branch"
                           : "assign-branch"
                       }"
@@ -399,7 +408,7 @@ function loadDeliveryBasket(tableId, url) {
                         data-lbNum="${item.DocEntry}"
                         data-branches="${branches}">
                         ${
-                          item.PickListStatus === "A"
+                          item.PickListStatus === "PROCESSING"
                             ? "Edit Assignment"
                             : "Set Assignment"
                         }
@@ -410,6 +419,8 @@ function loadDeliveryBasket(tableId, url) {
                   }
                 </ul>
               </div>`,
+            // console.log(`PICKLIST: ${item.PKList_Number}`),
+            // console.log(`BRANCHES: ${branches}`),
           ]);
 
           // END OF NEWLY ADDED LOOP
@@ -447,9 +458,9 @@ function loadDeliveryBasket(tableId, url) {
               $(row)
                 .attr("data-rownum", originalItem.DocEntry)
                 .attr("data-picklist", originalItem.PKList_Number)
-                .attr("data-lbNum", originalItem.DocEntry)
-                .attr("data-batchnum", originalItem.DocEntry);
-              // .attr("data-branches", branches);
+                // .attr("data-lbNum", originalItem.DocEntry)
+                // .attr("data-batchnum", originalItem.DocEntry)
+                .attr("data-branches", branches);
             }
           },
           paging: true,
@@ -553,7 +564,7 @@ $(document).on("click", "#deliveryItemsTable tbody .open-srn", function (e) {
 
 function toggleDelivery() {
   const loadDeliveryBtn = document.getElementById("loadDeliveryBtn");
-  const selectAllBtn = document.getElementById("selectAllBtn")
+  const selectAllBtn = document.getElementById("selectAllBtn");
 
   // ✅ Reliable state tracking (instead of :visible)
   let selectionMode = $("#basketTableAssigned").data("selectionMode") || false;
@@ -587,7 +598,7 @@ function toggleDelivery() {
         title: "No Available Request(s)",
         confirmButtonText: "OKAY",
       });
-      selectAllBtn.classList.add("d-none")
+      selectAllBtn.classList.add("d-none");
       return;
     }
 
@@ -616,13 +627,12 @@ function toggleDelivery() {
         //   checkbox.prop("disabled", true);
         //   // console.log(`CHECKBOX DISABLED`);
         // }
-        
       } else {
         checkbox.hide();
       }
     });
 
-    selectAllBtn.classList.remove("d-none")
+    selectAllBtn.classList.remove("d-none");
 
     // ✅ Update UI
     loadDeliveryBtn.textContent = "Add Items";
@@ -1304,6 +1314,7 @@ function loadPicklistBranches(lbNum, model, category, callback) {
 
         if (branches.length > 1) {
           branches.forEach((branch) => {
+            // console.log(`BRANCH NAME : ${branch.RequestingBranch}`);
             let row = `
             <tr>
               <td style="background: #FFF7BC">${branch.RequestingBranch}</td>
@@ -1747,7 +1758,6 @@ function restrictInput() {
 
       let text = (e.originalEvent || e).clipboardData.getData("text");
 
-      // Keep only numbers and limit to 3 digits
       text = text.replace(/[^0-9]/g, "").substring(0, 3);
 
       document.execCommand("insertText", false, text);
@@ -1755,124 +1765,83 @@ function restrictInput() {
   );
 }
 
-// function updateRowAndBalance(activeCell) {
-//   let overallTotal = 0;
+function validateSummaryTable() {
+  let hasError = false;
+  let hasEmpty = false;
 
-//   $("#summaryTable tbody tr").each(function () {
-//     let row = $(this);
+  $("#summaryTable td[contenteditable='true']").each(function () {
+    let val = $(this).text().trim();
 
-//     let actualQty = parseInt(row.find("td:eq(3)").text()) || 0;
+    // EMPTY
+    if (val === "") {
+      $(this).css("border", "2px solid #ffc107");
+      hasEmpty = true;
+    }
 
-//     let sum = 0;
+    // EXCEEDED (from your existing logic)
+    if ($(this).attr("data-error") === "true") {
+      $(this).css("border", "2px solid #dc3545");
+      hasError = true;
+    }
+  });
 
-//     let editableCells = row.find("td[contenteditable='true']");
-
-//     editableCells.each(function () {
-//       let val = parseInt($(this).text()) || 0;
-//       sum += val;
-//     });
-
-//     overallTotal += sum;
-
-//     // 🔥 RULES
-//     if (sum > actualQty) {
-//       // ❌ EXCEEDED → ALL CELLS STAY RED
-//       editableCells.css("border", "2px solid #dc3545");
-//     } else if (sum < actualQty) {
-//       // ⚠️ INCOMPLETE
-//       editableCells.css("border", ""); // reset first
-
-//       if (this.contains(activeCell)) {
-//         $(activeCell).css("border", "2px solid #ffc107");
-//       }
-//     } else {
-//       // ✅ EXACT → CLEAR ALL
-//       editableCells.css("border", "");
-//     }
-//   });
-
-//   let totalQty = parseInt($("#summaryQty").text()) || 0;
-//   let balance = totalQty - overallTotal;
-
-//   $("#balanceQty").text(balance);
-// }
+  return {
+    hasError,
+    hasEmpty,
+    isValid: !hasError && !hasEmpty,
+  };
+}
 
 function updateRowAndBalance(activeCell) {
-  // FOR TOTALS
-
   let branchTotals = {};
+  let totalAssigned = 0;
+  let totalActual = 0;
 
-  // initialize totals
+  // init branch totals
   $("#branchTotalsContainer .branch-total").each(function () {
     let branch = $(this).data("branch");
     branchTotals[branch] = 0;
   });
 
-  // loop through table rows
-  $("#summaryTable tbody tr").each(function () {
-    $(this)
-      .find("td[contenteditable='true']")
-      .each(function (index) {
-        let value = parseInt($(this).text()) || 0;
-
-        let branch = $("#branchTotalsContainer .branch-total")
-          .eq(index)
-          .data("branch");
-
-        if (branch) {
-          branchTotals[branch] += value;
-        }
-      });
-  });
-
-  // update UI
-  $("#branchTotalsContainer .branch-total").each(function () {
-    let branch = $(this).data("branch");
-    $(this).text(branchTotals[branch]);
-  });
-
-  // OPTIONAL: update balance
-  // let totalQty = parseInt($("#summaryQty").text()) || 0;
-  // let usedQty = Object.values(branchTotals).reduce((a, b) => a + b, 0);
-
-  // $("#balanceQty").text(balance);
-  let overallTotal = 0;
-
   $("#summaryTable tbody tr").each(function () {
     let row = $(this);
 
-    let actualQty = parseInt(row.find("td:eq(3)").text()) || 0;
+    if (row.hasClass("empty-row")) return;
+
+    let actualQty = parseInt(row.find("td:eq(4)").text()) || 0;
+    totalActual += actualQty;
+
+    let editableCells = row.find("td[contenteditable='true']");
 
     let sum = 0;
-    let editableCells = row.find("td[contenteditable='true']");
 
     editableCells.each(function () {
       let val = parseInt($(this).text()) || 0;
+      let branch = $(this).data("branch");
+
+      if (!branch) return;
+
+      branchTotals[branch] += val;
       sum += val;
+      totalAssigned += val;
     });
 
-    overallTotal += sum;
-
-    // 🧠 DO NOT RESET ALL BORDERS HERE
-
+    // ==============================
+    // ✅ YOUR VALIDATION (UNCHANGED)
+    // ==============================
     if (sum > actualQty) {
-      // ❌ ONLY mark the ACTIVE CELL as red
-      if (activeCell && this.contains(activeCell)) {
+      if (activeCell && row[0].contains(activeCell)) {
         $(activeCell)
           .css("border", "2px solid #dc3545")
-          .attr("data-error", "true"); // persist flag
+          .attr("data-error", "true");
       }
     } else if (sum < actualQty) {
-      // ⚠️ incomplete
-
-      if (activeCell && this.contains(activeCell)) {
-        // Only apply yellow if NOT already red
+      if (activeCell && row[0].contains(activeCell)) {
         if (!$(activeCell).attr("data-error")) {
           $(activeCell).css("border", "2px solid #ffc107");
         }
       }
     } else {
-      // ✅ exact → clear ONLY non-error cells
       editableCells.each(function () {
         if (!$(this).attr("data-error")) {
           $(this).css("border", "");
@@ -1881,15 +1850,20 @@ function updateRowAndBalance(activeCell) {
     }
   });
 
-  let totalQty = parseInt($("#summaryQty").text()) || 0;
-  let balance = totalQty - overallTotal;
-  // let totalQty = parseInt($("#summaryQty").text()) || 0;
-  let usedQty = Object.values(branchTotals).reduce((a, b) => a + b, 0);
+  // ==============================
+  // ✅ Render branch totals
+  // ==============================
+  $("#branchTotalsContainer .branch-total").each(function () {
+    let branch = $(this).data("branch");
+    $(this).text(branchTotals[branch] || 0);
+  });
 
-  $("#balanceQty").text(balance);
+  // ==============================
+  // ✅ Balance (actual - assigned)
+  // ==============================
+  let balance = totalActual - totalAssigned;
+  $("#balanceQty").text(balance >= 0 ? balance : 0);
 }
-
-// ARROW NAVIGATION
 
 $(document).on(
   "keydown",
@@ -1945,6 +1919,7 @@ function assignBranch(picklist, branchees) {
     submitBranchDelivery();
     restrictInput();
     updateRowAndBalance();
+    submitBranchAssignment();
 
     $.ajax({
       url: "dirs/basket/dashboard/actions/get_loadingbasket.php",
@@ -1959,11 +1934,11 @@ function assignBranch(picklist, branchees) {
           let totalQty = 0;
           let rows = [];
           let branches = [
-            // ...new Set(items.map((item) => item.Destination).filter(Boolean)),
             ...new Set(items.map((item) => item.Req_Branch).filter(Boolean)),
           ];
           let headerRow = `
             <tr>
+              <th class="d-none"></th>
               <th class="text-secondary">Brand</th>
               <th class="text-secondary">Model</th>
               <th class="text-secondary">Category</th>
@@ -1993,62 +1968,73 @@ function assignBranch(picklist, branchees) {
           items.forEach(function (unit) {
             console.log(`UNIT DETAILS: ${JSON.stringify(unit)}`);
             console.log(``);
-            // let key = unit.ItemCode;
             let key = unit.Req_ItemName;
 
             if (!groupedItems[key]) {
               groupedItems[key] = {
+                Item_ids: [],
                 ItemBrand: unit.Req_ItemBrand,
                 ItemName: unit.Req_ItemName,
                 ItemCategory: unit.Req_ItemCategory,
-                // Deliver_Qty: 0,
                 Actual_Item_Qty: unit.Actual_Item_Qty || 0,
                 Branches: {},
               };
             }
 
             let qty = Math.trunc(Number(unit.Actual_Item_Qty || 0));
+            groupedItems[key].Item_ids.push(unit.Item_id);
             groupedItems[key].Actual_Item_Qty += qty;
-            // let branchName = unit.Destination;
             let branchName = unit.Req_Branch;
-            // console.log(`BRANCH NAME: ${branchName}`);
             if (branchName) {
               if (!groupedItems[key].Branches[branchName]) {
                 groupedItems[key].Branches[branchName] = 0;
               }
               groupedItems[key].Branches[branchName] += qty;
             }
-
-            // groupedItems[key].Actual_Item_Qty = Math.trunc(
-            //   Number(unit.Actual_Item_Qty || 0),
-            // );
           });
 
           let mergedItems = Object.values(groupedItems);
 
           mergedItems.forEach(function (unit, index) {
-            // console.log(`UNIT: ${JSON.stringify(unit)}`);
-            // console.log(``);
             let qty = Math.trunc(Number(unit.Actual_Item_Qty || 0));
             totalQty += qty;
 
             let row = `
               <tr class="item-row" style="height: 40px; min-height: 40px; cursor: pointer">
+                <td class="d-none item-ids">${unit.Item_ids.join(",")}</td>
                 <td class="align-middle ps-3" style="background: ##F7F7F7">${unit.ItemBrand}</td>
                 <td class="align-middle ps-3" style="background: ##F7F7F7">${unit.ItemName}</td>
                 <td class="align-middle ps-3" style="background: ##F7F7F7">${unit.ItemCategory}</td>
                 <td class="align-middle ps-3" style="background: ##F7F7F7">${Math.trunc(Number(unit.Actual_Item_Qty))}</td>
               `;
 
-            branches.forEach((branch) => {
-              let val = unit.Branches?.[branch] ?? "";
-              // console.log(`VAL BRANCH: ${val}`);
-              let isEditable = val > 0;
+            // Count editable branches for this row
+            let editableBranches = [];
 
-              val = isEditable ? "" : "";
+            branches.forEach((branch) => {
+              let val = unit.Branches?.[branch] ?? 0;
+              if (val > 0) {
+                editableBranches.push(branch);
+              }
+            });
+
+            // If only one editable branch → assign full qty
+            if (editableBranches.length === 1) {
+              let onlyBranch = editableBranches[0];
+              unit.Branches[onlyBranch] = Math.trunc(
+                Number(unit.Actual_Item_Qty || 0),
+              );
+            }
+
+            branches.forEach((branch) => {
+              let rawVal = unit.Branches?.[branch] ?? 0;
+              let isEditable = rawVal > 0;
+
+              let val =
+                editableBranches.length === 1 && isEditable ? rawVal : "";
 
               row += `
-                <td class="align-middle ps-3 text-center"
+                <td class="align-middle ps-3 text-center" data-branch="${branch}"
                     ${isEditable ? 'contenteditable="true"' : ""}
                     style="background: ${isEditable ? "#FFFBDF" : "#F7F7F7"}; cursor: ${isEditable ? "text" : "default"}; outline: none;"
                     onfocus="this.style.border='1px solid #ffc107'; this.style.outline='none';">
@@ -2061,13 +2047,13 @@ function assignBranch(picklist, branchees) {
 
               branches.forEach((branch, index) => {
                 totalsContainer.append(`
-    <div class="d-flex">
-      <div class="p-2 text-end">${branch}:</div>
-      <div class="p-2 branch-total" 
-           style="width:120px;" 
-           data-branch="${branch}">0</div>
-    </div>
-  `);
+                  <div class="d-flex">
+                    <div class="p-2 text-end">${branch}:</div>
+                    <div class="p-2 branch-total" 
+                        style="width:120px;" 
+                        data-branch="${branch}">0</div>
+                  </div>
+                `);
               });
             });
 
@@ -2117,6 +2103,7 @@ function assignBranch(picklist, branchees) {
 
             for (let i = 0; i < emptyRow; i++) {
               let emptyCells = `
+                <td style="background: #F7F7F7" class="d-none"></td>
                 <td style="background: #F7F7F7"></td>
                 <td style="background: #F7F7F7"></td>
                 <td style="background: #F7F7F7"></td>
@@ -2143,13 +2130,251 @@ function assignBranch(picklist, branchees) {
   });
 }
 
-// SUBMIT DELIVERY
+function editAssignBranch(picklist, branchees) {
+  $.post("dirs/basket/dashboard/editAssignment.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+
+    submitBranchDelivery();
+    restrictInput();
+    updateRowAndBalance();
+    submitBranchAssignment();
+
+    $.ajax({
+      url: "dirs/basket/dashboard/actions/get_loadingbasket.php",
+      type: "POST",
+      data: { picklist: picklist },
+      dataType: "json",
+      success: function (response) {
+        if (response.isSuccess === "success") {
+          let header = response.Header;
+          let items = response.Orders;
+          let editSummaryTable = $("#editSummaryTable tbody");
+          let totalQty = 0;
+          let rows = [];
+          let branches = [
+            ...new Set(items.map((item) => item.Req_Branch).filter(Boolean)),
+          ];
+          let headerRow = `
+            <tr>
+              <th class="d-none"></th>
+              <th class="text-secondary">Brand</th>
+              <th class="text-secondary">Model</th>
+              <th class="text-secondary">Category</th>
+              <th class="text-secondary">Actual Quantity</th>
+          `;
+
+          branches.forEach((branch) => {
+            headerRow += `<th class="text-secondary text-center">${branch}</th>`;
+          });
+
+          headerRow += `</tr>`;
+
+          $("#editSummaryTable thead").html(headerRow);
+
+          $("#pcklstno").val(header.PKList_Number);
+          $("#docdate").val(header.DocDate.substring(0, 10));
+          $("#origin").val(header.Picked_Branch || "");
+          $("#status").val(header.PickListStatus);
+          $("#prepby").val(header.CollectedBy);
+
+          let groupedItems = {};
+
+          items.forEach(function (unit) {
+            // console.log(`UNIT DETAILS: ${JSON.stringify(unit)}`);
+            console.log(
+              `UNIT BRAND: ${unit.Req_ItemBrand} - UNIT ORDER QTY: ${JSON.stringify(unit.ToDeliver_Qty)} - BRANCH: ${unit.Req_Branch}`,
+            );
+            // console.log(``);
+            let key = unit.Req_ItemName;
+
+            if (!groupedItems[key]) {
+              groupedItems[key] = {
+                Item_ids: [],
+                ItemBrand: unit.Req_ItemBrand,
+                ItemName: unit.Req_ItemName,
+                ItemCategory: unit.Req_ItemCategory,
+                Actual_Item_Qty: unit.Actual_Item_Qty || 0,
+                Branches: {},
+              };
+            }
+
+            let qty = Math.trunc(Number(unit.Actual_Item_Qty || 0));
+            groupedItems[key].Item_ids.push(unit.Item_id);
+            groupedItems[key].Actual_Item_Qty += qty;
+            let branchName = unit.Req_Branch;
+            if (branchName) {
+              if (!groupedItems[key].Branches[branchName]) {
+                groupedItems[key].Branches[branchName] = 0;
+              }
+              groupedItems[key].Branches[branchName] += qty;
+            }
+          });
+
+          let mergedItems = Object.values(groupedItems);
+
+          mergedItems.forEach(function (unit, index) {
+            let qty = Math.trunc(Number(unit.Actual_Item_Qty || 0));
+            totalQty += qty;
+
+            let row = `
+              <tr class="item-row" style="height: 40px; min-height: 40px; cursor: pointer">
+                <td class="d-none item-ids">${unit.Item_ids.join(",")}</td>
+                <td class="align-middle ps-3" style="background: ##F7F7F7">${unit.ItemBrand}</td>
+                <td class="align-middle ps-3" style="background: ##F7F7F7">${unit.ItemName}</td>
+                <td class="align-middle ps-3" style="background: ##F7F7F7">${unit.ItemCategory}</td>
+                <td class="align-middle ps-3" style="background: ##F7F7F7">${Math.trunc(Number(unit.Actual_Item_Qty))}</td>
+              `;
+
+            // Count editable branches for this row
+            let editableBranches = [];
+
+            branches.forEach((branch) => {
+              let val = unit.Branches?.[branch] ?? 0;
+              if (val > 0) {
+                editableBranches.push(branch);
+              }
+            });
+
+            // If only one editable branch → assign full qty
+            if (editableBranches.length === 1) {
+              let onlyBranch = editableBranches[0];
+              unit.Branches[onlyBranch] = Math.trunc(
+                Number(unit.Actual_Item_Qty || 0),
+              );
+            }
+
+            branches.forEach((branch) => {
+              let rawVal = unit.Branches?.[branch] ?? 0;
+              let isEditable = rawVal > 0;
+
+              let val =
+                editableBranches.length === 1 && isEditable ? rawVal : "";
+
+              row += `
+                <td class="align-middle ps-3 text-center" data-branch="${branch}"
+                    ${isEditable ? 'contenteditable="true"' : ""}
+                    style="background: ${isEditable ? "#FFFBDF" : "#F7F7F7"}; cursor: ${isEditable ? "text" : "default"}; outline: none;"
+                    onfocus="this.style.border='1px solid #ffc107'; this.style.outline='none';">
+                    ${rawVal > 0 ? rawVal : ""}
+                </td>
+              `;
+
+              let totalsContainer = $("#branchTotalsContainer");
+              totalsContainer.empty();
+
+              branches.forEach((branch, index) => {
+                totalsContainer.append(`
+                  <div class="d-flex">
+                    <div class="p-2 text-end">${branch}:</div>
+                    <div class="p-2 branch-total" 
+                        style="width:120px;" 
+                        data-branch="${branch}">0</div>
+                  </div>
+                `);
+              });
+            });
+
+            row += `</tr>`;
+            rows += row;
+          });
+
+          $(document)
+            .off("input", "#editSummaryTable td[contenteditable='true']")
+            .on(
+              "input",
+              "#editSummaryTable td[contenteditable='true']",
+              function () {
+                let el = this;
+
+                let selection = window.getSelection();
+                let range = selection.getRangeAt(0);
+                let cursorPos = range.startOffset;
+
+                let value = $(el).text();
+
+                value = value.replace(/[^0-9]/g, "");
+                value = value.substring(0, 3);
+
+                $(el).text(value);
+
+                let newPos = Math.min(cursorPos, value.length);
+
+                let newRange = document.createRange();
+                newRange.setStart(el.childNodes[0] || el, newPos);
+                newRange.collapse(true);
+
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+
+                updateRowAndBalance(el);
+              },
+            );
+
+          $("#summaryQty").text(totalQty);
+          $("#balanceQty").text(totalQty);
+          editSummaryTable.html(rows);
+
+          let rowCount = mergedItems.length;
+          if (rowCount < 8) {
+            let emptyRow = 8 - rowCount;
+
+            for (let i = 0; i < emptyRow; i++) {
+              let emptyCells = `
+                <td style="background: #F7F7F7" class="d-none"></td>
+                <td style="background: #F7F7F7"></td>
+                <td style="background: #F7F7F7"></td>
+                <td style="background: #F7F7F7"></td>
+                <td style="background: #F7F7F7"></td>
+              `;
+
+              // ✅ add dynamic branch columns
+              branches.forEach(() => {
+                emptyCells += `<td style="background: #F7F7F7"></td>`;
+              });
+
+              let empty = `
+                <tr class="item-row empty-row" style="height: 50px; min-height: 50px">
+                  ${emptyCells}
+                </tr>
+              `;
+              editSummaryTable.append(empty);
+            }
+            $("#summaryQty").text(totalQty);
+          }
+        }
+      },
+    });
+  });
+}
+
+// SUBMIT BRANCH ASSIGNMENT
 function submitBranchAssignment() {
-  // FORM SUBMISSION
   let commitBtn = document.getElementById("branchAssignmentBtn");
 
   commitBtn.addEventListener("click", function (e) {
     e.preventDefault();
+
+    let validation = validateSummaryTable();
+
+    if (!validation.isValid) {
+      if (validation.hasEmpty) {
+        Swal.fire({
+          icon: "warning",
+          title: "Incomplete Assignment",
+          text: "All editable fields must have a value.",
+        });
+        return;
+      }
+
+      if (validation.hasError) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Quantity",
+          text: "Some values exceed the allowed quantity.",
+        });
+        return;
+      }
+    }
 
     Swal.fire({
       icon: "warning",
@@ -2162,57 +2387,110 @@ function submitBranchAssignment() {
       if (res.isConfirmed) {
         // PROCEED FOR SUBMISSION
         let items = [];
-        let nonSerializeItems = [];
+        // let nonSerializeItems = [];
 
         let hasUnassigned = false;
 
-        $("#summaryDeliveryTable tbody tr").each(function () {
-          let badgeText = $(this).find(".badge").text().trim().toLowerCase();
-          let serial = $(this).find("td:nth-child(2)").text().trim();
-          let branch = $(this).find("td:nth-child(3)").text().trim();
-          let brand = $(this).find("td:nth-child(4)").text().trim();
-          let model = $(this).find("td:nth-child(5)").text().trim();
-          let category = $(this).find("td:nth-child(6)").text().trim();
-          let quantity = $(this).find("td:nth-child(7)").text().trim();
-          let itemCode = $(this).find("td:nth-child(8)").text().trim();
+        // $("#summaryDeliveryTable tbody tr").each(function () {
+        //   let badgeText = $(this).find(".badge").text().trim().toLowerCase();
+        //   let serial = $(this).find("td:nth-child(2)").text().trim();
+        //   let branch = $(this).find("td:nth-child(3)").text().trim();
+        //   let brand = $(this).find("td:nth-child(4)").text().trim();
+        //   let model = $(this).find("td:nth-child(5)").text().trim();
+        //   let category = $(this).find("td:nth-child(6)").text().trim();
+        //   let quantity = $(this).find("td:nth-child(7)").text().trim();
+        //   let itemCode = $(this).find("td:nth-child(8)").text().trim();
 
-          if (badgeText === "unassigned") {
-            hasUnassigned = true;
-            return false;
-          }
+        //   if (badgeText === "unassigned") {
+        //     hasUnassigned = true;
+        //     return false;
+        //   }
 
+        //   if (brand !== "") {
+        //     items.push({
+        //       serial: serial,
+        //       branch: branch,
+        //       brand: brand,
+        //       model: model,
+        //       category: category,
+        //       quantity: quantity,
+        //       itemCode: itemCode,
+        //     });
+        //   }
+        // });
+
+        // $("#summaryNonserializeTable tbody tr").each(function () {
+        //   let branch = $(this).find("td:nth-child(2)").text().trim();
+        //   let brand = $(this).find("td:nth-child(3)").text().trim();
+        //   let model = $(this).find("td:nth-child(4)").text().trim();
+        //   let category = $(this).find("td:nth-child(5)").text().trim();
+        //   let quantity = $(this).find("td:nth-child(6)").text().trim();
+        //   let itemCode = $(this).find("td:nth-child(7)").text().trim();
+
+        //   if (itemCode !== "" && brand !== "") {
+        //     nonSerializeItems.push({
+        //       branch: branch,
+        //       brand: brand,
+        //       model: model,
+        //       category: category,
+        //       quantity: quantity,
+        //       itemCode: itemCode,
+        //     });
+        //   }
+        // });
+
+        // $("#summaryTable tbody tr").each(function () {
+        $("#summaryTable tbody tr.item-row").each(function () {
+          let tds = $(this).find("td");
+
+          // let ids = tds.eq(".item-ids").text().split(",");
+          // let branch = tds.eq("td:nth-child()").text().trim();
+          // let brand = tds.eq("td:nth-child(3)").text().trim();
+          // let model = tds.eq("td:nth-child(4)").text().trim();
+          // let category = tds.eq("td:nth-child(5)").text().trim();
+          // let quantity = tds.eq("td:nth-child(6)").text().trim();
+          // // let itemCode = $(this).find("td:nth-child(7)").text().trim();
+
+          let ids = tds.eq(0).text().split(",");
+          // let branch = tds.eq(1).text().trim();
+          let brand = tds.eq(1).text().trim();
+          let model = tds.eq(2).text().trim();
+          let category = tds.eq(3).text().trim();
+          let quantity = tds.eq(4).text().trim();
+          // let itemCode = $(this).find("td:nth-child(7)").text().trim();
+
+          if (!brand) return;
+
+          let branchData = [];
+
+          tds.slice(5).each(function () {
+            let branch = $(this).data("branch");
+            let qty = $(this).text().trim() || 0;
+
+            if (branch) {
+              branchData.push({
+                branch: branch,
+                quantity: parseInt(qty) || 0,
+              });
+            }
+          });
+
+          // if (itemCode !== "" && brand !== "") {
           if (brand !== "") {
             items.push({
-              serial: serial,
-              branch: branch,
-              brand: brand,
-              model: model,
-              category: category,
-              quantity: quantity,
-              itemCode: itemCode,
+              // branch: branch,
+              item_ids: ids,
+              brand,
+              model,
+              category,
+              quantity: parseInt(quantity) || 0,
+              // itemCode: itemCode,
+              branches: branchData,
             });
           }
         });
 
-        $("#summaryNonserializeTable tbody tr").each(function () {
-          let branch = $(this).find("td:nth-child(2)").text().trim();
-          let brand = $(this).find("td:nth-child(3)").text().trim();
-          let model = $(this).find("td:nth-child(4)").text().trim();
-          let category = $(this).find("td:nth-child(5)").text().trim();
-          let quantity = $(this).find("td:nth-child(6)").text().trim();
-          let itemCode = $(this).find("td:nth-child(7)").text().trim();
-
-          if (itemCode !== "" && brand !== "") {
-            nonSerializeItems.push({
-              branch: branch,
-              brand: brand,
-              model: model,
-              category: category,
-              quantity: quantity,
-              itemCode: itemCode,
-            });
-          }
-        });
+        console.log(`ITEMS TO SUBMIT : ${JSON.stringify(items)}`);
 
         if (hasUnassigned) {
           Swal.fire({
@@ -2223,7 +2501,8 @@ function submitBranchAssignment() {
           return;
         }
 
-        if (items.length === 0 && nonSerializeItems.length === 0) {
+        // if (items.length === 0 && nonSerializeItems.length === 0) {
+        if (items.length === 0) {
           Swal.fire({
             icon: "error",
             title: "No items on summary",
@@ -2235,25 +2514,46 @@ function submitBranchAssignment() {
         let formData = new FormData();
 
         // formData.append("BatchNum", $("#lbnum").val());
+        formData.append("PickListNumber", $("#pcklstno").val());
         formData.append("Branch", $("#origin").val());
         formData.append("OrginWhscode", $("#whcode").val());
         formData.append("Remarks", $("#remarks").val());
 
         // SERIALIZED
+        // items.forEach((item, i) => {
+        //   // formData.append(`Serial[${i}]`, item.serial);
+        //   // formData.append(`BranchFor[${i}]`, item.branch);
+        //   formData.append(`Brand[${i}]`, item.brand);
+        //   formData.append(`Model[${i}]`, item.model);
+        //   // formData.append(`ItemCode[${i}]`, item.itemCode);
+        //   formData.append(`Category[${i}]`, item.category); // add if needed
+        //   formData.append(`Quantity[${i}]`, item.quantity);
+
+        //   item.branches.forEach((b, j) => {
+        //     formData.append(`Branch[${i}][${j}]`, b.branch);
+        //     formData.append(`Qty[${i}][${j}]`, b.quantity);
+        //   });
+        // });
+
+        formData.append("PickListNumber", $("#pcklstno").val());
+
         items.forEach((item, i) => {
-          formData.append(`Serial[${i}]`, item.serial);
-          formData.append(`BranchFor[${i}]`, item.branch);
-          formData.append(`Brand[${i}]`, item.brand);
-          formData.append(`Model[${i}]`, item.model);
-          formData.append(`ItemCode[${i}]`, item.itemCode);
-          formData.append(`Category[${i}]`, item.category); // add if needed
-          formData.append(`Quantity[${i}]`, item.quantity);
+          item.item_ids.forEach((id, k) => {
+            item.branches.forEach((b, j) => {
+              formData.append(`ItemId[]`, id);
+              // formData.append(`PickListNumber[]`, $("#pcklstno").val()); // adjust if different
+              formData.append(`RequestingBranch[]`, b.branch);
+              formData.append(`DeliveryQty[]`, b.quantity);
+              formData.append(`Remarks[]`, $("#remarks").val());
+            });
+          });
         });
 
         // ================= DEBUG =================
 
         $.ajax({
-          url: "dirs/basket/dashboard/actions/update_loadingbasket.php",
+          // url: "dirs/basket/dashboard/actions/update_loadingbasket.php",
+          url: "dirs/basket/dashboard/actions/update_setupdeliveryqty.php",
           type: "POST",
           data: formData,
           processData: false,
@@ -2459,7 +2759,6 @@ function loadDeliveryItems(PickLst_Num) {
       // url: "dirs/basket/dashboard/actions/get_loading_breakdown.php",
       url: "dirs/incoming/dashboard/actions/get_picklist_items.php",
       type: "POST",
-      // data: { PickLst_Num: PickLst_Num },
       data: { PicklistNumber: PickLst_Num },
       dataType: "json",
       success: function (response) {
@@ -2499,7 +2798,6 @@ function loadDeliveryItems(PickLst_Num) {
 
           if (rows.length === 0) {
             for (let i = 0; i < 8; i++) {
-              // rows.push(["", "", "", "", ""]);
               rows.push(["", "", "", ""]);
             }
           }
@@ -2515,19 +2813,7 @@ function loadDeliveryItems(PickLst_Num) {
               { title: "Model", className: "text-start ps-2" },
               { title: "Category", className: "text-start ps-2" },
               { title: "Quantity", className: "text-start ps-2" },
-              // { title: "", orderable: false },
             ],
-            // createdRow: function (row, data, dataIndex) {
-            //   // let originalItem = sortedData[dataIndex];
-            //   let originalItem = response.Data[dataIndex];
-
-            //   if (originalItem) {
-            //     $(row)
-            //       .attr("data-srn-num", originalItem.BaseNum_SRN)
-            //       .attr("data-picklist", PickLst_Num)
-            //       .attr("data-delivery-num", del_num);
-            //   }
-            // },
             paging: true,
             searching: true,
             info: true,
@@ -2559,11 +2845,6 @@ function loadDeliveryItems(PickLst_Num) {
               let currentRows = tableBody.find("tr").length;
 
               for (let i = currentRows; i < 8; i++) {
-                // let $emptyRow = $(`
-                //   <tr class="empty-row" style="background: #FFFBDF">
-                //     <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
-                //   </tr>
-                // `);
                 let $emptyRow = $(`
                   <tr class="empty-row" style="background: #FFFBDF">
                     <td colspan="4" style="background: #FFFBDF">&nbsp;</td>
@@ -2677,15 +2958,6 @@ function formattedDate() {
 
   document.getElementById("formattedDate").value = `${yyyy}-${mm}-${dd}`;
 }
-
-// function deliveryDate() {
-//   const today = new Date();
-//   const yyyy = today.getFullYear();
-//   const mm = String(today.getMonth() + 1).padStart(2, "0");
-//   const dd = String(today.getDate()).padStart(2, "0");
-//   document.getElementById("docdate").value = `${yyyy}-${mm}-${dd}`;
-//   document.getElementById("deldate").value = `${yyyy}-${mm}-${dd}`;
-// }
 
 function deliveryDate() {
   const today = new Date();
@@ -2906,7 +3178,6 @@ function getDeliveryDetails() {
 }
 
 // ORIGINAL
-// function createDr(batchContainer) {
 function createDr() {
   $("#main-content").html(spinner);
   $.post("dirs/basket/dashboard/createDr.php", function (data) {

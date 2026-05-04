@@ -35,7 +35,7 @@
                                         </div>
                                         <div class="col p-0 d-flex align-items-baseline col" hidden>
                                             <label for="whcode" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
-                                            <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
+                                            <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f2f2f2" value="NEWWHS" readonly>
                                         </div>
                                     </div>
                                     <input type="hidden" name="lbnum" id="lbnum" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
@@ -51,111 +51,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- SERIAL TOGGLER -->
-                            <div class="d-flex justify-content-end align-items-baseline gap-3 mt-5">
-                                <div class="d-flex align-items-center gap-2">
-                                    <label class="mb-0 text-secondary">Serial:</label>
-                                    <label class="modern-switch shadow-sm rounded-5">
-                                        <input type="checkbox" id="serialToggler" class="p-1">
-                                        <div class="switch-track px-3 d-flex justify-content-center gap-4">
-                                            <span class="switch-text text-start text-white scan">Scan</span>
-                                            <span class="switch-text text-center text-white manual">Manual</span>
-                                        </div>
-                                        <div class="switch-knob shadow"></div>
-                                    </label>
-                                </div>
-                                <div class="d-flex gap-1">
-                                    <button type="button" class="btn btn-sm btn-primary" id="addSerialModalBtn" data-bs-toggle="modal" data-bs-target="#addSerialModal"><i class="bi bi-plus"></i> Insert</button>
-                                    <button type="button" class="btn btn-sm btn-primary" id="addDeliveryModalBtn"><i class="bi bi-plus"></i> Add</button>
-                                    <button type="button" class="btn btn-sm btn-danger" id="clearDeliveryTableBtn" onclick="clearTable()">Clear</button>
-                                    <button type="button" class="btn btn-sm btn-info" id="deliverySummaryBtn" data-bs-toggle="modal" data-bs-target="#deliverySummary">Delivery</button>
-                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#nonSerializeSummary">NonSerialize</button>
-                                </div>
-                            </div>
                             <div class="table-responsive d-flex gap-1 overflow-auto mt-3" style="max-height: 450px">
-                                <!--SERIAL TABLE  -->
-                                <table class="table table-hover col-2" id="delivery-serial-table">
-                                    <thead class="sticky-top">
-                                        <tr>
-                                            <th class="text-secondary" colspan="2" style="overflow-x: hidden; white-space: nowrap;  outline: none; scrollbar-width: none; -ms-overflow-style: none;"
-                                                onfocus="this.style.outline='none';"
-                                                oninput="this.scrollLeft = this.scrollWidth">Serial No.</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td rowspan="9" colspan="2" style="background: #FFFDBF" style="white-space: pre-wrap;"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
                                 <!-- SUMMARY TABLE -->
                                 <table class="table table-hover col" id="editSummaryTable">
                                     <thead class="sticky-top">
-                                        <tr>
-                                            <th class="text-secondary">Brand</th>
-                                            <th class="text-secondary">Model</th>
-                                            <th class="text-secondary">Category</th>
-                                            <th class="text-secondary">Quantity</th>
-                                            <th class="text-secondary">Allocated</th>
-                                        </tr>
                                     </thead>
                                     <tbody>
-                                        <!-- <tr class="empty-row" style="height: 40px; min-height: 40px;">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr>
-                                        <tr class="empty-row" style="height: 40px; min-height: 40px;">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                        </tr> -->
                                     </tbody>
                                 </table>
                             </div>
@@ -176,10 +77,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button class="clearfix btn btn-primary float-end" type="submit" id="branchAssignmentBtn">Commit</button>
+                                <button class="clearfix btn btn-primary float-end" type="submit" id="branchAssignmentBtn">Save</button>
                             </div>
                         </form>
                     </div>
+                </div>
             </section>
         </div>
     </div>
