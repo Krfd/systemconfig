@@ -52,7 +52,6 @@ function loadIncoming() {
           }
 
           existingSeries.add(item.SR_Number);
-          // console.log(`SRN ITEM: ${JSON.stringify(item)}`)
 
           let status = item.RequestStatus
             ? item.RequestStatus.toUpperCase()
@@ -1121,8 +1120,6 @@ function loadBasket() {
             }
           });
 
-          // const groupedArray = Object.values(grouped);
-
           const groupedArray = Object.values(grouped).map((item) => ({
             ...item,
             SR_Numbers: Array.from(item.SR_Numbers), // convert Set → Array
@@ -1130,16 +1127,9 @@ function loadBasket() {
 
           groupedArray.forEach((item) => {
             const isSingleSR = item.SR_Numbers.length === 1;
-            // console.log(`PICKLIST BASKET ITEM: ${JSON.stringify(item)}`)
+            // console.log(`PICKLIST BASKET ITEM: ${JSON.stringify(item)}`);
+            // console.log(``);
             const condition = item.allHaveActualQty && isSingleSR;
-
-            // console.log(
-            //   "PK:", item.PKList_Number,
-            //   "| allHaveActualQty:", item.allHaveActualQty,
-            //   "| isSingleSR:", isSingleSR,
-            //   "| condition:", condition
-            // );
-            // console.log(``)
 
             const date = new Date(item.DocDate);
             const formatted = date.toISOString().split("T")[0];
@@ -1155,16 +1145,31 @@ function loadBasket() {
                 </li>`
               : "";
 
+            // const actualQtyOption = item.allHaveActualQty
+            //   ? (item.PickListStatus === "PROCESSING")
+            //   ? "" :`<li>
+            //         <a class="dropdown-item edit-actual-qty" href="#">
+            //           Edit Actual Quantity
+            //         </a>
+            //     </li>`)
+            //   : `<li>
+            //         <a class="dropdown-item enter-actual-qty" href="#">
+            //           Encode Quantity
+            //         </a>
+            //     </li>`;
+
             const actualQtyOption = item.allHaveActualQty
-              ? `<li>
-                    <a class="dropdown-item edit-actual-qty" href="#">
-                      Edit Actual Quantity
-                    </a>
-                </li>`
+              ? item.PickListStatus === "PROCESSING"
+                ? "" // Hide option if status is PROCESSING
+                : `<li>
+                  <a class="dropdown-item edit-actual-qty" href="#">
+                    Edit Actual Quantity
+                  </a>
+                  </li>`
               : `<li>
-                    <a class="dropdown-item enter-actual-qty" href="#">
-                      Encode Quantity
-                    </a>
+                  <a class="dropdown-item enter-actual-qty" href="#">
+                    Encode Quantity
+                  </a>
                 </li>`;
 
             const createDr =
@@ -1468,7 +1473,7 @@ function encodeQty(picklistNum) {
             let groupedArray = Object.values(groupedItems);
 
             Object.values(groupedItems).forEach((item) => {
-              console.log(`ENCODE QTY ITEM: ${JSON.stringify(item)}`);
+              // console.log(`ENCODE QTY ITEM: ${JSON.stringify(item)}`);
               picklistEntry = item.DocEntry;
               index++;
               rows += `
@@ -1703,7 +1708,8 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
                   //   cancelButtonText: "Normal",
                   //   allowOutsideClick: false,
                   // }).then((swalResult) => {
-                  const groupByCategory = swalResult.isConfirmed; // ✅ correct place
+                  // const groupByCategory = swalResult.isConfirmed; // ✅ correct place
+                  const groupByCategory = false;
                   const openPrint = () => {
                     window.open(
                       `pdf/requests.php?DocEntry=${DocEntry}` +
