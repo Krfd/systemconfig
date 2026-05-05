@@ -1792,10 +1792,12 @@ function validateSummaryTable() {
   };
 }
 
-function updateRowAndBalance(activeCell) {
+function updateRowAndBalance(activeCell, selector = "#summaryTable") {
   let branchTotals = {};
   let totalAssigned = 0;
   let totalActual = 0;
+
+  let table = $(selector)
 
   // init branch totals
   $("#branchTotalsContainer .branch-total").each(function () {
@@ -1803,7 +1805,8 @@ function updateRowAndBalance(activeCell) {
     branchTotals[branch] = 0;
   });
 
-  $("#summaryTable tbody tr").each(function () {
+  // $("#summaryTable tbody tr").each(function () {
+  table.find("tbody tr").each(function () {
     let row = $(this);
 
     if (row.hasClass("empty-row")) return;
@@ -1867,7 +1870,7 @@ function updateRowAndBalance(activeCell) {
 
 $(document).on(
   "keydown",
-  "#summaryTable td[contenteditable='true']",
+  "#summaryTable td[contenteditable='true'], #editSummaryTable td[contenteditable='true']",
   function (e) {
     let cell = $(this);
     let row = cell.closest("tr");
@@ -1955,12 +1958,8 @@ function assignBranch(picklist, branchees) {
 
           $("#pcklstno").val(header.PKList_Number);
           $("#docdate").val(header.DocDate.substring(0, 10));
-          // $("#origin").val(item.Destination || "");
-          // $("#whcode").val(item.DWhscode || "");
           $("#origin").val(header.Picked_Branch || "");
-          // $("#whcode").val(header.DWhscode || "");
           $("#status").val(header.PickListStatus);
-          // $("#prepby").val(header.PickedBy);
           $("#prepby").val(header.CollectedBy);
 
           let groupedItems = {};
@@ -2089,7 +2088,7 @@ function assignBranch(picklist, branchees) {
                 selection.removeAllRanges();
                 selection.addRange(newRange);
 
-                updateRowAndBalance(el);
+                updateRowAndBalance(el, "#summaryTable");
               },
             );
 
@@ -2137,7 +2136,7 @@ function editAssignBranch(picklist, branchees) {
     submitBranchDelivery();
     restrictInput();
     updateRowAndBalance();
-    submitBranchAssignment();
+    saveBranchAssignment();
 
     $.ajax({
       url: "dirs/basket/dashboard/actions/get_loadingbasket.php",
@@ -2176,11 +2175,11 @@ function editAssignBranch(picklist, branchees) {
           $("#origin").val(header.Picked_Branch || "");
           $("#status").val(header.PickListStatus);
           $("#prepby").val(header.CollectedBy);
+          $("#remarks").val(header.Remarks);
 
           let groupedItems = {};
 
           items.forEach(function (unit) {
-            // console.log(`UNIT DETAILS: ${JSON.stringify(unit)}`);
             console.log(
               `UNIT BRAND: ${unit.Req_ItemBrand} - UNIT ORDER QTY: ${JSON.stringify(unit.ToDeliver_Qty)} - BRANCH: ${unit.Req_Branch}`,
             );
@@ -2194,11 +2193,13 @@ function editAssignBranch(picklist, branchees) {
                 ItemName: unit.Req_ItemName,
                 ItemCategory: unit.Req_ItemCategory,
                 Actual_Item_Qty: unit.Actual_Item_Qty || 0,
+                // Actual_Item_Qty: 0,
                 Branches: {},
               };
             }
 
             let qty = Math.trunc(Number(unit.Actual_Item_Qty || 0));
+            let deliverQty = Math.trunc(Number(unit.ToDeliver_Qty || 0));
             groupedItems[key].Item_ids.push(unit.Item_id);
             groupedItems[key].Actual_Item_Qty += qty;
             let branchName = unit.Req_Branch;
@@ -2206,12 +2207,29 @@ function editAssignBranch(picklist, branchees) {
               if (!groupedItems[key].Branches[branchName]) {
                 groupedItems[key].Branches[branchName] = 0;
               }
-              groupedItems[key].Branches[branchName] += qty;
+              groupedItems[key].Branches[branchName] += deliverQty;
             }
           });
 
           let mergedItems = Object.values(groupedItems);
 
+mergedItems.forEach(function (unit) {
+  let branchSum = Object.values(unit.Branches)
+    .reduce((a, b) => a + b, 0);
+
+  let actual = Math.trunc(Number(unit.Actual_Item_Qty || 0));
+
+  if (branchSum !== actual) {
+    let diff = actual - branchSum;
+
+    let firstBranch = Object.keys(unit.Branches)[0];
+
+    if (firstBranch) {
+      unit.Branches[firstBranch] += diff;
+    }
+  }
+});
+          
           mergedItems.forEach(function (unit, index) {
             let qty = Math.trunc(Number(unit.Actual_Item_Qty || 0));
             totalQty += qty;
@@ -2306,7 +2324,7 @@ function editAssignBranch(picklist, branchees) {
                 selection.removeAllRanges();
                 selection.addRange(newRange);
 
-                updateRowAndBalance(el);
+                updateRowAndBalance(el, "#editSummaryTable");
               },
             );
 
@@ -2349,6 +2367,248 @@ function editAssignBranch(picklist, branchees) {
 
 // SUBMIT BRANCH ASSIGNMENT
 function submitBranchAssignment() {
+  let commitBtn = document.getElementById("branchAssignmentBtn");
+
+  commitBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    let validation = validateSummaryTable();
+
+    if (!validation.isValid) {
+      if (validation.hasEmpty) {
+        Swal.fire({
+          icon: "warning",
+          title: "Incomplete Assignment",
+          text: "All editable fields must have a value.",
+        });
+        return;
+      }
+
+      if (validation.hasError) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Quantity",
+          text: "Some values exceed the allowed quantity.",
+        });
+        return;
+      }
+    }
+
+    Swal.fire({
+      icon: "warning",
+      title: "Save branch assignment?",
+      confirmButtonText: "Save",
+      allowOutsideClick: false,
+      showCancelButton: true,
+      cancelButtonText: "Back",
+    }).then((res) => {
+      if (res.isConfirmed) {
+        // PROCEED FOR SUBMISSION
+        let items = [];
+        // let nonSerializeItems = [];
+
+        let hasUnassigned = false;
+
+        // $("#summaryDeliveryTable tbody tr").each(function () {
+        //   let badgeText = $(this).find(".badge").text().trim().toLowerCase();
+        //   let serial = $(this).find("td:nth-child(2)").text().trim();
+        //   let branch = $(this).find("td:nth-child(3)").text().trim();
+        //   let brand = $(this).find("td:nth-child(4)").text().trim();
+        //   let model = $(this).find("td:nth-child(5)").text().trim();
+        //   let category = $(this).find("td:nth-child(6)").text().trim();
+        //   let quantity = $(this).find("td:nth-child(7)").text().trim();
+        //   let itemCode = $(this).find("td:nth-child(8)").text().trim();
+
+        //   if (badgeText === "unassigned") {
+        //     hasUnassigned = true;
+        //     return false;
+        //   }
+
+        //   if (brand !== "") {
+        //     items.push({
+        //       serial: serial,
+        //       branch: branch,
+        //       brand: brand,
+        //       model: model,
+        //       category: category,
+        //       quantity: quantity,
+        //       itemCode: itemCode,
+        //     });
+        //   }
+        // });
+
+        // $("#summaryNonserializeTable tbody tr").each(function () {
+        //   let branch = $(this).find("td:nth-child(2)").text().trim();
+        //   let brand = $(this).find("td:nth-child(3)").text().trim();
+        //   let model = $(this).find("td:nth-child(4)").text().trim();
+        //   let category = $(this).find("td:nth-child(5)").text().trim();
+        //   let quantity = $(this).find("td:nth-child(6)").text().trim();
+        //   let itemCode = $(this).find("td:nth-child(7)").text().trim();
+
+        //   if (itemCode !== "" && brand !== "") {
+        //     nonSerializeItems.push({
+        //       branch: branch,
+        //       brand: brand,
+        //       model: model,
+        //       category: category,
+        //       quantity: quantity,
+        //       itemCode: itemCode,
+        //     });
+        //   }
+        // });
+
+        // $("#summaryTable tbody tr").each(function () {
+        $("#summaryTable tbody tr.item-row").each(function () {
+          let tds = $(this).find("td");
+
+          // let ids = tds.eq(".item-ids").text().split(",");
+          // let branch = tds.eq("td:nth-child()").text().trim();
+          // let brand = tds.eq("td:nth-child(3)").text().trim();
+          // let model = tds.eq("td:nth-child(4)").text().trim();
+          // let category = tds.eq("td:nth-child(5)").text().trim();
+          // let quantity = tds.eq("td:nth-child(6)").text().trim();
+          // // let itemCode = $(this).find("td:nth-child(7)").text().trim();
+
+          let ids = tds.eq(0).text().split(",");
+          // let branch = tds.eq(1).text().trim();
+          let brand = tds.eq(1).text().trim();
+          let model = tds.eq(2).text().trim();
+          let category = tds.eq(3).text().trim();
+          let quantity = tds.eq(4).text().trim();
+          // let itemCode = $(this).find("td:nth-child(7)").text().trim();
+
+          if (!brand) return;
+
+          let branchData = [];
+
+          tds.slice(5).each(function () {
+            let branch = $(this).data("branch");
+            let qty = $(this).text().trim() || 0;
+
+            if (branch) {
+              branchData.push({
+                branch: branch,
+                quantity: parseInt(qty) || 0,
+              });
+            }
+          });
+
+          // if (itemCode !== "" && brand !== "") {
+          if (brand !== "") {
+            items.push({
+              // branch: branch,
+              item_ids: ids,
+              brand,
+              model,
+              category,
+              quantity: parseInt(quantity) || 0,
+              // itemCode: itemCode,
+              branches: branchData,
+            });
+          }
+        });
+
+        console.log(`ITEMS TO SUBMIT : ${JSON.stringify(items)}`);
+
+        if (hasUnassigned) {
+          Swal.fire({
+            icon: "error",
+            title: "Unassigned Items Found",
+            text: "Please assign all items before submitting.",
+          });
+          return;
+        }
+
+        // if (items.length === 0 && nonSerializeItems.length === 0) {
+        if (items.length === 0) {
+          Swal.fire({
+            icon: "error",
+            title: "No items on summary",
+            text: "No item(s) found on the summary",
+          });
+          return;
+        }
+
+        let formData = new FormData();
+
+        // formData.append("BatchNum", $("#lbnum").val());
+        formData.append("PickListNumber", $("#pcklstno").val());
+        formData.append("Branch", $("#origin").val());
+        formData.append("OrginWhscode", $("#whcode").val());
+        formData.append("Remarks", $("#remarks").val());
+
+        // SERIALIZED
+        // items.forEach((item, i) => {
+        //   // formData.append(`Serial[${i}]`, item.serial);
+        //   // formData.append(`BranchFor[${i}]`, item.branch);
+        //   formData.append(`Brand[${i}]`, item.brand);
+        //   formData.append(`Model[${i}]`, item.model);
+        //   // formData.append(`ItemCode[${i}]`, item.itemCode);
+        //   formData.append(`Category[${i}]`, item.category); // add if needed
+        //   formData.append(`Quantity[${i}]`, item.quantity);
+
+        //   item.branches.forEach((b, j) => {
+        //     formData.append(`Branch[${i}][${j}]`, b.branch);
+        //     formData.append(`Qty[${i}][${j}]`, b.quantity);
+        //   });
+        // });
+
+        formData.append("PickListNumber", $("#pcklstno").val());
+
+        items.forEach((item, i) => {
+          item.item_ids.forEach((id, k) => {
+            item.branches.forEach((b, j) => {
+              formData.append(`ItemId[]`, id);
+              // formData.append(`PickListNumber[]`, $("#pcklstno").val()); // adjust if different
+              formData.append(`RequestingBranch[]`, b.branch);
+              formData.append(`DeliveryQty[]`, b.quantity);
+              formData.append(`Remarks[]`, $("#remarks").val());
+            });
+          });
+        });
+
+        // ================= DEBUG =================
+
+        $.ajax({
+          // url: "dirs/basket/dashboard/actions/update_loadingbasket.php",
+          url: "dirs/basket/dashboard/actions/update_setupdeliveryqty.php",
+          type: "POST",
+          data: formData,
+          processData: false,
+          contentType: false,
+          dataType: "json",
+          success: function (response) {
+            if (response.isSuccess === "success") {
+              Swal.fire({
+                icon: "success",
+                title: "Items has been assigned",
+              }).then(() => {
+                loadDeliveryBasketContent();
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Failed",
+                text: response.message || "Error submitting data",
+              });
+            }
+          },
+          error: function (xhr) {
+            console.error(xhr.responseText);
+            Swal.fire({
+              icon: "error",
+              title: "Server Error",
+              text: "Something went wrong.",
+            });
+          },
+        });
+      }
+    });
+  });
+}
+
+// EDIT BRANCH ASSIGNMENT
+function saveBranchAssignment() {
   let commitBtn = document.getElementById("branchAssignmentBtn");
 
   commitBtn.addEventListener("click", function (e) {

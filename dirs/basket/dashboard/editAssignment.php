@@ -52,7 +52,6 @@
                                 </div>
                             </div>
                             <div class="table-responsive d-flex gap-1 overflow-auto mt-3" style="max-height: 450px">
-                                <!-- SUMMARY TABLE -->
                                 <table class="table table-hover col" id="editSummaryTable">
                                     <thead class="sticky-top">
                                     </thead>
@@ -60,9 +59,37 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div id="totalRowOutside" class="d-flex border-top fw-bold justify-content-end w-100" style="background: #FFFBDF">
+                            <!-- <div id="totalRowOutside" class="d-flex border-top fw-bold justify-content-end w-100" style="background: #FFFBDF">
                                 <div class=" p-2 text-end">Total Quantity:</div>
                                 <div class="p-2" style="width:120px;" id="editSummaryQty">0</div>
+                            </div> -->
+                            <div id="totalRowOutside"
+                                class="d-flex border-top fw-bold align-items-center w-100"
+                                style="background: #f2f2f2">
+                                <!-- ✅ LEFT SIDE (Balance) -->
+                                <div class="d-flex">
+                                    <div class="p-2 text-end">Balance:</div>
+                                    <div class="p-2" style="width:120px;" id="balanceQty">0</div>
+                                </div>
+                                <!-- ✅ RIGHT SIDE (everything else) -->
+                                <div class="d-flex ms-auto" id="branchTotalsContainer">
+                                    <div class="d-flex">
+                                        <div class="p-2 text-end">Total Quantity:</div>
+                                        <div class="p-2" style="width:120px;" id="summaryQty">0</div>
+                                    </div>
+                                    <div class="d-flex">
+                                        <div class="p-2 text-end">Total:</div>
+                                        <div class="p-2" style="width:120px;" id="total1">0</div>
+                                    </div>
+                                    <div class="d-flex">
+                                        <div class="p-2 text-end">Total:</div>
+                                        <div class="p-2" style="width:120px;" id="total2">0</div>
+                                    </div>
+                                    <div class="d-flex">
+                                        <div class="p-2 text-end">Total:</div>
+                                        <div class="p-2" style="width:120px;" id="total3">0</div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="d-flex justify-content-between align-items-end mt-5">
                                 <div class="d-flex justify-content-start align-items-end gap-1 col-3">
