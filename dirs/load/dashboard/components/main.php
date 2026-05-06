@@ -1,8 +1,7 @@
-<div class="table-responsive-md">
+<div class="table-responsive-md mt-3">
     <table class="table table-hover datatables col" id="loadingBasketTableDisplay">
         <thead class="sticky-top">
             <tr>
-                <th></th>
                 <th class="text-secondary text-center">#</th>
                 <th class="text-secondary">Batch No.</th>
                 <th class="text-secondary">Status</th>

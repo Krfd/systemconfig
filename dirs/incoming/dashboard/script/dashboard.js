@@ -62,6 +62,8 @@ function loadIncoming() {
             statusClass = "bg-primary";
           } else if (status === "CANCEL" || status === "CANCELLED") {
             statusClass = "bg-warning";
+          } else if (status === "PREPARING") {
+            statusClass = "bg-danger";
           } else if (status === "TERMINATED") {
             statusClass = "bg-secondary";
           } else if (status === "REJECTED") {
@@ -824,14 +826,12 @@ $(document).on("click", ".dropdown .single-dr", function (e) {
   e.preventDefault();
 
   let picklistedRow = $(this).closest("tr");
-  // let picklistNum = picklistedRow.attr("data-picklist-num");
-  // let srn = picklistedRow.attr("data-srn")
   let picklistNum = $(this).data("picklist");
   let srn = $(this).data("sr-number");
 
   $("#main-content").html(spinner);
   setTimeout(function () {
-    createDr(picklistNum, srn);
+    // createDr(picklistNum, srn);
   }, 200);
 });
 
@@ -1127,8 +1127,6 @@ function loadBasket() {
 
           groupedArray.forEach((item) => {
             const isSingleSR = item.SR_Numbers.length === 1;
-            // console.log(`PICKLIST BASKET ITEM: ${JSON.stringify(item)}`);
-            // console.log(``);
             const condition = item.allHaveActualQty && isSingleSR;
 
             const date = new Date(item.DocDate);
@@ -1145,22 +1143,9 @@ function loadBasket() {
                 </li>`
               : "";
 
-            // const actualQtyOption = item.allHaveActualQty
-            //   ? (item.PickListStatus === "PROCESSING")
-            //   ? "" :`<li>
-            //         <a class="dropdown-item edit-actual-qty" href="#">
-            //           Edit Actual Quantity
-            //         </a>
-            //     </li>`)
-            //   : `<li>
-            //         <a class="dropdown-item enter-actual-qty" href="#">
-            //           Encode Quantity
-            //         </a>
-            //     </li>`;
-
             const actualQtyOption = item.allHaveActualQty
               ? item.PickListStatus === "PROCESSING"
-                ? "" // Hide option if status is PROCESSING
+                ? ""
                 : `<li>
                   <a class="dropdown-item edit-actual-qty" href="#">
                     Edit Actual Quantity
@@ -1172,14 +1157,14 @@ function loadBasket() {
                   </a>
                 </li>`;
 
-            const createDr =
-              item.allHaveActualQty && isSingleSR
-                ? `
-                <li>
-                  <a class="dropdown-item single-dr" href="#" data-picklist="${item.PKList_Number}" data-sr-number="${item.SR_Numbers[0]}">Create DR</a>
-                </li>
-              `
-                : "";
+            // const loadToBasket =
+            //   item.allHaveActualQty && isSingleSR
+            //     ? `
+            //     <li>
+            //       <a class="dropdown-item single-dr" href="#" data-picklist="${item.PKList_Number}" data-sr-number="${item.SR_Numbers[0]}">Load to Basket</a>
+            //     </li>
+            //   `
+            //     : "";
 
             rows.push([
               item.PKList_Number || "",
@@ -1192,13 +1177,12 @@ function loadBasket() {
                   <li><a class="dropdown-item open-picklist-items" href="#">Open</a></li>
                   ${printOption}
                   ${actualQtyOption}
-                  ${createDr}
                 </ul>
               </div>`,
             ]);
           });
 
-          // <li><a class="dropdown-item enter-actual-qty" href="#">Encode Quantity</a></li>
+          // ${loadToBasket}
 
           if (rows.length === 0) {
             for (let i = 0; i < 8; i++) {
@@ -1222,7 +1206,6 @@ function loadBasket() {
               { title: "", orderable: false },
             ],
             createdRow: function (row, data, dataIndex) {
-              // let originalItem = sortedData[dataIndex];
               let originalItem = groupedArray[dataIndex];
 
               if (originalItem) {
@@ -1397,7 +1380,7 @@ $(document).on("keydown", ".editable-cell", function (e) {
       break;
 
     default:
-      return; // allow normal typing
+      return;
   }
 
   if ($target && $target.length) {
@@ -1405,7 +1388,6 @@ $(document).on("keydown", ".editable-cell", function (e) {
 
     $target.focus();
 
-    // Move cursor to end of content
     const range = document.createRange();
     const sel = window.getSelection();
     range.selectNodeContents($target[0]);
@@ -1447,7 +1429,7 @@ function encodeQty(picklistNum) {
                   DocEntry: item.DocEntry,
                   totalQty: 0,
                   branches: new Set(),
-                  rows: [], // 🔥 store original rows
+                  rows: [],
                 };
               }
 
@@ -1473,12 +1455,12 @@ function encodeQty(picklistNum) {
             let groupedArray = Object.values(groupedItems);
 
             Object.values(groupedItems).forEach((item) => {
-              // console.log(`ENCODE QTY ITEM: ${JSON.stringify(item)}`);
               picklistEntry = item.DocEntry;
               index++;
               rows += `
-                <tr style="height: 50px; min-height: 50px" data-rows='${JSON.stringify(item.rows)}'>
+                <tr class="item-row" style="height: 50px; min-height: 50px" data-rows='${JSON.stringify(item.rows)}'>
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${index}</td>
+                  <td class="align-middle ps-3 d-none" style="background: #F7F7F7;">${picklistEntry}</td>
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemBrand}</td>
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemName}</td>
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemCategory}</td>
@@ -1568,6 +1550,8 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
       let isValid = true;
       let hasEmpty = false;
       let hasExceeded = false;
+
+      // console.log(`SRN MAP: ${srnMap}`);
 
       $(this)
         .find(".editable-cell")
@@ -1681,6 +1665,7 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
 
             // PRINT WITH ACTUAL QUANTITY
             let PickListNum = picklistNum;
+            // let picklist = [];
 
             $.ajax({
               url: "dirs/incoming/dashboard/actions/update_actual_qty.php",
@@ -1694,10 +1679,12 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
                     ? JSON.parse(response)
                     : response;
 
-                const DocEntry = PicklistEntry;
-
                 if (res.status === "success") {
                   const DocEntry = PicklistEntry;
+
+                  if (srnMap && srnMap.length === 1) {
+                    addToBasket(PickListNum);
+                  }
 
                   // Swal.fire({
                   //   title: "Printing option",
@@ -1721,37 +1708,38 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
 
                   openPrint();
 
-                  if (srnMap && srnMap.length === 1) {
-                    let srArray = [];
-                    if (Array.isArray(srNumberMap)) {
-                      srArray = srNumberMap;
-                    } else if (typeof srNumberMap === "string") {
-                      srArray = srNumberMap
-                        .split(",")
-                        .map((s) => s.trim())
-                        .filter(Boolean);
-                    }
+                  // if (srnMap && srnMap.length === 1) {
+                  //   let srArray = [];
+                  //   if (Array.isArray(srNumberMap)) {
+                  //     srArray = srNumberMap;
+                  //   } else if (typeof srNumberMap === "string") {
+                  //     srArray = srNumberMap
+                  //       .split(",")
+                  //       .map((s) => s.trim())
+                  //       .filter(Boolean);
+                  //   }
 
-                    Swal.fire({
-                      icon: "success",
-                      title: "Would you like to create DR?",
-                      showCancelButton: true,
-                      confirmButtonText: "create DR",
-                      cancelButtonText: "No",
-                      allowOutsideClick: false,
-                    }).then((drResult) => {
-                      if (drResult.isConfirmed) {
-                        if (srArray.length === 1) {
-                          $("#main-content").html(spinner);
-                          createDr(picklistNum, srArray);
-                        }
-                      } else {
-                        loadBasketContent();
-                      }
-                    });
-                  } else {
-                    loadBasketContent();
-                  }
+                  //   Swal.fire({
+                  //     icon: "success",
+                  //     title:
+                  //       "Would you like to load this item to Loading Basket?",
+                  //     showCancelButton: true,
+                  //     confirmButtonText: "Load to Basket",
+                  //     cancelButtonText: "No",
+                  //     allowOutsideClick: false,
+                  //   }).then((drResult) => {
+                  //     if (drResult.isConfirmed) {
+                  //       if (srArray.length === 1) {
+                  //         $("#main-content").html(spinner);
+                  //         // createDr(picklistNum, srArray);
+                  //       }
+                  //     } else {
+                  //       loadBasketContent();
+                  //     }
+                  //   });
+                  // } else {
+                  loadBasketContent();
+                  // }
 
                   // });
                 } else {
@@ -1777,19 +1765,40 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
     });
 }
 
-// CREATE DELIVERY
-function createDr(picklistNum, srn) {
-  // console.log(`PICKLIST NUMBER : ${picklistNum}`)
-  $.post("dirs/basket/dashboard/createDr.php", function (data) {
-    $("#main-content").hide().html(data).fadeIn(200);
-    $("#picklist").val(picklistNum);
-    get_userinfo();
-    deliveryDate();
-    getDeliveryDetails();
-    getBatchItems(picklistNum);
-    submitDelivery(srn);
+function addToBasket(PickListNum) {
+  let items = [];
+  const picklist = [];
+  picklist.push(PickListNum);
+  $.ajax({
+    url: "dirs/incoming/dashboard/actions/save_loading_basket_items_solo.php",
+    type: "POST",
+    data: { PicklistNumber: picklist },
+    dataType: "json",
+    success: function (response) {
+      if (response.isSuccess === "success") {
+        console.log(`PICKLIST HAS BEEN ADDED TO LOADING BASKET`);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: response.Message,
+        });
+      }
+    },
   });
 }
+
+// CREATE DELIVERY
+// function createDr(picklistNum, srn) {
+//   $.post("dirs/basket/dashboard/createDr.php", function (data) {
+//     $("#main-content").hide().html(data).fadeIn(200);
+//     $("#picklist").val(picklistNum);
+//     get_userinfo();
+//     deliveryDate();
+//     getDeliveryDetails();
+//     getBatchItems(picklistNum);
+//     submitDelivery(srn);
+//   });
+// }
 
 // UPDATE ACTUAL QUANTITY
 function editEncodedQty(picklistNum) {
@@ -1826,7 +1835,7 @@ function editEncodedQty(picklistNum) {
                   totalQty: 0,
                   branches: new Set(),
                   Actual_Item_Qty: actual_qty,
-                  rows: [], // 🔥 store original rows
+                  rows: [],
                 };
               }
 

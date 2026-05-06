@@ -36,10 +36,9 @@ try {
         ]);
     }
 
-    // ✅ HEADER UPDATE MOVED OUTSIDE LOOP (IMPORTANT FIX)
     $upd_header = $conn->prepare("
         UPDATE Pick_List_Header_1 
-        SET PickListStatus = 'PROCESSING', Remarks = ?
+        SET PickListStatus = 'ASSIGNED', Remarks = ?
         WHERE PKList_Number = ?
     ");
 

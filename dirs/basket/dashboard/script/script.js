@@ -19,7 +19,6 @@ function loadDashboard() {
     });
     loadDeliveryBasket(
       "#basketTableDashboard",
-      // "dirs/basket/dashboard/actions/get_all.php",
       "dirs/incoming/dashboard/actions/picklisteditems.php",
     );
     $("#loadDeliveryBtn").prop("disabled", true);
@@ -134,7 +133,6 @@ $(document).on(
 
     $("#main-content").html(spinner);
     setTimeout(function () {
-      // loadDeliveryItems(PickLst_Num, del_num);
       loadDeliveryItems(PickLst_Num);
     }, 200);
   },
@@ -143,14 +141,11 @@ $(document).on(
 // PICKLIST BASKET DROPDOWN TO PICKLIST ITEMS
 $(document).on("click", ".dropdown .open-picklisted", function (e) {
   let Picklist = $(this).closest("tr").attr("data-picklist");
-  // let del_num = $(this).closest("tr").attr("data-delivery-num");
 
   deliveryPicklistNum = Picklist;
-  // deliveryNum = del_num;
 
   $("#main-content").html(spinner);
   setTimeout(function () {
-    // loadDeliveryItems(Picklist, del_num);
     loadDeliveryItems(Picklist);
   }, 200);
 });
@@ -158,9 +153,7 @@ $(document).on("click", ".dropdown .open-picklisted", function (e) {
 $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
   let serial = $(this).data("serial");
   let itemCode = $(this).data("itemcode");
-  // let deliveryNumber = $(this).data("deliverynum");
   let lbNum = $(this).data("lbnum");
-  // let picklistNumber = $(this).data("picklist");
   let brand = $(this).find("td:nth-child(1)").text().trim();
   let model = $(this).find("td:nth-child(2)").text().trim();
   let category = $(this).find("td:nth-child(3)").text().trim();
@@ -407,8 +400,6 @@ function loadDeliveryBasket(tableId, url) {
             { title: "", orderable: false },
           ],
           createdRow: function (row, data, dataIndex) {
-            // let originalItem = sortedData[dataIndex];
-            // let originalItem = grouped[dataIndex];
             let originalItem = Object.values(grouped)[dataIndex];
             if (originalItem) {
               let branches = Array.from(originalItem.Req_Branch).join(", ");
@@ -530,20 +521,15 @@ function toggleDelivery() {
   if (!selectionMode) {
     let availableRows = 0;
 
-    // $("#basketTableDashboard tbody tr").each(function () {
     $("#basketTableAssigned tbody tr").each(function () {
       const row = $(this);
 
       if (row.hasClass("empty-row")) return;
 
       const statusText = row.find("td:eq(3) span").text().trim().toUpperCase();
-      // const batchNum = row.attr("data-batchnum");
 
-      // const hasBatch = batchNum && batchNum !== "null" && batchNum !== "";
-      // if (statusText === "UNASSIGNED" && !hasBatch) {
       if (statusText === "ASSIGNED") {
         availableRows++;
-        // batchContainer.push(batchNum);
       }
     });
 
@@ -557,7 +543,6 @@ function toggleDelivery() {
       return;
     }
 
-    // $("#basketTableDashboard tbody tr").each(function () {
     $("#basketTableAssigned tbody tr").each(function () {
       const row = $(this);
 
@@ -566,7 +551,6 @@ function toggleDelivery() {
 
       // const checkbox = row.find(".checkbox");
       const checkbox = row.find("input[type='checkbox']");
-      // const batchNum = row.attr("data-batchnum");
 
       if (statusText === "ASSIGNED" || statusText === "NEW") {
         checkbox.css("display", "inline-block");
@@ -592,9 +576,7 @@ function toggleDelivery() {
     // ✅ Update UI
     loadDeliveryBtn.textContent = "Add Items";
 
-    // ✅ Save state
     $("#basketTableAssigned").data("selectionMode", true);
-    // updateDropdownState();
     return;
   }
 
@@ -658,6 +640,8 @@ function toggleDelivery() {
         dataType: "json",
         success: function (response) {
           if (response.isSuccess === "success") {
+            $("#basketTableAssigned").data("selectionMode", false);
+            loadDeliveryBtn.textContent = "Load Items";
             Swal.fire({
               icon: "success",
               title: "Items has been added to loading basket",
@@ -2354,7 +2338,7 @@ function submitBranchAssignment() {
           }
         });
 
-        console.log(`ITEMS TO SUBMIT : ${JSON.stringify(items)}`);
+        // console.log(`ITEMS TO SUBMIT : ${JSON.stringify(items)}`);
 
         if (hasUnassigned) {
           Swal.fire({
@@ -3181,7 +3165,6 @@ function createDr() {
     $("#main-content").hide().html(data).fadeIn(200);
     get_userinfo();
     deliveryDate();
-    // getBatchItems(batchContainer);
     getBatchItems(batchContainer);
     getDeliveryDetails();
     submitDelivery();

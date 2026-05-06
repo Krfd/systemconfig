@@ -21,6 +21,41 @@ function loadDashboard() {
   });
 }
 
+// FOR BREAKDOWN
+$(document).on("click", ".dropdown .open-batch", function (e) {
+  e.preventDefault();
+
+  let batch = $(this).data("batch");
+
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    viewBatch(batch);
+  }, 200);
+});
+
+// FOR DELIVERY
+$(document).on("click", ".dropdown .create-dr", function (e) {
+  // let batch = $(this).closest("tr").attr("data-batch");
+  e.preventDefault();
+
+  let batch = $(this).data("batch");
+
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    createDr(batch);
+  }, 200);
+});
+
+function loadingBasket() {
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    $.post("dirs/load/dashboard/load.php", {}, function (data) {
+      $("#main-content").hide().html(data).fadeIn(200);
+      loadBasket();
+    });
+  }, 200);
+}
+
 function loadBasket() {
   $.ajax({
     url: "dirs/load/dashboard/actions/get_loadingbasketdisplay.php",
@@ -29,11 +64,9 @@ function loadBasket() {
     success: function (response) {
       let data = response.Data;
       let rows = [];
-      let index = 1;
+      let rowNum = 1;
 
       if (response.isSuccess === "success") {
-        // console.log(`LOADING BASKET DATA HERE`);
-
         let grouped = {};
 
         data.forEach(function (item, index) {
@@ -50,38 +83,38 @@ function loadBasket() {
 
           const isDisabled = item.DocStatus === "IN TRANSIT" ? "disabled" : "";
 
+          const date = new Date(item.DocDate);
+          const formatted = date.toISOString().split("T")[0];
+
           rows.push([
-            `<input type="checkbox" name="checkbox" data-row-batch="${item.BatchNumber}" data-docstatus="${item.DocStatus}"
-            class="form-check-input align-self-center mx-auto checkbox border border-primary" style="cursor: pointer;" ${isDisabled}>`,
-            index++,
-            item.BatchNumber, // batch
-            item.DocStatus,
-            item.DocDate,
+            rowNum++,
+            item.BatchNumber,
             (() => {
               let status = item.DocStatus || "";
-
               let badgeClass = "primary";
 
               if (status === "IN TRANSIT") badgeClass = "warning";
+              else if (status === "PREPARING") badgeClass = "danger";
               else if (status === "DELIVERED") badgeClass = "success";
 
               return `<span class="badge bg-${badgeClass}">${status}</span>`;
             })(),
+            formatted,
             '<div class="dropdown dropstart">' +
               '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
               '<i class="bi bi-three-dots"></i></button>' +
               `<ul class="dropdown-menu">
-              <li><a class="dropdown-item open-picklist" href="#">Open</a></li>
-              <li><a class="dropdown-item" href="#" data-batch="${item.BatchNumber}">Open</a></li>
-              <li><a class="dropdown-item" href="#" data-batch="${item.BatchNumber}">Create DR</a></li>
+              <li><a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}">Open</a></li>
+              <li><a class="dropdown-item create-dr" href="#" data-batch="${item.BatchNumber}">Create DR</a></li>
             </ul>` +
               "</div>",
+            item.BatchNumber,
           ]);
         });
 
         if (rows.length === 0) {
           for (let i = 0; i < 8; i++) {
-            rows.push(["", "", "", "", "", ""]);
+            rows.push(["", "", "", "", ""]);
           }
         }
 
@@ -89,37 +122,36 @@ function loadBasket() {
           $("#loadingBasketTableDisplay").DataTable().clear().destroy();
         }
 
-        $("#loadingBasketTableDisplay").Datatable({
+        $("#loadingBasketTableDisplay").DataTable({
           data: rows,
           columns: [
-            { title: "", className: "text-center" },
-            { title: "#" },
+            { title: "#", className: "text-center" },
             { title: "Batch No.", className: "text-start ps-5" },
             { title: "Status", className: "ps-3" },
-            { title: "Date" },
+            { title: "Date", className: "text-start ps-3" },
             { title: "Action" },
           ],
           createdRow: function (row, data, dataIndex) {
             let originalItem = data[dataIndex];
             if (originalItem) {
-              $(row).attr("data-batch", originalItem.PKList_Number);
+              $(row).attr("data-batch", originalItem.BatchNumber);
             }
+            // $(row).attr("data-batch", data[5]);
           },
           paging: true,
           searching: true,
           info: true,
           processing: false,
           autoWidth: false,
-          order: [[0, "desc"]],
+          // order: [[0, "desc"]],
           rowCallback: function (row, data) {
-            $("td:not(:first-child)", row).css({
+            $("td", row).css({
               background: "#FFFBDF",
               padding: "3px",
               height: "40px",
               "min-height": "40px",
               cursor: "pointer",
             });
-            // $("td:eq(1)", row).addClass("text-primary ps-2");
 
             $(row).hover(
               function () {
@@ -137,7 +169,6 @@ function loadBasket() {
             for (let i = currentRows; i < 8; i++) {
               let $emptyRow = $(`
                   <tr class="empty-row">
-                    <td>&nbsp;</td>
                     <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
                   </tr>
                 `);
@@ -147,6 +178,7 @@ function loadBasket() {
                 height: "40px",
                 "min-height:": "40px",
               });
+
               $emptyRow.hover(
                 function () {
                   $(this).css("background", "#FFF4C2");
@@ -181,4 +213,238 @@ function loadBasket() {
       console.error("Error loading basket data: ", error);
     },
   });
+}
+
+function getBatchItems(batch, tableSelector) {
+  $.ajax({
+    url: "dirs/load/dashboard/actions/get_reviewdelivery.php",
+    type: "POST",
+    data: { BatchNumber: batch },
+    dataType: "json",
+    success: function (response) {
+      let header = response.Header;
+      let items = response.Items;
+      let totalQty = 0;
+      let counter = 0;
+      let batchTable = $(`${tableSelector} tbody`);
+      batchTable.empty();
+
+      if (response.isSuccess === "success") {
+        // USER DETAILS
+        $("#user-origin").val(header.BranchSet);
+        $("#prepby").val(header.PickedBy);
+
+        let groupedItems = {};
+
+        items.forEach((item) => {
+          let model = item.Model;
+          let pk = item.PKList_Number;
+
+          if (!groupedItems[model]) {
+            groupedItems[model] = {
+              ...item,
+              Deliver_Qty: parseInt(item.Deliver_Qty) || 0,
+              PKList_Numbers: [pk],
+            };
+          } else {
+            groupedItems[model].Deliver_Qty += parseInt(item.Deliver_Qty) || 0;
+            groupedItems[model].PKList_Numbers.push(pk);
+          }
+        });
+
+        Object.values(groupedItems).forEach((item) => {
+          counter += 1;
+
+          totalQty += item.Deliver_Qty;
+
+          let row = `
+            <tr class="item-row" style="height: 40px; min-height: 40px; cursor: pointer" data-pklist='${JSON.stringify(item.PKList_Numbers)}'>
+              <td class="align-middle ps-3" style="background: #FFFBDF">${counter}</td>
+              <td class="align-middle ps-3 text-primary" style="background: #FFFBDF">${item.Brand}</td>
+              <td class="align-middle ps-3" style="background: #FFFBDF">${item.Model}</td>
+              <td class="align-middle ps-3" style="background: #FFFBDF">${item.Category}</td>
+              <td class="align-middle ps-3" style="background: #FFFBDF">${item.Deliver_Qty}</td>
+            </tr>
+          `;
+          batchTable.append(row);
+        });
+
+        // TOTAL
+        $("#batchTotal").text(totalQty);
+
+        for (let i = Object.keys(groupedItems).length; i < 8; i++) {
+          let emptyRow = $(`
+            <tr class="empty-row">
+              <td colspan="5" style="background: #FFFBDF"></td>
+            </tr>
+          `);
+
+          $(emptyRow).css({
+            background: "#FFFBDF",
+            height: "50px",
+          });
+          batchTable.append(emptyRow);
+        }
+      } else {
+        console.log(`NO FETCHED DATA FOR BATCH : ${batch}`);
+      }
+    },
+  });
+}
+
+function createDr(batch) {
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    $.post("dirs/load/dashboard/createDr.php", function (data) {
+      $("#main-content").hide().html(data).fadeIn(200);
+      getBatchItems(batch, "#deliveryFormTable");
+      getDeliveryDetails();
+      deliveryDate();
+      submitDr();
+    });
+  }, 200);
+}
+
+function viewBatch(batch) {
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    $.post("dirs/load/dashboard/viewBatch.php", function (data) {
+      $("#main-content").hide().html(data).fadeIn(200);
+      $("#batchNumDisplay").text(batch);
+      getBatchItems(batch, "#batchItemTable");
+    });
+  }, 200);
+}
+
+function getDeliveryDetails() {
+  const truckData = {
+    "4 Wheeler": ["ABC-123", "DEF-456"],
+    "6 Wheeler": ["GHI-789", "JKL-012"],
+    "10 Wheeler": ["MNO-345", "PQR-678"],
+  };
+
+  document.getElementById("truckCat").addEventListener("change", function () {
+    const plateSelect = document.getElementById("plate");
+    const selectedCategory = this.value;
+
+    // Clear existing options
+    plateSelect.innerHTML = '<option value="">Select Plate</option>';
+
+    if (truckData[selectedCategory]) {
+      truckData[selectedCategory].forEach((plate) => {
+        const option = document.createElement("option");
+        option.value = plate;
+        option.textContent = plate;
+        plateSelect.appendChild(option);
+      });
+    }
+  });
+}
+
+function deliveryDate() {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+  const todayStr = `${yyyy}-${mm}-${dd}`;
+
+  // Set default values
+  document.getElementById("docdate").value = todayStr;
+  document.getElementById("deldate").value = todayStr;
+
+  // Disable previous dates
+  document.getElementById("docdate").min = todayStr;
+  document.getElementById("deldate").min = todayStr;
+}
+
+function submitDr() {
+  $(document)
+    .off("submit", "#deliver")
+    .on("submit", "#deliver", function (e) {
+      e.preventDefault();
+
+      Swal.fire({
+        icon: "warning",
+        title: "Submit items for delivery?",
+        confirmButtonText: "Submit",
+        allowOutsideClick: false,
+        showCancelButton: true,
+        cancelButtonText: "Back",
+      }).then((res) => {
+        if (res.isConfirmed) {
+          let items = [];
+          let allPKs = new Set();
+          let formData = new FormData(this);
+
+          formData.append("DeliveryDate", $("#deldate").val());
+          formData.append("Driver", $("#driver").val());
+          formData.append("TruckType", $("#truckCat").val());
+          formData.append("PlateNumber", $("#plate").val());
+          formData.append("Remarks", $("#remarks").val());
+
+          // $("#deliveryFormTable .item-row").each(function () {
+          //   let pkList = $(this).data("pklist");
+
+          //   items.push({
+          //     PKList_Numbers: pkList,
+          //   });
+          // });
+
+          $("#deliveryFormTable .item-row").each(function () {
+            let pkList = $(this).data("pklist") || [];
+
+            // ✅ remove duplicates inside each row
+            let uniqueRowPKs = [...new Set(pkList)];
+
+            // ✅ add to global set (removes duplicates across rows)
+            uniqueRowPKs.forEach((pk) => allPKs.add(pk));
+          });
+
+          // ✅ final unique array
+          let uniquePKList = Array.from(allPKs);
+
+          items.push({
+            PKList_Numbers: uniquePKList,
+          });
+
+          formData.append("items", JSON.stringify(items));
+
+          for (let pair of formData.entries()) {
+            console.log(pair[0] + ": " + pair[1]);
+          }
+
+          // $.ajax({
+          //   url: "dirs/load/dashboard/actions/update_deliveryinfo.php",
+          //   type: "POST",
+          //   data: formData,
+          //   processData: false,
+          //   contentType: false,
+          //   dataType: "json",
+          //   success: function (response) {
+          //     if (response.isSuccess === "success") {
+          //       Swal.fire({
+          //         icon: "success",
+          //         title: "Processing items for delivery",
+          //       }).then(() => {
+          //         loadBasket();
+          //       });
+          //     } else {
+          //       Swal.fire({
+          //         icon: "error",
+          //         title: "Failed to submit delivery",
+          //       });
+          //     }
+          //   },
+          //   error: function (xhr) {
+          //     console.error(xhr.responseText);
+          //     Swal.fire({
+          //       icon: "error",
+          //       title: "Server Error",
+          //       text: "Something went wrong.",
+          //     });
+          //   },
+          // });
+        }
+      });
+    });
 }
