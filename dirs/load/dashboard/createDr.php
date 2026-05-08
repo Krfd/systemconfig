@@ -22,6 +22,12 @@
                                         </div>
                                     </div> -->
                                     <div class="input-group col p-0 d-flex align-items-baseline gap-1">
+                                        <div class="col p-0 d-flex align-items-baseline gap-1 col">
+                                            <label for="batch" class="form-label text-dark-emphasis col-3"><small>Batch No:</small></label>
+                                            <input type="text" name="batch" id="batch" class="form-control form-control-sm col ms-3" style="background: #F7F7F7" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="input-group col p-0 d-flex align-items-baseline gap-1">
                                         <div class="p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="user-origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
                                             <input type="text" name="user-origin" id="user-origin" class="form-control form-control-sm col ms-3" style="background: #F7F7F7;" required readonly>
@@ -69,7 +75,7 @@
                             <div id="totalRowOutside" class="d-flex border-top fw-bold"
                                 style="background:#FFF7BC;">
                                 <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>
-                                <div class="p-2" style="width:120px;" id="delTotalQuantity">0</div>
+                                <div class="p-2" style="width:120px;" id="batchTotal">0</div>
                             </div>
                             <div class="d-flex justify-content-start align-items-end mt-5 gap-1">
                                 <div class="d-flex flex-column gap-1 col-3">

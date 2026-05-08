@@ -13,6 +13,24 @@ $TruckType       = $_POST['TruckType'] ?? null;
 $PlateNumber     = $_POST['PlateNumber'] ?? null;
 $Remarks         = $_POST['Remarks'] ?? '';
 
+// $logData = [
+//     'User'            => $_SESSION['Uid'] ?? null,
+//     'PickListNumbers' => $_POST['PickListNumber'] ?? [],
+//     'BatchNumber'     => $_POST['BatchNumber'] ?? null,
+//     'DeliveryDate'    => $_POST['DeliveryDate'] ?? null,
+//     'Driver'          => $_POST['Driver'] ?? null,
+//     'TruckType'       => $_POST['TruckType'] ?? null,
+//     'PlateNumber'     => $_POST['PlateNumber'] ?? null,
+//     'Remarks'         => $_POST['Remarks'] ?? '',
+//     'Timestamp'       => date('Y-m-d H:i:s')
+// ];
+// $logFile = 'delivery_log.txt';
+// file_put_contents(
+//     $logFile,
+//     json_encode($logData, JSON_PRETTY_PRINT) . PHP_EOL,
+//     FILE_APPEND
+// );
+
 try {
     $conn->beginTransaction();
 

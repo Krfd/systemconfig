@@ -41,7 +41,7 @@
  </form>
 
  <!-- SUMMARY -->
- <div class="modal fade" tabindex="-1" id="deliverySummary">
+ <!-- <div class="modal fade" tabindex="-1" id="deliverySummary">
      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
          <div class="modal-content">
              <div class="modal-header">
@@ -70,7 +70,7 @@
              </div>
          </div>
      </div>
- </div>
+ </div> -->
 
  <!-- NON-SERTIALIZE TABLE -->
  <div class="modal fade" tabindex="-1" id="nonSerializeSummary">

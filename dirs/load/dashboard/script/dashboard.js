@@ -69,18 +69,7 @@ function loadBasket() {
       if (response.isSuccess === "success") {
         let grouped = {};
 
-        data.forEach(function (item, index) {
-          // let key = item.Model; // group by Model
-          // if (!grouped[key]) {
-          //   grouped[key] = {
-          //     Brand: item.Brand || "",
-          //     Model: item.Model || "",
-          //     Category: item.Category || "",
-          //     Quantity: 0,
-          //   };
-          // }
-          // grouped[key].Quantity += Math.trunc(Number(item.Actual_Quantity) || 0);
-
+        data.filter(item => item.DocStatus !== "IN TRANSIT").forEach(function (item, index) {
           const isDisabled = item.DocStatus === "IN TRANSIT" ? "disabled" : "";
 
           const date = new Date(item.DocDate);
@@ -93,11 +82,12 @@ function loadBasket() {
               let status = item.DocStatus || "";
               let badgeClass = "primary";
 
-              if (status === "IN TRANSIT") badgeClass = "warning";
-              else if (status === "PREPARING") badgeClass = "danger";
+              // if (status === "IN TRANSIT") badgeClass = "primary";
+              // else 
+                if (status === "PREPARING") badgeClass = "danger";
               else if (status === "DELIVERED") badgeClass = "success";
 
-              return `<span class="badge bg-${badgeClass}">${status}</span>`;
+              return `<span class="badge bg-${badgeClass}" >${status}</span>`;
             })(),
             formatted,
             '<div class="dropdown dropstart">' +
@@ -136,7 +126,6 @@ function loadBasket() {
             if (originalItem) {
               $(row).attr("data-batch", originalItem.BatchNumber);
             }
-            // $(row).attr("data-batch", data[5]);
           },
           paging: true,
           searching: true,
@@ -231,6 +220,7 @@ function getBatchItems(batch, tableSelector) {
 
       if (response.isSuccess === "success") {
         // USER DETAILS
+        $("#batch").val(batch);
         $("#user-origin").val(header.BranchSet);
         $("#prepby").val(header.PickedBy);
 
@@ -239,16 +229,28 @@ function getBatchItems(batch, tableSelector) {
         items.forEach((item) => {
           let model = item.Model;
           let pk = item.PKList_Number;
+          let qty = parseInt(item.Deliver_Qty) || 0;
 
+          // GROUP BY MODEL
           if (!groupedItems[model]) {
             groupedItems[model] = {
               ...item,
-              Deliver_Qty: parseInt(item.Deliver_Qty) || 0,
-              PKList_Numbers: [pk],
+              Deliver_Qty: 0,
+              PKList_Numbers: [],
+              processedPKs: {}, // prevents duplicate qty per PK
             };
-          } else {
-            groupedItems[model].Deliver_Qty += parseInt(item.Deliver_Qty) || 0;
+          }
+
+          // ADD PK ONLY ONCE
+          if (!groupedItems[model].PKList_Numbers.includes(pk)) {
             groupedItems[model].PKList_Numbers.push(pk);
+          }
+
+          // ADD QTY ONLY ONCE PER PK
+          // prevents duplicated API rows from inflating qty
+          if (!groupedItems[model].processedPKs[pk]) {
+            groupedItems[model].Deliver_Qty += qty;
+            groupedItems[model].processedPKs[pk] = true;
           }
         });
 
@@ -258,14 +260,33 @@ function getBatchItems(batch, tableSelector) {
           totalQty += item.Deliver_Qty;
 
           let row = `
-            <tr class="item-row" style="height: 40px; min-height: 40px; cursor: pointer" data-pklist='${JSON.stringify(item.PKList_Numbers)}'>
-              <td class="align-middle ps-3" style="background: #FFFBDF">${counter}</td>
-              <td class="align-middle ps-3 text-primary" style="background: #FFFBDF">${item.Brand}</td>
-              <td class="align-middle ps-3" style="background: #FFFBDF">${item.Model}</td>
-              <td class="align-middle ps-3" style="background: #FFFBDF">${item.Category}</td>
-              <td class="align-middle ps-3" style="background: #FFFBDF">${item.Deliver_Qty}</td>
+            <tr 
+              class="item-row"
+              style="height: 40px; min-height: 40px; cursor: pointer"
+              data-pklist='${JSON.stringify(item.PKList_Numbers)}'
+            >
+              <td class="align-middle ps-3" style="background: #FFFBDF">
+                ${counter}
+              </td>
+
+              <td class="align-middle ps-3 text-primary" style="background: #FFFBDF">
+                ${item.Brand}
+              </td>
+
+              <td class="align-middle ps-3" style="background: #FFFBDF">
+                ${item.Model}
+              </td>
+
+              <td class="align-middle ps-3" style="background: #FFFBDF">
+                ${item.Category}
+              </td>
+
+              <td class="align-middle ps-3" style="background: #FFFBDF">
+                ${item.Deliver_Qty}
+              </td>
             </tr>
           `;
+
           batchTable.append(row);
         });
 
@@ -283,6 +304,7 @@ function getBatchItems(batch, tableSelector) {
             background: "#FFFBDF",
             height: "50px",
           });
+
           batchTable.append(emptyRow);
         }
       } else {
@@ -358,93 +380,95 @@ function deliveryDate() {
 }
 
 function submitDr() {
-  $(document)
-    .off("submit", "#deliver")
-    .on("submit", "#deliver", function (e) {
-      e.preventDefault();
+  $(document).off("submit.deliver");
 
-      Swal.fire({
-        icon: "warning",
-        title: "Submit items for delivery?",
-        confirmButtonText: "Submit",
-        allowOutsideClick: false,
-        showCancelButton: true,
-        cancelButtonText: "Back",
-      }).then((res) => {
-        if (res.isConfirmed) {
-          let items = [];
-          let allPKs = new Set();
-          let formData = new FormData(this);
+  $(document).on("submit.deliver", "#deliver", function (e) {
+    e.preventDefault();
 
-          formData.append("DeliveryDate", $("#deldate").val());
-          formData.append("Driver", $("#driver").val());
-          formData.append("TruckType", $("#truckCat").val());
-          formData.append("PlateNumber", $("#plate").val());
-          formData.append("Remarks", $("#remarks").val());
+    Swal.fire({
+      icon: "warning",
+      title: "Submit items for delivery?",
+      confirmButtonText: "Submit",
+      allowOutsideClick: false,
+      showCancelButton: true,
+      cancelButtonText: "Back",
+    }).then((res) => {
+      if (res.isConfirmed) {
+        let allPKs = new Set();
+        let formData = new FormData(this);
 
-          // $("#deliveryFormTable .item-row").each(function () {
-          //   let pkList = $(this).data("pklist");
+        // EXTRA FIELDS
+        formData.append("BatchNumber", $("#batch").val());
+        formData.append("DeliveryDate", $("#deldate").val());
+        formData.append("Driver", $("#driver").val());
+        formData.append("TruckType", $("#truckCat").val());
+        formData.append("PlateNumber", $("#plate").val());
+        formData.append("Remarks", $("#remarks").val());
+        // COLLECT UNIQUE PICK LIST NUMBERS
+        $("#deliveryFormTable .item-row").each(function () {
+          let pkList = $(this).data("pklist") || [];
 
-          //   items.push({
-          //     PKList_Numbers: pkList,
-          //   });
-          // });
-
-          $("#deliveryFormTable .item-row").each(function () {
-            let pkList = $(this).data("pklist") || [];
-
-            // ✅ remove duplicates inside each row
-            let uniqueRowPKs = [...new Set(pkList)];
-
-            // ✅ add to global set (removes duplicates across rows)
-            uniqueRowPKs.forEach((pk) => allPKs.add(pk));
-          });
-
-          // ✅ final unique array
-          let uniquePKList = Array.from(allPKs);
-
-          items.push({
-            PKList_Numbers: uniquePKList,
-          });
-
-          formData.append("items", JSON.stringify(items));
-
-          for (let pair of formData.entries()) {
-            console.log(pair[0] + ": " + pair[1]);
+          // normalize to array
+          if (!Array.isArray(pkList)) {
+            pkList = [pkList];
           }
 
-          // $.ajax({
-          //   url: "dirs/load/dashboard/actions/update_deliveryinfo.php",
-          //   type: "POST",
-          //   data: formData,
-          //   processData: false,
-          //   contentType: false,
-          //   dataType: "json",
-          //   success: function (response) {
-          //     if (response.isSuccess === "success") {
-          //       Swal.fire({
-          //         icon: "success",
-          //         title: "Processing items for delivery",
-          //       }).then(() => {
-          //         loadBasket();
-          //       });
-          //     } else {
-          //       Swal.fire({
-          //         icon: "error",
-          //         title: "Failed to submit delivery",
-          //       });
-          //     }
-          //   },
-          //   error: function (xhr) {
-          //     console.error(xhr.responseText);
-          //     Swal.fire({
-          //       icon: "error",
-          //       title: "Server Error",
-          //       text: "Something went wrong.",
-          //     });
-          //   },
-          // });
-        }
-      });
+          // remove duplicates inside row
+          let uniqueRowPKs = [...new Set(pkList)];
+
+          // add to global unique set
+          uniqueRowPKs.forEach((pk) => {
+            if (pk && pk.trim() !== "") {
+              allPKs.add(pk);
+            }
+          });
+        });
+
+        // FINAL UNIQUE ARRAY
+        let uniquePKList = Array.from(allPKs);
+
+        // APPEND AS PHP ARRAY
+        uniquePKList.forEach((pk) => {
+          formData.append("PickListNumber[]", pk);
+        });
+
+        $.ajax({
+          url: "dirs/load/dashboard/actions/update_deliveryinfo.php",
+          type: "POST",
+          data: formData,
+          processData: false,
+          contentType: false,
+          dataType: "json",
+          success: function (response) {
+            console.log(response);
+
+            if (response.isSuccess === "success") {
+              Swal.fire({
+                icon: "success",
+                title: "Processing items for delivery",
+              }).then(() => {
+                loadBasket();
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                // title: "Failed to submit delivery",
+                text: response.message || "Unknown error",
+              });
+            }
+          },
+
+          error: function (xhr) {
+            console.error(xhr.responseText);
+
+            Swal.fire({
+              icon: "error",
+              title: "Server Error",
+              text: "Something went wrong.",
+            });
+          },
+        });
+      }
     });
+  });
 }

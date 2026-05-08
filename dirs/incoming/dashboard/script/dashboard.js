@@ -1551,8 +1551,6 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
       let hasEmpty = false;
       let hasExceeded = false;
 
-      // console.log(`SRN MAP: ${srnMap}`);
-
       $(this)
         .find(".editable-cell")
         .each(function () {
@@ -1657,15 +1655,17 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
             formData.append("ExecutedBy", executedBy);
             let srnIndex = 0;
 
+            // PRINT WITH ACTUAL QUANTITY
+            let PickListNum = picklistNum;
+
+            formData.append("PickListNum", PickListNum);
             encodedItems.forEach((item) => {
               formData.append("ItemNumber[]", item.ItemNumber);
               formData.append("ActualQty[]", item.ActualQty);
               formData.append("SR_Number[]", item.SR_Number);
             });
 
-            // PRINT WITH ACTUAL QUANTITY
-            let PickListNum = picklistNum;
-            // let picklist = [];
+            
 
             $.ajax({
               url: "dirs/incoming/dashboard/actions/update_actual_qty.php",
@@ -1767,12 +1767,14 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
 
 function addToBasket(PickListNum) {
   let items = [];
-  const picklist = [];
-  picklist.push(PickListNum);
+  // const picklist = [];
+  // picklist.push(PickListNum);
   $.ajax({
-    url: "dirs/incoming/dashboard/actions/save_loading_basket_items_solo.php",
+    // url: "dirs/incoming/dashboard/actions/save_loading_basket_items_solo.php",
+    url: "dirs/incoming/dashboard/actions/update_solo_picklist.php",
     type: "POST",
-    data: { PicklistNumber: picklist },
+    // data: { PickListNumber: picklist },
+    data: { PickListNumber: PickListNum },
     dataType: "json",
     success: function (response) {
       if (response.isSuccess === "success") {

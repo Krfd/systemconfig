@@ -332,8 +332,8 @@ function loadDeliveryBasket(tableId, url) {
             (() => {
               let status = item.PickListStatus || "";
 
-              if (status === "NEW") status = "UNASSIGNED";
-              if (status === "PROCESSING") status = "ASSIGNED";
+              if (status === "NEW" || status === "PROCESSING") status = "UNASSIGNED";
+              // if (status === "PROCESSING") status = "ASSIGNED";
 
               let badgeClass = "primary";
 
@@ -349,10 +349,12 @@ function loadDeliveryBasket(tableId, url) {
                   <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
                   ${
                     item.PickListStatus !== "IT"
+                    // item.PickListStatus !== "NEW"
                       ? `
                     <li>
                       <a class="dropdown-item ${
-                        item.PickListStatus === "PROCESSING"
+                        // item.PickListStatus === "PROCESSING"
+                        item.PickListStatus === "ASSIGNED"
                           ? "edit-branch"
                           : "assign-branch"
                       }"
@@ -361,7 +363,8 @@ function loadDeliveryBasket(tableId, url) {
                         data-lbNum="${item.DocEntry}"
                         data-branches="${branches}">
                         ${
-                          item.PickListStatus === "PROCESSING"
+                          // item.PickListStatus === "PROCESSING"
+                          item.PickListStatus === "ASSIGNED"
                             ? "Edit Assignment"
                             : "Set Assignment"
                         }

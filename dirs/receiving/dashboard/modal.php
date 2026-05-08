@@ -1,4 +1,4 @@
-  <!-- FOR NEW ITEM -->
+  <!-- NON SERIALIZE -->
   <form id="frm-add-delivery" method="POST">
       <div class="modal fade" tabindex="-1" id="addDeliveryModal" data-bs-backdrop="static" data-bs-keyboard="false">
           <div class="modal-dialog modal-dialog-centered">
@@ -40,7 +40,7 @@
       </div>
   </form>
 
-  <!-- FOR NEW ITEM -->
+  <!-- SERIALIZE -->
   <form id="serial-delivery" method="POST">
       <div class="modal fade" tabindex="-1" id="addSerialModal" data-bs-backdrop="static" data-bs-keyboard="false">
           <div class="modal-dialog modal-dialog-centered">
