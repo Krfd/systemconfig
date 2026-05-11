@@ -19,10 +19,6 @@
                                         <label for="srn" class="form-label text-dark-emphasis col-3"><small>SRN:</small></label>
                                         <input type="text" name="srn" id="srn" class="form-control form-control-sm col" style="background: #f7f7f7" disabled required readonly>
                                     </div>
-                                    <!-- <div class="d-flex align-items-baseline gap-3">
-                                        <label for="typeOfReq" class="form-label text-dark-emphasis col-3"><small>Type of Request:</small></label>
-                                        <input type="text" name="typeOfReq" id="typeOfReq" class="form-control form-control-sm col" style="background: #f7f7f7" readonly>
-                                    </div> -->
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="destination" class="form-label text-dark-emphasis col-5"><small>Destination:</small></label>
@@ -71,7 +67,7 @@
                                 </table>
                             </div>
                             <div id="totalRowOutside" class="d-flex border-top fw-bold"
-                                style="background:#f7f7f7;">
+                                style="background:#FFFBDF;">
                                 <div class="p-2 flex-grow-1 text-end">
                                     Total Quantity:
                                 </div>

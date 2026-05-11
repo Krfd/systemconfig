@@ -294,7 +294,6 @@ function openRequest(DocEntry) {
           let items = response.Items;
 
           $("#srn").val(header.SR_Number);
-          // $("#typeOfReq").val(header.TypeRequest);
           $("#destination").val(header.BranchDestination);
           $("#branchWhCode").val(header.BranchDestination_Whscode);
           $("#origin").val(header.BranchOrigin);
@@ -312,11 +311,11 @@ function openRequest(DocEntry) {
             totalQty += quantity;
             rows += `
             <tr>
-              <td style="background:#F7F7F7">${index + 1}</td>
-              <td style="background:#F7F7F7">${item.ItemBrand}</td>
-              <td style="background:#F7F7F7">${item.ItemName}</td>
-              <td style="background:#F7F7F7">${item.ItemCategory}</td>
-              <td style="background:#F7F7F7">${item.Request_Qty}</td>
+              <td style="background:#FFFBDF">${index + 1}</td>
+              <td style="background:#FFFBDF">${item.ItemBrand}</td>
+              <td style="background:#FFFBDF">${item.ItemName}</td>
+              <td style="background:#FFFBDF">${item.ItemCategory}</td>
+              <td style="background:#FFFBDF">${item.Request_Qty}</td>
             </tr>
             `;
           });
@@ -330,11 +329,11 @@ function openRequest(DocEntry) {
             for (let i = 0; i < emptyRows; i++) {
               let emptyRow = `
               <tr class="item-row empty-row" style="height: 50px; min-height: 50px;">
-                <td style="background: #F7F7F7"></td>
-                <td style="background: #F7F7F7"></td>
-                <td style="background: #F7F7F7"></td>
-                <td style="background: #F7F7F7"></td>
-                <td style="background: #F7F7F7"></td>
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
               </tr>
               `;
               $("#openIncomingTable tbody").append(emptyRow);

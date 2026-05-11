@@ -140,8 +140,6 @@ function loadIncoming() {
             $("td:eq(2)", row).addClass("text-primary");
             $("td:eq(6)", row).addClass("text-start");
 
-            // console.log(`INCOMING DATA STATUS : ${sortedData[index].DocStatus}`)
-
             // Hover effect
             $(row).hover(
               function () {
@@ -753,25 +751,22 @@ function loadIncomingDashboard() {
 // PICKLIST BASKET TO PICKLIST ITEMS
 $(document).on("dblclick", "#basketTable tbody .open-picklist", function (e) {
   e.preventDefault();
-  if (!$(this).find(".open-picklist").length) return;
+
+  let row = this;
+
+  const tooltipInstance = bootstrap.Tooltip.getInstance(row);
+  if (tooltipInstance) {
+    tooltipInstance.hide();
+    tooltipInstance.dispose();
+  }
+
   let $row = $(this).closest("tr");
   let picklistNum = $row.attr("data-picklist-num");
-  // let docEntry = $row.attr("data-doc-entry");
+
   $("#main-content").html(spinner);
+
   setTimeout(function () {
     openPicklist(picklistNum);
-  }, 200);
-});
-
-// PICKLIST ITEMS TO INDIVIDUAL SRN
-$(document).on("dblclick", "#picklistItemTable tbody tr", function (e) {
-  e.preventDefault();
-  if ($(this).hasClass("empty-row")) return;
-  // let DocEntry = $(this).data("docentry");
-  let SR_Number = $(this).data("srn");
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    openPicklistedForm(SR_Number);
   }, 200);
 });
 
@@ -883,7 +878,8 @@ function openPicklist(picklistNum) {
               rowCallback: function (row, data) {
                 const isEmpty = !data[0];
                 $("td", row).css({
-                  background: "#F7F7F7",
+                  // background: "#F7F7F7",
+                  background: "#FFFBDF",
                   padding: "3px",
                   height: "40px",
                   "min-height": "40px",
@@ -896,13 +892,19 @@ function openPicklist(picklistNum) {
                 let currentRows = tableBody.find("tr").length;
 
                 for (let i = currentRows; i < 8; i++) {
+                  // let $emptyRow = $(`
+                  //   <tr class="empty-row" style="background: #f7f7f7">
+                  //     <td colspan="5" style="background: #f7f7f7">&nbsp;</td>
+                  //   </tr>
+                  // `);
                   let $emptyRow = $(`
-                  <tr class="empty-row" style="background: #f7f7f7">
-                    <td colspan="5" style="background: #f7f7f7">&nbsp;</td>
-                  </tr>
-                `);
+                    <tr class="empty-row" style="background: #FFFBDF">
+                      <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
+                    </tr>
+                  `);
                   $emptyRow.css({
-                    background: "#f7f7f7",
+                    // background: "#f7f7f7",
+                    background: "#FFFBDF",
                     height: "40px",
                     "min-height": "40px",
                   });
@@ -976,7 +978,6 @@ function loadBasketContent() {
 
 // ALREADY HAS A PICKLIST NUMBER
 function openPicklistedForm(SR_Number) {
-  $("#pageLoader").removeClass("d-none");
   $.post(
     "dirs/incoming/dashboard/picklistedForm.php",
     { SR_Number: SR_Number },
@@ -1055,17 +1056,13 @@ function openPicklistedForm(SR_Number) {
           } else {
             alert(response.Data);
           }
-          $("#pageLoader").addClass("d-none");
         },
         error: function (xhr) {
           console.error(xhr.responseText);
-          $("#pageLoader").addClass("d-none");
         },
       });
     },
-  ).fail(function () {
-    $("#pageLoader").addClass("d-none");
-  });
+  );
 }
 
 // DISPLAY BASKET
@@ -1122,14 +1119,15 @@ function loadBasket() {
 
           const groupedArray = Object.values(grouped).map((item) => ({
             ...item,
-            SR_Numbers: Array.from(item.SR_Numbers), // convert Set → Array
+            SR_Numbers: Array.from(item.SR_Numbers),
           }));
 
           groupedArray.forEach((item) => {
-            console.log(`PICKLIST ITEM : ${JSON.stringify(item)}`)
+            // console.log(`PICKLIST ITEM : ${JSON.stringify(item)}`);
             const isSingleSR = item.SR_Numbers.length === 1;
             const condition = item.allHaveActualQty && isSingleSR;
-
+            console.log(`SRN's : ${item.SR_Numbers}`);
+            console.log(``);
             const date = new Date(item.DocDate);
             const formatted = date.toISOString().split("T")[0];
 
@@ -1158,7 +1156,9 @@ function loadBasket() {
                   </a>
                 </li>`;
 
-            const encoded = item.allHaveActualQty ? "<span class='badge bg-success'>Encoded</span>" : "<span class='badge bg-warning text-white'>Pending</span>"
+            const encoded = item.allHaveActualQty
+              ? "<span class='badge bg-success'>Encoded</span>"
+              : "<span class='badge bg-warning text-white'>Pending</span>";
 
             rows.push([
               item.PKList_Number || "",
@@ -1177,8 +1177,6 @@ function loadBasket() {
             ]);
           });
 
-          // ${loadToBasket}
-
           if (rows.length === 0) {
             for (let i = 0; i < 8; i++) {
               rows.push(["", "", "", "", ""]);
@@ -1196,7 +1194,7 @@ function loadBasket() {
                 title: "Picklist No.",
                 className: "text-start open-picklist ps-5",
               },
-              { title: "Status"},
+              { title: "Status" },
               { title: "Date", className: "text-start ps-5" },
               { title: "Quantity", className: "text-center" },
               { title: "", orderable: false },
@@ -1208,7 +1206,12 @@ function loadBasket() {
                 $(row)
                   .attr("data-rownum", originalItem.PKList_Number)
                   .attr("data-picklist-num", originalItem.PKList_Number)
-                  .addClass("picklist-row");
+                  .addClass("picklist-row")
+                  .addClass("picklist-row open-picklist")
+                  .attr(
+                    "data-bs-title",
+                    `SRN's: ${originalItem.SR_Numbers || "No Branch"}`,
+                  );
               }
             },
             paging: true,
@@ -1218,6 +1221,8 @@ function loadBasket() {
             autoWidth: false,
             order: [[0, "desc"]],
             rowCallback: function (row, data) {
+              const isEmptyRow = !data[0];
+
               $("td", row).css({
                 background: "#FFFBDF",
                 padding: "3px",
@@ -1226,6 +1231,12 @@ function loadBasket() {
               });
               $("td:eq(0)", row).addClass("text-primary");
               $("td:eq(1)", row).css("text-align", "start");
+
+              if (!isEmptyRow) {
+                $(row).css("cursor", "pointer");
+              } else {
+                $(row).css("cursor", "default");
+              }
 
               $(row).hover(
                 function () {
@@ -1260,6 +1271,59 @@ function loadBasket() {
                 );
                 tableBody.append($emptyRow);
               }
+
+              $("#basketTable tbody tr").each(function () {
+                const existingTooltip = bootstrap.Tooltip.getInstance(this);
+
+                if (existingTooltip) {
+                  existingTooltip.dispose();
+                }
+
+                new bootstrap.Tooltip(this, {
+                  placement: "right",
+                  trigger: "hover",
+                  container: "body",
+                });
+              });
+
+              $("#basketTable tbody")
+                .off("show.bs.dropdown hide.bs.dropdown click.dropdownAction")
+
+                // REMOVE TOOLTIP WHEN DROPDOWN OPENS
+                .on("show.bs.dropdown", ".dropdown", function () {
+                  const row = $(this).closest("tr")[0];
+
+                  const tooltipInstance = bootstrap.Tooltip.getInstance(row);
+
+                  if (tooltipInstance) {
+                    tooltipInstance.hide();
+                    tooltipInstance.dispose();
+                  }
+                })
+
+                // REMOVE TOOLTIP WHEN DROPDOWN CLOSES
+                .on("hide.bs.dropdown", ".dropdown", function () {
+                  const row = $(this).closest("tr")[0];
+
+                  const tooltipInstance = bootstrap.Tooltip.getInstance(row);
+
+                  if (tooltipInstance) {
+                    tooltipInstance.hide();
+                    tooltipInstance.dispose();
+                  }
+                })
+
+                // REMOVE TOOLTIP WHEN ANY DROPDOWN ITEM IS CLICKED
+                .on("click.dropdownAction", ".dropdown-item", function () {
+                  const row = $(this).closest("tr")[0];
+
+                  const tooltipInstance = bootstrap.Tooltip.getInstance(row);
+
+                  if (tooltipInstance) {
+                    tooltipInstance.hide();
+                    tooltipInstance.dispose();
+                  }
+                });
             },
           });
 
@@ -1455,13 +1519,13 @@ function encodeQty(picklistNum) {
               index++;
               rows += `
                 <tr class="item-row" style="height: 50px; min-height: 50px" data-rows='${JSON.stringify(item.rows)}'>
-                  <td class="align-middle ps-3" style="background: #F7F7F7;">${index}</td>
+                  <td class="align-middle text-center" style="background: #F7F7F7;">${index}</td>
                   <td class="align-middle ps-3 d-none" style="background: #F7F7F7;">${picklistEntry}</td>
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemBrand}</td>
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemName}</td>
-                  <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemCategory}</td>
-                  <td class="align-middle ps-3" style="background: #F7F7F7;">${item.totalQty}</td>
-                  <td class="align-middle ps-3 editable-cell" style="background: #FFFBDF" contenteditable="true" onfocus="handleFocus(this)" oninput="validateNumber(this)"></td>
+                  <td class="align-middle ps-3 text-start" style="background: #F7F7F7;">${item.Req_ItemCategory}</td>
+                  <td class="align-middle text-center" style="background: #F7F7F7;">${item.totalQty}</td>
+                  <td class="align-middle ps-3 editable-cell" style="background: #FFFBDF" contenteditable="true" onfocus="handleFocus(this)" oninput="validateNumber(this)" style="width: 100px; max-width: 100px"></td>
                 </tr>
               `;
             });
@@ -1474,7 +1538,7 @@ function encodeQty(picklistNum) {
 
               for (let i = 0; i < emptyRowsNeeded; i++) {
                 let emptyRow = `
-                  <tr class="item-row empty-row" style="height: 50px; min-height: 50px;">
+                  <tr class="empty-row" style="height: 50px; min-height: 50px;">
                     <td style="background: #F7F7F7" class="d-none"></td>
                     <td style="background: #F7F7F7"></td>
                     <td style="background: #F7F7F7"></td>
@@ -1487,6 +1551,42 @@ function encodeQty(picklistNum) {
                 $("#encodeQtyTable tbody").append(emptyRow);
               }
             }
+
+            $("#encodeQtyTable").DataTable({
+              destroy: true,
+              paging: true,
+              searching: true,
+              info: true,
+              order: [[5, "desc"]],
+
+              createdRow: function (row) {
+                if ($(row).hasClass("empty-row")) {
+                  $(row)
+                    .attr("data-order", "999999") // keeps them at bottom
+                    .addClass("no-sort");
+                }
+              },
+
+              rowCallback: function (row) {
+                if ($(row).hasClass("empty-row")) {
+                  $(row).appendTo("#encodeQtyTable tbody");
+                }
+              },
+
+              columnDefs: [
+                {
+                  targets: "_all",
+                  orderDataType: "dom-text",
+                },
+              ],
+
+              drawCallback: function () {
+                // always move empty rows to bottom after sorting/filtering
+                $("#encodeQtyTable tbody tr.empty-row").appendTo(
+                  "#encodeQtyTable tbody",
+                );
+              },
+            });
 
             submitEncodedQty(picklistEntry, picklistNum, srNumberMap);
           } else {
@@ -1732,7 +1832,11 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
                   //     }
                   //   });
                   // } else {
-                  loadBasketContent();
+                  Swal.close();
+                  // loadBasketContent();
+                  setTimeout(() => {
+                    loadBasketContent();
+                  }, 300);
                   // }
 
                   // });
@@ -1761,8 +1865,6 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
 
 function addToBasket(PickListNum) {
   let items = [];
-  // const picklist = [];
-  // picklist.push(PickListNum);
   $.ajax({
     // url: "dirs/incoming/dashboard/actions/save_loading_basket_items_solo.php",
     url: "dirs/incoming/dashboard/actions/update_solo_picklist.php",
@@ -1782,19 +1884,6 @@ function addToBasket(PickListNum) {
     },
   });
 }
-
-// CREATE DELIVERY
-// function createDr(picklistNum, srn) {
-//   $.post("dirs/basket/dashboard/createDr.php", function (data) {
-//     $("#main-content").hide().html(data).fadeIn(200);
-//     $("#picklist").val(picklistNum);
-//     get_userinfo();
-//     deliveryDate();
-//     getDeliveryDetails();
-//     getBatchItems(picklistNum);
-//     submitDelivery(srn);
-//   });
-// }
 
 // UPDATE ACTUAL QUANTITY
 function editEncodedQty(picklistNum) {
@@ -2060,7 +2149,6 @@ function getBatchItems(PicklistNumber) {
 }
 
 function submitDelivery(srn) {
-  // console.log(`BRANCH: ${srn}`)
   $("#deliver").on("submit", function (e) {
     e.preventDefault();
 

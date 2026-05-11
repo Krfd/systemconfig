@@ -45,14 +45,14 @@
                                     <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                         <label for="user-origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
                                         <select name="user-origin" id="user-origin" class="form-control form-control-sm col ms-3" style="background: #FFFBDF">
-                                        <option value="NEWSC1" selected>NEWSC1</option>    
-                                    </select>
+                                            <option value="NEWSC1" selected>NEWSC1</option>
+                                        </select>
                                     </div>
                                     <div class="col p-0 d-flex align-items-baseline">
                                         <label for="originCodeForm" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
                                         <select name="originCodeForm" id="originCodeForm" class="form-select form-select-sm col" style="background: #FFFBDF" required>
-                                        <option value="NEWWHS" selected>NEWWHS</option>    
-                                    </select>
+                                            <option value="NEWWHS" selected>NEWWHS</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>

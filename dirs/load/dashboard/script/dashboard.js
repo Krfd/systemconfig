@@ -69,38 +69,41 @@ function loadBasket() {
       if (response.isSuccess === "success") {
         let grouped = {};
 
-        data.filter(item => item.DocStatus !== "IN TRANSIT").forEach(function (item, index) {
-          const isDisabled = item.DocStatus === "IN TRANSIT" ? "disabled" : "";
+        data
+          .filter((item) => item.DocStatus !== "IN TRANSIT")
+          .forEach(function (item, index) {
+            const isDisabled =
+              item.DocStatus === "IN TRANSIT" ? "disabled" : "";
 
-          const date = new Date(item.DocDate);
-          const formatted = date.toISOString().split("T")[0];
+            const date = new Date(item.DocDate);
+            const formatted = date.toISOString().split("T")[0];
 
-          rows.push([
-            rowNum++,
-            item.BatchNumber,
-            (() => {
-              let status = item.DocStatus || "";
-              let badgeClass = "primary";
+            rows.push([
+              rowNum++,
+              item.BatchNumber,
+              (() => {
+                let status = item.DocStatus || "";
+                let badgeClass = "primary";
 
-              // if (status === "IN TRANSIT") badgeClass = "primary";
-              // else 
+                // if (status === "IN TRANSIT") badgeClass = "primary";
+                // else
                 if (status === "PREPARING") badgeClass = "danger";
-              else if (status === "DELIVERED") badgeClass = "success";
+                else if (status === "DELIVERED") badgeClass = "success";
 
-              return `<span class="badge bg-${badgeClass}" >${status}</span>`;
-            })(),
-            formatted,
-            '<div class="dropdown dropstart">' +
-              '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
-              '<i class="bi bi-three-dots"></i></button>' +
-              `<ul class="dropdown-menu">
+                return `<span class="badge bg-${badgeClass}" >${status}</span>`;
+              })(),
+              formatted,
+              '<div class="dropdown dropstart">' +
+                '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
+                '<i class="bi bi-three-dots"></i></button>' +
+                `<ul class="dropdown-menu">
               <li><a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}">Open</a></li>
               <li><a class="dropdown-item create-dr" href="#" data-batch="${item.BatchNumber}">Create DR</a></li>
             </ul>` +
-              "</div>",
-            item.BatchNumber,
-          ]);
-        });
+                "</div>",
+              item.BatchNumber,
+            ]);
+          });
 
         if (rows.length === 0) {
           for (let i = 0; i < 8; i++) {
@@ -121,11 +124,15 @@ function loadBasket() {
             { title: "Date", className: "text-start ps-3" },
             { title: "Action" },
           ],
-          createdRow: function (row, data, dataIndex) {
-            let originalItem = data[dataIndex];
-            if (originalItem) {
-              $(row).attr("data-batch", originalItem.BatchNumber);
-            }
+          // createdRow: function (row, data, dataIndex) {
+          //   let originalItem = data[dataIndex];
+          //   if (originalItem) {
+          //     $(row).attr("data-batch", originalItem.BatchNumber);
+          //   }
+          // },
+
+          createdRow: function (row, data) {
+            $(row).attr("data-batch", data[5]);
           },
           paging: true,
           searching: true,
@@ -440,14 +447,16 @@ function submitDr() {
           contentType: false,
           dataType: "json",
           success: function (response) {
-            console.log(response);
+            // console.log(`SUBMIT DELIVERY RESPONSE: ${response}`);
 
             if (response.isSuccess === "success") {
               Swal.fire({
                 icon: "success",
                 title: "Processing items for delivery",
               }).then(() => {
-                loadBasket();
+                console.log(`DELIVERY HAS BEEN CREATED: ${response}`);
+                // loadBasket();
+                loadingBasket();
               });
             } else {
               Swal.fire({

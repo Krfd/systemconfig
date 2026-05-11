@@ -1,12 +1,3 @@
-<div id="pageLoader"
-    class="position-fixed top-0 start-0 w-100 vh-100 d-none 
-            justify-content-center align-items-center bg-white"
-    style="z-index: 1055;">
-    <div class="text-center">
-        <div class="spinner-border text-primary" role="status"></div>
-        <div class="mt-2">Loading...</div>
-    </div>
-</div>
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-start align-items-baseline gap-3">
         <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadBasketContent()">
@@ -36,17 +27,17 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive overflow-auto mt-5" style="max-height: 450px">
+                            <div class="table-responsive overflow-auto mt-5" style="max-height: 700px">
                                 <table class="table datatables" id="encodeQtyTable">
                                     <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary d-none"></th>
-                                            <th class="text-secondary">#</th>
+                                            <th class="text-secondary text-center">#</th>
                                             <th class="text-secondary">Brand</th>
                                             <th class="text-secondary">Model</th>
-                                            <th class="text-secondary">Category</th>
-                                            <th class="text-secondary">Quantity</th>
-                                            <th class="text-secondary">Actual Qty</th>
+                                            <th class="text-secondary text-start">Category</th>
+                                            <th class="text-secondary text-center">Quantity</th>
+                                            <th class="text-secondary" style="width: 100px; max-width: 100px">Actual Qty</th>
                                         </tr>
                                     </thead>
                                     <tbody>

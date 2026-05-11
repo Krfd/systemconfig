@@ -319,6 +319,8 @@ function loadDeliveryBasket(tableId, url) {
 
       if (response.isSuccess === "success") {
         Object.values(grouped).forEach((item) => {
+          // console.log(`BRANCH ASS. ITEM: ${JSON.stringify(item)}`);
+          // console.log(``);
           let branches = Array.from(item.Req_Branch).join(", ");
 
           const isDisabledAttr =
@@ -332,8 +334,8 @@ function loadDeliveryBasket(tableId, url) {
             (() => {
               let status = item.PickListStatus || "";
 
-              if (status === "NEW" || status === "PROCESSING") status = "UNASSIGNED";
-              // if (status === "PROCESSING") status = "ASSIGNED";
+              if (status === "NEW" || status === "PROCESSING")
+                status = "UNASSIGNED";
 
               let badgeClass = "primary";
 
@@ -349,11 +351,10 @@ function loadDeliveryBasket(tableId, url) {
                   <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
                   ${
                     item.PickListStatus !== "IT"
-                    // item.PickListStatus !== "NEW"
-                      ? `
+                      ? // item.PickListStatus !== "NEW"
+                        `
                     <li>
                       <a class="dropdown-item ${
-                        // item.PickListStatus === "PROCESSING"
                         item.PickListStatus === "ASSIGNED"
                           ? "edit-branch"
                           : "assign-branch"
@@ -363,7 +364,6 @@ function loadDeliveryBasket(tableId, url) {
                         data-lbNum="${item.DocEntry}"
                         data-branches="${branches}">
                         ${
-                          // item.PickListStatus === "PROCESSING"
                           item.PickListStatus === "ASSIGNED"
                             ? "Edit Assignment"
                             : "Set Assignment"
@@ -409,7 +409,8 @@ function loadDeliveryBasket(tableId, url) {
               $(row)
                 .attr("data-rownum", originalItem.DocEntry)
                 .attr("data-picklist", originalItem.PKList_Number)
-                .attr("data-branches", branches);
+                .attr("data-branches", branches)
+                .attr("data-bs-title", `Branches: ${branches || "No Branch"}`);
             }
           },
           paging: true,
@@ -482,7 +483,34 @@ function loadDeliveryBasket(tableId, url) {
               } else {
                 dropdownBtn.prop("disabled", false).removeClass("disabled");
               }
+
+              const existingTooltip = bootstrap.Tooltip.getInstance(this);
+
+              if (existingTooltip) {
+                existingTooltip.dispose();
+              }
+
+              // create new tooltip
+              new bootstrap.Tooltip(this, {
+                placement: "right",
+                trigger: "hover",
+                container: "body",
+              });
             });
+
+            // remove tooltip when dropdown opens
+            $(tableId + " tbody")
+              .off("show.bs.dropdown")
+              .on("show.bs.dropdown", ".dropdown", function () {
+                const row = $(this).closest("tr")[0];
+
+                const tooltipInstance = bootstrap.Tooltip.getInstance(row);
+
+                if (tooltipInstance) {
+                  tooltipInstance.hide(); // hide immediately
+                  tooltipInstance.dispose(); // completely remove
+                }
+              });
           },
         });
       } else {

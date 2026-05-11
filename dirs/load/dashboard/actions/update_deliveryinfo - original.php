@@ -14,6 +14,15 @@ $Remarks         = $_POST['Remarks'] ?? '';
 try {
     $conn->beginTransaction();
 
+    $stmt = $conn->prepare("EXEC dbo.[DeliveryNumber_Auto_Generate] ?");
+    $stmt->execute([$User]);
+    $result   = $stmt->fetch(PDO::FETCH_ASSOC);
+    $DRNumber = $result['DRNumber'] ?? null;
+
+    if (!$DRNumber) {
+        throw new Exception("Failed to generate DR Number.");
+    }
+
     $stmtCollect = $conn->prepare("EXEC dbo.[ChainUpdateTables_Loadingbasket] ?,?");
     foreach ($pickListNumbers as $pickListNumber) {
         if (empty($pickListNumber)) continue;
@@ -24,10 +33,11 @@ try {
         ]);
     }
 
-    $ins_loadingheader = $conn->prepare("EXEC dbo.[UpdateLoadingBasket_Delivery] ?,?,?,?,?,?,?");
+    $ins_loadingheader = $conn->prepare("EXEC dbo.[UpdateLoadingBasket_Delivery] ?,?,?,?,?,?,?,?");
     $ins_loadingheader->execute([
         $User,
         $BatchNumber,
+        $DRNumber,
         $DeliveryDate,
         $Driver,
         $TruckType,
@@ -39,14 +49,14 @@ try {
 
     echo json_encode([
         "isSuccess"   => "success",
-        "BatchNumber" => $BatchNumber
+        "BatchNumber" => $BatchNumber,
+        "DRNumber"    => $DRNumber
     ]);
 } catch (Exception $e) {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     if ($conn->inTransaction()) {
         $conn->rollback();
     }
-
     echo json_encode([
         "isSuccess" => "error",
         "message"   => $e->getMessage()

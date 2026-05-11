@@ -13,8 +13,6 @@ try {
     $ua = $conn->prepare("EXEC dbo.[Session_Account] ?");
     $ua->execute([$User]);
     $user = $ua->fetch(PDO::FETCH_ASSOC);
-    $role = $_SESSION['UserRole'];
-    echo 'USER ROLE: ' . $role;
 } catch (PDOException $e) {
     echo "<b>Database Error:</b> " . htmlspecialchars($e->getMessage());
     exit();
@@ -107,7 +105,7 @@ try {
                         <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="delivery">
                                 <i class="nav-icon bi bi-truck"></i>
-                                <p>Stock Delivery Form</p>
+                                <p>Stock Delivery</p>
                             </a>
                         </li>
                         <li class="nav-item">

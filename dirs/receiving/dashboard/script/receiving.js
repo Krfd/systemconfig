@@ -23,11 +23,11 @@ function receivingForm() {
       $("#main-content").html(data);
 
       receiveItem();
-      toggler();
       ordersReceived();
       formattedDate();
       loadImperialBrands();
       addNonSerialize();
+      serialDeliveryInput();
 
       $("#newBrand").on("change", function () {
         $("#newModel").html('<option value="">Select Model</option>');
@@ -49,39 +49,65 @@ function receivingForm() {
         const scan = document.querySelector(".switch-track .scan");
         const serialInput = document.getElementById("newSerial");
 
+        function preventTyping(e) {
+          const allowedKeys = [
+            "Enter",
+            "Tab",
+            "Backspace",
+            "Delete",
+            "ArrowLeft",
+            "ArrowRight",
+          ];
+
+          if (!allowedKeys.includes(e.key)) {
+            e.preventDefault();
+          }
+        }
+
         function updateKnob() {
           scan.style.transition = "opacity 0.3s ease";
           manual.style.transition = "opacity 0.3s ease";
 
           if (toggler.checked) {
+            // SCAN MODE
             toggler.dataset.value = "Scan";
+
             knob.style.width = "55px";
             knob.style.transform = "translateX(8px)";
-            scan.classList.add("text-white");
-            manual.style.opacity = "0";
-            manual.style.pointerEvents = "none";
-            scan.style.opacity = "1";
-            scan.style.pointerEvents = "auto";
 
-            serialInput.removeEventListener("keydown", preventTyping);
+            scan.style.opacity = "1";
+            manual.style.opacity = "0";
+
+            scan.style.pointerEvents = "auto";
+            manual.style.pointerEvents = "none";
+
+            // console.log("SCAN");
+
+            serialInput.value = "";
+            serialInput.focus();
+
+            // Prevent manual typing
+            serialInput.addEventListener("keydown", preventTyping);
           } else {
+            // MANUAL MODE
             toggler.dataset.value = "Manual";
+
             knob.style.width = "60px";
             knob.style.transform = "translateX(0px)";
-            manual.classList.add("text-white");
-            scan.style.opacity = "0";
-            scan.style.pointerEvents = "none";
+
             manual.style.opacity = "1";
+            scan.style.opacity = "0";
+
             manual.style.pointerEvents = "auto";
+            scan.style.pointerEvents = "none";
 
+            // console.log("MANUAL");
+
+            serialInput.value = "";
+            serialInput.focus();
+
+            // Allow manual typing
             serialInput.removeEventListener("keydown", preventTyping);
-          }
-        }
-
-        function preventTyping(e) {
-          const allowedKeys = ["Enter", "Tab"]; // allow scanner's "Enter" or tab navigation
-          if (!allowedKeys.includes(e.key)) {
-            e.preventDefault();
           }
         }
 
@@ -89,7 +115,7 @@ function receivingForm() {
 
         toggler.addEventListener("change", updateKnob);
       }
-      // FOR NON-SERIALIZE ITEMS
+
       const addBtn = document.getElementById("addDeliveryModalBtn");
       const newItemModal = new bootstrap.Modal(
         document.getElementById("addDeliveryModal"),
@@ -114,12 +140,12 @@ function receivingForm() {
           if (result.isConfirmed) {
             allowNonserialize = true;
             newItemModal.show();
-            }
-          });
+          }
+        });
       });
 
       function adjustTotalWidth() {
-        const summaryTable = document.getElementById("summaryTable");
+        const summaryTable = document.getElementById("receiving-form-table");
         const totalRow = document.getElementById("totalRowOutside");
 
         if (summaryTable && totalRow) {
@@ -128,8 +154,6 @@ function receivingForm() {
       }
 
       toggler();
-      serialDeliveryInput();
-      addNonSerialize();
       adjustTotalWidth();
       window.addEventListener("resize", adjustTotalWidth);
       submitReceiving();
@@ -168,26 +192,26 @@ function receiveItem() {
 
   let allowNonserialize = false;
 
-  addBtn.addEventListener("click", function () {
-    if (allowNonserialize) {
-      newItemModal.show();
-      return;
-    }
+  // addBtn.addEventListener("click", function () {
+  //   if (allowNonserialize) {
+  //     newItemModal.show();
+  //     return;
+  //   }
 
-    Swal.fire({
-      title: "Enter non-serialize items?",
-      text: "Please confirm before proceeding.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Allow",
-      cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        allowNonserialize = true;
-        newItemModal.show();
-      }
-    });
-  });
+  //   Swal.fire({
+  //     title: "Enter non-serialize items?",
+  //     text: "Please confirm before proceeding.",
+  //     icon: "warning",
+  //     showCancelButton: true,
+  //     confirmButtonText: "Allow",
+  //     cancelButtonText: "Cancel",
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       allowNonserialize = true;
+  //       newItemModal.show();
+  //     }
+  //   });
+  // });
 }
 
 $(document).on("input blur keyup", ".item-qty-received", function () {
@@ -319,6 +343,38 @@ function ordersReceived() {
   });
 }
 
+function clearTable() {
+  Swal.fire({
+    icon: "question",
+    title: "Are you sure to clear this form?",
+    confirmButtonText: "Clear",
+    showCancelButton: true,
+    cancelButtonColor: "#d33",
+  }).then((res) => {
+    if (res.isConfirmed) {
+      let row = [];
+
+      $("#receiving-form-table tbody").empty();
+
+      for (let i = 0; i < 8; i++) {
+        row = `
+          <tr>
+          <td style="background: #FFFBDF; height: 50px;"></td>
+          <td style="background: #FFFBDF; height: 50px;"></td>
+          <td style="background: #FFFBDF; height: 50px;"></td>
+          <td style="background: #FFFBDF; height: 50px;"></td>
+          <td style="background: #FFFBDF; height: 50px;"></td>
+          <td style="background: #FFFBDF; height: 50px;"></td>
+          <td style="background: #FFFBDF; height: 50px;"></td>
+        </tr>
+        `;
+
+        $("#receiving-form-table tbody").append(row);
+      }
+    }
+  });
+}
+
 function formattedDate() {
   const today = new Date();
   const yyyy = today.getFullYear();
@@ -328,12 +384,7 @@ function formattedDate() {
   const formattedDate = `${yyyy}-${mm}-${dd}`;
 
   document.getElementById("docDateRecForm").value = formattedDate;
-}
-
-function openRec1() {
-  $.post("dirs/receiving/received/received1.php", {}, function (data) {
-    $("#main-content").html(data);
-  });
+  document.getElementById("postDate").value = formattedDate;
 }
 
 function loadImperialBrands() {
@@ -417,7 +468,6 @@ async function loadImperialModel() {
   );
 }
 
-// function addNonSerialize(ItemSerial, lbNum, picklistDr) {
 function addNonSerialize() {
   $("#frm-add-delivery")
     .off("submit")
@@ -433,292 +483,67 @@ function addNonSerialize() {
         `BRAND: ${Brand} - MODEL: ${Model} - CATEGORY - ${Category} - QUANTITY: ${Quantity}`,
       );
 
-      // $.ajax({
-      //   url: "dirs/basket/dashboard/actions/get_nonserialized_item.php",
-      //   type: "POST",
-      //   data: {
-      //     Brand: Brand,
-      //     Model: Model,
-      //   },
-      //   dataType: "json",
-      //   success: function (response) {
-      //     if (response.isSuccess === "success") {
-      //       let items = response.Data;
+      // let rows = [];
+      // //       let existingTotal = parseInt($("#summaryQty").text()) || 0;
+      // //       let totalQty = existingTotal;
+      // let $receivingTbody = $("#receiving-form-table tbody");
 
-      //       if (response.Data.length === 0) {
-      //         Swal.fire({
-      //           icon: "error",
-      //           title: "Unavailable stock(s) for this model",
-      //           text: "Please try other item",
-      //           confirmButtonText: "OKAY",
-      //         });
-      //         return;
-      //       }
-
-      let rows = [];
-      //       let existingTotal = parseInt($("#summaryQty").text()) || 0;
-      //       let totalQty = existingTotal;
-      let $receivingTbody = $("#receiving-form-table tbody");
-
-      let counter =
-        $receivingTbody.find("tr").filter(function () {
-          // check if row has meaningful content (not empty)
-          return (
-            $(this)
-              .find("td")
-              .filter(function () {
-                return $(this).text().trim() !== "";
-              }).length > 0
-          );
-        }).length + 1;
-
-      //       let $summaryDeliveryTbody = $("#summaryDeliveryTable tbody");
-
-      //       const groupedItems = {};
-
-      //       items.forEach((item) => {
-      //         if (!item.ItemCode) return;
-
-      //         if (!groupedItems[item.ItemCode]) {
-      //           groupedItems[item.ItemCode] = {
-      //             ...item,
-      //             qty: 0,
-      //           };
-      //         }
-
-      //         groupedItems[item.ItemCode].qty += 1;
-      //       });
-
-      //       Object.values(groupedItems).forEach(function (item) {
-      //         let brand = item.Brand;
-      //         let model = item.Model;
-      //         let category = item.Category;
-      //         let itemCode = item.ItemCode;
-      //         // let qty = item.qty;
-      //         if (!brand || !model || !category || !itemCode) {
-      //           console.warn("Skipped item due to null/empty value:", item);
-      //           return;
-      //         }
-      //         // totalQty += qty;
-      //         totalQty += quantity;
-
-      // let $existingRow = $summaryTbody.find(`tr[data-itemcode="${itemCode}"]`);
-      //         let $existingSummaryQty = $summaryDeliveryTbody.find(
-      //           `tr[data-itemcode="${itemCode}"]`,
-      //         );
-      //         // loadPicklistBranches(
-      //         //   lbNum,
-      //         //   picklistDr,
-      //         //   model,
-      //         //   category,
-      //         //   function (length, branchName) {
-      //         //     if (length > 1) {
-      //         //       rows += `
-      //         //           <tr style="height: 40px; min-height: 40px; cursor: pointer">
-      //         //             <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
-      //         //             <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${model}</td>
-      //         //             <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${category}</td>
-      //         //             <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${quantity}</td>
-      //         //           </tr>`;
-      //         //       if ($existingRow.length) {
-      //         //         let currentQty =
-      //         //           parseInt($existingRow.find("td:nth-child(4)").text()) ||
-      //         //           0;
-      //         //         $existingRow
-      //         //           .find("td:nth-child(4)")
-      //         //           .text(currentQty + quantity);
-
-      //         //         $existingRow.find("td:nth-child(5)").html(`
-      //         //             <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">Assigned</span>
-      //         //         `);
-
-      //         //         $existingRow.attr("data-itemcode", itemCode);
-      //         //       } else {
-      //         //         let newRow = `
-      //         //           <tr data-itemcode="${itemCode}" data-lbnum="${lbNum}" data-picklist="${picklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
-      //         //             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
-      //         //             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
-      //         //             <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
-      //         //             <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${quantity}</td>
-      //         //             <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
-      //         //               <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">Unassigned</span>
-      //         //             </td>
-      //         //           </tr>
-      //         //         `;
-      //         //         let $emptyRow = $summaryTbody
-      //         //           .find("tr.empty-row")
-      //         //           .first();
-      //         //         if ($emptyRow.length) {
-      //         //           $emptyRow.replaceWith(newRow);
-      //         //         } else {
-      //         //           $summaryTbody.append(newRow);
-      //         //         }
-      //         //       }
-      //         //     } else {
+      // let counter =
+      //   $receivingTbody.find("tr").filter(function () {
+      //     // check if row has meaningful content (not empty)
+      //     return (
+      //       $(this)
+      //         .find("td")
+      //         .filter(function () {
+      //           return $(this).text().trim() !== "";
+      //         }).length > 0
+      //     );
+      //   }).length + 1;
 
       // rows += `
-      //                   <tr style="height: 40px; min-height: 40px; cursor: pointer">
-      //                     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
-      //                     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${model}</td>
-      //                     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${category}</td>
-      //                     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${quantity}</td>
-      //                   </tr>`;
-      rows += `
-        <tr style="height: 40px; min-height: 40px; cursor: pointer">
-          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${counter}</td>
-          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${Brand}</td>
-          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${Model}</td>
-          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${Category}</td>
-          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${Quantity}</td>
-          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px" contenteditable="true" class="item-qty-received editable-cell" onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)"></td>
-        </tr>`;
-      // if ($existingRow.length) {
-      //   let currentQty =
-      //     parseInt($existingRow.find("td:nth-child(4)").text()) || 0;
-      //   $existingRow.find("td:nth-child(4)").text(currentQty + quantity);
-      //   $existingSummaryQty.find("td:nth-child(7)").text(currentQty + quantity);
+      //   <tr style="height: 40px; min-height: 40px; cursor: pointer">
+      //     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${counter}</td>
+      //     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${Brand}</td>
+      //     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${Model}</td>
+      //     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${Category}</td>
+      //     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${Quantity}</td>
+      //     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px" contenteditable="true" class="item-qty-received editable-cell" onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)"></td>
+      //   </tr>`;
 
-      //   $existingRow.find("td:nth-child(5)").html(`
-      //                     <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">
-      //                         Assigned
-      //                     </span>
-      //                 `);
-      //   $existingRow.attr("data-itemcode", itemCode);
-      // } else {
-      //   let newRow = `
-      //                     <tr data-itemcode="${itemCode}" data-lbnum="${lbNum}" data-picklist="${picklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
-      //                       <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
-      //                       <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
-      //                       <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
-      //                       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${quantity}</td>
-      //                       <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
-      //                         <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">Assigned</span>
-      //                       </td>
-      //                     </tr>
-      //                   `;
-      // Replace first empty row if exists
-      // let $emptyRow = $summaryTbody.find("tr.empty-row").first();
-      // if ($emptyRow.length) {
-      //   $emptyRow.replaceWith(newRow);
-      // } else {
-      //   $summaryTbody.append(newRow);
-      // }
-      // let rowCount = $("#receiving-form-table tbody tr").filter(function () {
-      //   return $(this).find("td:nth-child(2)").text().trim() !== "";
-      // }).length;
-      // if ($.fn.DataTable.isDataTable("#receiving-form-table")) {
-      //   $("#receiving-form-table").DataTable().clear().destroy();
-      // }
-      // let exists = false;
-      // $("#receiving-form-table tbody tr").each(function () {
-      //   let code = $(this).data("itemcode");
-      //   if (code == itemCode) {
-      //     exists = true;
-      //     return false; // break loop
-      //   }
-      // });
-      // // OR SIMPLY DISABLE THE SAVE BUTTON
-      // if (exists) {
-      //   Swal.fire({
-      //     icon: "error",
-      //     title: "Item already assigned to the branch",
-      //     confirmButtonText: "OKAY",
-      //   });
-      //   return;
-      // }
-      // $("#summaryTable tbody tr").each(function () {
-      //   let branch = $(this).find("td:nth-child(1)").text().trim();
-      //   let model = $(this).find("td:nth-child(2)").text().trim();
-      //   let quantity = $(this).find("td:nth-child(4)").text().trim();
-      //   if (!quantity || quantity === "0") return;
-      //   rowCount++;
-      //   let $emptyRow = $(
-      //     "#receiving-form-table tbody tr.empty-row",
-      //   ).first();
+      // let $rows = $receivingTbody.find("tr");
 
-      //   let newRow = $(`
-      //               <tr data-itemcode="${itemCode}" style="padding: 3px; height: 40px; min-height: 40px; cursor: pointer">
-      //                 <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
-      //                 <td style="background:#FFFBDF" class="text-primary"></td>
-      //                 <td style="background:#FFFBDF">${branchName}</td>
-      //                 <td style="background:#FFFBDF">${brand}</td>
-      //                 <td style="background:#FFFBDF" class="text-start">${model}</td>
-      //                 <td style="background:#FFFBDF" class="text-start">${category}</td>
-      //                 <td style="background:#FFFBDF" class="text-center">${quantity}</td>
-      //                 <td style="background:#FFFBDF" class="d-none">${itemCode}</td>
-      //               </tr>
-      //             `);
-      //   if ($emptyRow.length) {
-      //     $emptyRow.replaceWith(newRow);
-      //   } else {
-      // $("#receiving-form-table tbody").append(rows);
-      // $receivingTbody.append(rows);
-
-      let $rows = $receivingTbody.find("tr");
-
-      // filter non-empty rows
-      let $nonEmptyRows = $rows.filter(function () {
-        return (
-          $(this)
-            .find("td")
-            .filter(function () {
-              return $(this).text().trim() !== "";
-            }).length > 0
-        );
-      });
-
-      // insert after last non-empty row
-      if ($nonEmptyRows.length > 0) {
-        $nonEmptyRows.last().after(rows);
-      } else {
-        // fallback if somehow all rows are empty
-        $receivingTbody.prepend(rows);
-      }
-      //   }
-      //   newRow.hover(
-      //     function () {
-      //       $(this).css("background", "#FFF4C2");
-      //     },
-      //     function () {
-      //       $(this).css("background", "#FFFBDF");
-      //     },
+      // // filter non-empty rows
+      // let $nonEmptyRows = $rows.filter(function () {
+      //   return (
+      //     $(this)
+      //       .find("td")
+      //       .filter(function () {
+      //         return $(this).text().trim() !== "";
+      //       }).length > 0
       //   );
       // });
-      // }
-      //         //     }
-      //         //     $("#summaryQty").text(totalQty);
-      //         //   },
-      //         // );
-      //       });
 
-      // $("#newItemCode").val("");
-      $("#newQuantity").val("");
-      $("#newBrand").val("");
-      $("#newModel").val("");
-      $("#newCategory").val("").prop("disabled", true);
-      $("#addDeliveryModal").modal("hide");
-      //       $("#summaryQty").text(existingTotal + quantity);
-      //     } else {
-      //       Swal.fire({
-      //         icon: "error",
-      //         title: response.isSuccess,
-      //       });
-      //     }
-      //   },
-      // });
+      // // insert after last non-empty row
+      // if ($nonEmptyRows.length > 0) {
+      //   $nonEmptyRows.last().after(rows);
+      // } else {
+      //   // fallback if somehow all rows are empty
+      //   $receivingTbody.prepend(rows);
+      // }
+
+      // // $("#newItemCode").val("");
+      // $("#newQuantity").val("");
+      // $("#newBrand").val("");
+      // $("#newModel").val("");
+      // $("#newCategory").val("").prop("disabled", true);
+      // $("#addDeliveryModal").modal("hide");
     });
 }
 
 // FOR RECEIVING ITEM
-function serialDeliveryInput(
-  lbNum,
-  PicklistDr,
-  previousSerials,
-  allowedItemCodes,
-) {
-  $("#serial-delivery").on("submit", function (e) {
+function serialDeliveryInput() {
+  $(document).on("submit", "#serial-delivery", function (e) {
     e.preventDefault();
-    console.log(`SERIAL INPUT ALLOWED ITEMCODES: ${allowedItemCodes}`);
     const serialInput = $("#newSerial");
     const Serial = serialInput.val().trim();
     let lines = Serial.split(/\r?\n/)
@@ -728,240 +553,97 @@ function serialDeliveryInput(
     let ItemCode = "";
     if (Serial) {
       $.ajax({
-        url: "dirs/basket/dashboard/actions/get_branch_stock_serial.php",
+        url: "dirs/receiving/dashboard/actions/get_testscanning.php",
         type: "POST",
         data: {
-          ItemSerial: latestInput,
-          lbNum: lbNum,
-          ItemCode: ItemCode,
+          ItemSerial: Serial,
         },
         dataType: "json",
         success: function (response) {
           if (response.isSuccess === "success") {
             let items = response.Data;
             let rows = [];
-            let existingTotal = parseInt($("#summaryQty").text()) || 0;
+            let existingTotal = parseInt($("#receivingQty").text()) || 0;
             let totalQty = existingTotal;
-            let $summaryTbody = $("#summaryTable tbody");
-            let $summaryDeliveryTbody = $("#summaryDeliveryTable tbody");
-
+            let receivingBody = $("#receiving-form-table tbody");
             const groupedItems = {};
-
             items.forEach((item) => {
-              if (!item.ItemCode) return;
-
-              if (!groupedItems[item.ItemCode]) {
-                groupedItems[item.ItemCode] = {
+              if (!item.Itemcode) return;
+              if (!groupedItems[item.Itemcode]) {
+                groupedItems[item.Itemcode] = {
                   ...item,
                   qty: 0,
                 };
               }
-
-              groupedItems[item.ItemCode].qty += 1;
             });
-
             Object.values(groupedItems).forEach(function (item) {
-              let brand = item.Brand;
-              let model = item.Model;
-              let category = item.Category;
-              let itemCode = item.ItemCode;
-              let qty = item.qty;
-
-              // if (!allowedItemCodes.includes(itemCode)) {
-              //   Swal.fire({
-              //     icon: "error",
-              //     title: "Invalid Item",
-              //     text: "This item does not belong to the selected loading basket.",
-              //   });
-              //   return;
-              // }
+              let brand = item.ItemBrand;
+              let model = item.ItemName;
+              let category = item.ItemCategory;
+              let itemCode = item.Itemcode;
+              let qty = 1;
 
               if (!brand || !model || !category || !itemCode) {
                 console.warn("Skipped item due to null/empty value:", item);
                 return;
               }
               totalQty += qty;
-
-              let $existingRow = $summaryTbody.find(
+              let existingRow = receivingBody.find(
                 `tr[data-itemcode="${itemCode}"]`,
               );
-              let $existingSummaryQty = $summaryDeliveryTbody.find(
-                `tr[data-itemcode="${itemCode}"]`,
-              );
-              console.log(`SERIALIZE BATCH NUMBER: ${lbNum}`);
-              loadPicklistBranches(
-                lbNum,
-                model,
-                category,
-                function (length, branchName) {
-                  console.log(`BRANCH NAMES : ${branchName}`);
-                  if (length > 1) {
-                    console.log(`BRANCHES LENGTH: ${length}`);
-                    rows += `
-                        <tr style="height: 40px; min-height: 40px;" data-serial="${latestInput}">
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${model}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${category}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${qty}</td>
-                        </tr>`;
-                    if ($existingRow.length) {
-                      let currentQty =
-                        parseInt($existingRow.find("td:nth-child(4)").text()) ||
-                        0;
-                      $existingRow.find("td:nth-child(4)").text(currentQty + 1);
 
-                      // ✅ Update data attributes if needed
-                      $existingRow.attr("data-serial", latestInput);
-                      $existingRow.attr("data-itemcode", itemCode);
-                    } else {
-                      // ✅ CREATE NEW ROW
-                      let newRow = `
-                        <tr data-itemcode="${itemCode}" data-serialbased="true" data-serial="${latestInput}" data-lbnum="${lbNum}" data-picklist="${PicklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
-                          <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
-                          <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
-                          <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${qty}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
-                            <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">Unassigned</span>
-                          </td>
-                        </tr>
-                      `;
-                      let $emptyRow = $summaryTbody
-                        .find("tr.empty-row")
-                        .first();
-                      if ($emptyRow.length) {
-                        $emptyRow.replaceWith(newRow);
-                      } else {
-                        $summaryTbody.append(newRow);
-                      }
-                    }
-                  } else {
-                    rows += `
-                        <tr style="height: 40px; min-height: 40px;">
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${model}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${category}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${qty}</td>
-                        </tr>`;
-                    if ($existingRow.length) {
-                      let currentQty =
-                        parseInt($existingRow.find("td:nth-child(4)").text()) ||
-                        0;
-                      $existingRow.find("td:nth-child(4)").text(currentQty + 1);
-                      $existingSummaryQty
-                        .find("td:nth-child(7)")
-                        .text(currentQty + 1);
+              if (existingRow.length) {
+                let currentQty =
+                  parseInt(existingRow.find("td:nth-child(5)").text()) || 0;
+                existingRow.find("td:nth-child(5)").text(currentQty + 1);
+                existingRow.attr("data-itemcode", itemCode);
+              } else {
+                let counter =
+                  receivingBody.find("tr[data-itemcode]").length + 1;
+                let newRow = `
+                    <tr data-itemcode="${itemCode}" data-serialbased="true" style="height: 40px; min-height: 40px; cursor: pointer">
+                      <td class="align-middle ps-3 text-center" style="background: #FFFBDF">${counter}</td>
+                      <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>
+                      <td class="align-middle ps-3" style="background:#FFFBDF">${model}</td>
+                      <td class="align-middle ps-3" style="background:#FFFBDF">${category}</td>
+                      <td class="align-middle ps-3" style="background:#FFFBDF">${qty}</td>
+                    </tr>
+                  `;
 
-                      // $existingRow.find("td:nth-child(5)").html(`
-                      //     <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">
-                      //         Assigned
-                      //     </span>
-                      // `);
+                // <td class="align-middle ps-3" style="background: #FFFBDF" contenteditable="true"></td>
 
-                      // ✅ Update data attributes if needed
-                      $existingRow.attr("data-serial", latestInput);
-                      $existingRow.attr("data-itemcode", itemCode);
-                    } else {
-                      // ✅ CREATE NEW ROW
-                      let newRow = `
-                          <tr data-itemcode="${itemCode}" data-serial="${latestInput}" data-lbnum="${lbNum}" data-picklist="${PicklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
-                            <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
-                            <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
-                            <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
-                            <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${qty}</td>
-                            <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
-                              <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">Assigned</span>
-                            </td>
-                          </tr>
-                        `;
-                      // Replace first empty row if exists
-                      let $emptyRow = $summaryTbody
-                        .find("tr.empty-row")
-                        .first();
-                      if ($emptyRow.length) {
-                        $emptyRow.replaceWith(newRow);
-                      } else {
-                        $summaryTbody.append(newRow);
-                      }
-                      let rowCount = $("#summaryDeliveryTable tbody tr").filter(
-                        function () {
-                          return (
-                            $(this).find("td:nth-child(2)").text().trim() !== ""
-                          );
-                        },
-                      ).length;
-                      if ($.fn.DataTable.isDataTable("#summaryDeliveryTable")) {
-                        $("#summaryDeliveryTable")
-                          .DataTable()
-                          .clear()
-                          .destroy();
-                      }
-                      let exists = false;
-                      $("#summaryDeliveryTable tbody tr").each(function () {
-                        let code = $(this).data("itemcode");
-                        if (code == itemCode) {
-                          exists = true;
-                          return false; // break loop
-                        }
-                      });
-                      // OR SIMPLY DISABLE THE SAVE BUTTON
-                      if (exists) {
-                        Swal.fire({
-                          icon: "error",
-                          title: "Item already assigned to the branch",
-                          confirmButtonText: "OKAY",
-                        });
-                        return;
-                      }
-                      $("#summaryTable tbody tr").each(function () {
-                        let branch = $(this)
-                          .find("td:nth-child(1)")
-                          .text()
-                          .trim();
-                        let model = $(this)
-                          .find("td:nth-child(2)")
-                          .text()
-                          .trim();
-                        let qty = $(this).find("td:nth-child(4)").text().trim();
-                        if (!qty || qty === "0") return;
-                        rowCount++;
-                        let $emptyRow = $(
-                          "#summaryDeliveryTable tbody tr.empty-row",
-                        ).first();
+                // let emptyRow = receivingBody.find("tr.empty-row");
+                let emptyRow = receivingBody
+                  .find("tr:not([data-itemcode])")
+                  .first();
+                if (emptyRow.length) {
+                  emptyRow.replaceWith(newRow);
+                } else {
+                  // receivingBody.append(newRow);
+                  receivingBody.prepend(newRow);
+                }
+                renumberRows();
+              }
 
-                        let newRow = $(`
-                              <tr data-itemcode="${itemCode}" style="padding: 3px; height: 40px; min-height: 40px">
-                                <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
-                                <td style="background:#FFFBDF" class="text-primary">${Serial}</td>
-                                <td style="background:#FFFBDF">${branchName}</td>
-                                <td style="background:#FFFBDF">${brand}</td>
-                                <td style="background:#FFFBDF" class="text-start">${model}</td>
-                                <td style="background:#FFFBDF" class="text-start">${category}</td>
-                                <td style="background:#FFFBDF" class="text-center">${qty}</td>
-                                <td style="background:#FFFBDF" class="d-none">${itemCode}</td>
-                              </tr>
-                            `);
-                        if ($emptyRow.length) {
-                          $emptyRow.replaceWith(newRow);
-                        } else {
-                          $("#summaryDeliveryTable tbody").append(newRow);
-                        }
-                        newRow.hover(
-                          function () {
-                            $(this).css("background", "#FFF4C2");
-                          },
-                          function () {
-                            $(this).css("background", "#FFFBDF");
-                          },
-                        );
-                      });
-                    }
-                  }
-                  $("#summaryQty").text(totalQty);
-                },
-              );
+              if ($.fn.DataTable.isDataTable("#receiving-form-table")) {
+                $("#receiving-form-table").DataTable().clear().destroy();
+              }
+
+              let exists = false;
+              $("#receiving-form-table tbody tr").each(function () {
+                let code = $(this).data("itemcode");
+                if (code == itemCode) {
+                  exists = true;
+                  return false; // break loop
+                }
+              });
+
+              // }
             });
-          } else if (response.isSuccess === "empty") {
+
+            // $("#receiving-form-table tbody").html(rows);
+            $("#receivingQty").text(totalQty);
+          } else if (response.isSuccess === "Failed") {
             Swal.fire({
               icon: "error",
               title: "Unavailable stock for this model",
@@ -981,9 +663,6 @@ function serialDeliveryInput(
             title: "Something went wrong",
           });
         },
-        // complete: function () {
-        //   $("#nonSerializeBtn").prop("disabled", false);
-        // },
       });
     }
     serialInput.val("");
@@ -991,282 +670,105 @@ function serialDeliveryInput(
   });
 }
 
-function addNonSerialize(ItemSerial, lbNum, picklistDr, allowedItemCodes) {
-  console.log(`NONSERIALIZE ALLOWED ITEM CODES: ${allowedItemCodes}`);
-  $("#frm-add-delivery")
-    .off("submit")
-    .on("submit", function (e) {
-      e.preventDefault();
-
-      let Brand = $("#newBrand").val();
-      let Model = $("#newModel").val();
-      let quantity = parseInt($("#newQuantity").val()) || 1;
-
-      $.ajax({
-        url: "dirs/basket/dashboard/actions/get_nonserialized_item.php",
-        type: "POST",
-        data: {
-          Brand: Brand,
-          Model: Model,
-        },
-        dataType: "json",
-        success: function (response) {
-          if (response.isSuccess === "success") {
-            // let items = response.Data[0];
-            let items = response.Data;
-
-            if (response.Data.length === 0) {
-              Swal.fire({
-                icon: "error",
-                title: "Unavailable stock(s) for this model",
-                text: "Please try other item",
-                confirmButtonText: "OKAY",
-              });
-              return;
-            }
-
-            let rows = [];
-            let existingTotal = parseInt($("#summaryQty").text()) || 0;
-            let totalQty = existingTotal;
-            let $summaryTbody = $("#summaryTable tbody");
-            let $summaryDeliveryTbody = $("#summaryDeliveryTable tbody");
-
-            const groupedItems = {};
-
-            items.forEach((item) => {
-              if (!item.ItemCode) return;
-              if (!groupedItems[item.ItemCode]) {
-                groupedItems[item.ItemCode] = {
-                  ...item,
-                  qty: 0,
-                };
-              }
-
-              groupedItems[item.ItemCode].qty += 1;
-            });
-
-            Object.values(groupedItems).forEach(function (item) {
-              let brand = item.Brand;
-              let model = item.Model;
-              let category = item.Category;
-              let itemCode = item.ItemCode;
-              // let qty = item.qty;
-
-              // if (!allowedItemCodes.includes(itemCode)) {
-              //   Swal.fire({
-              //     icon: "error",
-              //     title: "Invalid Item",
-              //     text: "This item does not belong to this picklist.",
-              //   });
-              //   return;
-              // }
-
-              if (!brand || !model || !category || !itemCode) {
-                console.warn("Skipped item due to null/empty value:", item);
-                return;
-              }
-              // totalQty += qty;
-              totalQty += quantity;
-
-              let $existingRow = $summaryTbody.find(
-                `tr[data-itemcode="${itemCode}"]`,
-              );
-              let $existingSummaryQty = $summaryDeliveryTbody.find(
-                `tr[data-itemcode="${itemCode}"]`,
-              );
-              loadPicklistBranches(
-                lbNum,
-                model,
-                category,
-                function (length, branchName) {
-                  if (length > 1) {
-                    rows += `
-                        <tr style="height: 40px; min-height: 40px; cursor: pointer">
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${model}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${category}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${quantity}</td>
-                        </tr>`;
-                    if ($existingRow.length) {
-                      let currentQty =
-                        parseInt($existingRow.find("td:nth-child(4)").text()) ||
-                        0;
-                      $existingRow
-                        .find("td:nth-child(4)")
-                        .text(currentQty + quantity);
-
-                      $existingRow.find("td:nth-child(5)").html(`
-                          <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">Assigned</span>
-                      `);
-
-                      $existingRow.attr("data-itemcode", itemCode);
-                    } else {
-                      let newRow = `
-                        <tr data-itemcode="${itemCode}" data-lbnum="${lbNum}" data-picklist="${picklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
-                          <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
-                          <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
-                          <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${quantity}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
-                            <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">Unassigned</span>
-                          </td>
-                        </tr>
-                      `;
-                      let $emptyRow = $summaryTbody
-                        .find("tr.empty-row")
-                        .first();
-                      if ($emptyRow.length) {
-                        $emptyRow.replaceWith(newRow);
-                      } else {
-                        $summaryTbody.append(newRow);
-                      }
-                    }
-                  } else {
-                    rows += `
-                    <tr style="height: 40px; min-height: 40px; cursor: pointer">
-                      <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
-                      <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${model}</td>
-                      <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${category}</td>
-                      <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${quantity}</td>
-                    </tr>`;
-                    if ($existingRow.length) {
-                      let currentQty =
-                        parseInt($existingRow.find("td:nth-child(4)").text()) ||
-                        0;
-                      $existingRow
-                        .find("td:nth-child(4)")
-                        .text(currentQty + quantity);
-                      $existingSummaryQty
-                        .find("td:nth-child(7)")
-                        .text(currentQty + quantity);
-
-                      $existingRow.find("td:nth-child(5)").html(`
-                      <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">
-                          Assigned
-                      </span>
-                  `);
-                      $existingRow.attr("data-itemcode", itemCode);
-                    } else {
-                      let newRow = `
-                      <tr data-itemcode="${itemCode}" data-lbnum="${lbNum}" data-picklist="${picklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
-                        <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
-                        <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
-                        <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
-                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${quantity}</td>
-                        <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
-                          <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">Assigned</span>
-                        </td>
-                      </tr>
-                    `;
-                      // Replace first empty row if exists
-                      let $emptyRow = $summaryTbody
-                        .find("tr.empty-row")
-                        .first();
-                      if ($emptyRow.length) {
-                        $emptyRow.replaceWith(newRow);
-                      } else {
-                        $summaryTbody.append(newRow);
-                      }
-                      let rowCount = $("#summaryDeliveryTable tbody tr").filter(
-                        function () {
-                          return (
-                            $(this).find("td:nth-child(2)").text().trim() !== ""
-                          );
-                        },
-                      ).length;
-                      if ($.fn.DataTable.isDataTable("#summaryDeliveryTable")) {
-                        $("#summaryDeliveryTable")
-                          .DataTable()
-                          .clear()
-                          .destroy();
-                      }
-                      let exists = false;
-                      $("#summaryDeliveryTable tbody tr").each(function () {
-                        let code = $(this).data("itemcode");
-                        if (code == itemCode) {
-                          exists = true;
-                          return false; // break loop
-                        }
-                      });
-                      // OR SIMPLY DISABLE THE SAVE BUTTON
-                      if (exists) {
-                        Swal.fire({
-                          icon: "error",
-                          title: "Item already assigned to the branch",
-                          confirmButtonText: "OKAY",
-                        });
-                        return;
-                      }
-                      $("#summaryTable tbody tr").each(function () {
-                        let branch = $(this)
-                          .find("td:nth-child(1)")
-                          .text()
-                          .trim();
-                        let model = $(this)
-                          .find("td:nth-child(2)")
-                          .text()
-                          .trim();
-                        let quantity = $(this)
-                          .find("td:nth-child(4)")
-                          .text()
-                          .trim();
-                        if (!quantity || quantity === "0") return;
-                        rowCount++;
-                        let $emptyRow = $(
-                          "#summaryDeliveryTable tbody tr.empty-row",
-                        ).first();
-
-                        let newRow = $(`
-                          <tr data-itemcode="${itemCode}" style="padding: 3px; height: 40px; min-height: 40px; cursor: pointer">
-                            <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
-                            <td style="background:#FFFBDF" class="text-primary"></td>
-                            <td style="background:#FFFBDF">${branchName}</td>
-                            <td style="background:#FFFBDF">${brand}</td>
-                            <td style="background:#FFFBDF" class="text-start">${model}</td>
-                            <td style="background:#FFFBDF" class="text-start">${category}</td>
-                            <td style="background:#FFFBDF" class="text-center">${quantity}</td>
-                            <td style="background:#FFFBDF" class="d-none">${itemCode}</td>
-                          </tr>
-                        `);
-                        if ($emptyRow.length) {
-                          $emptyRow.replaceWith(newRow);
-                        } else {
-                          $("#summaryDeliveryTable tbody").append(newRow);
-                        }
-                        newRow.hover(
-                          function () {
-                            $(this).css("background", "#FFF4C2");
-                          },
-                          function () {
-                            $(this).css("background", "#FFFBDF");
-                          },
-                        );
-                      });
-                    }
-                  }
-                  $("#summaryQty").text(totalQty);
-                },
-              );
-            });
-
-            // $("#newItemCode").val("");
-            $("#newQuantity").val("");
-            $("#newBrand").val("");
-            $("#newModel").val("");
-            $("#newCategory").val("").prop("disabled", true);
-            $("#addDeliveryModal").modal("hide");
-            $("#summaryQty").text(existingTotal + quantity);
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: response.isSuccess,
-            });
-          }
-        },
-      });
-    });
+function renumberRows() {
+  $("#receiving-form-table tbody tr[data-itemcode]").each(function (index) {
+    $(this)
+      .find("td:first")
+      .text(index + 1);
+  });
 }
 
 function submitReceiving() {
-  console.log(`RECEIVING FORM SUBMITTED`)
+  console.log(`ITEMS HAS BEEN RECEIVED`);
+
+  $(document).on("submit", "#receivingForm", function (e) {
+    e.preventDefault();
+
+    let formData = {
+      drNo: $("#drNoRecForm").val(),
+      origin: $('input[name="originRecForm"]').val(),
+      whCode: $('input[name="origRecForm"]').val(),
+      docDate: $("#docDateRecForm").val(),
+      postDate: $("#postDate").val(),
+      status: $("#statusRecForm").val(),
+      receivedBy: $("#receiveByRecForm").val(),
+      driver: $("#driverRecForm").val(),
+      truckCategory: $("#truckCat").val(),
+      plateNo: $("#plateRecForm").val(),
+      remarks: $("#remarksRecForm").val(),
+      totalQty: $("#receivingQty").text(),
+      items: [],
+    };
+
+    // GET TABLE ROWS
+    $("#receiving-form-table tbody tr[data-itemcode]").each(function () {
+      let row = $(this);
+
+      let item = {
+        itemCode: row.data("itemcode"),
+        brand: row.find("td:eq(1)").text().trim(),
+        model: row.find("td:eq(2)").text().trim(),
+        category: row.find("td:eq(3)").text().trim(),
+        qty: parseInt(row.find("td:eq(4)").text().trim()) || 0,
+        // qtyReceived: parseInt(row.find("td:eq(5)").text().trim()) || 0,
+        serialBased: row.data("serialbased") || false,
+      };
+
+      formData.items.push(item);
+    });
+
+    // VALIDATION
+    if (formData.items.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "No items found",
+      });
+      return;
+    }
+
+    console.log(formData);
+
+    // $.ajax({
+    //   url: "dirs/receiving/dashboard/actions/submit_receiving.php",
+    //   type: "POST",
+    //   data: {
+    //     receivingData: JSON.stringify(formData),
+    //   },
+    //   dataType: "json",
+    //   beforeSend: function () {
+    //     $("#submitRecBtn")
+    //       .prop("disabled", true)
+    //       .html(
+    //         `<span class="spinner-border spinner-border-sm"></span> Processing`,
+    //       );
+    //   },
+    //   success: function (response) {
+    //     if (response.isSuccess === "success") {
+    //       Swal.fire({
+    //         icon: "success",
+    //         title: "Receiving submitted successfully",
+    //       });
+
+    //       $("#receivingForm")[0].reset();
+
+    //       // OPTIONAL: CLEAR TABLE
+    //       clearTable();
+    //     } else {
+    //       Swal.fire({
+    //         icon: "error",
+    //         title: response.message || "Submission failed",
+    //       });
+    //     }
+    //   },
+    //   error: function () {
+    //     Swal.fire({
+    //       icon: "error",
+    //       title: "Something went wrong",
+    //     });
+    //   },
+    //   complete: function () {
+    //     $("#submitRecBtn").prop("disabled", false).html("Received");
+    //   },
+    // });
+  });
 }

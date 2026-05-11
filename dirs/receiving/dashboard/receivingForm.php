@@ -14,40 +14,30 @@
                     <div class="row">
                         <form method="POST" id="receivingForm">
                             <div class="d-flex justify-content-between align-items-start">
-                                <div class="d-flex flex-column gap-1 col-4">
+                                <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-items-baseline gap-3">
-                                        <label for="rrNoRecForm" class="form-label text-dark-emphasis col-3"><small>RR No:</small></label>
-                                        <input type="text" name="rrNoRecForm" id="rrNoRecForm" class="form-control form-control-sm col" style="background: #f2f2f2" value="REC10001" readonly>
+                                        <label for="drNoRecForm" class="form-label text-dark-emphasis col-3"><small>DR No:</small></label>
+                                        <input type="text" name="drNoRecForm" id="drNoRecForm" class="form-control form-control-sm col" style="background: #FFFBDF">
                                     </div>
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="originRecForm" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
-                                            <input type="text" name="originRecForm" class="form-control form-control-sm ms-3" value="PLAZA" style="background: #f2f2f2" readonly required>
+                                            <input type="text" name="originRecForm" class="form-control form-control-sm ms-3" value="NEWSC1" style="background: #f2f2f2" readonly required>
                                         </div>
                                         <div class="col p-0 d-flex align-items-baseline gap-1">
                                             <label for="origCodeRecForm" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
-                                            <input type="text" name="origRecForm" class="form-control form-control-sm" value="PLZA" style="background: #f2f2f2" readonly required>
-                                        </div>
-                                    </div>
-                                    <div class="input-group col p-0 d-flex align-items-baseline gap-1">
-                                        <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
-                                            <label for="desRecForm" class="form-label text-dark-emphasis col-5"><small>Destination:</small></label>
-                                            <input type="text" name="desRecForm" class="form-control form-control-sm ms-3" value="VIAC" style="background: #f2f2f2" readonly required>
-                                        </div>
-                                        <div class="col p-0 d-flex align-items-baseline">
-                                            <label for="desCodeRecForm" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
-                                            <input type="text" name="originCodeRecForm" class="form-control form-control-sm" value="VIAC" style="background: #f2f2f2" readonly required>
+                                            <input type="text" name="origRecForm" class="form-control form-control-sm" value="NEWWHS" style="background: #f2f2f2" readonly required>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-items-baseline gap-3">
-                                        <label for="drNoRecForm" class="form-label text-dark-emphasis col-4"><small>DR No:</small></label>
-                                        <input type="text" name="drNoRecForm" id="drNoRecForm" class="form-control form-control-sm col" style="background: #FFFBDF">
-                                    </div>
-                                    <div class="d-flex align-items-baseline gap-3">
                                         <label for="docDateRecForm" class="form-label text-dark-emphasis col-4"><small>Document Date:</small></label>
                                         <input type="text" name="docDateRecForm" id="docDateRecForm" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
+                                    </div>
+                                    <div class="d-flex align-items-baseline gap-3">
+                                        <label for="postDate" class="form-label text-dark-emphasis col-4"><small>Posting Date:</small></label>
+                                        <input type="text" name="postDate" id="postDate" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="statusRecForm" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>
@@ -75,81 +65,24 @@
                                 </div>
                             </div>
                             <div class="table-responsive mt-5 d-flex gap-1 overflow-auto" style="max-height: 450px">
-                                <table class="table table-hover col-2" id="receiving-serial-table">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-secondary" colspan="2">Serial No.</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td rowspan="9" colspan="2" style="background: #FFFDBF"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
                                 <table class="table table-hover col" id="receiving-form-table">
                                     <thead>
                                         <tr>
-                                            <th class="text-secondary">#</th>
+                                            <th class="text-secondary text-center">#</th>
                                             <th class="text-secondary">Brand</th>
                                             <th class="text-secondary">Model</th>
                                             <th class="text-secondary">Category</th>
                                             <th class="text-secondary">Quantity</th>
-                                            <th class="text-secondary">Quantity Received</th>
+                                            <!-- <th class="text-secondary">Quantity Received</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="item-row" style="height: 50px; min-height: 50px">
-                                            <td style="background: #FFFBDF">1</td>
-                                            <td style="background: #FFFBDF" class="item-brand">APPLE</td>
-                                            <td style="background: #FFFBDF" class="item-model">iPHONE 15 256GB BLUE</td>
-                                            <td style="background: #FFFBDF" class="item-code" hidden>123</td>
-                                            <td style="background: #FFFBDF" class="item-category">PHONE</td>
-                                            <td style="background: #FFFBDF" class="item-quantity">4</td>
-                                            <td style="background: #FFFBDF; padding: 3px" contenteditable="true" class="item-qty-received editable-cell" onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)"></td>
-                                        </tr>
-                                        <tr class="item-row" style="height: 50px; min-height: 50px">
-                                            <td style="background: #FFFBDF">2</td>
-                                            <td style="background: #FFFBDF" class="item-brand">SHARP</td>
-                                            <td style="background: #FFFBDF" class="item-model">AH-XS10VF/AU-XS10VP</td>
-                                            <td style="background: #FFFBDF" class="item-code" hidden>234</td>
-                                            <td style="background: #FFFBDF" class="item-category">AIRCON</td>
-                                            <td style="background: #FFFBDF" class="item-quantity">3</td>
-                                            <td style="background: #FFFBDF; padding: 3px" contenteditable="true" class="item-qty-received editable-cell" onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)"></td>
-                                        </tr>
-                                        <tr class="item-row" style="height: 50px; min-height: 50px">
-                                            <td style="background: #FFFBDF">3</td>
-                                            <td style="background: #FFFBDF" class="item-brand">CONDURA</td>
-                                            <td style="background: #FFFBDF" class="item-model">WCONZ006EC1</td>
-                                            <td style="background: #FFFBDF" class="item-code" hidden>345</td>
-                                            <td style="background: #FFFBDF" class="item-category">AIRCON</td>
-                                            <td style="background: #FFFBDF" class="item-quantity">3</td>
-                                            <td style="background: #FFFBDF; padding: 3px" contenteditable="true" class="item-qty-received editable-cell" onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)"></td>
-                                        </tr>
-                                        <tr class="item-row" style="height: 50px; min-height: 50px">
-                                            <td style="background: #FFFBDF">4</td>
-                                            <td style="background: #FFFBDF" class="item-brand">PANASONIC</td>
-                                            <td style="background: #FFFBDF" class="item-model">CW-SC85JPH</td>
-                                            <td style="background: #FFFBDF" class="item-code" hidden>456</td>
-                                            <td style="background: #FFFBDF" class="item-category">AIRCON</td>
-                                            <td style="background: #FFFBDF" class="item-quantity">2</td>
-                                            <td style="background: #FFFBDF; padding: 3px" contenteditable="true" class="item-qty-received editable-cell" onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)"></td>
-                                        </tr>
-                                        <tr class="item-row" style="height: 50px; min-height: 50px">
-                                            <td style="background: #FFFBDF">5</td>
-                                            <td style="background: #FFFBDF" class="item-brand">APPLE</td>
-                                            <td style="background: #FFFBDF" class="item-model">iPHONE 16 128GB PINK</td>
-                                            <td style="background: #FFFBDF" class="item-code" hidden>567</td>
-                                            <td style="background: #FFFBDF" class="item-category">PHONE</td>
-                                            <td style="background: #FFFBDF" class="item-quantity">4</td>
-                                            <td style="background: #FFFBDF; padding: 3px" contenteditable="true" class="item-qty-received editable-cell" onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)"></td>
-                                        </tr>
                                         <tr style="height: 50px; min-height: 50px">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF" hidden></td>
-                                            <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
+                                            <!-- <td style="background: #FFFBDF"></td> -->
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
@@ -157,8 +90,8 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF" hidden></td>
-                                            <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
+                                            <!-- <td style="background: #FFFBDF"></td> -->
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
@@ -166,13 +99,63 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF" hidden></td>
+                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
+                                            <!-- <td style="background: #FFFBDF"></td> -->
                                             <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr style="height: 50px; min-height: 50px">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
+                                            <!-- <td style="background: #FFFBDF"></td> -->
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr style="height: 50px; min-height: 50px">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
+                                            <!-- <td style="background: #FFFBDF"></td> -->
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr style="height: 50px; min-height: 50px">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
+                                            <!-- <td style="background: #FFFBDF"></td> -->
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr style="height: 50px; min-height: 50px">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
+                                            <!-- <td style="background: #FFFBDF"></td> -->
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                        </tr>
+                                        <tr style="height: 50px; min-height: 50px">
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
+                                            <!-- <td style="background: #FFFBDF"></td> -->
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                            <div id="totalRowOutside" class="d-flex border-top fw-bold"
+                                style="background:#FFF7BC;">
+                                <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>
+                                <div class="p-2" style="width:120px;" id="receivingQty">0</div>
                             </div>
                             <!-- BOTTOM DATA -->
                             <div class="d-flex justify-content-between align-items-end mt-5">

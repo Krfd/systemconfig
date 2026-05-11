@@ -49,7 +49,7 @@ $("#main-menu")
         break;
       case "delivery":
         $maintitle = "";
-        $mainbreadcrumb = `<li class="breadcrumb-item active">Stock Delivery Form</li>`;
+        $mainbreadcrumb = `<li class="breadcrumb-item active">Stock Delivery</li>`;
         $file = "dirs/delivery/dashboard/delivery.php";
         break;
       case "receiving":

@@ -32,24 +32,20 @@ $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
 };
 
 // DASHBOARD - FORM
-$(document).on("dblclick", "#deliveryTableDisplay tbody tr", function (e) {
-  if ($(e.target).closest(".dropdown").length) return;
+// $(document).on("dblclick", "#deliveryTableDisplay tbody tr", function (e) {
+//   if ($(e.target).closest(".dropdown").length) return;
 
-  // let RowNumber = $(this).find("td:nth-child(1)").text().trim();
-  let DeliveryNum = $(this).find("td:nth-child(2)").text().trim();
-  // let PicklistNumber = $(this).find("td:nth-child(3)").text().trim();
+//   let DeliveryNum = $(this).find("td:nth-child(2)").text().trim();
 
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    // openForm(DeliveryNum, PicklistNumber, RowNumber);
-    openForm(DeliveryNum);
-  }, 200);
-});
+//   $("#main-content").html(spinner);
+//   setTimeout(function () {
+//     openForm(DeliveryNum);
+//   }, 200);
+// });
 
 // DELIVERY DASHBOARD
 function loadDelivery() {
   $.ajax({
-    // url: "dirs/delivery/dashboard/actions/get_deliveries.php",
     url: "dirs/delivery/dashboard/actions/get_displayintransit.php",
     type: "POST",
     dataType: "json",
@@ -60,16 +56,12 @@ function loadDelivery() {
       let index = 1;
 
       if (response.isSuccess === "success") {
-        // let sortedData = response.Data.sort(
-        //   (a, b) => Number(b.DeliveryNumber || 0) - Number(a.DeliveryNumber || 0),
-        // );
-        
-        let sortedData = response.Orders.sort(
-          (a, b) => Number(b.DeliveryNumber || 0) - Number(a.DeliveryNumber || 0),
+        let sortedData = response.Header.sort(
+          (a, b) =>
+            Number(b.DeliveryNumber || 0) - Number(a.DeliveryNumber || 0),
         );
 
         sortedData.forEach((item) => {
-        // response.Header.forEach((item) => {
           console.log(`DELIVERY ITEM: ${JSON.stringify(item)}`);
           console.log(``);
 
@@ -305,36 +297,37 @@ $("#newModel").on("change", function () {
   $("#itemcode").val(selected.data("itemcode") || "");
 });
 
-// LOADING BASKET TO LOADING ITEMS
-$(document).on(
-  "dblclick",
-  "#deliveryBasketTable tbody .open-picklist",
-  function (e) {
-    e.preventDefault();
-    let $row = $(this).closest("tr");
-    let PickLst_Num = $row.attr("data-picklist");
-    let del_num = $row.attr("data-delivery-num");
-    deliveryPicklistNum = PickLst_Num;
-    deliveryNum = del_num;
+// // LOADING BASKET TO LOADING ITEMS
+// $(document).on(
+//   "dblclick",
+//   "#deliveryBasketTable tbody .open-picklist",
+//   function (e) {
+//     e.preventDefault();
+//     let $row = $(this).closest("tr");
+//     let PickLst_Num = $row.attr("data-picklist");
+//     let del_num = $row.attr("data-delivery-num");
+//     deliveryPicklistNum = PickLst_Num;
+//     deliveryNum = del_num;
 
-    $("#main-content").html(spinner);
-    setTimeout(function () {
-      loadDeliveryItems(PickLst_Num, del_num);
-    }, 200);
-  },
-);
+//     $("#main-content").html(spinner);
+//     setTimeout(function () {
+//       loadDeliveryItems(PickLst_Num, del_num);
+//     }, 200);
+//   },
+// );
 
 // PICKLIST BASKET DROPDOWN TO PICKLIST ITEMS
 $(document).on("click", ".dropdown .open-picklisted", function (e) {
-  let Picklist = $(this).closest("tr").attr("data-picklist");
+  // let Picklist = $(this).closest("tr").attr("data-picklist");
   let del_num = $(this).closest("tr").attr("data-delivery-num");
 
-  deliveryPicklistNum = Picklist;
+  // deliveryPicklistNum = Picklist;
   deliveryNum = del_num;
 
   $("#main-content").html(spinner);
   setTimeout(function () {
-    loadDeliveryItems(Picklist, del_num);
+    // loadDeliveryItems(Picklist, del_num);
+    loadDeliveryItems(del_num);
   }, 200);
 });
 
@@ -362,8 +355,6 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
   let model = $(this).find("td:nth-child(2)").text().trim();
   let category = $(this).find("td:nth-child(3)").text().trim();
   let qty = $(this).find("td:nth-child(4)").text().trim();
-
-  // console.log(`PICKLIST NUMBER: ${picklistNumber}`);
 
   // ✅ Prevent modal if row is empty
   if (!brand && !model && !qty) {
@@ -1852,147 +1843,146 @@ function removeSRN(SRN) {
   });
 }
 
-// LOAD DELIVERY ITEMS
-function loadDeliveryItems(PickLst_Num, del_num) {
-  $.post("dirs/delivery/dashboard/loadDeliveryItems.php", {}, function (data) {
-    $("#main-content").html(data);
+// // LOAD DELIVERY ITEMS
+// function loadDeliveryItems(PickLst_Num, del_num) {
+//   $.post("dirs/delivery/dashboard/loadDeliveryItems.php", {}, function (data) {
+//     $("#main-content").html(data);
 
-    deliveryPicklistNum = PickLst_Num;
-    deliveryNum = del_num;
+//     deliveryNum = del_num;
 
-    $.ajax({
-      url: "dirs/delivery/dashboard/actions/get_loading_breakdown.php",
-      type: "POST",
-      data: { PickLst_Num: PickLst_Num },
-      dataType: "json",
-      success: function (response) {
-        $("#picklistDeliveryDisplay").text(PickLst_Num);
-        if (
-          !response ||
-          response.isSuccess !== "success" ||
-          !Array.isArray(response.Data)
-        ) {
-          response = {
-            isSuccess: "success",
-            Data: [],
-          };
-        }
-        let rows = [];
-        if (response.isSuccess === "success") {
-          let sortedData = response.Data.sort(
-            (a, b) => Number(b.BaseNum_SRN || 0) - Number(a.RowNum || 0),
-          );
+//     $.ajax({
+//       url: "dirs/delivery/dashboard/actions/get_loading_breakdown.php",
+//       type: "POST",
+//       // data: { PickLst_Num: PickLst_Num },
+//       dataType: "json",
+//       success: function (response) {
+//         $("#picklistDeliveryDisplay").text(PickLst_Num);
+//         if (
+//           !response ||
+//           response.isSuccess !== "success" ||
+//           !Array.isArray(response.Data)
+//         ) {
+//           response = {
+//             isSuccess: "success",
+//             Data: [],
+//           };
+//         }
+//         let rows = [];
+//         if (response.isSuccess === "success") {
+//           let sortedData = response.Data.sort(
+//             (a, b) => Number(b.BaseNum_SRN || 0) - Number(a.RowNum || 0),
+//           );
 
-          sortedData.forEach((item) => {
-            rows.push([
-              item.BaseNum_SRN || "",
-              item.DocDate || "",
-              item.ReqBranch || "",
-              item.TotalQty || "",
-              '<div class="dropdown dropstart">' +
-                '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
-                '<i class="bi bi-three-dots"></i></button>' +
-                `<ul class="dropdown-menu">
-                  <li><a class="dropdown-item open-srn" href="#">Open</a></li>
-                  <li><a class="dropdown-item remove-srn" href="#">Remove</a></li>
-                </ul>
-              </div>`,
-            ]);
-          });
+//           sortedData.forEach((item) => {
+//             rows.push([
+//               item.BaseNum_SRN || "",
+//               item.DocDate || "",
+//               item.ReqBranch || "",
+//               item.TotalQty || "",
+//               '<div class="dropdown dropstart">' +
+//                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
+//                 '<i class="bi bi-three-dots"></i></button>' +
+//                 `<ul class="dropdown-menu">
+//                   <li><a class="dropdown-item open-srn" href="#">Open</a></li>
+//                   <li><a class="dropdown-item remove-srn" href="#">Remove</a></li>
+//                 </ul>
+//               </div>`,
+//             ]);
+//           });
 
-          if (rows.length === 0) {
-            for (let i = 0; i < 8; i++) {
-              rows.push(["", "", "", "", ""]);
-            }
-          }
+//           if (rows.length === 0) {
+//             for (let i = 0; i < 8; i++) {
+//               rows.push(["", "", "", "", ""]);
+//             }
+//           }
 
-          if ($.fn.DataTable.isDataTable("#deliveryItemsTable")) {
-            $("#deliveryItemsTable").DataTable().clear().destroy();
-          }
+//           if ($.fn.DataTable.isDataTable("#deliveryItemsTable")) {
+//             $("#deliveryItemsTable").DataTable().clear().destroy();
+//           }
 
-          $("#deliveryItemsTable").DataTable({
-            data: rows,
-            columns: [
-              { title: "SRN", className: "text-start ps-5 open-picklist" },
-              { title: "Date", className: "text-start ps-2" },
-              { title: "Requesting Branch", className: "text-start ps-2" },
-              { title: "Quantity", className: "text-start ps-2" },
-              { title: "", orderable: false },
-            ],
-            createdRow: function (row, data, dataIndex) {
-              let originalItem = sortedData[dataIndex];
+//           $("#deliveryItemsTable").DataTable({
+//             data: rows,
+//             columns: [
+//               { title: "SRN", className: "text-start ps-5 open-picklist" },
+//               { title: "Date", className: "text-start ps-2" },
+//               { title: "Requesting Branch", className: "text-start ps-2" },
+//               { title: "Quantity", className: "text-start ps-2" },
+//               { title: "", orderable: false },
+//             ],
+//             createdRow: function (row, data, dataIndex) {
+//               let originalItem = sortedData[dataIndex];
 
-              if (originalItem) {
-                $(row)
-                  .attr("data-srn-num", originalItem.BaseNum_SRN)
-                  .attr("data-picklist", PickLst_Num)
-                  .attr("data-delivery-num", del_num);
-              }
-            },
-            paging: true,
-            searching: true,
-            info: true,
-            processing: false,
-            autoWidth: false,
-            order: [[0, "desc"]],
-            rowCallback: function (row, data) {
-              $("td", row).css({
-                background: "#FFFBDF",
-                padding: "3px",
-                height: "40px",
-                "min-height": "40px",
-                cursor: "pointer",
-              });
-              $("td:eq(0)", row).addClass("text-primary");
-              $("td:eq(1)", row).css("text-align", "start");
+//               if (originalItem) {
+//                 $(row)
+//                   .attr("data-srn-num", originalItem.BaseNum_SRN)
+//                   .attr("data-picklist", PickLst_Num)
+//                   .attr("data-delivery-num", del_num);
+//               }
+//             },
+//             paging: true,
+//             searching: true,
+//             info: true,
+//             processing: false,
+//             autoWidth: false,
+//             order: [[0, "desc"]],
+//             rowCallback: function (row, data) {
+//               $("td", row).css({
+//                 background: "#FFFBDF",
+//                 padding: "3px",
+//                 height: "40px",
+//                 "min-height": "40px",
+//                 cursor: "pointer",
+//               });
+//               $("td:eq(0)", row).addClass("text-primary");
+//               $("td:eq(1)", row).css("text-align", "start");
 
-              $(row).hover(
-                function () {
-                  $(this).css("background", "#FFF4C2");
-                },
-                function () {
-                  $(this).css("background", "#FFFBDF");
-                },
-              );
-            },
-            drawCallback: function () {
-              let tableBody = $("#deliveryItemsTable tbody");
-              let currentRows = tableBody.find("tr").length;
+//               $(row).hover(
+//                 function () {
+//                   $(this).css("background", "#FFF4C2");
+//                 },
+//                 function () {
+//                   $(this).css("background", "#FFFBDF");
+//                 },
+//               );
+//             },
+//             drawCallback: function () {
+//               let tableBody = $("#deliveryItemsTable tbody");
+//               let currentRows = tableBody.find("tr").length;
 
-              for (let i = currentRows; i < 8; i++) {
-                let $emptyRow = $(`
-                <tr class="empty-row" style="background: #FFFBDF">
-                  <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
-                </tr>
-              `);
-                $emptyRow.css({
-                  background: "#FFFBDF",
-                  height: "40px",
-                  "min-height": "40px",
-                  cursor: "pointer",
-                });
-                $emptyRow.hover(
-                  function () {
-                    $(this).css("background", "#FFF4C2");
-                  },
-                  function () {
-                    $(this).css("background", "#FFFBDF");
-                  },
-                );
-                tableBody.append($emptyRow);
-              }
-            },
-          });
-        } else {
-          console.error(response.Data);
-        }
-      },
-      error: function (xhr, status, error) {
-        console.error("Error loading outgoing data: ", error);
-      },
-    });
-  });
-}
+//               for (let i = currentRows; i < 8; i++) {
+//                 let $emptyRow = $(`
+//                 <tr class="empty-row" style="background: #FFFBDF">
+//                   <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
+//                 </tr>
+//               `);
+//                 $emptyRow.css({
+//                   background: "#FFFBDF",
+//                   height: "40px",
+//                   "min-height": "40px",
+//                   cursor: "pointer",
+//                 });
+//                 $emptyRow.hover(
+//                   function () {
+//                     $(this).css("background", "#FFF4C2");
+//                   },
+//                   function () {
+//                     $(this).css("background", "#FFFBDF");
+//                   },
+//                 );
+//                 tableBody.append($emptyRow);
+//               }
+//             },
+//           });
+//         } else {
+//           console.error(response.Data);
+//         }
+//       },
+//       error: function (xhr, status, error) {
+//         console.error("Error loading outgoing data: ", error);
+//       },
+//     });
+//   });
+// }
 
 $(document).on("dblclick", "#deliveryItemsTable tbody tr", function (e) {
   if ($(e.target).closest(".dropdown").length) return;
