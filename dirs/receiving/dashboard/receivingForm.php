@@ -4,7 +4,7 @@
             <i class="bi bi-arrow-left"></i>
         </button>
         <div class="d-flex justify-content-start align-items-start gap-3">
-            <h3 class="fw-bold text-primary">Receiving Item</h3>
+            <h3 class="fw-bold text-primary">Receiving</h3>
         </div>
     </div>
     <div class="card shadow-sm mt-2" id="dashboard-display">

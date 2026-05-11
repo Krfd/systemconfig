@@ -1,6 +1,6 @@
 let timeout;
-// const idleLimit = 5 * 60 * 1000; // 10 minutes
-const idleLimit = 5 * 1000; // 5 seconds
+const idleLimit = 5 * 60 * 1000; // 10 minutes
+// const idleLimit = 5 * 1000; // 5 seconds
 
 function resetTimer() {
   clearTimeout(timeout);

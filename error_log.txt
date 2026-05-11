@@ -1,0 +1,5 @@
+[2026-05-10 15:41:46] Error: [2] Undefined array key "UserRole" in C:\xampp\htdocs\ishiftdemo\index.php on line 16
+[2026-05-10 15:42:33] Error: [2] Undefined array key "UserRole" in C:\xampp\htdocs\ishiftdemo\index.php on line 16
+[2026-05-10 15:42:35] Error: [2] Undefined array key "UserRole" in C:\xampp\htdocs\ishiftdemo\index.php on line 16
+[2026-05-10 15:44:15] Error: [2] Undefined array key "UserRole" in C:\xampp\htdocs\ishiftdemo\index.php on line 16
+[2026-05-10 15:45:46] Error: [2] Undefined array key "UserRole" in C:\xampp\htdocs\ishiftdemo\index.php on line 16

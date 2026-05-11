@@ -13,13 +13,8 @@ try {
     $ua = $conn->prepare("EXEC dbo.[Session_Account] ?");
     $ua->execute([$User]);
     $user = $ua->fetch(PDO::FETCH_ASSOC);
-
-    /*  if ($user['Role'] !== 'Admin') {
-        $_SESSION = [];
-        session_destroy();
-        header("Location: login.php");
-        exit();
-    }*/
+    $role = $_SESSION['UserRole'];
+    echo 'USER ROLE: ' . $role;
 } catch (PDOException $e) {
     echo "<b>Database Error:</b> " . htmlspecialchars($e->getMessage());
     exit();
@@ -83,15 +78,6 @@ try {
             <div class="sidebar">
                 <nav id="main-menu" class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <!-- <li class="nav-item">
-                            <p class="text-muted">Menus</p>
-                        </li> -->
-                        <!-- <li class="nav-item">
-                            <a href="#" class="nav-link active" name="menu" menucode="dashboard" data-bs-toggle="tooltip" data-bs-title="Dashboard" data-bs-placement="right">
-                                <i class="nav-icon bi bi-grid"></i>
-                                <p>Dashboard</p>
-                            </a>
-                        </li> -->
                         <li class="nav-item">
                             <a href="#" class="nav-link active" name="menu" menucode="outgoing">
                                 <i class="nav-icon bi bi-box-arrow-in-left"></i>
@@ -142,12 +128,6 @@ try {
                                 <p>Stock Transfer</p>
                             </a>
                         </li>
-                        <!-- <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="settings" data-bs-toggle="tooltip" data-bs-title="Settings" data-bs-placement="right">
-                                <i class="nav-icon bi bi-gear"></i>
-                                <p>Settings</p>
-                            </a>
-                        </li> -->
                         <hr>
                         <li class="nav-item">
                             <a href="#" class="nav-link" onclick="logout()">

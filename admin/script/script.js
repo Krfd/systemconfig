@@ -35,23 +35,23 @@ $("#main-menu")
       $mainbreadcrumb = `<li class="breadcrumb-item active">Dashboard</li>`;
       $file = "dirs/dashboard/dashboard.php";
       break;
-    case "store":
-      $maintitle = "Store Setup";
-      $mainbreadcrumb = `<li class="breadcrumb-item active">Add Member</li>`;
-      $file = "dirs/store_master/store_master.php";
+    case "requests":
+      $maintitle = "Requests";
+      $mainbreadcrumb = `<li class="breadcrumb-item active">Requests</li>`;
+      $file = "dirs/requests/requests.php";
       break;
-    case "setupmenu":
-      $maintitle = "Store Menu";
-      $mainbreadcrumb = `<li class="breadcrumb-item active">Setup Menu</li>`;
-      $file = "dirs/food_menu/food_menu.php";
-    break;
-    case "stock_transfer":
-      $maintitle = "Stock Transfer";
-      $mainbreadcrumb = `<li class="breadcrumb-item active">Add Member</li>`;
-      $file = "dirs/stock_transfer/stock_transfer.php";
-    break;
+    case "users":
+      $maintitle = "Users";
+      $mainbreadcrumb = `<li class="breadcrumb-item active">Users</li>`;
+      $file = "dirs/users/users.php";
+      break;
+    case "findings":
+      $maintitle = "Findings";
+      $mainbreadcrumb = `<li class="breadcrumb-item active">Findings</li>`;
+      $file = "dirs/findings/findings.php";
+      break;
     case "settings":
-      $maintitle = "Account Settings";
+      $maintitle = "Settings";
       $mainbreadcrumb = `<li class="breadcrumb-item active">Settings</li>`;
       $file = "dirs/settings/settings.php";
       break;

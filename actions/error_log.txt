@@ -1,45 +1,4 @@
-[2026-04-25 09:07:37] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [64].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 09:07:37] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 09:07:40] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [64].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 09:07:40] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 09:07:43] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [53].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 09:07:43] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 09:07:50] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [53].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 09:07:50] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 09:07:57] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [53].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 09:07:57] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 09:08:33] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [64].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 09:08:33] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 09:08:54] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [53].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 09:08:54] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 09:09:27] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [64].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 09:09:27] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 09:09:46] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [53].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 09:09:46] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 09:09:50] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [53].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 09:09:50] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 09:11:13] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Unable to complete login process due to delay in opening server connection in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 09:11:13] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 10:20:43] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\ishiftdemo\actions\logout.php on line 4
-[2026-04-25 12:50:13] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [53].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 12:50:13] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 12:50:41] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [53].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 12:50:41] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 12:51:15] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [64].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 12:51:15] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [53].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 12:51:15] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 12:51:15] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 12:51:18] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [53].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 12:51:18] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 12:56:39] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [64].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-04-25 12:56:39] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-04-25 14:58:58] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\ishiftdemo\actions\logout.php on line 4
-[2026-05-04 11:53:01] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShiftDemo\actions\logout.php on line 4
-[2026-05-04 21:19:41] Error: [2] SQLSTATE[08S01]: [Microsoft][ODBC Driver 17 for SQL Server]TCP Provider: An existing connection was forcibly closed by the remote host.
- in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 10
-[2026-05-04 21:20:32] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [64].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-05-04 21:20:32] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-05-08 09:37:46] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [64].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-05-08 09:37:46] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
-[2026-05-08 09:38:56] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [53].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-05-08 09:38:56] Error: [2] Undefined variable $conn in C:\xampp\htdocs\ishiftdemo\actions\login.php on line 9
+[2026-05-10 15:40:48] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\ishiftdemo\actions\logout.php on line 4
+[2026-05-10 15:44:50] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\ishiftdemo\actions\logout.php on line 4
+[2026-05-10 15:44:50] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\ishiftdemo\actions\logout.php on line 4
+[2026-05-10 15:47:19] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [64].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18

@@ -12,10 +12,20 @@ try {
     if ($user && password_verify($Password, $user['Password'])) {
         $_SESSION['Uid'] = $user['Uid'];
         $_SESSION['Role'] = $user['UserRole'];
-        echo json_encode([
-            "isSuccess" => "OK",
-            "Data" => $user
-        ]);
+
+        if ($_SESSION['Role'] === "Admin") {
+            echo json_encode([
+                "isSuccess" => "OK",
+                "Data" => $user,
+                "Role" => $_SESSION['Role'],
+            ]);
+        } else if ($_SESSION['Role'] === "Administrator") {
+            echo json_encode([
+                "isSuccess" => "OK",
+                "Data" => $user,
+                "Role" => $_SESSION['Role'],
+            ]);
+        }
     } else {
         echo json_encode([
             "isSuccess" => "Failed",

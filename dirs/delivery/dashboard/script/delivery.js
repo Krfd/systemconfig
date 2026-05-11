@@ -49,22 +49,32 @@ $(document).on("dblclick", "#deliveryTableDisplay tbody tr", function (e) {
 // DELIVERY DASHBOARD
 function loadDelivery() {
   $.ajax({
-    url: "dirs/delivery/dashboard/actions/get_deliveries.php",
+    // url: "dirs/delivery/dashboard/actions/get_deliveries.php",
+    url: "dirs/delivery/dashboard/actions/get_displayintransit.php",
     type: "POST",
     dataType: "json",
     success: function (response) {
       let rows = [];
-      let existingSeries = new Set();
+      let header = response.Header;
+      // let existingSeries = new Set();
+      let index = 1;
+
       if (response.isSuccess === "success") {
-        let sortedData = response.Data.sort(
-          (a, b) => Number(b.Delivery_Num || 0) - Number(a.Delivery_Num || 0),
+        // let sortedData = response.Data.sort(
+        //   (a, b) => Number(b.DeliveryNumber || 0) - Number(a.DeliveryNumber || 0),
+        // );
+        
+        let sortedData = response.Orders.sort(
+          (a, b) => Number(b.DeliveryNumber || 0) - Number(a.DeliveryNumber || 0),
         );
 
         sortedData.forEach((item) => {
+        // response.Header.forEach((item) => {
           console.log(`DELIVERY ITEM: ${JSON.stringify(item)}`);
           console.log(``);
 
-          let status = item.DocStatus ? item.DocStatus.toUpperCase() : "";
+          // let status = item.DocStatus ? item.DocStatus.toUpperCase() : "";
+          let status = "IN TRANSIT";
           let statusClass = "";
 
           if (status === "NEW" || status === "IN TRANSIT") {
@@ -81,16 +91,16 @@ function loadDelivery() {
 
           let statusBadge = `<span class="badge ${statusClass}">${status || ""}</span>`;
 
-          if (existingSeries.has(item.DeliveryNumber)) {
-            return;
-          }
+          // if (existingSeries.has(item.DeliveryNumber)) {
+          //   return;
+          // }
 
-          existingSeries.add(item.DeliveryNumber);
+          // existingSeries.add(item.DeliveryNumber);
 
           rows.push([
-            item.DocEntry || "",
+            // item.DocEntry || "",
+            index++,
             item.DeliveryNumber || "",
-            // item.PickList_Num || "",
             statusBadge,
             item.Driver,
             item.DeliveryDate || "",
@@ -113,7 +123,6 @@ function loadDelivery() {
           columns: [
             { title: "#", className: "text-center" },
             { title: "DR No." },
-            // { title: "Picklist No." },
             { title: "Status" },
             { title: "Driver" },
             { title: "Delivery Date", className: "text-start" },
@@ -181,7 +190,7 @@ function loadDelivery() {
           },
         });
       } else {
-        console.error(response.Data);
+        console.error(response.Orders);
       }
     },
     error: function (xhr, status, error) {

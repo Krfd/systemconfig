@@ -1126,6 +1126,7 @@ function loadBasket() {
           }));
 
           groupedArray.forEach((item) => {
+            console.log(`PICKLIST ITEM : ${JSON.stringify(item)}`)
             const isSingleSR = item.SR_Numbers.length === 1;
             const condition = item.allHaveActualQty && isSingleSR;
 
@@ -1157,17 +1158,11 @@ function loadBasket() {
                   </a>
                 </li>`;
 
-            // const loadToBasket =
-            //   item.allHaveActualQty && isSingleSR
-            //     ? `
-            //     <li>
-            //       <a class="dropdown-item single-dr" href="#" data-picklist="${item.PKList_Number}" data-sr-number="${item.SR_Numbers[0]}">Load to Basket</a>
-            //     </li>
-            //   `
-            //     : "";
+            const encoded = item.allHaveActualQty ? "<span class='badge bg-success'>Encoded</span>" : "<span class='badge bg-warning text-white'>Pending</span>"
 
             rows.push([
               item.PKList_Number || "",
+              encoded,
               formatted || "",
               item.RequestItemQty || "",
               '<div class="dropdown dropstart">' +
@@ -1186,7 +1181,7 @@ function loadBasket() {
 
           if (rows.length === 0) {
             for (let i = 0; i < 8; i++) {
-              rows.push(["", "", "", ""]);
+              rows.push(["", "", "", "", ""]);
             }
           }
 
@@ -1201,6 +1196,7 @@ function loadBasket() {
                 title: "Picklist No.",
                 className: "text-start open-picklist ps-5",
               },
+              { title: "Status"},
               { title: "Date", className: "text-start ps-5" },
               { title: "Quantity", className: "text-center" },
               { title: "", orderable: false },
@@ -1664,8 +1660,6 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
               formData.append("ActualQty[]", item.ActualQty);
               formData.append("SR_Number[]", item.SR_Number);
             });
-
-            
 
             $.ajax({
               url: "dirs/incoming/dashboard/actions/update_actual_qty.php",

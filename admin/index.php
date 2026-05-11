@@ -10,18 +10,11 @@ if (!isset($_SESSION['Uid'])) {
 $User = $_SESSION['Uid'];
 
 try {
-    $ua = $conn->prepare("CALL SESSION_USER (?)");
+    $ua = $conn->prepare("EXEC dbo.[Session_Account] ?");
     $ua->execute([$User]);
     $user = $ua->fetch(PDO::FETCH_ASSOC);
 
-    if ($user['SysRole'] !== 'Admin') {
-        $_SESSION = [];
-        session_destroy();
-        header("Location: ../login.php");
-        exit();
-    }
-
-
+    echo 'USER : ' . $User;
 
 } catch (PDOException $e) {
     echo "<b>Database Error:</b> " . htmlspecialchars($e->getMessage());
@@ -34,7 +27,7 @@ try {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bo's Café</title>
+  <title>iShift</title>
   <link rel="stylesheet" href="../assets/plugins/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" type="text/css" href="../assets/plugins/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="../assets/css/adminlte.min.css">
@@ -51,17 +44,17 @@ try {
   <link rel="stylesheet" href="../assets/plugins/datepicker/jquery-ui.structure.min.css">
   <link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.min.css">
   <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="icon" href="../assets/image/icon/favicon.png">
+  <link rel="icon" href="../assets/image/logo/iap_icon.png">
 
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
-    <div class="wrapper">
-        <nav class="main-header navbar navbar-expand">
+     <div class="wrapper">
+        <nav class="main-header navbar navbar-expand bg-light">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="bi bi-list"></i></a>
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item text-info">
                     <a href="#" class="nav-link text-center">
                         <i class="bi bi-clock ml-4"></i>
                         <strong class="ml-2">
@@ -72,60 +65,50 @@ try {
                 </li>
             </ul>
         </nav>
-        <aside class="main-sidebar sidebar-dark-secondary elevation-5">
+        <aside class="main-sidebar bg-primary-subtle elevation-5">
             <p class="text-center brand-link">
                 <a href="index.php" style="text-decoration: none; color: inherit;">
-                    <img src="../assets/image/icon/favicon.png" alt="Bo's Café Logo" id="profile-image"style="width: 100px; height: 100px; object-fit: cover;">
+                    <img src="../assets/image/logo/iap_icon.png" alt="iShift Admin" id="profile-image" style="width: 100px; height: 65px; object-fit: cover;">
                     <br>
-                    <small>Bo's Café</small>
                 </a>
+                <small><?php echo isset($user['Username']) ? $user['Username'] : 'Bonjing!'; ?></small>
                 <br>
-                <span class="badge text-sm bg-secondary" id="system-type"><?php echo $user['SysRole'];  ?></span>
+                <span class="badge text-sm bg-primary" id="system-type"><?php echo (isset($user['UserRole']) ? $user['UserRole'] : '') . ' - ' . (isset($user['Branch']) ? $user['Branch'] : '') ?></span>
             </p>
             <div class="sidebar">
                 <nav id="main-menu" class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false" >
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <li class="nav-item">
-                            <p class="text-muted">Menus</p>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="dashboard" data-bs-toggle="tooltip" data-bs-title="Dashboard" data-bs-placement="right">
-                                <i class="nav-icon bi bi-grid"></i>
+                            <a href="#" class="nav-link active" name="menu" menucode="dashboard">
+                                <i class="nav-icon bi bi-box-arrow-in-left"></i>
                                 <p>Dashboard</p>
                             </a>
                         </li>
-                       
                         <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="leave">
-                                <i class="nav-icon bi bi-reply"></i>
-                                <p>Leave</p>
+                            <a href="#" class="nav-link" name="menu" menucode="requests">
+                                <i class="nav-icon bi bi-box-arrow-in-right"></i>
+                                <p>Requests</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="holiday">
-                                <i class="nav-icon bi bi-cash"></i>
-                                <p>Payroll</p>
+                            <a href="#" class="nav-link" name="menu" menucode="users">
+                                <i class="bi bi-card-checklist"></i>
+                                <p>Users</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                             <a href="#" class="nav-link active" name="menu" menucode="setupmenu">
-                                 <i class="nav-icon bi-journal-text"></i>
-                                 <p>Menu Setup</p>
-                             </a>
-                        </li> 
-                        <li class="nav-item">
-                             <a href="#" class="nav-link" name="menu" menucode="store">
-                                 <i class="nav-icon bi bi-building"></i>
-                                 <p>Store Setup</p>
-                             </a>
-                         </li> 
-                        <hr>
+                            <a href="#" class="nav-link" name="menu" menucode="findings">
+                                <i class="nav-icon bi bi-cart"></i>
+                                <p>Findings</p>
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="settings">
-                                <i class="nav-icon bi bi-gear"></i>
+                                <i class="nav-icon bi bi-truck"></i>
                                 <p>Settings</p>
                             </a>
                         </li>
+                        <hr>
                         <li class="nav-item">
                             <a href="#" class="nav-link" onclick="logout()">
                                 <i class="nav-icon bi bi-box-arrow-right text-danger"></i>
@@ -135,28 +118,48 @@ try {
                     </ul>
                 </nav>
             </div>
+            <input type="hidden" value="<?php echo $user['Username']; ?>" id="session-user">
         </aside>
     </div>
     <div class="content-wrapper">
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row mb-2">
-            <div class="col-sm-6">
-              <h4 class="m-0 text-secondary" id="main-title"></h4>
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-bold" id="main-title" style="color: #4A6CC3"></h1>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-      <section class="content">
-        <div class="container-fluid" id="main-content"></div>
-      </section>
+        <section class="content">
+            <div class="container-fluid" id="main-content"></div>
+        </section>
     </div>
     <footer class="main-footer">
-        <small>Bo's Café. All rights reserved. Developed by: Reil P. Padilla</small>
+        <small>Imperial Appliance Plaza. All rights reserved.</small>
         <span id="current-year"></span>
         <div class="float-right d-none d-sm-inline-block">
         </div>
     </footer>
+    </div>
+
+    <!-- FOR INACTIVE USER -->
+    <div id="lockOverlay" class="lock-overlay">
+        <div class="lock-box">
+            <h2>Session Locked</h2>
+            <p>Please login again to continue</p>
+            <input type="text" id="newUsername" class="form-control" placeholder="Username" />
+            <input type="password" id="newPassword" class="form-control" placeholder="Password" />
+            <div class="col form-check d-flex justify-content-start mt-2 ms-1">
+                <input class="form-check-input" type="checkbox" id="toggle-show-password" onclick="togglePassword()">
+                <label class="form-check-label text-muted ms-2" for="toggle-show-password">
+                    Show Password
+                </label>
+            </div>
+            <button type="submit" onclick="unlockScreen()" class="btn btn-primary btn-sm">Login</button>
+            <p id="errorMsg" class="error"></p>
+        </div>
+    </div>
 </div>
 
 
@@ -180,6 +183,7 @@ try {
 <script src="../node_modules/uikit/dist/js/uikit.min.js"></script>
 <script src="../node_modules/xlsx/dist/xlsx.full.min.js"></script>
 <script src="script/script.js"></script>
+<script src="..assets/script/relogin.js"></script>
 <?php include '../modal.php';?>
 </body>
 </html>
