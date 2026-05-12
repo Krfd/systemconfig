@@ -534,6 +534,9 @@ function togglePreview() {
     }
   }
 
+  // const DocEntry = $(this).data("doc-entry");
+  // console.log(`DOC ENTRY: ${DocEntry}`);
+  // console.log(``);
   Swal.fire({
     icon: "question",
     title: "Create picklist on the following item(s)?",
@@ -542,45 +545,81 @@ function togglePreview() {
     cancelButtonText: "Back",
   }).then((result) => {
     if (result.isConfirmed) {
-      $.ajax({
-        url: "dirs/incoming/dashboard/actions/save_create_item_picklist.php",
-        type: "POST",
-        data: {
-          docEntries: entries,
+      Swal.fire({
+        title: "Executed By",
+        input: "text",
+        inputPlaceholder: "Enter your name",
+        inputAttributes: {
+          autocapitalize: "off",
         },
-        dataType: "json",
-        success: function (response) {
-          if (response.isSuccess === "success") {
-            Swal.fire({
-              icon: "success",
-              title: "Picklist has been created",
-              confirmButtonText: "OKAY",
-            });
-
-            const SRNumbers = $("#previewTableDisplay").data("srnumbers");
-
-            // ORIGINAL
-            $("#previewTableDisplay tbody .checkbox")
-              .hide()
-              .prop("checked", false);
-            previewPicklistBtn.textContent = "Create Picklist";
-            loadBasketContent();
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: response.message,
-              confirmButtonText: "OKAY",
-              confirmButtonColor: "#d33",
-            });
+        showCancelButton: true,
+        confirmButtonText: "Continue",
+        cancelButtonText: "Cancel",
+        allowOutsideClick: false,
+        inputValidator: (value) => {
+          if (!value) {
+            return "Executed By is required!";
           }
         },
-        error: function (xhr) {
-          Swal.fire({
-            icon: "error",
-            title: "Server error",
-            text: "Something went wrong while processing the picklist.",
-          });
-        },
+      }).then((userInput) => {
+        if (!userInput.isConfirmed) return;
+
+        let executedBy = userInput.value;
+
+        // const groupByCategory = response.isConfirmed;
+        const groupByCategory = false;
+
+        const openPrint = (DocEntry) => {
+          window.open(
+            `pdf/requests.php?DocEntry=${DocEntry}` +
+              `&executedBy=${encodeURIComponent(executedBy)}` +
+              `&groupByCategory=${groupByCategory ? 1 : 0}`,
+            "_blank",
+          );
+        };
+
+        $.ajax({
+          url: "dirs/incoming/dashboard/actions/save_create_item_picklist.php",
+          type: "POST",
+          data: {
+            docEntries: entries,
+          },
+          dataType: "json",
+          success: function (response) {
+            if (response.isSuccess === "success") {
+              Swal.fire({
+                icon: "success",
+                title: "Picklist has been created",
+                confirmButtonText: "OKAY",
+              });
+
+              openPrint(response.DocEntry);
+
+              const SRNumbers = $("#previewTableDisplay").data("srnumbers");
+
+              // ORIGINAL
+              $("#previewTableDisplay tbody .checkbox")
+                .hide()
+                .prop("checked", false);
+              previewPicklistBtn.textContent = "Create Picklist";
+              loadBasketContent();
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: response.message,
+                confirmButtonText: "OKAY",
+                confirmButtonColor: "#d33",
+              });
+            }
+          },
+          error: function (xhr) {
+            Swal.fire({
+              icon: "error",
+              title: "Server error",
+              text: "Something went wrong while processing the picklist.",
+            });
+          },
+        });
       });
     }
   });
@@ -682,11 +721,11 @@ function openIncoming(DocEntry) {
             totalQty += quantity;
             rows += `
                 <tr style="height: 40px; min-height: 40px">
-                  <td class="align-middle ps-3" style="background:#F7F7F7">${index + 1}</td>
-                  <td class="align-middle ps-3" style="background:#F7F7F7">${item.ItemBrand}</td>
-                  <td class="align-middle ps-3" style="background:#F7F7F7">${item.ItemName}</td>
-                  <td class="align-middle ps-3" style="background:#F7F7F7">${item.ItemCategory}</td>
-                  <td class="align-middle ps-3" style="background:#F7F7F7">${item.Request_Qty}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF">${index + 1}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF">${item.ItemBrand}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF">${item.ItemName}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF">${item.ItemCategory}</td>
+                  <td class="align-middle ps-3" style="background:#FFFBDF">${item.Request_Qty}</td>
                 </tr>
               `;
           });
@@ -700,11 +739,11 @@ function openIncoming(DocEntry) {
             for (let i = 0; i < emptyRowsNeeded; i++) {
               let emptyRow = `
                   <tr class="item-row empty-row" style="height: 50px; min-height: 50px;">
-                    <td style="background: #F7F7F7"></td>
-                    <td style="background: #F7F7F7"></td>
-                    <td style="background: #F7F7F7"></td>
-                    <td style="background: #F7F7F7"></td>
-                    <td style="background: #F7F7F7"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #FFFBDF"></td>
                   </tr>
               `;
               $("#openIncomingTable tbody").append(emptyRow);
@@ -757,7 +796,6 @@ $(document).on("dblclick", "#basketTable tbody .open-picklist", function (e) {
   const tooltipInstance = bootstrap.Tooltip.getInstance(row);
   if (tooltipInstance) {
     tooltipInstance.hide();
-    tooltipInstance.dispose();
   }
 
   let $row = $(this).closest("tr");
@@ -1024,11 +1062,11 @@ function openPicklistedForm(SR_Number) {
               totalQty += quantity;
               rows += `
                       <tr style="height: 40px; min-height: 40px">
-                        <td class="align-middle ps-3" style="background:#F7F7F7">${index + 1}</td>
-                        <td class="align-middle ps-3" style="background:#F7F7F7">${item.Req_ItemBrand}</td>
-                        <td class="align-middle ps-3" style="background:#F7F7F7">${item.Req_ItemName}</td>
-                        <td class="align-middle ps-3" style="background:#F7F7F7">${item.Req_ItemCategory}</td>
-                        <td class="align-middle ps-3" style="background:#F7F7F7">${Math.trunc(Number(item.Req_Item_Qty))}</td>
+                        <td class="align-middle ps-3" style="background:#FFFBDF">${index + 1}</td>
+                        <td class="align-middle ps-3" style="background:#FFFBDF">${item.Req_ItemBrand}</td>
+                        <td class="align-middle ps-3" style="background:#FFFBDF">${item.Req_ItemName}</td>
+                        <td class="align-middle ps-3" style="background:#FFFBDF">${item.Req_ItemCategory}</td>
+                        <td class="align-middle ps-3" style="background:#FFFBDF">${Math.trunc(Number(item.Req_Item_Qty))}</td>
                       </tr>
                     `;
             });
@@ -1042,11 +1080,11 @@ function openPicklistedForm(SR_Number) {
               for (let i = 0; i < emptyRowsNeeded; i++) {
                 let emptyRow = `
                         <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
-                          <td style="background: #F7F7F7"></td>
-                          <td style="background: #F7F7F7"></td>
-                          <td style="background: #F7F7F7"></td>
-                          <td style="background: #F7F7F7"></td>
-                          <td style="background: #F7F7F7"></td>
+                          <td style="background: #FFFBDF"></td>
+                          <td style="background: #FFFBDF"></td>
+                          <td style="background: #FFFBDF"></td>
+                          <td style="background: #FFFBDF"></td>
+                          <td style="background: #FFFBDF"></td>
                         </tr>
                       `;
                 $("#openIncomingTable tbody").append(emptyRow);
@@ -1126,8 +1164,8 @@ function loadBasket() {
             // console.log(`PICKLIST ITEM : ${JSON.stringify(item)}`);
             const isSingleSR = item.SR_Numbers.length === 1;
             const condition = item.allHaveActualQty && isSingleSR;
-            console.log(`SRN's : ${item.SR_Numbers}`);
-            console.log(``);
+            // console.log(`SRN's : ${item.SR_Numbers}`);
+            // console.log(``);
             const date = new Date(item.DocDate);
             const formatted = date.toISOString().split("T")[0];
 
@@ -1210,7 +1248,7 @@ function loadBasket() {
                   .addClass("picklist-row open-picklist")
                   .attr(
                     "data-bs-title",
-                    `SRN's: ${originalItem.SR_Numbers || "No Branch"}`,
+                    `SRN's:<br>${originalItem.SR_Numbers.join("\n") || "No Branch"}`,
                   );
               }
             },
@@ -1274,15 +1312,15 @@ function loadBasket() {
 
               $("#basketTable tbody tr").each(function () {
                 const existingTooltip = bootstrap.Tooltip.getInstance(this);
-
                 if (existingTooltip) {
-                  existingTooltip.dispose();
+                  existingTooltip.hide();
                 }
 
                 new bootstrap.Tooltip(this, {
                   placement: "right",
                   trigger: "hover",
                   container: "body",
+                  html: true,
                 });
               });
 
@@ -1297,7 +1335,6 @@ function loadBasket() {
 
                   if (tooltipInstance) {
                     tooltipInstance.hide();
-                    tooltipInstance.dispose();
                   }
                 })
 
@@ -1309,7 +1346,6 @@ function loadBasket() {
 
                   if (tooltipInstance) {
                     tooltipInstance.hide();
-                    tooltipInstance.dispose();
                   }
                 })
 
@@ -1321,7 +1357,6 @@ function loadBasket() {
 
                   if (tooltipInstance) {
                     tooltipInstance.hide();
-                    tooltipInstance.dispose();
                   }
                 });
             },
@@ -1346,51 +1381,41 @@ function loadBasket() {
                 cancelButtonText: "Cancel",
               }).then((result) => {
                 if (result.isConfirmed) {
-                  Swal.fire({
-                    title: "Executed By",
-                    input: "text",
-                    inputPlaceholder: "Enter your name",
-                    inputAttributes: {
-                      autocapitalize: "off",
-                    },
-                    showCancelButton: true,
-                    confirmButtonText: "Continue",
-                    cancelButtonText: "Cancel",
-                    inputValidator: (value) => {
-                      if (!value) {
-                        return "Executed By is required!";
-                      }
-                    },
-                  }).then((userInput) => {
-                    if (!userInput.isConfirmed) return;
+                  // Swal.fire({
+                  //   title: "Executed By",
+                  //   input: "text",
+                  //   inputPlaceholder: "Enter your name",
+                  //   inputAttributes: {
+                  //     autocapitalize: "off",
+                  //   },
+                  //   showCancelButton: true,
+                  //   confirmButtonText: "Continue",
+                  //   cancelButtonText: "Cancel",
+                  //   inputValidator: (value) => {
+                  //     if (!value) {
+                  //       return "Executed By is required!";
+                  //     }
+                  //   },
+                  // }).then((userInput) => {
+                  //   if (!userInput.isConfirmed) return;
 
-                    let executedBy = userInput.value;
+                  // let executedBy = userInput.value;
+                  let executedBy = "";
 
-                    // 👉 PROCEED WITH ORIGINAL LOGIC
-                    // PRINT ONLY
+                  // PRINT ONLY
+                  // const groupByCategory = response.isConfirmed;
+                  const groupByCategory = false;
 
-                    // Swal.fire({
-                    //   title: "Printing option",
-                    //   text: "Do you want to print items by category?",
-                    //   icon: "question",
-                    //   showCancelButton: true,
-                    //   confirmButtonText: "Yes, categorized",
-                    //   cancelButtonText: "Normal",
-                    //   allowOutsideClick: false,
-                    // }).then((response) => {
-                    const groupByCategory = response.isConfirmed;
-
-                    const openPrint = () => {
-                      window.open(
-                        `pdf/requests.php?DocEntry=${DocEntry}` +
-                          `&executedBy=${encodeURIComponent(executedBy)}` +
-                          `&groupByCategory=${groupByCategory ? 1 : 0}`,
-                        "_blank",
-                      );
-                    };
-                    openPrint();
-                    // });
-                  });
+                  const openPrint = () => {
+                    window.open(
+                      `pdf/requests.php?DocEntry=${DocEntry}` +
+                        `&executedBy=${encodeURIComponent(executedBy)}` +
+                        `&groupByCategory=${groupByCategory ? 1 : 0}`,
+                      "_blank",
+                    );
+                  };
+                  openPrint();
+                  // });
                 }
               });
             });
@@ -1688,7 +1713,6 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
           title: "Invalid Input",
           text: message,
         });
-
         return;
       }
 
@@ -1710,13 +1734,14 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
 
           $(tableSelector + " tbody tr").each(function () {
             let cells = $(this).find("td");
-            let actualQty = $(cells[5]).text().trim();
+            let actualQty = $(cells[6]).text().trim();
 
             let originalRows = $(this).data("rows");
 
             if (!originalRows || actualQty === "") return;
 
             originalRows.forEach((row) => {
+              console.log(`ITEM ID: ${row.Item_id}`);
               encodedItems.push({
                 ItemNumber: row.Item_id,
                 ActualQty: actualQty,
@@ -1725,138 +1750,70 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
             });
           });
 
-          Swal.fire({
-            title: "Executed By",
-            input: "text",
-            inputAttributes: {
-              autocapitalize: "off",
-            },
-            inputPlaceholder: "Enter your name",
-            showCancelButton: true,
-            confirmButtonText: "Continue",
-            cancelButtonText: "Cancel",
-            inputValidator: (value) => {
-              if (!value) {
-                return "Executed By is required!";
-              }
-            },
-          }).then((userInput) => {
-            if (!userInput.isConfirmed) return;
-            let DocEntry = "";
+          let executedBy = "";
+          let formId = $(this).attr("id");
+          let formData = new FormData(document.getElementById(formId));
 
-            let executedBy = userInput.value;
-            let formId = $(this).attr("id");
-            let formData = new FormData(document.getElementById(formId));
+          formData.append("ExecutedBy", executedBy);
+          let srnIndex = 0;
 
-            formData.append("ExecutedBy", executedBy);
-            let srnIndex = 0;
+          // PRINT WITH ACTUAL QUANTITY
+          let PickListNum = picklistNum;
 
-            // PRINT WITH ACTUAL QUANTITY
-            let PickListNum = picklistNum;
+          formData.append("PickListNum", PickListNum);
+          encodedItems.forEach((item) => {
+            formData.append("ItemNumber[]", item.ItemNumber);
+            formData.append("ActualQty[]", item.ActualQty);
+            formData.append("SR_Number[]", item.SR_Number);
+          });
 
-            formData.append("PickListNum", PickListNum);
-            encodedItems.forEach((item) => {
-              formData.append("ItemNumber[]", item.ItemNumber);
-              formData.append("ActualQty[]", item.ActualQty);
-              formData.append("SR_Number[]", item.SR_Number);
-            });
+          $.ajax({
+            url: "dirs/incoming/dashboard/actions/update_actual_qty.php",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+              let res =
+                typeof response === "string" ? JSON.parse(response) : response;
 
-            $.ajax({
-              url: "dirs/incoming/dashboard/actions/update_actual_qty.php",
-              type: "POST",
-              data: formData,
-              processData: false,
-              contentType: false,
-              success: function (response) {
-                let res =
-                  typeof response === "string"
-                    ? JSON.parse(response)
-                    : response;
+              if (res.status === "success") {
+                const DocEntry = PicklistEntry;
 
-                if (res.status === "success") {
-                  const DocEntry = PicklistEntry;
-
-                  if (srnMap && srnMap.length === 1) {
-                    addToBasket(PickListNum);
-                  }
-
-                  // Swal.fire({
-                  //   title: "Printing option",
-                  //   text: "Do you want to print items by category?",
-                  //   icon: "question",
-                  //   showCancelButton: true,
-                  //   confirmButtonText: "Yes, categorized",
-                  //   cancelButtonText: "Normal",
-                  //   allowOutsideClick: false,
-                  // }).then((swalResult) => {
-                  // const groupByCategory = swalResult.isConfirmed; // ✅ correct place
-                  const groupByCategory = false;
-                  const openPrint = () => {
-                    window.open(
-                      `pdf/requests.php?DocEntry=${DocEntry}` +
-                        `&executedBy=${encodeURIComponent(executedBy)}` +
-                        `&groupByCategory=${groupByCategory ? 1 : 0}`,
-                      "_blank",
-                    );
-                  };
-
-                  openPrint();
-
-                  // if (srnMap && srnMap.length === 1) {
-                  //   let srArray = [];
-                  //   if (Array.isArray(srNumberMap)) {
-                  //     srArray = srNumberMap;
-                  //   } else if (typeof srNumberMap === "string") {
-                  //     srArray = srNumberMap
-                  //       .split(",")
-                  //       .map((s) => s.trim())
-                  //       .filter(Boolean);
-                  //   }
-
-                  //   Swal.fire({
-                  //     icon: "success",
-                  //     title:
-                  //       "Would you like to load this item to Loading Basket?",
-                  //     showCancelButton: true,
-                  //     confirmButtonText: "Load to Basket",
-                  //     cancelButtonText: "No",
-                  //     allowOutsideClick: false,
-                  //   }).then((drResult) => {
-                  //     if (drResult.isConfirmed) {
-                  //       if (srArray.length === 1) {
-                  //         $("#main-content").html(spinner);
-                  //         // createDr(picklistNum, srArray);
-                  //       }
-                  //     } else {
-                  //       loadBasketContent();
-                  //     }
-                  //   });
-                  // } else {
-                  Swal.close();
-                  // loadBasketContent();
-                  setTimeout(() => {
-                    loadBasketContent();
-                  }, 300);
-                  // }
-
-                  // });
-                } else {
-                  Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: res.message,
-                  });
+                if (srnMap && srnMap.length === 1) {
+                  addToBasket(PickListNum);
                 }
-              },
-              error: function (xhr) {
-                console.error(xhr.responseText);
+
+                const groupByCategory = false;
+                const openPrint = () => {
+                  window.open(
+                    `pdf/requests.php?DocEntry=${DocEntry}` +
+                      `&executedBy=${encodeURIComponent(executedBy)}` +
+                      `&groupByCategory=${groupByCategory ? 1 : 0}`,
+                    "_blank",
+                  );
+                };
+                openPrint();
+                Swal.close();
+                setTimeout(() => {
+                  loadBasketContent();
+                }, 300);
+              } else {
                 Swal.fire({
                   icon: "error",
-                  title: "Server Error",
-                  text: "Please check console for details",
+                  title: "Error",
+                  text: res.message,
                 });
-              },
-            });
+              }
+            },
+            error: function (xhr) {
+              console.error(xhr.responseText);
+              Swal.fire({
+                icon: "error",
+                title: "Server Error",
+                text: "Please check console for details",
+              });
+            },
           });
         }
       });

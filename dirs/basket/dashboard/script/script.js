@@ -150,39 +150,41 @@ $(document).on("click", ".dropdown .open-picklisted", function (e) {
   }, 200);
 });
 
-$(document).on("dblclick", "#summaryTable tbody tr", function (e) {
-  let serial = $(this).data("serial");
-  let itemCode = $(this).data("itemcode");
-  let lbNum = $(this).data("lbnum");
-  let brand = $(this).find("td:nth-child(1)").text().trim();
-  let model = $(this).find("td:nth-child(2)").text().trim();
-  let category = $(this).find("td:nth-child(3)").text().trim();
-  let qty = $(this).find("td:nth-child(4)").text().trim();
+// $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
+//   let serial = $(this).data("serial");
+//   let itemCode = $(this).data("itemcode");
+//   let lbNum = $(this).data("lbnum");
+//   let brand = $(this).find("td:nth-child(1)").text().trim();
+//   let model = $(this).find("td:nth-child(2)").text().trim();
+//   let category = $(this).find("td:nth-child(3)").text().trim();
+//   let qty = $(this).find("td:nth-child(4)").text().trim();
 
-  // ✅ Prevent modal if row is empty
-  if (!brand && !model && !qty) {
-    return;
-  }
+//   // ✅ Prevent modal if row is empty
+//   if (!brand && !model && !qty) {
+//     return;
+//   }
 
-  // OPTIONAL (stronger check): ignore placeholder rows
-  if ($(this).hasClass("empty-row")) {
-    return;
-  }
+//   // OPTIONAL (stronger check): ignore placeholder rows
+//   if ($(this).hasClass("empty-row")) {
+//     return;
+//   }
 
-  $("#assignBranchModal #serial").val(serial);
-  $("#assignBranchModal #brand").val(brand);
-  $("#assignBranchModal #model").val(model);
-  $("#assignBranchModal #itemCode").val(itemCode);
-  $("#assignBranchModal #deliveryQty").text(qty);
-  loadPicklistBranches(lbNum, model, category, function (length) {
-    console.log(`BRANCHES LENGTH: ${length}`);
-    if (length > 1) {
-      $("#assignBranchModal").modal("show");
-    } else {
-      console.log("Single branch");
-    }
-  });
-});
+//   $("#assignBranchModal #serial").val(serial);
+//   $("#assignBranchModal #brand").val(brand);
+//   $("#assignBranchModal #model").val(model);
+//   $("#assignBranchModal #itemCode").val(itemCode);
+//   $("#assignBranchModal #deliveryQty").text(qty);
+//   loadPicklistBranches(lbNum, model, category, function (length) {
+//     console.log(`BRANCHES LENGTH: ${length}`);
+//     if (length > 1) {
+//       $("#assignBranchModal").modal("show");
+//     } else {
+//       console.log("Single branch");
+//     }
+//   });
+// });
+
+// ---------------------------------------------------------------
 
 // $(document).on("click", "#summaryTable tbody tr", function (e) {
 //   e.preventDefault();
@@ -406,11 +408,17 @@ function loadDeliveryBasket(tableId, url) {
             let originalItem = Object.values(grouped)[dataIndex];
             if (originalItem) {
               let branches = Array.from(originalItem.Req_Branch).join(", ");
+              const branchList = (branches || "")
+                .split(",")
+                .map((b) => b.trim());
               $(row)
                 .attr("data-rownum", originalItem.DocEntry)
                 .attr("data-picklist", originalItem.PKList_Number)
                 .attr("data-branches", branches)
-                .attr("data-bs-title", `Branches: ${branches || "No Branch"}`);
+                .attr(
+                  "data-bs-title",
+                  `<div class="text-start">Branches: <br>${branchList.join("<br>") || "No Branch"}</div>`,
+                );
             }
           },
           paging: true,
@@ -485,16 +493,15 @@ function loadDeliveryBasket(tableId, url) {
               }
 
               const existingTooltip = bootstrap.Tooltip.getInstance(this);
-
               if (existingTooltip) {
-                existingTooltip.dispose();
+                existingTooltip.hide();
               }
 
-              // create new tooltip
               new bootstrap.Tooltip(this, {
                 placement: "right",
                 trigger: "hover",
                 container: "body",
+                html: true,
               });
             });
 
@@ -507,8 +514,25 @@ function loadDeliveryBasket(tableId, url) {
                 const tooltipInstance = bootstrap.Tooltip.getInstance(row);
 
                 if (tooltipInstance) {
-                  tooltipInstance.hide(); // hide immediately
-                  tooltipInstance.dispose(); // completely remove
+                  tooltipInstance.hide();
+                }
+              })
+              .on("hide.bs.dropdown", ".dropdown", function () {
+                const row = $(this).closest("tr")[0];
+
+                const tooltipInstance = bootstrap.Tooltip.getInstance(row);
+
+                if (tooltipInstance) {
+                  tooltipInstance.hide();
+                }
+              }) // REMOVE TOOLTIP WHEN ANY DROPDOWN ITEM IS CLICKED
+              .on("click.dropdownAction", ".dropdown-item", function () {
+                const row = $(this).closest("tr")[0];
+
+                const tooltipInstance = bootstrap.Tooltip.getInstance(row);
+
+                if (tooltipInstance) {
+                  tooltipInstance.hide();
                 }
               });
           },

@@ -36,8 +36,12 @@ try {
     $insHeader = $conn->prepare("EXEC dbo.[CreatePickList_Header] ?,?");
     $insHeader->execute([$User, $PicklistNumber]);
 
+    $result = $insHeader->fetch(PDO::FETCH_ASSOC);
+
+    $docEntry = $result['DocEntry'];
+
     $fetchItems = $conn->prepare("EXEC dbo.[Review_StockRequest_Items] ?");
-    
+
     $insertItem = $conn->prepare("EXEC dbo.[Collect_StockRequest_Items] ?,?,?,?,?,?,?,?,?,?");
 
     $updateStatus = $conn->prepare("UPDATE Stock_Transfer_Header_1 
@@ -73,15 +77,15 @@ try {
     }
 
     $ins_countpicklist = $conn->prepare("EXEC dbo.[UpdatePicklist_Header] ?, ?");
-    $ins_countpicklist->execute([$User,$PicklistNumber]);
+    $ins_countpicklist->execute([$User, $PicklistNumber]);
 
     $conn->commit();
 
     echo json_encode([
         "isSuccess" => "success",
-        "PickListNumber" => $PicklistNumber
+        "PickListNumber" => $PicklistNumber,
+        "DocEntry" => $docEntry,
     ]);
-
 } catch (Exception $e) {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollback();
@@ -90,4 +94,3 @@ try {
         "message" => $e->getMessage()
     ]);
 }
-?>

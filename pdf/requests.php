@@ -49,13 +49,13 @@ try {
         public $categoryTitle;
         function Header()
         {
-            $this->Image('../assets/image/logo/iap_icon.png', 10, 10, 30);
-            $this->SetFont('Arial', 'B', 20);
+            $this->Image('../assets/image/logo/iap_icon.png', 10, 10, 20);
+            $this->SetFont('Arial', 'B', 35);
+            $this->SetTextColor(64, 64, 64);
             $pageWidth = $this->GetPageWidth();
-            $this->SetX(10);
-            $this->Cell($pageWidth - 10, 20, 'PICKLIST SUMMARY', 0, 1, 'C');
-
-            $this->Ln(10);
+            $this->SetX(12);
+            $this->Cell($pageWidth - 15, 20, 'PICK LIST', 0, 1, 'C');
+            $this->Ln(8);
         }
         function Footer()
         {
@@ -196,7 +196,9 @@ try {
             $brandRaw = $row->Req_ItemBrand ?? '';
             $categoryRaw = $row->Req_ItemCategory ?? '';
             $quantity = (int)($row->Req_Item_Qty ?? 0);
-            $actual = (int)($row->Actual_Item_Qty ?? 0);
+            $actual = isset($row->Actual_Item_Qty) && $row->Actual_Item_Qty !== ''
+                ? (int)$row->Actual_Item_Qty
+                : null;
 
             $key = $modelRaw . '|' . $brandRaw . '|' . $categoryRaw;
 
@@ -206,15 +208,12 @@ try {
                     'Brand' => $brandRaw,
                     'Category' => $categoryRaw,
                     'Quantity' => 0,
-                    'Actual' => 0
+                    'Actual' => null
                 ];
             }
 
             $groupedItems[$key]['Quantity'] += $quantity;
             $groupedItems[$key]['Actual'] = $actual;
-            // if ($groupedItems[$key]['Actual'] === null) {
-            //     $groupedItems[$key]['Actual'] = $actual;
-            // }
         }
 
         /* ---------- TABLE ROWS ---------- */
@@ -326,13 +325,15 @@ try {
         /** ---------------- RIGHT COLUMN ---------------- **/
         $pdf->SetXY($rightX, $startY);
 
-        // Executed By
-        $pdf->SetFont('Arial', 'B', 9);
-        $pdf->Cell(60, 5, 'Executed by', 0, 1);
+        if ($executedby && !empty($executedby)) {
+            // Executed By
+            $pdf->SetFont('Arial', 'B', 9);
+            $pdf->Cell(60, 5, 'Executed by', 0, 1);
 
-        $pdf->SetX($rightX);
-        $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell(60, 5, $executedby, 0, 1);
+            $pdf->SetX($rightX);
+            $pdf->SetFont('Arial', '', 9);
+            $pdf->Cell(60, 5, $executedby, 0, 1);
+        }
 
         $pdf->Ln(3);
     }

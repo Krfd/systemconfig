@@ -167,7 +167,6 @@
         btn.prop("disabled", true);
 
         $.post("dirs/outgoing/form/actions/save_stockrequest.php", {
-            // RequestType: RequestType,
             PurposeRequest: PurposeRequest,
             OBranch: OBranch,
             OWhscode: OWhscode,
@@ -182,7 +181,9 @@
                 Swal.fire({
                     icon: "success",
                     title: "Success",
-                    text: "Request submitted successfully!",
+                    text: "Request submitted successfully",
+                    showConfirmButton: true,
+                    confirmButtonText: "OKAY"
                 }).then(() => {
                     location.reload();
                 });

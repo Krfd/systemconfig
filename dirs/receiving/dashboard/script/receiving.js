@@ -22,7 +22,7 @@ function receivingForm() {
     $.post("dirs/receiving/dashboard/receivingForm.php", {}, function (data) {
       $("#main-content").html(data);
 
-      fetchOrderDetails()
+      fetchOrderDetails();
       receiveItem();
       // ordersReceived();
       formattedDate();
@@ -228,10 +228,8 @@ $(document).on("input blur keyup", ".item-qty-received", function () {
 
 function fetchOrderDetails() {
   $("#drNoRecForm").on("keydown", function (e) {
-
     // ENTER KEY
     if (e.key === "Enter") {
-
       e.preventDefault();
       e.stopPropagation();
 
@@ -256,11 +254,9 @@ function fetchOrderDetails() {
         },
 
         success: function (response) {
-
           let header = response.Header;
 
           if (response.isSuccess === "success") {
-
             $("#originRecForm").val(header.BranchSet);
             $("#docDateRecForm").val(header.DeliveryDate || "");
             $("#statusRecForm").val(header.status || "IN TRANSIT");
@@ -278,7 +274,6 @@ function fetchOrderDetails() {
         },
 
         error: function () {
-
           Swal.fire({
             icon: "error",
             title: "Error fetching DR data.",
@@ -287,131 +282,13 @@ function fetchOrderDetails() {
 
         complete: function () {
           $("#submitRecBtn").prop("disabled", false);
-        }
+        },
       });
 
       return false;
     }
   });
 }
-
-// function ordersReceived() {
-//   $("#receivingForm").on("submit", function (e) {
-//     e.preventDefault();
-
-//     let items = [];
-//     let hasError = false;
-
-//     $("#receiving-form-table tbody tr.item-row")
-//       .not(".empty-row")
-//       .each(function () {
-//         let brand = $(this).find(".item-brand").text().trim();
-//         let model = $(this).find(".item-model").text().trim();
-//         let code = $(this).find(".item-code").text().trim();
-//         let category = $(this).find(".item-category").text().trim();
-//         let quantity = $(this).find(".item-quantity").text().trim();
-
-//         let qtyCell = $(this).find(".item-qty-received");
-
-//         let receivedQty = $(this)
-//           .find(".item-qty-received")
-//           .text()
-//           .replace(/\u00A0/g, "")
-//           .replace(/<br>/g, "")
-//           .replace(/[\n\r]/g, "")
-//           .trim();
-
-//         qtyCell.css("border", "");
-
-//         if (receivedQty === "") {
-//           hasError = true;
-//         }
-
-//         $(".editable-cell").each(function () {
-//           let value = $(this).text().trim();
-
-//           if (value === "") {
-//             isValid = false;
-//             $(this).addClass("border border-danger");
-//           } else {
-//             $(this).removeClass("border border-danger");
-//           }
-//         });
-
-//         items.push({
-//           brand,
-//           model,
-//           code,
-//           category,
-//           quantity,
-//           receivedQty,
-//         });
-//       });
-
-//     // ❗ AFTER LOOP (only once)
-//     if (hasError) {
-//       Swal.fire({
-//         icon: "warning",
-//         title: "Missing Quantity",
-//         text: `All rows must have a received quantity.`,
-//       });
-//       return;
-//     }
-
-//     if (items.length === 0) {
-//       Swal.fire({
-//         icon: "warning",
-//         title: "No Items on the table",
-//         text: "Please try again.",
-//       });
-//       return;
-//     }
-
-//     let formData = new FormData(document.getElementById("receivingForm"));
-//     formData.append("items", JSON.stringify(items));
-
-//     let formObject = Object.fromEntries(formData.entries());
-//     formObject.items = items;
-
-//     console.log(formObject);
-
-//     Swal.fire({
-//       icon: "question",
-//       title: "Are you sure to receive the following item(s)?",
-//       showConfirmButton: true,
-//       confirmButtonText: "Receive",
-//       showCancelButton: true,
-//       cancelButtonText: "Cancel",
-//     }).then((response) => {
-//       if (response.isConfirmed) {
-//         $.ajax({
-//           url: "dirs/receiving/dashboard/actions/items_received.php",
-//           type: "POST",
-//           data: JSON.stringify(formObject),
-//           processData: false,
-//           contentType: "application/json",
-//           dataType: "json",
-//           success: function (response) {
-//             if (response.isSuccess === "success") {
-//               Swal.fire({
-//                 icon: "success",
-//                 title: "Items has been received",
-//               }).then(() => {
-//                 loadDashboard();
-//               });
-//             } else {
-//               Swal.fire({
-//                 icon: "error",
-//                 title: response.isSuccess,
-//                 text: response.message,
-//               });
-//             }
-//           },
-//         });
-//       }
-//     });
-//   });
-// }
 
 function clearTable() {
   Swal.fire({
@@ -668,7 +545,7 @@ function serialDeliveryInput() {
                 existingRow.find("td:nth-child(5)").text(currentQty + 1);
                 existingRow.attr("data-itemcode", itemCode);
               } else {
-                console.log(`item code : ${itemCode}`)
+                console.log(`item code : ${itemCode}`);
                 let counter =
                   receivingBody.find("tr[data-itemcode]").length + 1;
                 let newRow = `
@@ -757,114 +634,114 @@ function submitReceiving() {
   $(document)
     .off("submit", "#receivingForm")
     .on("submit", "#receivingForm", function (e) {
-    e.preventDefault();
+      e.preventDefault();
 
-    let formData = {
-      drNo: $("#drNoRecForm").val(),
-      origin: $('input[name="originRecForm"]').val(),
-      whCode: $('input[name="origRecForm"]').val(),
-      docDate: $("#docDateRecForm").val(),
-      postDate: $("#postDate").val(),
-      status: $("#statusRecForm").val(),
-      receivedBy: $("#receiveByRecForm").val(),
-      driver: $("#driverRecForm").val(),
-      truckCategory: $("#truckCat").val(),
-      plateNo: $("#plateRecForm").val(),
-      remarks: $("#remarksRecForm").val(),
-      totalQty: $("#receivingQty").text(),
-      items: [],
-    };
-
-    // GET TABLE ROWS
-    $("#receiving-form-table tbody tr[data-itemcode]").each(function () {
-      let row = $(this);
-
-      let item = {
-        itemCode: row.data("itemcode"),
-        brand: row.find("td:eq(1)").text().trim(),
-        model: row.find("td:eq(2)").text().trim(),
-        category: row.find("td:eq(3)").text().trim(),
-        qty: parseInt(row.find("td:eq(4)").text().trim()) || 0,
-        // qtyReceived: parseInt(row.find("td:eq(5)").text().trim()) || 0,
-        serialBased: row.data("serialbased") || false,
+      let formData = {
+        drNo: $("#drNoRecForm").val(),
+        origin: $('input[name="originRecForm"]').val(),
+        whCode: $('input[name="origRecForm"]').val(),
+        docDate: $("#docDateRecForm").val(),
+        postDate: $("#postDate").val(),
+        status: $("#statusRecForm").val(),
+        receivedBy: $("#receiveByRecForm").val(),
+        driver: $("#driverRecForm").val(),
+        truckCategory: $("#truckCat").val(),
+        plateNo: $("#plateRecForm").val(),
+        remarks: $("#remarksRecForm").val(),
+        totalQty: $("#receivingQty").text(),
+        items: [],
       };
 
-      formData.items.push(item);
-    });
+      // GET TABLE ROWS
+      $("#receiving-form-table tbody tr[data-itemcode]").each(function () {
+        let row = $(this);
 
-    console.log(`FORM DATA LENGTH: ${formData.items.length}`)
+        let item = {
+          itemCode: row.data("itemcode"),
+          brand: row.find("td:eq(1)").text().trim(),
+          model: row.find("td:eq(2)").text().trim(),
+          category: row.find("td:eq(3)").text().trim(),
+          qty: parseInt(row.find("td:eq(4)").text().trim()) || 0,
+          // qtyReceived: parseInt(row.find("td:eq(5)").text().trim()) || 0,
+          serialBased: row.data("serialbased") || false,
+        };
 
-    // VALIDATION
-    if (formData.items.length === 0) {
-      Swal.fire({
-        icon: "warning",
-        title: "No items found",
+        formData.items.push(item);
       });
-      return;
-    }
 
-    console.log(formData);
+      console.log(`FORM DATA LENGTH: ${formData.items.length}`);
 
-    Swal.fire({
-      title: "Submit Receiving?",
-      text: "Please confirm before submitting the receiving form.",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Submit",
-      cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (!result.isConfirmed) return;
+      // VALIDATION
+      if (formData.items.length === 0) {
         Swal.fire({
-          icon:"success",
+          icon: "warning",
+          title: "No items found",
+        });
+        return;
+      }
+
+      console.log(formData);
+
+      Swal.fire({
+        title: "Submit Receiving?",
+        text: "Please confirm before submitting the receiving form.",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Submit",
+        cancelButtonText: "Cancel",
+      }).then((result) => {
+        if (!result.isConfirmed) return;
+        Swal.fire({
+          icon: "success",
           title: "Items has been received",
-          showConfirmButton:true,
-          confirmButtonText:"OKAY"
+          showConfirmButton: true,
+          confirmButtonText: "OKAY",
         }).then(() => {
-          loadDashboard()
-        })
+          loadDashboard();
+        });
       });
 
-    // $.ajax({
-    //   url: "dirs/receiving/dashboard/actions/submit_receiving.php",
-    //   type: "POST",
-    //   data: {
-    //     receivingData: JSON.stringify(formData),
-    //   },
-    //   dataType: "json",
-    //   beforeSend: function () {
-    //     $("#submitRecBtn")
-    //       .prop("disabled", true)
-    //       .html(
-    //         `<span class="spinner-border spinner-border-sm"></span> Processing`,
-    //       );
-    //   },
-    //   success: function (response) {
-    //     if (response.isSuccess === "success") {
-    //       Swal.fire({
-    //         icon: "success",
-    //         title: "Receiving submitted successfully",
-    //       });
+      // $.ajax({
+      //   url: "dirs/receiving/dashboard/actions/submit_receiving.php",
+      //   type: "POST",
+      //   data: {
+      //     receivingData: JSON.stringify(formData),
+      //   },
+      //   dataType: "json",
+      //   beforeSend: function () {
+      //     $("#submitRecBtn")
+      //       .prop("disabled", true)
+      //       .html(
+      //         `<span class="spinner-border spinner-border-sm"></span> Processing`,
+      //       );
+      //   },
+      //   success: function (response) {
+      //     if (response.isSuccess === "success") {
+      //       Swal.fire({
+      //         icon: "success",
+      //         title: "Receiving submitted successfully",
+      //       });
 
-    //       $("#receivingForm")[0].reset();
+      //       $("#receivingForm")[0].reset();
 
-    //       // OPTIONAL: CLEAR TABLE
-    //       clearTable();
-    //     } else {
-    //       Swal.fire({
-    //         icon: "error",
-    //         title: response.message || "Submission failed",
-    //       });
-    //     }
-    //   },
-    //   error: function () {
-    //     Swal.fire({
-    //       icon: "error",
-    //       title: "Something went wrong",
-    //     });
-    //   },
-    //   complete: function () {
-    //     $("#submitRecBtn").prop("disabled", false).html("Received");
-    //   },
-    // });
-  });
+      //       // OPTIONAL: CLEAR TABLE
+      //       clearTable();
+      //     } else {
+      //       Swal.fire({
+      //         icon: "error",
+      //         title: response.message || "Submission failed",
+      //       });
+      //     }
+      //   },
+      //   error: function () {
+      //     Swal.fire({
+      //       icon: "error",
+      //       title: "Something went wrong",
+      //     });
+      //   },
+      //   complete: function () {
+      //     $("#submitRecBtn").prop("disabled", false).html("Received");
+      //   },
+      // });
+    });
 }
