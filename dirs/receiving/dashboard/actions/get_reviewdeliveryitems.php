@@ -23,7 +23,7 @@ try {
 
     echo json_encode($response);
 } catch (PDOException $e) {
-
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollback();
 
     $response = array(

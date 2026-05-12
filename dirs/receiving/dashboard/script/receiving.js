@@ -22,8 +22,9 @@ function receivingForm() {
     $.post("dirs/receiving/dashboard/receivingForm.php", {}, function (data) {
       $("#main-content").html(data);
 
+      fetchOrderDetails()
       receiveItem();
-      ordersReceived();
+      // ordersReceived();
       formattedDate();
       loadImperialBrands();
       addNonSerialize();
@@ -225,123 +226,192 @@ $(document).on("input blur keyup", ".item-qty-received", function () {
   }
 });
 
-function ordersReceived() {
-  $("#receivingForm").on("submit", function (e) {
-    e.preventDefault();
+function fetchOrderDetails() {
+  $("#drNoRecForm").on("keydown", function (e) {
 
-    let items = [];
-    let hasError = false;
+    // ENTER KEY
+    if (e.key === "Enter") {
 
-    $("#receiving-form-table tbody tr.item-row")
-      .not(".empty-row")
-      .each(function () {
-        let brand = $(this).find(".item-brand").text().trim();
-        let model = $(this).find(".item-model").text().trim();
-        let code = $(this).find(".item-code").text().trim();
-        let category = $(this).find(".item-category").text().trim();
-        let quantity = $(this).find(".item-quantity").text().trim();
+      e.preventDefault();
+      e.stopPropagation();
 
-        let qtyCell = $(this).find(".item-qty-received");
+      let drNo = $(this).val().trim();
 
-        let receivedQty = $(this)
-          .find(".item-qty-received")
-          .text()
-          .replace(/\u00A0/g, "")
-          .replace(/<br>/g, "")
-          .replace(/[\n\r]/g, "")
-          .trim();
-
-        qtyCell.css("border", "");
-
-        if (receivedQty === "") {
-          hasError = true;
-        }
-
-        $(".editable-cell").each(function () {
-          let value = $(this).text().trim();
-
-          if (value === "") {
-            isValid = false;
-            $(this).addClass("border border-danger");
-          } else {
-            $(this).removeClass("border border-danger");
-          }
+      if (!drNo) {
+        Swal.fire({
+          icon: "warning",
+          title: "Please enter DR No.",
         });
-
-        items.push({
-          brand,
-          model,
-          code,
-          category,
-          quantity,
-          receivedQty,
-        });
-      });
-
-    // ❗ AFTER LOOP (only once)
-    if (hasError) {
-      Swal.fire({
-        icon: "warning",
-        title: "Missing Quantity",
-        text: `All rows must have a received quantity.`,
-      });
-      return;
-    }
-
-    if (items.length === 0) {
-      Swal.fire({
-        icon: "warning",
-        title: "No Items on the table",
-        text: "Please try again.",
-      });
-      return;
-    }
-
-    let formData = new FormData(document.getElementById("receivingForm"));
-    formData.append("items", JSON.stringify(items));
-
-    let formObject = Object.fromEntries(formData.entries());
-    formObject.items = items;
-
-    console.log(formObject);
-
-    Swal.fire({
-      icon: "question",
-      title: "Are you sure to receive the following item(s)?",
-      showConfirmButton: true,
-      confirmButtonText: "Receive",
-      showCancelButton: true,
-      cancelButtonText: "Cancel",
-    }).then((response) => {
-      if (response.isConfirmed) {
-        $.ajax({
-          url: "dirs/receiving/dashboard/actions/items_received.php",
-          type: "POST",
-          data: JSON.stringify(formObject),
-          processData: false,
-          contentType: "application/json",
-          dataType: "json",
-          success: function (response) {
-            if (response.isSuccess === "success") {
-              Swal.fire({
-                icon: "success",
-                title: "Items has been received",
-              }).then(() => {
-                loadDashboard();
-              });
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: response.isSuccess,
-                text: response.message,
-              });
-            }
-          },
-        });
+        return false;
       }
-    });
+
+      $.ajax({
+        url: "dirs/receiving/dashboard/actions/get_reviewdeliveryitems.php",
+        type: "POST",
+        data: { DeliveryNumber: drNo },
+        dataType: "json",
+
+        beforeSend: function () {
+          $("#submitRecBtn").prop("disabled", true);
+        },
+
+        success: function (response) {
+
+          let header = response.Header;
+
+          if (response.isSuccess === "success") {
+
+            $("#originRecForm").val(header.BranchSet);
+            $("#docDateRecForm").val(header.DeliveryDate || "");
+            $("#statusRecForm").val(header.status || "IN TRANSIT");
+
+            $("#driverRecForm").val(header.Driver || "");
+            $("#truckCat").val(header.TruckCategory || "");
+            $("#plateRecForm").val(header.TruckPlate || "");
+            $("#remarksRecForm").val(header.Remarks || "");
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: response.message || "DR not found",
+            });
+          }
+        },
+
+        error: function () {
+
+          Swal.fire({
+            icon: "error",
+            title: "Error fetching DR data.",
+          });
+        },
+
+        complete: function () {
+          $("#submitRecBtn").prop("disabled", false);
+        }
+      });
+
+      return false;
+    }
   });
 }
+
+// function ordersReceived() {
+//   $("#receivingForm").on("submit", function (e) {
+//     e.preventDefault();
+
+//     let items = [];
+//     let hasError = false;
+
+//     $("#receiving-form-table tbody tr.item-row")
+//       .not(".empty-row")
+//       .each(function () {
+//         let brand = $(this).find(".item-brand").text().trim();
+//         let model = $(this).find(".item-model").text().trim();
+//         let code = $(this).find(".item-code").text().trim();
+//         let category = $(this).find(".item-category").text().trim();
+//         let quantity = $(this).find(".item-quantity").text().trim();
+
+//         let qtyCell = $(this).find(".item-qty-received");
+
+//         let receivedQty = $(this)
+//           .find(".item-qty-received")
+//           .text()
+//           .replace(/\u00A0/g, "")
+//           .replace(/<br>/g, "")
+//           .replace(/[\n\r]/g, "")
+//           .trim();
+
+//         qtyCell.css("border", "");
+
+//         if (receivedQty === "") {
+//           hasError = true;
+//         }
+
+//         $(".editable-cell").each(function () {
+//           let value = $(this).text().trim();
+
+//           if (value === "") {
+//             isValid = false;
+//             $(this).addClass("border border-danger");
+//           } else {
+//             $(this).removeClass("border border-danger");
+//           }
+//         });
+
+//         items.push({
+//           brand,
+//           model,
+//           code,
+//           category,
+//           quantity,
+//           receivedQty,
+//         });
+//       });
+
+//     // ❗ AFTER LOOP (only once)
+//     if (hasError) {
+//       Swal.fire({
+//         icon: "warning",
+//         title: "Missing Quantity",
+//         text: `All rows must have a received quantity.`,
+//       });
+//       return;
+//     }
+
+//     if (items.length === 0) {
+//       Swal.fire({
+//         icon: "warning",
+//         title: "No Items on the table",
+//         text: "Please try again.",
+//       });
+//       return;
+//     }
+
+//     let formData = new FormData(document.getElementById("receivingForm"));
+//     formData.append("items", JSON.stringify(items));
+
+//     let formObject = Object.fromEntries(formData.entries());
+//     formObject.items = items;
+
+//     console.log(formObject);
+
+//     Swal.fire({
+//       icon: "question",
+//       title: "Are you sure to receive the following item(s)?",
+//       showConfirmButton: true,
+//       confirmButtonText: "Receive",
+//       showCancelButton: true,
+//       cancelButtonText: "Cancel",
+//     }).then((response) => {
+//       if (response.isConfirmed) {
+//         $.ajax({
+//           url: "dirs/receiving/dashboard/actions/items_received.php",
+//           type: "POST",
+//           data: JSON.stringify(formObject),
+//           processData: false,
+//           contentType: "application/json",
+//           dataType: "json",
+//           success: function (response) {
+//             if (response.isSuccess === "success") {
+//               Swal.fire({
+//                 icon: "success",
+//                 title: "Items has been received",
+//               }).then(() => {
+//                 loadDashboard();
+//               });
+//             } else {
+//               Swal.fire({
+//                 icon: "error",
+//                 title: response.isSuccess,
+//                 text: response.message,
+//               });
+//             }
+//           },
+//         });
+//       }
+//     });
+//   });
+// }
 
 function clearTable() {
   Swal.fire({
@@ -383,7 +453,7 @@ function formattedDate() {
 
   const formattedDate = `${yyyy}-${mm}-${dd}`;
 
-  document.getElementById("docDateRecForm").value = formattedDate;
+  // document.getElementById("docDateRecForm").value = formattedDate;
   document.getElementById("postDate").value = formattedDate;
 }
 
@@ -598,6 +668,7 @@ function serialDeliveryInput() {
                 existingRow.find("td:nth-child(5)").text(currentQty + 1);
                 existingRow.attr("data-itemcode", itemCode);
               } else {
+                console.log(`item code : ${itemCode}`)
                 let counter =
                   receivingBody.find("tr[data-itemcode]").length + 1;
                 let newRow = `
@@ -625,8 +696,12 @@ function serialDeliveryInput() {
                 renumberRows();
               }
 
+              // if ($.fn.DataTable.isDataTable("#receiving-form-table")) {
+              //   $("#receiving-form-table").DataTable().clear().destroy();
+              // }
+
               if ($.fn.DataTable.isDataTable("#receiving-form-table")) {
-                $("#receiving-form-table").DataTable().clear().destroy();
+                $("#receiving-form-table").DataTable().destroy();
               }
 
               let exists = false;
@@ -679,9 +754,9 @@ function renumberRows() {
 }
 
 function submitReceiving() {
-  console.log(`ITEMS HAS BEEN RECEIVED`);
-
-  $(document).on("submit", "#receivingForm", function (e) {
+  $(document)
+    .off("submit", "#receivingForm")
+    .on("submit", "#receivingForm", function (e) {
     e.preventDefault();
 
     let formData = {
@@ -717,6 +792,8 @@ function submitReceiving() {
       formData.items.push(item);
     });
 
+    console.log(`FORM DATA LENGTH: ${formData.items.length}`)
+
     // VALIDATION
     if (formData.items.length === 0) {
       Swal.fire({
@@ -727,6 +804,25 @@ function submitReceiving() {
     }
 
     console.log(formData);
+
+    Swal.fire({
+      title: "Submit Receiving?",
+      text: "Please confirm before submitting the receiving form.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Submit",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+        Swal.fire({
+          icon:"success",
+          title: "Items has been received",
+          showConfirmButton:true,
+          confirmButtonText:"OKAY"
+        }).then(() => {
+          loadDashboard()
+        })
+      });
 
     // $.ajax({
     //   url: "dirs/receiving/dashboard/actions/submit_receiving.php",

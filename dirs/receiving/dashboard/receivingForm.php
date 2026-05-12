@@ -41,7 +41,7 @@
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="statusRecForm" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>
-                                        <input type="text" name="statusRecForm" id="statusRecForm" class="form-control form-control-sm col" style="background: #f2f2f2" value="NEW" readonly>
+                                        <input type="text" name="statusRecForm" id="statusRecForm" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -167,20 +167,20 @@
                                         </div>
                                         <div class="d-flex align-items-baseline gap-3">
                                             <label for=" driverRecForm" class="form-label text-dark-emphasis col-5"><small>Driver:</small></label>
-                                            <input type="text" name="driverRecForm" id="driverRecForm" class="form-control form-control-sm col" style="background: #f2f2f2" value="JOSE DELA CRUZ" readonly required>
+                                            <input type="text" name="driverRecForm" id="driverRecForm" class="form-control form-control-sm col" style="background: #f2f2f2" readonly required>
                                         </div>
                                         <div class="d-flex align-items-baseline gap-3">
                                             <label for="truckCat" class="form-label text-dark-emphasis col-5"><small>Truck Category:</small></label>
-                                            <input type="text" name="truckCat" id="truckCat" class="form-control form-control-sm col" style="background: #f2f2f2" value="4 Wheeler" readonly required>
+                                            <input type="text" name="truckCat" id="truckCat" class="form-control form-control-sm col" style="background: #f2f2f2" readonly required>
                                         </div>
                                         <div class="d-flex align-items-baseline gap-3">
                                             <label for=" plateRecForm" class="form-label text-dark-emphasis col-5"><small>Truck Plate No:</small></label>
-                                            <input type="text" name="plateRecForm" id="plateRecForm" class="form-control form-control-sm col" style="background: #f2f2f2" value="MFK567ROJ" readonly required>
+                                            <input type="text" name="plateRecForm" id="plateRecForm" class="form-control form-control-sm col" style="background: #f2f2f2" readonly required>
                                         </div>
                                     </div>
                                     <div class="col-3">
                                         <label for=" remarksRecForm" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
-                                        <textarea name="remarksRecForm" id="remarksRecForm" class="form-control form-control-sm col" rows="5" style="background: #f2f2f2; height: auto;" readonly>Hello world!</textarea>
+                                        <textarea name="remarksRecForm" id="remarksRecForm" class="form-control form-control-sm col" rows="5" style="background: #f2f2f2; height: auto;" readonly></textarea>
                                     </div>
                                 </div>
                                 <button type="submit" class="btn btn-primary" id="submitRecBtn">Received</button>
