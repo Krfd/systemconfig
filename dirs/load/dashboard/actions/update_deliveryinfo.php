@@ -3,7 +3,7 @@ require_once "../../../../config/connection.php";
 session_start();
 
 $User            = $_SESSION['Uid'] ?? null;
-$pickListNumbers = $_POST['PickListNumber'] ?? []; 
+$pickListNumbers = $_POST['PickListNumber'] ?? [];
 $BatchNumber     = $_POST['BatchNumber'] ?? null;
 $DeliveryDate    = $_POST['DeliveryDate'] ?? null;
 $Driver          = $_POST['Driver'] ?? null;
@@ -19,7 +19,7 @@ try {
     $fetch_drnumber->execute([$User]);
     $get_inclsioncode = $fetch_drnumber->fetch(PDO::FETCH_ASSOC);
     $DRNumber = $get_inclsioncode['DRNumber'];
-    
+
 
     $stmtCollect = $conn->prepare("EXEC dbo.[ChainUpdateTables_Loadingbasket] ?,?");
     foreach ($pickListNumbers as $pickListNumber) {
@@ -27,7 +27,8 @@ try {
 
         $stmtCollect->execute([
             $User,
-            $pickListNumber 
+            // $pickListNumber 
+            $BatchNumber
         ]);
     }
 
@@ -49,9 +50,8 @@ try {
         "isSuccess"   => "success",
         "BatchNumber" => $BatchNumber
     ]);
-
 } catch (Exception $e) {
-errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     if ($conn->inTransaction()) {
         $conn->rollback();
     }
@@ -61,4 +61,3 @@ errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
         "message"   => $e->getMessage()
     ]);
 }
-?>

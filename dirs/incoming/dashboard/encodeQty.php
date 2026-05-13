@@ -27,14 +27,14 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive overflow-auto mt-5" style="max-height: 700px">
+                            <div class="table-responsive-sm mt-5 w-100" style="max-height: 700px">
                                 <table class="table datatables" id="encodeQtyTable">
                                     <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary d-none"></th>
                                             <th class="text-secondary text-center">#</th>
-                                            <th class="text-secondary">Brand</th>
-                                            <th class="text-secondary">Model</th>
+                                            <th class="text-secondary" style="width: 300px; min-width: 300px">Brand</th>
+                                            <th class="text-secondary" style="width: 300px; min-width: 300px">Model</th>
                                             <th class="text-secondary text-start">Category</th>
                                             <th class="text-secondary text-center">Quantity</th>
                                             <th class="text-secondary" style="width: 100px; max-width: 100px">Actual Qty</th>

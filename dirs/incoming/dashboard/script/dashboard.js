@@ -1248,7 +1248,7 @@ function loadBasket() {
                   .addClass("picklist-row open-picklist")
                   .attr(
                     "data-bs-title",
-                    `SRN's:<br>${originalItem.SR_Numbers.join("\n") || "No Branch"}`,
+                    `<div class="text-start">SRN's:<br>${originalItem.SR_Numbers.join("\n") || "No Branch"}</div>`,
                   );
               }
             },
@@ -1741,7 +1741,7 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
             if (!originalRows || actualQty === "") return;
 
             originalRows.forEach((row) => {
-              console.log(`ITEM ID: ${row.Item_id}`);
+              // console.log(`ITEM ID: ${row.Item_id}`);
               encodedItems.push({
                 ItemNumber: row.Item_id,
                 ActualQty: actualQty,
@@ -1904,7 +1904,7 @@ function editEncodedQty(picklistNum) {
             let groupedArray = Object.values(groupedItems);
 
             Object.values(groupedItems).forEach((item) => {
-              console.log(`EDIT ENCODE QTY ITEM: ${JSON.stringify(item)}`);
+              // console.log(`EDIT ENCODE QTY ITEM: ${JSON.stringify(item)}`);
               picklistEntry = item.DocEntry;
               index++;
               rows += `

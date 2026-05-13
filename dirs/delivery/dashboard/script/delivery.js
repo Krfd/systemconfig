@@ -95,13 +95,15 @@ function loadDelivery() {
             item.DeliveryNumber || "",
             statusBadge,
             item.Driver,
+            item.TruckCategory,
+            item.TruckPlate,
             item.DeliveryDate || "",
           ]);
         });
 
         if (rows.length === 0) {
           for (let i = 0; i < 8; i++) {
-            rows.push(["", "", "", "", ""]);
+            rows.push(["", "", "", "", "", "", ""]);
           }
         }
 
@@ -117,7 +119,9 @@ function loadDelivery() {
             { title: "DR No." },
             { title: "Status" },
             { title: "Driver" },
-            { title: "Delivery Date", className: "text-start" },
+            { title: "Truck" },
+            { title: "Plate No.", className: "ps-3" },
+            { title: "Delivery Date", className: "text-start ps-3" },
           ],
           pageLength: 50,
           paging: true,
@@ -158,7 +162,7 @@ function loadDelivery() {
             for (let i = currentRows; i < 8; i++) {
               let $emptyRow = $(`
                 <tr class="empty-row">
-                  <td colspan="5" style="background:#FFFBDF"></td>
+                  <td colspan="7" style="background:#FFFBDF"></td>
                 </tr>
               `);
 

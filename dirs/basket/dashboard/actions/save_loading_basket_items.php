@@ -27,9 +27,8 @@ try {
         ]);
     }
 
-    $ins_laodingheader = $conn->prepare("EXEC dbo.[CreateLoadingBasket_Header] ?, ?");
-    $ins_laodingheader->execute([$User, $BatchNumber]);
-
+    // $ins_laodingheader = $conn->prepare("EXEC dbo.[CreateLoadingBasket_Header] ?, ?");
+    // $ins_laodingheader->execute([$User, $BatchNumber]);
 
     $conn->commit();
 
