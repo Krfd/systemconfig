@@ -50,7 +50,8 @@ try {
         function Header()
         {
             $this->Image('../assets/image/logo/iap_icon.png', 10, 10, 20);
-            $this->SetFont('Arial', 'B', 35);
+            // $this->SetFont('Arial', 'B', 35);
+            $this->SetFont('Arial', 'B', 32);
             $this->SetTextColor(64, 64, 64);
             $pageWidth = $this->GetPageWidth();
             $this->SetX(12);

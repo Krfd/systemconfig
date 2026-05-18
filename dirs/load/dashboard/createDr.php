@@ -15,12 +15,6 @@
                         <form method="POST" id="deliver">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="d-flex flex-column gap-1 col-4">
-                                    <!-- <div class="input-group col p-0 d-flex align-items-baseline gap-1">
-                                        <div class="col p-0 d-flex align-items-baseline gap-1 col">
-                                            <label for="picklist" class="form-label text-secondary col-3">Picklist: </label>
-                                            <input type="text" name="picklist" id="picklist" class="form-control form-control-sm col ms-3" style="background: #F7F7F7" readonly>
-                                        </div>
-                                    </div> -->
                                     <div class="input-group col p-0 d-flex align-items-baseline gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col">
                                             <label for="batch" class="form-label text-dark-emphasis col-3"><small>Batch No:</small></label>

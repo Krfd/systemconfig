@@ -12,13 +12,13 @@
             <section class="content">
                 <div class="container-fluid">
                     <div class="row">
-                        <form method="POST" id="delivery">
+                        <form method="POST" id="loadingBasketForm">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="d-flex flex-column gap-1 col-4">
-                                    <div class="d-flex align-items-baseline gap-3">
+                                    <!-- <div class="d-flex align-items-baseline gap-3">
                                         <label for="batch" class="form-label text-dark-emphasis col-3"><small>Batch No:</small></label>
                                         <input type="text" name="batch" id="batch" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
-                                    </div>
+                                    </div> -->
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
@@ -57,14 +57,14 @@
                                 <div class="d-flex gap-1">
                                     <button type="button" class="btn btn-sm btn-primary" id="addSerialModalBtn" data-bs-toggle="modal" data-bs-target="#addSerialModal"><i class="bi bi-plus"></i> Insert</button>
                                     <button type="button" class="btn btn-sm btn-primary" id="addDeliveryModalBtn"><i class="bi bi-plus"></i> Add</button>
-                                    <button type="button" class="btn btn-sm btn-danger" id="clearDeliveryTableBtn" onclick="clearTable()">Clear</button>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="clearLoadingTable()">Clear</button>
                                 </div>
                             </div>
                             <div class="table-responsive d-flex gap-1 overflow-auto mt-3" style="max-height: 450px">
                                 <table class="table table-hover col" id="loadBasketTable">
                                     <thead class="sticky-top">
                                         <tr>
-                                            <th class="text-secondary">#</th>
+                                            <th class="text-secondary text-center">#</th>
                                             <th class="text-secondary">Brand</th>
                                             <th class="text-secondary">Model</th>
                                             <th class="text-secondary">Category</th>
@@ -80,7 +80,7 @@
                                 <div class="p-2" style="width:120px;" id="loadingQty">0</div>
                             </div>
                             <div class="mt-5">
-                                <button class="btn btn-primary float-end" type="submit" id="branchAssignmentBtn">Load</button>
+                                <button class="btn btn-primary float-end" type="submit" id="loadingBasketBtn">Load</button>
                             </div>
                         </form>
                     </div>
@@ -91,5 +91,4 @@
 </div>
 <?php
 include("deliveryModal.php");
-include("branchModal.php");
 ?>

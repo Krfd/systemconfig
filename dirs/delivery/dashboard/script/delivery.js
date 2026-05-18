@@ -62,8 +62,8 @@ function loadDelivery() {
         );
 
         sortedData.forEach((item) => {
-          console.log(`DELIVERY ITEM: ${JSON.stringify(item)}`);
-          console.log(``);
+          // console.log(`DELIVERY ITEM: ${JSON.stringify(item)}`);
+          // console.log(``);
 
           // let status = item.DocStatus ? item.DocStatus.toUpperCase() : "";
           let status = "IN TRANSIT";

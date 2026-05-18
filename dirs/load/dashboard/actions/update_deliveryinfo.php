@@ -10,16 +10,15 @@ $Driver          = $_POST['Driver'] ?? null;
 $TruckType       = $_POST['TruckType'] ?? null;
 $PlateNumber     = $_POST['PlateNumber'] ?? null;
 $Remarks         = $_POST['Remarks'] ?? '';
+$itemIds         = $_POST['ItemRowNum'] ?? null;
 
 try {
     $conn->beginTransaction();
-
 
     $fetch_drnumber = $conn->prepare("EXEC dbo.[DeliveryNumber_Auto_Generate] ?");
     $fetch_drnumber->execute([$User]);
     $get_inclsioncode = $fetch_drnumber->fetch(PDO::FETCH_ASSOC);
     $DRNumber = $get_inclsioncode['DRNumber'];
-
 
     $stmtCollect = $conn->prepare("EXEC dbo.[ChainUpdateTables_Loadingbasket] ?,?");
     foreach ($pickListNumbers as $pickListNumber) {
@@ -27,7 +26,6 @@ try {
 
         $stmtCollect->execute([
             $User,
-            // $pickListNumber 
             $BatchNumber
         ]);
     }
@@ -44,6 +42,22 @@ try {
         $Remarks
     ]);
 
+    // RECENTLY ADDED
+    $ins_loadingorders = $conn->prepare("EXEC dbo.[Save_Orders] ?,?,?,?,?");
+    foreach ($pickListNumbers as $pk) {
+        foreach ($itemIds as $itemId) {
+            if (empty($pk) || empty($itemId)) continue;
+
+            $ins_loadingorders->execute([
+                $User,
+                $DRNumber,
+                $BatchNumber,
+                $pk,
+                $itemId
+            ]);
+        }
+    }
+
     $conn->commit();
 
     echo json_encode([
@@ -55,7 +69,6 @@ try {
     if ($conn->inTransaction()) {
         $conn->rollback();
     }
-
     echo json_encode([
         "isSuccess" => "error",
         "message"   => $e->getMessage()

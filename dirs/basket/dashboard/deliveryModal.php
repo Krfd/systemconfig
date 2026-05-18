@@ -119,7 +119,7 @@
                              required>
                      </div>
                      <div class="modal-footer">
-                         <button class="btn btn-success" type="submit" id="nonSerializeBtn">Add</button>
+                         <button class="btn btn-success" type="submit" id="serializeBtn">Add</button>
                          <button class="btn btn-danger" type="reset">Clear</button>
                      </div>
                  </div>

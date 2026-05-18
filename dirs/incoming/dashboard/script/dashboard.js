@@ -632,16 +632,60 @@ function checkAll() {
 
   if (checkboxes.length === 0) return;
 
-  const allChecked = checkboxes.length === checkboxes.filter(":checked").length;
+  // const allChecked = checkboxes.length === checkboxes.filter(":checked").length;
+  const checkedBoxes = checkboxes.filter(":checked");
+  const allChecked = checkboxes.length === checkedBoxes.length;
 
   if (allChecked) {
     checkboxes.prop("checked", false);
     $("#checkAllBtn").text("Select All");
   } else {
-    checkboxes.prop("checked", true);
-    $("#checkAllBtn").text("Deselect All");
+    // ORIGINAL
+    // checkboxes.prop("checked", true);
+    // $("#checkAllBtn").text("Deselect All");
+
+    // Select only up to 5 unchecked checkboxes
+    const remainingSlots = 5 - checkedBoxes.length;
+
+    if (remainingSlots <= 0) {
+      // alert("You can only select up to 5 rows.");
+      Swal.fire({
+        icon: "warning",
+        title: "You can only select up to 5 rows",
+        confirmButtonText: "OKAY"
+      })
+      return;
+    }
+
+    checkboxes
+      .not(":checked")
+      .slice(0, remainingSlots)
+      .prop("checked", true);
+
+    // Update button text
+    const totalChecked = checkboxes.filter(":checked").length;
+
+    $("#checkAllBtn").text(
+      totalChecked === checkboxes.length ? "Deselect All" : "Select All",
+    );
   }
 }
+
+// Optional: Prevent manual checking beyond 5
+$(document).on("change", "#incomingTableDisplay tbody .checkbox", function () {
+  const checkedCount = $(
+    "#incomingTableDisplay tbody .checkbox:checked",
+  ).length;
+
+  if (checkedCount > 5) {
+    this.checked = false;
+    Swal.fire({
+      icon: "warning",
+      title: "You can only select up to 5 rows",
+      confirmButtonText: "OKAY"
+    })
+  }
+});
 
 function selectAll() {
   const checkboxes = $("#previewTableDisplay tbody .checkbox:visible").not(
@@ -890,15 +934,20 @@ function openPicklist(picklistNum) {
             );
 
             sortedData.forEach((item) => {
+              console.log(`ITEM : ${JSON.stringify(item)}`)
               rows.push([
                 index++,
                 item.Brand || "",
                 item.Model || "",
                 item.Category || "",
                 item.Quantity ? Math.floor(Number(item.Quantity)) : "",
+                item.Actual_Quantity ? Math.floor(Number(item.Actual_Quantity)) : "",
               ]);
             });
-            $("#picklistItemTable").DataTable().clear().destroy();
+            // $("#picklistItemTable").DataTable().clear().destroy();
+            if ($.fn.DataTable.isDataTable("#picklistItemTable")) {
+              $("#picklistItemTable").DataTable().clear().destroy();
+            }
             $("#picklistItemTable").DataTable({
               data: rows,
               columns: [
@@ -907,6 +956,7 @@ function openPicklist(picklistNum) {
                 { title: "Model", className: "text-start ps-5" },
                 { title: "Category", className: "text-start ps-5" },
                 { title: "Quantity", className: "text-start ps-5" },
+                { title: "Actual Qty", className: "text-start ps-5" },
               ],
               paging: true,
               searching: true,
@@ -937,7 +987,7 @@ function openPicklist(picklistNum) {
                   // `);
                   let $emptyRow = $(`
                     <tr class="empty-row" style="background: #FFFBDF">
-                      <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
+                      <td colspan="6" style="background: #FFFBDF">&nbsp;</td>
                     </tr>
                   `);
                   $emptyRow.css({
@@ -1208,12 +1258,21 @@ function loadBasket() {
                 '<i class="bi bi-three-dots"></i></button>' +
                 `<ul class="dropdown-menu">
                   <li><a class="dropdown-item open-picklist-items" href="#">Open</a></li>
-                  ${printOption}
+                  <li>
+                  <a class="dropdown-item print-picklist" 
+                    href="#"
+                    data-picklist="${item.PKList_Number}" 
+                    data-doc-entry="${item.DocEntry}">
+                    Print
+                  </a>
+                </li>
                   ${actualQtyOption}
                 </ul>
               </div>`,
             ]);
           });
+
+          // ${printOption}
 
           if (rows.length === 0) {
             for (let i = 0; i < 8; i++) {

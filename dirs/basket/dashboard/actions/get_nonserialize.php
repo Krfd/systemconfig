@@ -1,21 +1,18 @@
 <?php
+
 require_once "../../../../config/connection.php";
 
-$ItemCode     = $_POST['ItemCode'];
-$Batch     = $_POST['Batch'];
-$response    = array();
+$Brand = $_POST['Brand'];
+$Model = $_POST['Model'];
+$Category = $_POST['Category'];
 
 try {
     $conn->beginTransaction();
 
-    // $fetch_items = $conn->prepare("EXEC dbo.[RR_Demo_Whs] ?");
-    // $fetch_items->execute([$ItemCode]);
-    // $get_items = $fetch_items->fetchAll(PDO::FETCH_ASSOC);
-
-    $fetch_items = $conn->prepare("SELECT ItemCode FROM Loading_Basket_Picklist_items WHERE BatchBasket_Num = ? AND ItemCode = ?");
-    $fetch_items->execute([$Batch, $ItemCode]);
-
-    $get_items = $fetch_items->fetch(PDO::FETCH_ASSOC);
+    $fetch_items = $conn->prepare("SELECT ItemSerial, ItemCode, ItemName, ItemBrand, ItemCategory FROM DEMO_DATA_WAREHOUSE 
+    WHERE ItemBrand = ? AND ItemName = ? AND ItemCategory = ?");
+    $fetch_items->execute([$Brand, $Model, $Category]);
+    $get_items = $fetch_items->fetchAll(PDO::FETCH_ASSOC);
 
     $conn->commit();
 
@@ -24,7 +21,7 @@ try {
         "Data" => $get_items
     );
     echo json_encode($response);
-} catch (PDOException $e) {
+} catch(PDOException $e) {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollback();
     $response = array(

@@ -23,8 +23,7 @@ function receivingForm() {
       $("#main-content").html(data);
 
       fetchOrderDetails();
-      receiveItem();
-      // ordersReceived();
+      // receiveItem();
       formattedDate();
       loadImperialBrands();
       addNonSerialize();

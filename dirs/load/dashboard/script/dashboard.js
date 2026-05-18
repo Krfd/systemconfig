@@ -70,10 +70,11 @@ function loadBasket() {
         let grouped = {};
 
         data
-          .filter((item) => item.DocStatus !== "IN TRANSIT")
+          // .filter((item) => item.DocStatus !== "IN TRANSIT")
           .forEach(function (item, index) {
-            const isDisabled =
-              item.DocStatus === "IN TRANSIT" ? "disabled" : "";
+            const isDisabled = item.DocStatus === "IN TRANSIT" ? "disabled" : "";
+
+              // console.log(`LOADING BASKET DATA INSIDE LOOP: ${JSON.stringify(data)}`)
 
             const date = new Date(item.DocDate);
             const formatted = date.toISOString().split("T")[0];
@@ -85,9 +86,8 @@ function loadBasket() {
                 let status = item.DocStatus || "";
                 let badgeClass = "primary";
 
-                // if (status === "IN TRANSIT") badgeClass = "primary";
-                // else
-                if (status === "PREPARING") badgeClass = "danger";
+                if (status === "IN TRANSIT") badgeClass = "primary";
+                else if (status === "PREPARING") badgeClass = "danger";
                 else if (status === "DELIVERED") badgeClass = "success";
 
                 return `<span class="badge bg-${badgeClass}" >${status}</span>`;
@@ -100,8 +100,9 @@ function loadBasket() {
               <li><a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}">Open</a></li>
               <li><a class="dropdown-item create-dr" href="#" data-batch="${item.BatchNumber}">Create DR</a></li>
             </ul>` +
-                "</div>",
-              item.BatchNumber,
+                "</div>"
+                // ,
+              // item.BatchNumber,
             ]);
           });
 
@@ -262,6 +263,8 @@ function getBatchItems(batch, tableSelector) {
         });
 
         Object.values(groupedItems).forEach((item) => {
+          // console.log(`DELIVERY ITEM: ${JSON.stringify(item)}`)
+          // console.log(`DELIVERY ITEM ID : ${item.ItemRowNum}`)
           counter += 1;
 
           totalQty += item.Deliver_Qty;
@@ -271,7 +274,8 @@ function getBatchItems(batch, tableSelector) {
               class="item-row"
               style="height: 40px; min-height: 40px; cursor: pointer"
               data-pklist='${JSON.stringify(item.PKList_Numbers)}'
-            >
+              data-itemid="${item.ItemRowNum}"
+              >
               <td class="align-middle ps-3" style="background: #FFFBDF">
                 ${counter}
               </td>
@@ -402,6 +406,7 @@ function submitDr() {
     }).then((res) => {
       if (res.isConfirmed) {
         let allPKs = new Set();
+        let itemIds = new Set();
         let formData = new FormData(this);
 
         // EXTRA FIELDS
@@ -429,6 +434,12 @@ function submitDr() {
               allPKs.add(pk);
             }
           });
+
+          let itemId = $(this).data("itemid");
+
+          if (itemId) {
+            itemIds.add(itemId);
+          }
         });
 
         // FINAL UNIQUE ARRAY
@@ -437,6 +448,10 @@ function submitDr() {
         // APPEND AS PHP ARRAY
         uniquePKList.forEach((pk) => {
           formData.append("PickListNumber[]", pk);
+        });
+
+        Array.from(itemIds).forEach((id) => {
+          formData.append("ItemRowNum[]", id);
         });
 
         $.ajax({
@@ -454,7 +469,7 @@ function submitDr() {
                 icon: "success",
                 title: "Processing items for delivery",
               }).then(() => {
-                console.log(`DELIVERY HAS BEEN CREATED: ${response}`);
+                // console.log(`DELIVERY HAS BEEN CREATED: ${response}`);
                 // loadBasket();
                 loadingBasket();
               });

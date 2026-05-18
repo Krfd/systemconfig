@@ -40,12 +40,16 @@ try {
         public $categoryTitle = '';
         function Header()
         {
-            $this->Image('assets/image/logo/iap_icon.png', 10, 10, 30);
-            $this->SetFont('Arial', 'B', 20);
+            // $this->Image('assets/image/logo/iap_icon.png', 10, 10, 30);
+            $this->Image('assets/image/logo/iap_icon.png', 10, 10, 20);
+            // $this->SetFont('Arial', 'B', 20);
+            $this->SetFont('Arial', 'B', 32);
+            $this->SetTextColor(64, 64, 64);
             $pageWidth = $this->GetPageWidth();
-
-            $this->SetX(10);
-            $this->Cell($pageWidth - 10, 20, 'STOCK REQUEST', 0, 0, 'C');
+            // $this->SetX(10);
+            $this->SetX(12);
+            // $this->Cell($pageWidth - 10, 20, 'STOCK REQUEST', 0, 0, 'C');
+            $this->Cell($pageWidth - 15, 20, 'STOCK REQUEST', 0, 0, 'C');
             $this->Ln(25);
         }
 

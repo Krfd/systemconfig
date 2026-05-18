@@ -18,6 +18,7 @@
                     <th class="text-secondary">Model</th>
                     <th class="text-secondary">Category</th>
                     <th class="text-secondary">Quantity</th>
+                    <th class="text-secondary">Actual Qty</th>
                 </tr>
             </thead>
             <tbody>
