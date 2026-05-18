@@ -11,8 +11,136 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
+  // console.log(`LOADED THE DASHBOARD`);
   $.post("dirs/receiving/dashboard/components/main.php", {}, function (data) {
     $("#main-content").html(data);
+    loadReceiving();
+    // console.log(`CALLED THE RECEIVING`);
+  });
+}
+
+// function loadingReceiving() {
+//   $("#main-content").html(spinner);
+//   setTimeout(() => {
+//     $.post("dirs/receiving/dashboard/components/main.php", {}, function (data) {
+//       $("#main-content").hide().html(data).fadeIn(200);
+//       loadReceiving();
+//     });
+//   }, 200);
+// }
+
+function loadReceiving() {
+  $.ajax({
+    url: "dirs/receiving/dashboard/actions/get_received.php",
+    type: "POST",
+    dataType: "json",
+    success: function (response) {
+      let data = response.Data;
+      let rows = [];
+      let counter = 1;
+      if (response.isSuccess === "success") {
+        data.forEach(function (item) {
+          const date = new Date(item.ArrivalDate);
+          const arrivalDate = date.toISOString().split("T")[0];
+
+          rows.push([
+            counter++,
+            item.ReceivedNumber,
+            arrivalDate,
+            item.OriginBranch,
+            // `<span class="badge bg-success">${item.ReceivedStatus}</span>`,
+            (() => {
+              let status = item.ReceivedStatus;
+
+              // let badgeClass = "success";
+              // console.log(`STATUS : ${status}`);
+
+              // return `<span class="badge bg-${badgeClass}">${status}</span>`;
+              return `<span class="badge bg-success">${status}</span>`;
+            })(),
+          ]);
+        });
+
+        if (rows.length < 8) {
+          for (let i = rows.length; i < 8; i++) {
+            rows.push(["", "", "", "", ""]);
+          }
+        }
+
+        if ($.fn.DataTable.isDataTable("#receivingTable")) {
+          $("#receivingTable").DataTable().clear().destroy();
+        }
+
+        $("#receivingTable").DataTable({
+          data: rows,
+          columns: [
+            { title: "#", className: "text-center" },
+            { title: "RR No." },
+            { title: "Arrival Date", className: "text-start ps-3" },
+            { title: "Stock Origin", className: "ps-3" },
+            {
+              title: "Status",
+              className: "ps-3",
+            },
+          ],
+          // createdRow: function (row, data) {}
+          paging: true,
+          searching: true,
+          info: true,
+          processing: false,
+          autoWidth: false,
+          order: [[0, "desc"]],
+          rowCallback: function (row, data) {
+            $("td", row).css({
+              background: "#FFFBDF",
+              padding: "3px",
+              height: "40px",
+              "min-height": "40px",
+              cursor: "pointer",
+            });
+            $("td:eq(1)", row).addClass("text-primary ps-2");
+
+            $(row).hover(
+              function () {
+                $(this).css("background", "#FFF4C2");
+              },
+              function () {
+                $(this).css("background", "#FFFBDF");
+              },
+            );
+          },
+          drawCallBack: function () {
+            let tableBody = $("#receivingTable tbody");
+            let currentRows = tableBody.find("tr").length;
+
+            for (let i = currentRows; i < 8; i++) {
+              let emptyRow = $(`
+                    <tr class="empty-row">
+                      <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
+                    </tr>
+                  `);
+
+              emptyRow.css({
+                background: "#FFFBDF",
+                height: "40px",
+                "min-height": "40px",
+              });
+
+              emptyRow.hover(function () {
+                $(this).css("background", "#FFFBDF");
+              });
+
+              tableBody.append(emptyRow);
+            }
+          },
+        });
+      } else {
+        console.error(response.Data);
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("Error loading receiving data: ", error);
+    },
   });
 }
 
@@ -22,6 +150,7 @@ function receivingForm() {
     $.post("dirs/receiving/dashboard/receivingForm.php", {}, function (data) {
       $("#main-content").html(data);
 
+      toggleReceivingButtons(false);
       fetchOrderDetails();
       // receiveItem();
       formattedDate();
@@ -231,47 +360,52 @@ function fetchOrderDetails() {
     if (e.key === "Enter") {
       e.preventDefault();
       e.stopPropagation();
-
       let drNo = $(this).val().trim();
 
       if (!drNo) {
+        toggleReceivingButtons(false);
         Swal.fire({
           icon: "warning",
           title: "Please enter DR No.",
         });
-        return false;
+        return;
       }
+      toggleReceivingButtons(false);
 
       $.ajax({
         url: "dirs/receiving/dashboard/actions/get_reviewdeliveryitems.php",
         type: "POST",
         data: { DeliveryNumber: drNo },
         dataType: "json",
-
         beforeSend: function () {
           $("#submitRecBtn").prop("disabled", true);
         },
-
         success: function (response) {
           let header = response.Header;
+          // console.log(`RECEIVING HEADER : ${header}`);
+          // console.log(``);
+          console.log(`RESPONSE : ${response.isSuccess}`);
+          console.log(``);
 
           if (response.isSuccess === "success") {
-            $("#originRecForm").val(header.BranchSet);
-            $("#docDateRecForm").val(header.DeliveryDate || "");
-            $("#statusRecForm").val(header.status || "IN TRANSIT");
+            $("#originRecForm").val(header.OriginBranch);
+            $("#docDateRecForm").val(header.ArrivalDate || "");
+            $("#statusRecForm").val(header.DlvryStatus || "");
 
             $("#driverRecForm").val(header.Driver || "");
             $("#truckCat").val(header.TruckCategory || "");
             $("#plateRecForm").val(header.TruckPlate || "");
             $("#remarksRecForm").val(header.Remarks || "");
+            toggleReceivingButtons(true);
           } else {
+            toggleReceivingButtons(false);
             Swal.fire({
               icon: "error",
               title: response.message || "DR not found",
             });
+            return;
           }
         },
-
         error: function () {
           Swal.fire({
             icon: "error",
@@ -283,10 +417,14 @@ function fetchOrderDetails() {
           $("#submitRecBtn").prop("disabled", false);
         },
       });
-
       return false;
     }
   });
+}
+
+function toggleReceivingButtons(enabled) {
+  $("#addSerialModalBtn").prop("disabled", !enabled);
+  $("#addDeliveryModalBtn").prop("disabled", !enabled);
 }
 
 function clearTable() {
@@ -491,6 +629,8 @@ function serialDeliveryInput() {
   $(document).on("submit", "#serial-delivery", function (e) {
     e.preventDefault();
     const serialInput = $("#newSerial");
+    const DeliveryNumber = $("#drNoRecForm").val();
+    // console.log(`DELIVERY NUMBER: ${DeliveryNumber}`);
     const Serial = serialInput.val().trim();
     let lines = Serial.split(/\r?\n/)
       .map((s) => s.replace(/[\u200B\s]+/g, "").trim())
@@ -499,10 +639,11 @@ function serialDeliveryInput() {
     let ItemCode = "";
     if (Serial) {
       $.ajax({
-        url: "dirs/receiving/dashboard/actions/get_testscanning.php",
+        url: "dirs/receiving/dashboard/actions/get_receivingitems.php",
         type: "POST",
         data: {
           ItemSerial: Serial,
+          DeliveryNumber,
         },
         dataType: "json",
         success: function (response) {
@@ -514,9 +655,10 @@ function serialDeliveryInput() {
             let receivingBody = $("#receiving-form-table tbody");
             const groupedItems = {};
             items.forEach((item) => {
-              if (!item.Itemcode) return;
-              if (!groupedItems[item.Itemcode]) {
-                groupedItems[item.Itemcode] = {
+              // console.log(`RECEIVING ITEM : ${JSON.stringify(item)}`);
+              if (!item.ItemCode) return;
+              if (!groupedItems[item.ItemCode]) {
+                groupedItems[item.ItemCode] = {
                   ...item,
                   qty: 0,
                 };
@@ -524,9 +666,10 @@ function serialDeliveryInput() {
             });
             Object.values(groupedItems).forEach(function (item) {
               let brand = item.ItemBrand;
-              let model = item.ItemName;
+              let model = item.ItemModel;
               let category = item.ItemCategory;
-              let itemCode = item.Itemcode;
+              let itemCode = item.ItemCode;
+              let itemRowNum = item.StckTransfr_RowNum;
               let qty = 1;
 
               if (!brand || !model || !category || !itemCode) {
@@ -544,11 +687,12 @@ function serialDeliveryInput() {
                 existingRow.find("td:nth-child(5)").text(currentQty + 1);
                 existingRow.attr("data-itemcode", itemCode);
               } else {
-                console.log(`item code : ${itemCode}`);
+                console.log(`receiving item code : ${itemCode}`);
+                console.log(`receiving item rownum : ${itemRowNum}`);
                 let counter =
                   receivingBody.find("tr[data-itemcode]").length + 1;
                 let newRow = `
-                    <tr data-itemcode="${itemCode}" data-serialbased="true" style="height: 40px; min-height: 40px; cursor: pointer">
+                    <tr data-itemcode="${itemCode}" data-rownum="${itemRowNum}" data-serialbased="true" style="height: 40px; min-height: 40px; cursor: pointer">
                       <td class="align-middle ps-3 text-center" style="background: #FFFBDF">${counter}</td>
                       <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>
                       <td class="align-middle ps-3" style="background:#FFFBDF">${model}</td>
@@ -557,24 +701,16 @@ function serialDeliveryInput() {
                     </tr>
                   `;
 
-                // <td class="align-middle ps-3" style="background: #FFFBDF" contenteditable="true"></td>
-
-                // let emptyRow = receivingBody.find("tr.empty-row");
                 let emptyRow = receivingBody
                   .find("tr:not([data-itemcode])")
                   .first();
                 if (emptyRow.length) {
                   emptyRow.replaceWith(newRow);
                 } else {
-                  // receivingBody.append(newRow);
                   receivingBody.prepend(newRow);
                 }
                 renumberRows();
               }
-
-              // if ($.fn.DataTable.isDataTable("#receiving-form-table")) {
-              //   $("#receiving-form-table").DataTable().clear().destroy();
-              // }
 
               if ($.fn.DataTable.isDataTable("#receiving-form-table")) {
                 $("#receiving-form-table").DataTable().destroy();
@@ -588,8 +724,6 @@ function serialDeliveryInput() {
                   return false; // break loop
                 }
               });
-
-              // }
             });
 
             // $("#receiving-form-table tbody").html(rows);
@@ -636,18 +770,19 @@ function submitReceiving() {
       e.preventDefault();
 
       let formData = {
-        drNo: $("#drNoRecForm").val(),
-        origin: $('input[name="originRecForm"]').val(),
-        whCode: $('input[name="origRecForm"]').val(),
-        docDate: $("#docDateRecForm").val(),
-        postDate: $("#postDate").val(),
-        status: $("#statusRecForm").val(),
-        receivedBy: $("#receiveByRecForm").val(),
-        driver: $("#driverRecForm").val(),
-        truckCategory: $("#truckCat").val(),
-        plateNo: $("#plateRecForm").val(),
-        remarks: $("#remarksRecForm").val(),
-        totalQty: $("#receivingQty").text(),
+        ReferenceNumber: $("#drNoRecForm").val(),
+        Branchorigin: $('input[name="originRecForm"]').val(),
+        BranchWhscode: $('input[name="origRecForm"]').val(),
+        // docDate: $("#docDateRecForm").val(),
+        ReceivingDate: $("#docDateRecForm").val(),
+        PostingDate: $("#postDate").val(),
+        // status: $("#statusRecForm").val(),
+        // receivedBy: $("#receiveByRecForm").val(),
+        Driver: $("#driverRecForm").val(),
+        TruckCategory: $("#truckCat").val(),
+        TruckPlate: $("#plateRecForm").val(),
+        Remarks: $("#remarksRecForm").val(),
+        ReceivedQty: $("#receivingQty").text(),
         items: [],
       };
 
@@ -661,25 +796,22 @@ function submitReceiving() {
           model: row.find("td:eq(2)").text().trim(),
           category: row.find("td:eq(3)").text().trim(),
           qty: parseInt(row.find("td:eq(4)").text().trim()) || 0,
-          // qtyReceived: parseInt(row.find("td:eq(5)").text().trim()) || 0,
           serialBased: row.data("serialbased") || false,
+          InTransitRowNum: row.data("rownum"),
         };
 
         formData.items.push(item);
       });
-
-      console.log(`FORM DATA LENGTH: ${formData.items.length}`);
 
       // VALIDATION
       if (formData.items.length === 0) {
         Swal.fire({
           icon: "warning",
           title: "No items found",
+          text: "Please add at least one item before submitting.",
         });
         return;
       }
-
-      console.log(formData);
 
       Swal.fire({
         title: "Submit Receiving?",
@@ -690,57 +822,47 @@ function submitReceiving() {
         cancelButtonText: "Cancel",
       }).then((result) => {
         if (!result.isConfirmed) return;
-        Swal.fire({
-          icon: "success",
-          title: "Items has been received",
-          showConfirmButton: true,
-          confirmButtonText: "OKAY",
-        }).then(() => {
-          loadDashboard();
+        $.ajax({
+          url: "dirs/receiving/dashboard/actions/save_createreceiving.php",
+          type: "POST",
+          data: {
+            receivingData: JSON.stringify(formData),
+          },
+          dataType: "json",
+          beforeSend: function () {
+            $("#submitRecBtn")
+              .prop("disabled", true)
+              .html(
+                `<span class="spinner-border spinner-border-sm"></span> Processing`,
+              );
+          },
+          success: function (response) {
+            if (response.isSuccess === "success") {
+              Swal.fire({
+                icon: "success",
+                title: "Items has been received",
+              });
+              // $("#receivingForm")[0].reset();
+              console.log(formData);
+              loadDashboard();
+              // clearTable();
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: response.message || "Submission failed",
+              });
+            }
+          },
+          error: function () {
+            Swal.fire({
+              icon: "error",
+              title: "Something went wrong",
+            });
+          },
+          complete: function () {
+            $("#submitRecBtn").prop("disabled", false).html("Received");
+          },
         });
       });
-
-      // $.ajax({
-      //   url: "dirs/receiving/dashboard/actions/submit_receiving.php",
-      //   type: "POST",
-      //   data: {
-      //     receivingData: JSON.stringify(formData),
-      //   },
-      //   dataType: "json",
-      //   beforeSend: function () {
-      //     $("#submitRecBtn")
-      //       .prop("disabled", true)
-      //       .html(
-      //         `<span class="spinner-border spinner-border-sm"></span> Processing`,
-      //       );
-      //   },
-      //   success: function (response) {
-      //     if (response.isSuccess === "success") {
-      //       Swal.fire({
-      //         icon: "success",
-      //         title: "Receiving submitted successfully",
-      //       });
-
-      //       $("#receivingForm")[0].reset();
-
-      //       // OPTIONAL: CLEAR TABLE
-      //       clearTable();
-      //     } else {
-      //       Swal.fire({
-      //         icon: "error",
-      //         title: response.message || "Submission failed",
-      //       });
-      //     }
-      //   },
-      //   error: function () {
-      //     Swal.fire({
-      //       icon: "error",
-      //       title: "Something went wrong",
-      //     });
-      //   },
-      //   complete: function () {
-      //     $("#submitRecBtn").prop("disabled", false).html("Received");
-      //   },
-      // });
     });
 }

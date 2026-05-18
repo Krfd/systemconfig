@@ -6,6 +6,7 @@ $DeliveryNumber = $_POST['DeliveryNumber'];
 try {
 
     $conn->beginTransaction();
+    // $stmt = $conn->prepare("EXEC dbo.DeliveryComplete_Details ?");
     $stmt = $conn->prepare("EXEC dbo.DeliveryComplete_Details ?");
     $stmt->execute([$DeliveryNumber]);
     $get_header = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -15,11 +16,17 @@ try {
     $delivery_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $conn->commit();
 
-    $response = array(
-        "isSuccess" => "success",
-        "Header" => $get_header,
-        "Orders" => $delivery_items
-    );
+    if ($get_header) {
+        $response = array(
+            "isSuccess" => "success",
+            "Header" => $get_header,
+            // "Orders" => $delivery_items
+        );
+    } else {
+        $response = array(
+            "isSuccess" => "failed",
+        );
+    }
 
     echo json_encode($response);
 } catch (PDOException $e) {

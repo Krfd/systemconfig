@@ -61,10 +61,10 @@ function loadDelivery() {
             Number(b.DeliveryNumber || 0) - Number(a.DeliveryNumber || 0),
         );
 
-        sortedData.forEach((item) => {
-          // console.log(`DELIVERY ITEM: ${JSON.stringify(item)}`);
-          // console.log(``);
+        // console.log(`DELIVERY DATA : ${JSON.stringify(sortedData)}`);
+        // console.log(``);
 
+        sortedData.forEach((item) => {
           // let status = item.DocStatus ? item.DocStatus.toUpperCase() : "";
           let status = "IN TRANSIT";
           let statusClass = "";
@@ -197,9 +197,11 @@ function loadDelivery() {
 
 function loadDeliveryDashboard() {
   $("#main-content").html(spinner);
+  console.log(`DELIVERIES`);
   setTimeout(function () {
     $.post("dirs/delivery/dashboard/delivery.php", {}, function (data) {
       $("#main-content").hide().html(data).fadeIn(200);
+      // console.log(`OPENING DELIVERIES`);
     });
   }, 200);
 }
@@ -1494,6 +1496,20 @@ function submitDelivery() {
           formData.append(`NonQuantity[${i}]`, item.quantity);
         });
 
+        // let formObject = Object.fromEntries(formData.entries())
+
+        // PDF DATA
+        let pdfData = {
+          DeliveryNum: $("#drno").val(),
+          PickListNum: $("#pcklstno").val(),
+          Branch: $("#origin").val(),
+          OriginWhscode: $("#whcode").val(),
+          Remarks: $("#remarks").val(),
+
+          SerializedItems: items,
+          NonSerializedItems: nonSerializeItems,
+        };
+
         // ================= DEBUG =================
         console.log("Serialized:", items);
         console.log("Non-Serialized:", nonSerializeItems);
@@ -1507,6 +1523,10 @@ function submitDelivery() {
           dataType: "json",
           success: function (response) {
             if (response.isSuccess === "success") {
+              window.open(
+                `pdf/delivery.php?data=${encodeURIComponent(JSON.stringify(pdfData))}`,
+                "_blank",
+              );
               Swal.fire({
                 icon: "success",
                 title: "Success",

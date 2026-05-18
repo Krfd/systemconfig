@@ -9,7 +9,7 @@ $ItemCode = $_POST['ItemCode'];
 
 try {
 
-$placeholders = implode(',', array_fill(0, count($Picklists), '?'));
+    $placeholders = implode(',', array_fill(0, count($Picklists), '?'));
 
     $conn->beginTransaction();
     // $stmt = $conn->prepare("EXEC dbo.LoadingBasketItemsFor_SetupDelivery ?, ?, ?");
@@ -25,15 +25,7 @@ $placeholders = implode(',', array_fill(0, count($Picklists), '?'));
         "Data" => $get_header
     );
 
-    // // LOG SUCCESS RESPONSE
-    // $logMessage = "[" . date("Y-m-d H:i:s") . "] SUCCESS\n";
-    // $logMessage .= json_encode($response, JSON_PRETTY_PRINT);
-    // $logMessage .= "\n\n";
-
-    // file_put_contents("setup_delivery_log.txt", $logMessage, FILE_APPEND);
-
     echo json_encode($response);
-
 } catch (PDOException $e) {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollback();
@@ -45,4 +37,3 @@ $placeholders = implode(',', array_fill(0, count($Picklists), '?'));
 
     echo json_encode($response);
 }
-?>

@@ -41,10 +41,10 @@
   </form>
 
   <!-- SERIALIZE -->
-  <form id="serial-delivery" method="POST">
-      <div class="modal fade" tabindex="-1" id="addSerialModal" data-bs-backdrop="static" data-bs-keyboard="false">
-          <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content">
+  <div class="modal fade" tabindex="-1" id="addSerialModal" data-bs-backdrop="static" data-bs-keyboard="false">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <form id="serial-delivery" method="POST">
                   <div class="modal-header">
                       <h4 class="modal-title text-secondary">Enter Serial</h4>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -60,7 +60,7 @@
                           <button class="btn btn-danger" type="reset">Clear</button>
                       </div>
                   </div>
-              </div>
+              </form>
           </div>
       </div>
-  </form>
+  </div>

@@ -1,22 +1,30 @@
 <?php
 require_once "../../../../config/connection.php";
+session_start();
 
-$ItemSerial     = $_POST['ItemSerial'];
-$response    = array();
+$User = $_SESSION['Uid'] ?? null;
+// $response = array();
 
 try {
     $conn->beginTransaction();
 
-    $fetch_items = $conn->prepare("EXEC dbo.[RR_Demo_Whs] ?");
-    $fetch_items->execute([$ItemSerial]);
-    $get_items = $fetch_items->fetchAll(PDO::FETCH_ASSOC);
+    $get_receiving = $conn->prepare("EXEC dbo.[Received] ?");
+    $get_receiving->execute([$User]);
+
+    $get_items = $get_receiving->fetchAll(PDO::FETCH_ASSOC);
 
     $conn->commit();
 
-    $response = array(
-        "isSuccess" => 'success',
-        "Data" => $get_items
-    );
+    if ($get_items) {
+        $response = array(
+            "isSuccess" => "success",
+            "Data" => $get_items
+        );
+    } else {
+        $response = array(
+            "isSuccess" => "failed",
+        );
+    }
     echo json_encode($response);
 } catch (PDOException $e) {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());

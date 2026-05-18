@@ -72,9 +72,8 @@ function loadBasket() {
         data
           // .filter((item) => item.DocStatus !== "IN TRANSIT")
           .forEach(function (item, index) {
-            const isDisabled = item.DocStatus === "IN TRANSIT" ? "disabled" : "";
-
-              // console.log(`LOADING BASKET DATA INSIDE LOOP: ${JSON.stringify(data)}`)
+            const isDisabled =
+              item.DocStatus === "IN TRANSIT" ? "disabled" : "";
 
             const date = new Date(item.DocDate);
             const formatted = date.toISOString().split("T")[0];
@@ -96,12 +95,39 @@ function loadBasket() {
               '<div class="dropdown dropstart">' +
                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
                 '<i class="bi bi-three-dots"></i></button>' +
-                `<ul class="dropdown-menu">
-              <li><a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}">Open</a></li>
-              <li><a class="dropdown-item create-dr" href="#" data-batch="${item.BatchNumber}">Create DR</a></li>
-            </ul>` +
-                "</div>"
-                // ,
+                (() => {
+                  const hasDeliveryNumber =
+                    item.DeliveryNumber !== null &&
+                    item.DeliveryNumber !== undefined &&
+                    item.DeliveryNumber !== "";
+                  //     `<ul class="dropdown-menu">
+                  //   <li><a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}">Open</a></li>
+                  //   <li><a class="dropdown-item create-dr" href="#" data-batch="${item.BatchNumber}">Create DR</a></li>
+                  // </ul>` +
+                  return `
+                    <ul class="dropdown-menu">
+                      <li>
+                        <a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}">
+                          Open
+                        </a>
+                      </li>
+
+                      ${
+                        !hasDeliveryNumber
+                          ? `
+                        <li>
+                          <a class="dropdown-item create-dr" href="#" data-batch="${item.BatchNumber}">
+                            Create DR
+                          </a>
+                        </li>
+                      `
+                          : ""
+                      }
+                    </ul>
+                  `;
+                })() +
+                "</div>",
+              // ,
               // item.BatchNumber,
             ]);
           });
@@ -133,7 +159,7 @@ function loadBasket() {
           // },
 
           createdRow: function (row, data) {
-            $(row).attr("data-batch", data[5]);
+            $(row).attr("data-batch", data[1]);
           },
           paging: true,
           searching: true,
@@ -245,7 +271,7 @@ function getBatchItems(batch, tableSelector) {
               ...item,
               Deliver_Qty: 0,
               PKList_Numbers: [],
-              processedPKs: {}, // prevents duplicate qty per PK
+              processedPKs: {},
             };
           }
 
@@ -263,8 +289,8 @@ function getBatchItems(batch, tableSelector) {
         });
 
         Object.values(groupedItems).forEach((item) => {
-          // console.log(`DELIVERY ITEM: ${JSON.stringify(item)}`)
-          // console.log(`DELIVERY ITEM ID : ${item.ItemRowNum}`)
+          // console.log(`DELIVERY QTY : ${item.Deliver_Qty}`);
+          // console.log(``);
           counter += 1;
 
           totalQty += item.Deliver_Qty;

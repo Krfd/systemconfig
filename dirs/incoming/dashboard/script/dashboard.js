@@ -652,15 +652,12 @@ function checkAll() {
       Swal.fire({
         icon: "warning",
         title: "You can only select up to 5 rows",
-        confirmButtonText: "OKAY"
-      })
+        confirmButtonText: "OKAY",
+      });
       return;
     }
 
-    checkboxes
-      .not(":checked")
-      .slice(0, remainingSlots)
-      .prop("checked", true);
+    checkboxes.not(":checked").slice(0, remainingSlots).prop("checked", true);
 
     // Update button text
     const totalChecked = checkboxes.filter(":checked").length;
@@ -682,8 +679,8 @@ $(document).on("change", "#incomingTableDisplay tbody .checkbox", function () {
     Swal.fire({
       icon: "warning",
       title: "You can only select up to 5 rows",
-      confirmButtonText: "OKAY"
-    })
+      confirmButtonText: "OKAY",
+    });
   }
 });
 
@@ -934,14 +931,16 @@ function openPicklist(picklistNum) {
             );
 
             sortedData.forEach((item) => {
-              console.log(`ITEM : ${JSON.stringify(item)}`)
+              console.log(`ITEM : ${JSON.stringify(item)}`);
               rows.push([
                 index++,
                 item.Brand || "",
                 item.Model || "",
                 item.Category || "",
                 item.Quantity ? Math.floor(Number(item.Quantity)) : "",
-                item.Actual_Quantity ? Math.floor(Number(item.Actual_Quantity)) : "",
+                item.Actual_Quantity
+                  ? Math.floor(Number(item.Actual_Quantity))
+                  : "",
               ]);
             });
             // $("#picklistItemTable").DataTable().clear().destroy();
@@ -1738,7 +1737,7 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
           let actual = Number(value);
 
           let maxQty = Number(
-            $(this).closest("tr").find("td:nth-child(5)").text(),
+            $(this).closest("tr").find("td:nth-child(6)").text().trim(),
           );
 
           if (value === "") {

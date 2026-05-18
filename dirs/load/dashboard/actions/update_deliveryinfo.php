@@ -30,7 +30,7 @@ try {
         ]);
     }
 
-    $ins_loadingheader = $conn->prepare("EXEC dbo.[UpdateLoadingBasket_Delivery] ?,?,?,?,?,?,?,?");
+    $ins_loadingheader = $conn->prepare("EXEC dbo.[UpdateLoadingBasket_Delivery] ?,?,?,?,?,?,?,?,?");
     $ins_loadingheader->execute([
         $User,
         $BatchNumber,
@@ -39,7 +39,8 @@ try {
         $Driver,
         $TruckType,
         $PlateNumber,
-        $Remarks
+        $Remarks,
+        $DeliveryDate
     ]);
 
     // RECENTLY ADDED
