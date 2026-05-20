@@ -56,6 +56,23 @@ function loadingBasket() {
   }, 200);
 }
 
+$(document).on("click", ".print-dr", function () {
+  let branches = $(this).data("branches");
+
+  let branchArray = JSON.parse(
+    decodeURIComponent($(this).attr("data-branches")),
+  );
+  let batchNumber = $(this).attr("data-batch");
+
+  console.log(`BATCH: ${batchNumber}`);
+  console.log("BRANCH ARRAY:", branchArray);
+
+  window.open(
+    `pdf/delivery.php?batch=${batchNumber}&branches=${encodeURIComponent(JSON.stringify(branchArray))}`,
+    "_blank",
+  );
+});
+
 function loadBasket() {
   $.ajax({
     url: "dirs/load/dashboard/actions/get_loadingbasketdisplay.php",
@@ -63,74 +80,76 @@ function loadBasket() {
     dataType: "json",
     success: function (response) {
       let data = response.Data;
+      let info = response.Info;
       let rows = [];
       let rowNum = 1;
 
       if (response.isSuccess === "success") {
         let grouped = {};
+        let batchInfo = {};
 
-        data
-          // .filter((item) => item.DocStatus !== "IN TRANSIT")
-          .forEach(function (item, index) {
-            const isDisabled =
-              item.DocStatus === "IN TRANSIT" ? "disabled" : "";
+        info.forEach(function (data, index) {
+          let batch = data.BatchBasket_Num;
 
-            const date = new Date(item.DocDate);
-            const formatted = date.toISOString().split("T")[0];
+          if (!grouped[batch]) {
+            grouped[batch] = {
+              picklists: new Set(),
+              branches: new Set(),
+            };
+          }
 
-            rows.push([
-              rowNum++,
-              item.BatchNumber,
-              (() => {
-                let status = item.DocStatus || "";
-                let badgeClass = "primary";
+          // Avoid duplicates automatically
+          grouped[batch].picklists.add(data.PKList_Number);
+          grouped[batch].branches.add(data.RequestingBranch);
+        });
 
-                if (status === "IN TRANSIT") badgeClass = "primary";
-                else if (status === "PREPARING") badgeClass = "danger";
-                else if (status === "DELIVERED") badgeClass = "success";
+        Object.keys(grouped).forEach(function (batch) {
+          let picklists = [...grouped[batch].picklists].join(", ");
+          let branches = [...grouped[batch].branches].join(", ");
 
-                return `<span class="badge bg-${badgeClass}" >${status}</span>`;
-              })(),
-              formatted,
-              '<div class="dropdown dropstart">' +
-                '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
-                '<i class="bi bi-three-dots"></i></button>' +
-                (() => {
-                  const hasDeliveryNumber =
-                    item.DeliveryNumber !== null &&
-                    item.DeliveryNumber !== undefined &&
-                    item.DeliveryNumber !== "";
-                  //     `<ul class="dropdown-menu">
-                  //   <li><a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}">Open</a></li>
-                  //   <li><a class="dropdown-item create-dr" href="#" data-batch="${item.BatchNumber}">Create DR</a></li>
-                  // </ul>` +
-                  return `
-                    <ul class="dropdown-menu">
-                      <li>
-                        <a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}">
-                          Open
-                        </a>
-                      </li>
+          // console.log(`PICKLISTS : ${picklists}`);
+          // console.log(`BRANCHES : ${branches}`);
+          console.log(``);
 
-                      ${
-                        !hasDeliveryNumber
-                          ? `
-                        <li>
-                          <a class="dropdown-item create-dr" href="#" data-batch="${item.BatchNumber}">
-                            Create DR
-                          </a>
-                        </li>
-                      `
-                          : ""
-                      }
-                    </ul>
-                  `;
-                })() +
-                "</div>",
-              // ,
-              // item.BatchNumber,
-            ]);
-          });
+          batchInfo[batch] = {
+            picklists: [...grouped[batch].picklists],
+            branches: [...grouped[batch].branches],
+          };
+        });
+
+        data.forEach(function (item, index) {
+          let branches = batchInfo[item.BatchNumber]?.branches || [];
+          const isDisabled = item.DocStatus === "IN TRANSIT" ? "disabled" : "";
+
+          const date = new Date(item.DocDate);
+          const formatted = date.toISOString().split("T")[0];
+
+          // console.log(`BRANCHES : ${branches}`);
+
+          rows.push([
+            rowNum++,
+            item.BatchNumber,
+            (() => {
+              let status = item.DocStatus || "";
+              let badgeClass = "primary";
+
+              if (status === "IN TRANSIT") badgeClass = "primary";
+              else if (status === "PREPARING") badgeClass = "danger";
+              else if (status === "DELIVERED") badgeClass = "success";
+
+              return `<span class="badge bg-${badgeClass}" >${status}</span>`;
+            })(),
+            formatted,
+            '<div class="dropdown dropstart">' +
+              '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
+              '<i class="bi bi-three-dots"></i></button>' +
+              `<ul class="dropdown-menu">
+                    <li><a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}">Open</a></li>
+                    <li><a class="dropdown-item print-dr" href="#" data-batch="${item.BatchNumber}" data-branches="${encodeURIComponent(JSON.stringify(branches))}">Print DR</a></li>
+                  </ul>` +
+              "</div>",
+          ]);
+        });
 
         if (rows.length === 0) {
           for (let i = 0; i < 8; i++) {
@@ -151,15 +170,15 @@ function loadBasket() {
             { title: "Date", className: "text-start ps-3" },
             { title: "Action" },
           ],
-          // createdRow: function (row, data, dataIndex) {
-          //   let originalItem = data[dataIndex];
-          //   if (originalItem) {
-          //     $(row).attr("data-batch", originalItem.BatchNumber);
-          //   }
-          // },
-
           createdRow: function (row, data) {
-            $(row).attr("data-batch", data[1]);
+            let batchNumber = data[1];
+            let picklists = batchInfo[batchNumber]?.picklists || [];
+            let branches = batchInfo[batchNumber]?.branches || [];
+            $(row).attr("data-batch", batchNumber);
+            $(row).attr(
+              "data-bs-title",
+              `<div class="text-start">Picklists: <br>${picklists.join("<br>")} <br><br>Branches: <br>${branches.join("<br>")}</div>`,
+            );
           },
           paging: true,
           searching: true,
@@ -225,6 +244,13 @@ function loadBasket() {
               } else {
                 dropdownBtn.prop("disabled", false).removeClass("disabled");
               }
+
+              new bootstrap.Tooltip(this, {
+                placement: "right",
+                trigger: "hover",
+                container: "body",
+                html: true,
+              });
             });
           },
         });

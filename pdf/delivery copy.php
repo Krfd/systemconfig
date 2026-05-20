@@ -7,41 +7,25 @@ require_once "../config/connection.php";
 require_once "../assets/plugins/fpdf/fpdf.php";
 session_start();
 
-$User = $_SESSION['Uid'];
+$data = json_decode($_GET['data'], true);
+$itemData = $data['items'] ?? [];
+// $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+// $file = "delivery_logs.txt";
+// file_put_contents($file, $jsonData . PHP_EOL, FILE_APPEND);
+$docDate = date("y-m-d");
+$driver = $data['driver'] ?? '';
+$plate  = $data['plate'] ?? '';
+$truckCat = $data['truckCat'] ?? '';
+$prepby = $data['prepby'] ?? '';
+$remarks = !empty(trim($data['remarks'] ?? ''))
+    ? $data['remarks']
+    : 'N/A';
+    $branchNames = $data['srn'] ?? [];
 
-$batch = $_GET['batch'] ?? '';
-$branches = [];
-
-if (!empty($_GET['branches'])) {
-    $raw = explode(',', $_GET['branches']);
-
-    foreach ($raw as $b) {
-        $b = trim($b);
-
-        $b = trim($b, "[]\"'");
-
-        if ($b !== '') {
-            $branches[] = $b;
-        }
-    }
+    // ensure array
+if (!is_array($branchNames)) {
+    $branchNames = [$branchNames];
 }
-
-$stmt = $conn->prepare("EXEC dbo.[Print_Delivery_Items] ?, ?");
-$stmt->execute([$User, $batch]);
-$header = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$stmt->nextRowset();
-$itemData = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$firstRow = $header[0] ?? [];
-
-$docDate  = $firstRow['DeliveryDate'] ?? date('Y-m-d');
-
-$driver   = $firstRow['Driver'] ?? '';
-$truckCat = $firstRow['TruckCategory'] ?? '';
-$plate    = $firstRow['TruckPlate'] ?? '';
-
-$prepby   = $firstRow['ModifyBy'] ?? '';
-$remarks  = $firstRow['Remarks'] ?? 'N/A';
 
 class PDF extends FPDF
 {
@@ -55,50 +39,15 @@ class PDF extends FPDF
         $this->series = $series;
     }
 
-    // function Header()
-    // {
-    //     $this->Image('../assets/image/logo/iap_icon.png', 10, 10, 30);
-    //     // $this->SetFont('Arial', 'B', 20);
-    //     $this->SetFont('Arial', 'B', 30);
-    //     $this->SetTextColor(64, 64, 64);
-    //     $pageWidth = $this->GetPageWidth();
-    //     $this->SetX(10);
-    //     $series = $this->series ?? 0;
-    //     $title = "DR-" . str_pad((string)$series, 5, "0", STR_PAD_LEFT);
-    //     $this->Cell($pageWidth - 10, 10, $title, 0, 1, 'C');
-    //     $this->Ln(5);
-    // }
-
-
     function Header()
     {
-        $logoX = 10;
-        $logoY = 10;
-        $logoW = 20;
+        $this->Image('../assets/image/logo/iap_icon.png', 10, 10, 30);
+        $this->SetFont('Arial', 'B', 20);
 
-        $this->Image('../assets/image/logo/iap_icon.png', $logoX, $logoY, $logoW);
+        $title = "DR-" . str_pad($this->series, 5, "0", STR_PAD_LEFT);
 
-        $this->SetFont('Arial', 'B', 30);
-        $this->SetTextColor(64, 64, 64);
-
-        $pageWidth = $this->GetPageWidth();
-
-        $title = "DR-" . str_pad((string)($this->series ?? 0), 5, "0", STR_PAD_LEFT);
-
-        // calculate true center of PAGE (not cell)
-        $textWidth = $this->GetStringWidth($title);
-        $centerX = ($pageWidth - $textWidth) / 2;
-
-        // avoid overlapping logo area
-        if ($centerX < ($logoX + $logoW + 5)) {
-            $centerX = $logoX + $logoW + 5;
-        }
-
-        // $this->SetXY($centerX, 15);
-        $this->SetXY($centerX, 10);
-        $this->Cell($textWidth, 10, $title, 0, 1, 'C');
-
-        // $this->Ln(5);
+        $this->Cell(0, 10, $title, 0, 1, 'C');
+        $this->Ln(5);
     }
 
     function Footer()
@@ -172,6 +121,7 @@ class PDF extends FPDF
     }
 }
 
+$branches = array_values(array_filter($branchNames));
 $pdf = new PDF();
 $pdf->AliasNbPages();
 $series = 10001;
@@ -189,14 +139,6 @@ function headerDetails($pdf, $docDate, $branch)
     $pdf->Cell($rightWidth, 6, 'Delivery Date: ' . $docDate, 0, 1, 'R');
 
     $pdf->Ln(2);
-}
-
-$itemsByBranch = [];
-
-foreach ($itemData as $row) {
-    $branchKey = $row['Branch'] ?? $row['RequestingBranch'] ?? 'UNKNOWN';
-
-    $itemsByBranch[$branchKey][] = $row;
 }
 
 function renderItemsTable($pdf, $itemData)
@@ -227,11 +169,10 @@ function renderItemsTable($pdf, $itemData)
     $groupedItems = [];
 
     foreach ($itemData as $row) {
-
-        $modelRaw = $row['ItemName'] ?? '';
-        $brandRaw = $row['ItemBrand'] ?? '';
-        $categoryRaw = $row['ItemCategory'] ?? '';
-        $quantity = (int)($row['Deliver_Qty'] ?? 0);
+        $modelRaw = $row['model'] ?? '';
+        $brandRaw = $row['brand'] ?? '';
+        $categoryRaw = $row['category'] ?? '';
+        $quantity = (int)($row['quantity'] ?? 0);
 
         $key = $modelRaw . '|' . $brandRaw . '|' . $categoryRaw;
 
@@ -249,10 +190,10 @@ function renderItemsTable($pdf, $itemData)
 
     foreach ($groupedItems  as $row) {
 
-        $brand = $row['brand'];
-        $model = $row['model'];
-        $category = $row['category'];
-        $quantity = $row['quantity'];
+        $brand = $row['brand'] ?? '';
+        $model = $row['model'] ?? '';
+        $category = $row['category'] ?? '';
+        $quantity = $row['quantity'] ?? 0;
         $totalQty += (int)$quantity;
 
         $x = $pdf->GetX();
@@ -317,30 +258,15 @@ function footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks)
     $pdf->Cell(0, 6, 'Remarks: ' . $remarks, 0, 1, 'L');
 }
 
+
 try {
-    // foreach ($branches as $branch) {
-
-    //     $pdf->setData($branch, $series++);
-    //     $pdf->AddPage();
-    //     $pdf->Ln(15);
-    //     headerDetails($pdf, $docDate, $branch);
-    //     renderItemsTable($pdf, $itemData);
-    //     footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks);
-    // }
     foreach ($branches as $branch) {
-
-        $branchItems = $itemsByBranch[$branch] ?? [];
-
-        if (empty($branchItems)) {
-            continue; // skip empty branch
-        }
 
         $pdf->setData($branch, $series++);
         $pdf->AddPage();
         $pdf->Ln(15);
-
         headerDetails($pdf, $docDate, $branch);
-        renderItemsTable($pdf, $branchItems);
+        renderItemsTable($pdf, $itemData);
         footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks);
     }
     $pdf->Output('I', 'delivery' . '.pdf');

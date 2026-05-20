@@ -13,7 +13,6 @@
                     <th class="text-secondary">RR No.</th>
                     <th class="text-secondary">Arrival Date</th>
                     <th class="text-secondary">Stock Origin</th>
-                    <!-- <th class="text-secondary">Delivery Date</th> -->
                     <th class="text-secondary">Status</th>
                 </tr>
             </thead>

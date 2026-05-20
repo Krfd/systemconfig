@@ -11,23 +11,11 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
-  // console.log(`LOADED THE DASHBOARD`);
   $.post("dirs/receiving/dashboard/components/main.php", {}, function (data) {
     $("#main-content").html(data);
     loadReceiving();
-    // console.log(`CALLED THE RECEIVING`);
   });
 }
-
-// function loadingReceiving() {
-//   $("#main-content").html(spinner);
-//   setTimeout(() => {
-//     $.post("dirs/receiving/dashboard/components/main.php", {}, function (data) {
-//       $("#main-content").hide().html(data).fadeIn(200);
-//       loadReceiving();
-//     });
-//   }, 200);
-// }
 
 function loadReceiving() {
   $.ajax({
@@ -48,14 +36,8 @@ function loadReceiving() {
             item.ReceivedNumber,
             arrivalDate,
             item.OriginBranch,
-            // `<span class="badge bg-success">${item.ReceivedStatus}</span>`,
             (() => {
               let status = item.ReceivedStatus;
-
-              // let badgeClass = "success";
-              // console.log(`STATUS : ${status}`);
-
-              // return `<span class="badge bg-${badgeClass}">${status}</span>`;
               return `<span class="badge bg-success">${status}</span>`;
             })(),
           ]);
@@ -109,7 +91,7 @@ function loadReceiving() {
               },
             );
           },
-          drawCallBack: function () {
+          drawCallback: function () {
             let tableBody = $("#receivingTable tbody");
             let currentRows = tableBody.find("tr").length;
 
@@ -382,8 +364,6 @@ function fetchOrderDetails() {
         },
         success: function (response) {
           let header = response.Header;
-          // console.log(`RECEIVING HEADER : ${header}`);
-          // console.log(``);
           console.log(`RESPONSE : ${response.isSuccess}`);
           console.log(``);
 
@@ -630,7 +610,6 @@ function serialDeliveryInput() {
     e.preventDefault();
     const serialInput = $("#newSerial");
     const DeliveryNumber = $("#drNoRecForm").val();
-    // console.log(`DELIVERY NUMBER: ${DeliveryNumber}`);
     const Serial = serialInput.val().trim();
     let lines = Serial.split(/\r?\n/)
       .map((s) => s.replace(/[\u200B\s]+/g, "").trim())
@@ -653,6 +632,7 @@ function serialDeliveryInput() {
             let existingTotal = parseInt($("#receivingQty").text()) || 0;
             let totalQty = existingTotal;
             let receivingBody = $("#receiving-form-table tbody");
+            // let totalDelivery = 0;
             const groupedItems = {};
             items.forEach((item) => {
               // console.log(`RECEIVING ITEM : ${JSON.stringify(item)}`);
@@ -670,7 +650,11 @@ function serialDeliveryInput() {
               let category = item.ItemCategory;
               let itemCode = item.ItemCode;
               let itemRowNum = item.StckTransfr_RowNum;
+              let itemDeliveryQty = item.Dlvry_ItemQty;
               let qty = 1;
+              // let totalDelivery = 0;
+
+              // console.log(`DELIVERY QTY: ${itemDeliveryQty}`);
 
               if (!brand || !model || !category || !itemCode) {
                 console.warn("Skipped item due to null/empty value:", item);

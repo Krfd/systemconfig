@@ -14,7 +14,7 @@ try {
     $conn->beginTransaction();
     // $stmt = $conn->prepare("EXEC dbo.LoadingBasketItemsFor_SetupDelivery ?, ?, ?");
     // $stmt->execute([$User, $BatchNumber, $ItemCode]);
-    $stmt = $conn->prepare("SELECT PKList_Number, Item_id, Req_ItemCode, Req_ItemName, Req_ItemBrand, Req_ItemCategory FROM Pick_List_Item_Collection
+    $stmt = $conn->prepare("SELECT PKList_Number, Item_id, Req_ItemCode, Req_ItemName, Req_ItemBrand, Req_ItemCategory, Actual_Item_Qty FROM Pick_List_Item_Collection
     WHERE PKList_Number IN ($placeholders) AND Req_ItemCode = ?");
     $params = array_merge($Picklists, [$ItemCode]);
     $stmt->execute($params);

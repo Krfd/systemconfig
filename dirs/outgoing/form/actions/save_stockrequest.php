@@ -61,7 +61,6 @@ try {
     $stmtHeader->execute([
         $User,
         $SRNumber,
-        // $RequestType,
         $PurposeRequest,
         $OBranch,
         $OWhscode,

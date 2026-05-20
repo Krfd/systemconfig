@@ -1505,7 +1505,6 @@ function submitDelivery() {
           Branch: $("#origin").val(),
           OriginWhscode: $("#whcode").val(),
           Remarks: $("#remarks").val(),
-
           SerializedItems: items,
           NonSerializedItems: nonSerializeItems,
         };

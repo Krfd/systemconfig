@@ -185,8 +185,14 @@
                     showConfirmButton: true,
                     confirmButtonText: "OKAY"
                 }).then(() => {
-                    location.reload();
+                    $.post("../actions/log.php", {
+                        Activity: "REQUESTED"
+                    }, function(response) {
+                        consol.log(`RESPONSE: ${response}`)
+                        location.reload();
+                    })
                 });
+                // location.reload();
             } else {
                 Swal.fire({
                     icon: "error",

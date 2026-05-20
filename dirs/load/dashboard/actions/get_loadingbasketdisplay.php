@@ -9,16 +9,22 @@ try {
 
     $fetch_loadingbasket = $conn->prepare("EXEC dbo.[DisplayDelivery_LoadingBasket] ?");
     $fetch_loadingbasket->execute([$User]);
-    $get_readydelivery = $fetch_loadingbasket->fetchAll(PDO::FETCH_ASSOC);
+    $basketHeader = $fetch_loadingbasket->fetchAll(PDO::FETCH_ASSOC);
+
+    $fetch_loadingbasket->nextRowset();
+
+    $basketData = $fetch_loadingbasket->fetchAll(PDO::FETCH_ASSOC);
 
     $conn->commit();
 
     $response = array(
         "isSuccess" => 'success',
-        "Data" => $get_readydelivery
+        "Data" => $basketHeader,
+        "Info" => $basketData,
     );
     echo json_encode($response);
 } catch (PDOException $e) {
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollback();
     $response = array(
         "isSuccess" => 'Failed',
