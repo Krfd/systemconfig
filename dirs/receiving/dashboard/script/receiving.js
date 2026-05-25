@@ -31,6 +31,13 @@ function loadReceiving() {
           const date = new Date(item.ArrivalDate);
           const arrivalDate = date.toISOString().split("T")[0];
 
+          console.log(`RECEIVED ITEM: ${JSON.stringify(item)}`)
+
+          // const arrivalDate =
+          // item.ArrivalDate && !isNaN(new Date(item.ArrivalDate).getTime())
+          //   ? new Date(item.ArrivalDate).toISOString().split("T")[0]
+          //   : "";
+
           rows.push([
             counter++,
             item.ReceivedNumber,
@@ -116,9 +123,10 @@ function loadReceiving() {
             }
           },
         });
-      } else {
-        console.error(response.Data);
       }
+      //  else {
+      //   console.error(response.Data);
+      // }
     },
     error: function (xhr, status, error) {
       console.error("Error loading receiving data: ", error);
@@ -361,16 +369,19 @@ function fetchOrderDetails() {
         dataType: "json",
         beforeSend: function () {
           $("#submitRecBtn").prop("disabled", true);
+          $("#receivingLoader").removeClass("d-none");
         },
         success: function (response) {
           let header = response.Header;
-          console.log(`RESPONSE : ${response.isSuccess}`);
-          console.log(``);
+          // console.log(`RESPONSE : ${JSON.stringify(header)}`);
+          // console.log(``);
 
           if (response.isSuccess === "success") {
             $("#originRecForm").val(header.OriginBranch);
-            $("#docDateRecForm").val(header.ArrivalDate || "");
-            $("#statusRecForm").val(header.DlvryStatus || "");
+            // $("#docDateRecForm").val(header.ArrivalDate);
+            $("#docDateRecForm").val(header.DeliveryDate);
+            // $("#statusRecForm").val(header.DlvryStatus);
+            $("#statusRecForm").val(header.DocStatus);
 
             $("#driverRecForm").val(header.Driver || "");
             $("#truckCat").val(header.TruckCategory || "");
@@ -392,9 +403,9 @@ function fetchOrderDetails() {
             title: "Error fetching DR data.",
           });
         },
-
         complete: function () {
           $("#submitRecBtn").prop("disabled", false);
+          $("#receivingLoader").addClass("d-none");
         },
       });
       return false;
@@ -608,6 +619,11 @@ function addNonSerialize() {
 function serialDeliveryInput() {
   $(document).on("submit", "#serial-delivery", function (e) {
     e.preventDefault();
+
+    // DISABLE ADD BUTTON
+    const serializeBtn = $("#serializeBtn");
+    serializeBtn.prop("disabled", true);
+
     const serialInput = $("#newSerial");
     const DeliveryNumber = $("#drNoRecForm").val();
     const Serial = serialInput.val().trim();
@@ -632,6 +648,7 @@ function serialDeliveryInput() {
             let existingTotal = parseInt($("#receivingQty").text()) || 0;
             let totalQty = existingTotal;
             let receivingBody = $("#receiving-form-table tbody");
+            // let receivingSerialTable = $("#receiving-serial-table tbody");
             // let totalDelivery = 0;
             const groupedItems = {};
             items.forEach((item) => {
@@ -646,15 +663,24 @@ function serialDeliveryInput() {
             });
             Object.values(groupedItems).forEach(function (item) {
               let brand = item.ItemBrand;
-              let model = item.ItemModel;
+              // let model = item.ItemModel;
+              let model = item.ItemName;
               let category = item.ItemCategory;
               let itemCode = item.ItemCode;
-              let itemRowNum = item.StckTransfr_RowNum;
-              let itemDeliveryQty = item.Dlvry_ItemQty;
+              // let itemRowNum = item.StckTransfr_RowNum;
+              let itemRowNum = item.ItemRowNum;
+              // let itemDeliveryQty = item.Dlvry_ItemQty;
+              let itemDeliveryQty = item.Deliver_Qty;
               let qty = 1;
               // let totalDelivery = 0;
 
               // console.log(`DELIVERY QTY: ${itemDeliveryQty}`);
+
+              // console.log(`BRAND : ${brand}`)
+              // console.log(`MODEL : ${model}`)
+              // console.log(`CATEGORY : ${category}`)
+              // console.log(`ITEM CODE : ${itemCode}`)
+              // console.log(`ITEM ID: ${itemRowNum}`)
 
               if (!brand || !model || !category || !itemCode) {
                 console.warn("Skipped item due to null/empty value:", item);
@@ -665,14 +691,48 @@ function serialDeliveryInput() {
                 `tr[data-itemcode="${itemCode}"]`,
               );
 
+              const serial = item.ItemSerial || Serial
+
+              const tableElement = document.querySelector("#receiving-serial-table");
+
+              const serialExisted = Array.from(
+                tableElement.querySelectorAll("tbody tr td")
+              ).some(td => td.textContent.trim() === serial);
+
+              if (!serialExisted) {
+                  let serialRow = `
+                      <tr style="height: 40px; min-height: 40px; cursor: pointer">
+                          <td class="align-middle ps-3" style="background: #FFFBDF">${model}</td>
+                          <td class="align-middle ps-3" style="background: #FFFBDF">${itemCode}</td>
+                          <td class="align-middle ps-3" style="background: #FFFBDF">${serial}</td>
+                      </tr>
+                  `;
+
+                  let receivingSerialTable = $("#receiving-serial-table tbody");
+
+                  // find first empty preset row
+                  // let emptyRow = receivingSerialTable.find("tr").filter(function () {
+                  //     return $(this).find("td").eq(0).text().trim() === "";
+                  // }).first();
+                  let emptyRow = receivingSerialTable.find("tr").filter(function () {
+                      return $(this).text().trim() === "";
+                  }).first();
+
+                  // replace empty row one by one
+                  if (emptyRow.length) {
+                      emptyRow.replaceWith(serialRow);
+                  } else {
+                      // no empty rows left
+                      receivingSerialTable.prepend(serialRow);
+                  }
+              }
+
               if (existingRow.length) {
                 let currentQty =
                   parseInt(existingRow.find("td:nth-child(5)").text()) || 0;
                 existingRow.find("td:nth-child(5)").text(currentQty + 1);
                 existingRow.attr("data-itemcode", itemCode);
               } else {
-                console.log(`receiving item code : ${itemCode}`);
-                console.log(`receiving item rownum : ${itemRowNum}`);
                 let counter =
                   receivingBody.find("tr[data-itemcode]").length + 1;
                 let newRow = `
@@ -685,14 +745,14 @@ function serialDeliveryInput() {
                     </tr>
                   `;
 
-                let emptyRow = receivingBody
-                  .find("tr:not([data-itemcode])")
-                  .first();
-                if (emptyRow.length) {
-                  emptyRow.replaceWith(newRow);
-                } else {
+                // let emptyRow = receivingBody
+                //   .find("tr:not([data-itemcode])")
+                //   .first();
+                // if (emptyRow.length) {
+                //   emptyRow.replaceWith(newRow);
+                // } else {
                   receivingBody.prepend(newRow);
-                }
+                // }
                 renumberRows();
               }
 
@@ -709,7 +769,7 @@ function serialDeliveryInput() {
                 }
               });
             });
-
+            $("#serializeBtn").prop("disabled", false);
             // $("#receiving-form-table tbody").html(rows);
             $("#receivingQty").text(totalQty);
           } else if (response.isSuccess === "Failed") {
@@ -724,6 +784,7 @@ function serialDeliveryInput() {
               title: response.Data,
               confirmButtonText: "OKAY",
             });
+            $("#serializeBtn").prop("disabled", false);
           }
         },
         error: function () {
@@ -731,6 +792,7 @@ function serialDeliveryInput() {
             icon: "error",
             title: "Something went wrong",
           });
+          $("#serializeBtn").prop("disabled", false);
         },
       });
     }

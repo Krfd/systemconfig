@@ -162,7 +162,6 @@
             return;
         }
 
-        // 🔹 Disable submit (prevent double click)
         var btn = $(this).find("button[type='submit']");
         btn.prop("disabled", true);
 
@@ -183,16 +182,16 @@
                     title: "Success",
                     text: "Request submitted successfully",
                     showConfirmButton: true,
-                    confirmButtonText: "OKAY"
+                    confirmButtonText: "OKAY"   
                 }).then(() => {
-                    $.post("../actions/log.php", {
-                        Activity: "REQUESTED"
-                    }, function(response) {
-                        consol.log(`RESPONSE: ${response}`)
+                    $.post("./actions/log.php", {
+                        Activity: "REQUESTED",
+                        Reference: response.SRNumber
+                    }, function(res) {
+                        console.log(`RESPONSE: ${res}`)
                         location.reload();
                     })
                 });
-                // location.reload();
             } else {
                 Swal.fire({
                     icon: "error",
@@ -200,7 +199,6 @@
                     text: data.message,
                 });
             }
-            // 🔹 Re-enable button
             btn.prop("disabled", false);
         });
 

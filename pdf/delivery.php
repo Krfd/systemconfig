@@ -70,36 +70,71 @@ class PDF extends FPDF
     // }
 
 
+    // function Header()
+    // {
+    //     $logoX = 10;
+    //     $logoY = 10;
+    //     $logoW = 20;
+
+    //     $this->Image('../assets/image/logo/iap_icon.png', $logoX, $logoY, $logoW);
+
+    //     $this->SetFont('Arial', 'B', 30);
+    //     $this->SetTextColor(64, 64, 64);
+
+    //     $pageWidth = $this->GetPageWidth();
+
+    //     // $title = "DR-" . str_pad((string)($this->series ?? 0), 5, "0", STR_PAD_LEFT);
+    //     $title = $this->series;
+
+    //     // calculate true center of PAGE (not cell)
+    //     $textWidth = $this->GetStringWidth($title);
+    //     $centerX = ($pageWidth - $textWidth) / 2;
+
+    //     // avoid overlapping logo area
+    //     if ($centerX < ($logoX + $logoW + 5)) {
+    //         $centerX = $logoX + $logoW + 5;
+    //     }
+
+    //     // $this->SetXY($centerX, 15);
+    //     $this->SetXY($centerX, 10);
+    //     $this->Cell($textWidth, 10, $title, 0, 1, 'C');
+
+    //     // $this->Ln(5);
+    // }
+
     function Header()
-    {
-        $logoX = 10;
-        $logoY = 10;
-        $logoW = 20;
+{
+    $logoX = 10;
+    $logoY = 10;
+    $logoW = 20;
 
-        $this->Image('../assets/image/logo/iap_icon.png', $logoX, $logoY, $logoW);
+    $this->Image('../assets/image/logo/iap_icon.png', $logoX, $logoY, $logoW);
 
-        $this->SetFont('Arial', 'B', 30);
-        $this->SetTextColor(64, 64, 64);
+    $this->SetFont('Arial', 'B', 30);
+    $this->SetTextColor(64, 64, 64);
 
-        $pageWidth = $this->GetPageWidth();
+    $pageWidth = $this->GetPageWidth();
 
-        $title = "DR-" . str_pad((string)($this->series ?? 0), 5, "0", STR_PAD_LEFT);
+    $title = $this->series ?? '';
 
-        // calculate true center of PAGE (not cell)
-        $textWidth = $this->GetStringWidth($title);
-        $centerX = ($pageWidth - $textWidth) / 2;
+    // true center of page
+    $textWidth = $this->GetStringWidth($title);
+    $centerX = ($pageWidth - $textWidth) / 2;
 
-        // avoid overlapping logo area
-        if ($centerX < ($logoX + $logoW + 5)) {
-            $centerX = $logoX + $logoW + 5;
-        }
+    // logo constraint (left safe area)
+    $minX = $logoX + $logoW + 5;
 
-        // $this->SetXY($centerX, 15);
-        $this->SetXY($centerX, 10);
-        $this->Cell($textWidth, 10, $title, 0, 1, 'C');
-
-        // $this->Ln(5);
+    if ($centerX < $minX) {
+        $centerX = $minX;
     }
+
+    // 🔥 balance shift so it doesn't look "pushed right"
+    $shift = $centerX - $minX;
+    $centerX = $centerX - ($shift / 2);
+
+    $this->SetXY($centerX, 10);
+    $this->Cell($textWidth, 10, $title, 0, 0, 'C');
+}
 
     function Footer()
     {
@@ -174,7 +209,6 @@ class PDF extends FPDF
 
 $pdf = new PDF();
 $pdf->AliasNbPages();
-$series = 10001;
 
 function headerDetails($pdf, $docDate, $branch)
 {
@@ -192,11 +226,23 @@ function headerDetails($pdf, $docDate, $branch)
 }
 
 $itemsByBranch = [];
+$seriesByBranch = [];
 
 foreach ($itemData as $row) {
-    $branchKey = $row['Branch'] ?? $row['RequestingBranch'] ?? 'UNKNOWN';
+    // $branchKey = $row['Branch'] ?? $row['RequestingBranch'] ?? 'UNKNOWN';
 
-    $itemsByBranch[$branchKey][] = $row;
+    // $itemsByBranch[$branchKey][] = $row;
+    
+    
+    $branch = $row['RequestingBranch'] ?? $row['Branch'] ?? 'UNKNOWN';
+
+    // group items per branch
+    $itemsByBranch[$branch][] = $row;
+
+    // assign reference number per branch (first occurrence wins)
+    if (!isset($seriesByBranch[$branch])) {
+        $seriesByBranch[$branch] = $row['ReferenceNumber'] ?? '';
+    }
 }
 
 function renderItemsTable($pdf, $itemData)
@@ -318,24 +364,18 @@ function footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks)
 }
 
 try {
-    // foreach ($branches as $branch) {
 
-    //     $pdf->setData($branch, $series++);
-    //     $pdf->AddPage();
-    //     $pdf->Ln(15);
-    //     headerDetails($pdf, $docDate, $branch);
-    //     renderItemsTable($pdf, $itemData);
-    //     footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks);
-    // }
     foreach ($branches as $branch) {
 
         $branchItems = $itemsByBranch[$branch] ?? [];
 
         if (empty($branchItems)) {
-            continue; // skip empty branch
+            continue; 
         }
 
-        $pdf->setData($branch, $series++);
+        $series = $seriesByBranch[$branch] ?? '';
+
+        $pdf->setData($branch, $series);
         $pdf->AddPage();
         $pdf->Ln(15);
 

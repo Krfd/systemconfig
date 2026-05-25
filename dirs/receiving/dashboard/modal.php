@@ -42,25 +42,77 @@
 
   <!-- SERIALIZE -->
   <div class="modal fade" tabindex="-1" id="addSerialModal" data-bs-backdrop="static" data-bs-keyboard="false">
-      <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
           <div class="modal-content">
-              <form id="serial-delivery" method="POST">
-                  <div class="modal-header">
-                      <h4 class="modal-title text-secondary">Enter Serial</h4>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                      <div class="form-input">
-                          <label for="newSerial" class="form-label text-dark-emphasis"><small>Serial:</small></label>
-                          <input type="text" name="newSerial" id="newSerial" class="form-control" style="background: #FFFBDF" inputmode="numeric"
-                              required>
-                      </div>
-                      <div class="modal-footer">
-                          <button class="btn btn-success" type="submit" id="nonSerializeBtn">Add</button>
-                          <button class="btn btn-danger" type="reset">Clear</button>
-                      </div>
-                  </div>
-              </form>
-          </div>
+            <div class="modal-header">
+                <h4 class="modal-title text-secondary">Enter Serial</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="serial-delivery" method="POST">
+                    <div class="d-flex align-items-baseline">
+                        <div class="form-input col-8">
+                            <label for="newSerial" class="form-label text-dark-emphasis"><small>Serial:</small></label>
+                            <input type="text" name="newSerial" id="newSerial" class="form-control" style="background: #FFFBDF" inputmode="numeric"
+                                required>
+                        </div>
+                        <!-- <div class="modal-footer"> -->
+                        <div class="col d-flex align-self-end ms-2 gap-2">
+                            <button class="btn btn-success" type="submit" id="nonSerializeBtn">Add</button>
+                            <button class="btn btn-danger" type="reset">Clear</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="container p-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive overflow-auto" style="max-height: 300px">
+                            <table class="table datatable" id="receiving-serial-table">
+                                <thead>
+                                    <tr>
+                                        <th>Model</th>
+                                        <th>Item Code</th>
+                                        <th>Serial</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="height: 40px">
+                                        <td class="" style="background: #FFFBDF"></td>
+                                        <td class="" style="background: #FFFBDF"></td>
+                                        <td class="" style="background: #FFFBDF"></td>
+                                    </tr>
+                                    <tr style="height: 40px">
+                                        <td class="" style="background: #FFFBDF"></td>
+                                        <td class="" style="background: #FFFBDF"></td>
+                                        <td class="" style="background: #FFFBDF"></td>
+                                    </tr>
+                                    <tr style="height: 40px">
+                                        <td class="" style="background: #FFFBDF"></td>
+                                        <td class="" style="background: #FFFBDF"></td>
+                                        <td class="" style="background: #FFFBDF"></td>
+                                    </tr>
+                                    <tr style="height: 40px">
+                                        <td class="" style="background: #FFFBDF"></td>
+                                        <td class="" style="background: #FFFBDF"></td>
+                                        <td class="" style="background: #FFFBDF"></td>
+                                    </tr>
+                                    <tr style="height: 40px">
+                                        <td class="" style="background: #FFFBDF"></td>
+                                        <td class="" style="background: #FFFBDF"></td>
+                                        <td class="" style="background: #FFFBDF"></td>
+                                    </tr>
+                                    <tr style="height: 40px">
+                                        <td class="" style="background: #FFFBDF"></td>
+                                        <td class="" style="background: #FFFBDF"></td>
+                                        <td class="" style="background: #FFFBDF"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
       </div>
   </div>

@@ -104,7 +104,6 @@
  </div>
 
  <!-- FOR NEW ITEM -->
-
  <div class="modal fade" tabindex="-1" id="addSerialModal" data-bs-backdrop="static" data-bs-keyboard="false">
      <div class="modal-dialog modal-lg modal-dialog-centered">
          <div class="modal-content">
@@ -132,7 +131,7 @@
                  <div class="card">
                      <div class="card-body">
                          <div class="table-responsive overflow-auto" style="max-height: 300px">
-                             <table class="table datatable table-borderless" id="basket-serial-table">
+                             <table class="table datatable" id="basket-serial-table">
                                  <thead>
                                      <tr>
                                          <th>Model</th>
@@ -141,41 +140,6 @@
                                      </tr>
                                  </thead>
                                  <tbody>
-                                     <!-- <tr>
-                                         <td>iPHONE 14 128GB STARLIGHT</td>
-                                         <td>APL-IP14-128GBSLIGHT</td>
-                                         <td>44529</td>
-                                     </tr>
-                                     <tr>
-                                         <td>iPHONE 14 128GB STARLIGHT</td>
-                                         <td>APL-IP14-128GBSLIGHT</td>
-                                         <td>44529</td>
-                                     </tr>
-                                     <tr>
-                                         <td>iPHONE 14 128GB STARLIGHT</td>
-                                         <td>APL-IP14-128GBSLIGHT</td>
-                                         <td>44529</td>
-                                     </tr>
-                                     <tr>
-                                         <td>iPHONE 14 128GB STARLIGHT</td>
-                                         <td>APL-IP14-128GBSLIGHT</td>
-                                         <td>44529</td>
-                                     </tr>
-                                     <tr>
-                                         <td>iPHONE 14 128GB STARLIGHT</td>
-                                         <td>APL-IP14-128GBSLIGHT</td>
-                                         <td>44529</td>
-                                     </tr>
-                                     <tr>
-                                         <td>iPHONE 14 128GB STARLIGHT</td>
-                                         <td>APL-IP14-128GBSLIGHT</td>
-                                         <td>44529</td>
-                                     </tr>
-                                     <tr>
-                                         <td>iPHONE 14 128GB STARLIGHT</td>
-                                         <td>APL-IP14-128GBSLIGHT</td>
-                                         <td>44529</td>
-                                     </tr> -->
                                  </tbody>
                              </table>
                          </div>

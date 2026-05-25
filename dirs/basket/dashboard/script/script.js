@@ -605,7 +605,6 @@ function toggleDelivery() {
       // ✅ FIXED index
       const statusText = row.find("td:eq(3) span").text().trim().toUpperCase();
 
-      // const checkbox = row.find(".checkbox");
       const checkbox = row.find("input[type='checkbox']");
 
       if (statusText === "ASSIGNED" || statusText === "NEW") {
@@ -635,9 +634,6 @@ function toggleDelivery() {
       .toggleClass("disabled", selectionMode);
   }
 
-  // =========================
-  // ✅ SECOND CLICK (GET SELECTED)
-  // =========================
   const PickListNum = [];
 
   $("#basketTableAssigned tbody .checkbox:checked").each(function () {
@@ -666,9 +662,6 @@ function toggleDelivery() {
     return;
   }
 
-  // =========================
-  // ✅ CONFIRM ACTION
-  // =========================
   Swal.fire({
     icon: "question",
     title: "Add selected item(s) to loading basket?",
@@ -678,43 +671,9 @@ function toggleDelivery() {
   }).then((result) => {
     if (result.isConfirmed) {
       $("#main-content").html(spinner);
-
-      // THIS IS TO SUBMIT THE FORM FOR LOADING BASKET
-      // console.log(`PICK LIST COLLECTION: ${PickListNum}`);
-      // $.ajax({
-      //   url: "dirs/basket/dashboard/actions/save_loading_basket_items.php",
-      //   type: "POST",
-      //   data: { PicklistNumber: PickListNum },
-      //   dataType: "json",
-      //   success: function (response) {
-      //     if (response.isSuccess === "success") {
-      //       $("#basketTableAssigned").data("selectionMode", false);
-      //       loadDeliveryBtn.textContent = "Load Items";
-      //       Swal.fire({
-      //         icon: "success",
-      //         title: "Items has been added to loading basket",
-      //         showConfirmButton: true,
-      //         confirmButtonText: "OKAY",
-      //       }).then(() => {
-      //         loadDeliveryBasket(
-      //           "#basketTableAssigned",
-      //           "dirs/incoming/dashboard/actions/picklisteditems.php",
-      //         );
       setTimeout(function () {
-        // loadToBasket(response.BatchNumber);
-        // loadToBasket("BAT10001");
         loadToBasket(PickListNum);
       }, 200);
-      // });
-      //     } else {
-      //       Swal.fire({
-      //         icon: "error",
-      //         title: response.Message,
-      //       });
-      //     }
-      //   },
-      // });
-      // $("#selectAllBtn").addClass("d-none");
     }
   });
 }
@@ -809,6 +768,7 @@ function clearTable() {
     }
   });
 }
+
 function clearLoadingTable() {
   Swal.fire({
     icon: "question",
@@ -2643,21 +2603,30 @@ function loadDestinationWhscodes(Branch) {
   );
 }
 
-// function loadToBasket(batch) {
 function loadToBasket(Picklists) {
   $.post("dirs/basket/dashboard/loadToBasket.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
 
     console.log(`PICKLISTS : ${Picklists}`);
 
-    // actualSummary(Picklists);
-    // $("#prepby").val(header.PickedBy);
+    $.ajax({
+      url : "dirs/basket/dashboard/actions/get_user.php",
+      type: "POST",
+      dataType: "json",
+      success: function(user) {
+        let pickedBy = user.Data.Fullname
+
+        $("#prepby").val(pickedBy);
+      }
+    })
+
     getDeliveryDetails();
     deliveryDate();
     serialDeliveryInput(Picklists);
     loadImperialBrands();
     addNonSerialize(Picklists);
     submitLoadingBasket(Picklists);
+    initializeEmptySerialRows()
 
     $("#newBrand").on("change", function () {
       $("#newModel").html('<option value="">Select Model</option>');
@@ -2810,27 +2779,16 @@ function loadToBasket(Picklists) {
   });
 }
 
-// function actualSummary(picklists) {
-//   console.log(`SUMMARY PICKLISTS`);
-
-//   $.ajax({
-//     url: "dirs/basket/dashboard/actions/actual_summary_qty.php",
-//     type: "POST",
-//     data: {
-//       picklists,
-//     },
-//     dataType: "json",
-//     success: function (response) {
-//       if (response.isSuccess === "success") {
-//         console.log(`SUMMARY DATA`);
-//       }
-//     },
-//   });
-// }
+const groupedItems = {}
 
 function serialDeliveryInput(Picklists) {
   $(document).on("submit", "#serial-delivery", function (e) {
     e.preventDefault();
+
+    // DISABLE ADD BUTTON
+    const serializeBtn = $("#serializeBtn");
+    serializeBtn.prop("disabled", true);
+
     const serialInput = $("#newSerial");
     const Serial = serialInput.val().trim();
     let lines = Serial.split(/\r?\n/)
@@ -2854,7 +2812,6 @@ function serialDeliveryInput(Picklists) {
             let totalQty = existingTotal;
             let loadingTableBody = $("#loadBasketTable tbody");
             let basketSerialTable = $("#basket-serial-table tbody");
-            const groupedItems = {};
 
             if (!items || items.length === 0) {
               e.stopPropagation();
@@ -2874,8 +2831,9 @@ function serialDeliveryInput(Picklists) {
               return false;
             }
 
+            const scanId = Date.now();
+
             items.forEach((item, index) => {
-              // console.log(`SERIAL : ${item.ItemSerial}`)
               if (!item.Itemcode) return;
 
               if (!groupedItems[item.Itemcode]) {
@@ -2884,272 +2842,261 @@ function serialDeliveryInput(Picklists) {
                   qty: 0,
                   Item_id: null,
                   picklist: null,
+                  loadedQty: 0,
                 };
               }
 
-              // lines.forEach(serial => {
-              //   if (!groupedItems[item.Itemcode].serials.includes(serial)) {
-              //     groupedItems[item.Itemcode].serials.push(serial);
-              //   }
-              // });
-              // console.log(`ITEM CODE: ${item.Itemcode}`);
+              groupedItems[item.Itemcode]._scanId = scanId;
 
               $.ajax({
-                url: "dirs/basket/dashboard/actions/get_dsplaybatch_models.php",
-                type: "POST",
-                data: { Picklists: Picklists, ItemCode: item.Itemcode },
+                url: "dirs/basket/dashboard/actions/get_actual_total.php",
+                type : "POST",
+                data: {
+                  Picklists: Picklists,
+                  ItemCode: item.Itemcode
+                },
                 dataType: "json",
-                success: function (response) {
-                  let data = response.Data;
-                  if (
-                    response.isSuccess === "success" &&
-                    data &&
-                    data.length > 0
-                  ) {
-                    Object.values(groupedItems).forEach(function (item) {
-                      let brand = item.ItemBrand;
-                      let model = item.ItemName;
-                      let category = item.ItemCategory;
-                      let itemCode = item.Itemcode;
-                      let qty = 1;
+                success: function (res) {
+                    if (res.isSuccess !== "success") {
+                      return;
+                    }
 
-                      console.log(`SERIAL DATA: ${JSON.stringify(item)}`);
-                      console.log(`ACTUAL ITEM QTY : ${item.Actual_Item_Qty}`);
+                    let totalActualPerModel = parseInt(res.Data?.[0]?.Total_Actual_Item_Qty) || 0;
 
-                      let itemId = data?.Item_id || data?.[0]?.Item_id || null;
-                      groupedItems[itemCode].Item_id = itemId;
+                    $.ajax({
+                      url: "dirs/basket/dashboard/actions/get_dsplaybatch_models.php",
+                      type: "POST",
+                      data: { Picklists: Picklists, ItemCode: item.Itemcode },
+                      dataType: "json",
+                      success: function (response) {
+                        let data = response.Data;
+                        if (
+                          response.isSuccess === "success" &&
+                          data &&
+                          data.length > 0
+                        ) {
 
-                      let picklist =
-                        data?.PKList_Number || data?.[0]?.PKList_Number || null;
-                      groupedItems[itemCode].PKList_Number = picklist;
+                          Object.values(groupedItems).forEach(function (item) {
+                            let brand = item.ItemBrand;
+                            let model = item.ItemName;
+                            let category = item.ItemCategory;
+                            let itemCode = item.Itemcode;
+                            let qty = 1;
 
-                      if (!brand || !model || !category || !itemCode) {
-                        console.warn(
-                          "Skipped item due to null/empty value:",
-                          item,
-                        );
-                        return;
-                      }
+                            if (item._scanId !== scanId) {
+                              return;
+                            }
 
-                      totalQty += qty;
+                            let itemId = data?.Item_id || data?.[0]?.Item_id || null;
+                            groupedItems[itemCode].Item_id = itemId;
 
-                      // const rowKey = itemCode + "|" + item.ItemSerial;
-                      // let existingRow = loadingTableBody.find(
-                      //   `tr[data-rowkey="${rowKey}"]`,
-                      // );
-                      // const itemKey = itemCode + "|" + model;
-                      // let existingItem = loadingTableBody.find(
-                      //   `td[data-itemkey="${itemKey}"]`,
-                      // );
+                            let picklist =
+                              data?.PKList_Number || data?.[0]?.PKList_Number || null;
+                            groupedItems[itemCode].PKList_Number = picklist;
 
-                      // // console.log(`ROW KEY : ${rowKey}`);
-                      // // console.log(`ITEM KEY : ${itemKey}`);
+                            if (!brand || !model || !category || !itemCode) {
+                              console.warn(
+                                "Skipped item due to null/empty value:",
+                                item,
+                              );
+                              return;
+                            }
 
-                      // if (existingItem.length) {
-                      //   let currentQty =
-                      //     parseInt(
-                      //       existingItem.find("td:nth-child(5)").text(),
-                      //     ) || 0;
-                      //   existingItem
-                      //     .find("td:nth-child(5)")
-                      //     .text(currentQty + 1);
-                      //   existingItem.attr("data-itemcode", itemCode);
+                            const rowKey = itemCode + "|" + item.ItemSerial;
+                            const itemKey = itemCode + "|" + model;
 
-                      //   existingItem.attr("data-serials", item.ItemSerial);
-                      //   existingItem.attr(
-                      //     "data-bs-title",
-                      //     "Serials: <br>" + item.ItemSerial,
-                      //   );
-                      // }
+                            // check duplicate serial
+                            let existingRow = loadingTableBody.find(
+                              `tr[data-rowkey="${rowKey}"]`,
+                            );
 
-                      // // if (existingRow.length) {
-                      // //   let currentQty =
-                      // //     parseInt(
-                      // //       existingRow.find("td:nth-child(5)").text(),
-                      // //     ) || 0;
-                      // //   existingRow
-                      // //     .find("td:nth-child(5)")
-                      // //     .text(currentQty + 1);
-                      // //   existingRow.attr("data-itemcode", itemCode);
+                            // check existing model/item row
+                            let existingItem = loadingTableBody.find(
+                              `tr[data-itemkey="${itemKey}"]`,
+                            );
 
-                      // //   existingRow.attr("data-itemid", itemId);
-                      // //   // let validatedSerials = item.serials || [];
+                            const serial = item.ItemSerial;
 
-                      // //   // let existingSerials =
-                      // //   //   existingRow.attr("data-serials") || "";
+                            // get the actual table element
+                            const tableElement = document.querySelector("#basket-serial-table");
 
-                      // //   // let serialArray = existingSerials
-                      // //   //   ? existingSerials.split(",")
-                      // //   //   : [];
+                            // check if serial already exists
+                            const serialExisted = Array.from(
+                              tableElement.querySelectorAll("tbody tr td")
+                            ).some(td => td.textContent.trim() === serial);
 
-                      // //   // // Merge validated serials only
-                      // //   // validatedSerials.forEach(serial => {
-                      // //   //   if (!serialArray.includes(serial)) {
-                      // //   //     serialArray.push(serial);
-                      // //   //   }
-                      // //   // });
+                              if (!serialExisted) {
+                                  let serialRow = `
+                                      <tr style="height: 40px; min-height: 40px; cursor: pointer">
+                                          <td class="align-middle ps-3" style="background: #FFFBDF">${model}</td>
+                                          <td class="align-middle ps-3" style="background: #FFFBDF">${itemCode}</td>
+                                          <td class="align-middle ps-3" style="background: #FFFBDF">${serial}</td>
+                                      </tr>
+                                  `;
 
-                      // //   existingRow.attr("data-serials", item.ItemSerial);
-                      // //   existingRow.attr(
-                      // //     "data-bs-title",
-                      // //     "Serials: <br>" + item.ItemSerial,
-                      // //   );
-                      // // }
-                      // if (existingRow.length) {
-                      //   // console.log(`Duplicate row skipped: ${rowKey}`);
-                      //   Swal.fire({
-                      //     icon: "error",
-                      //     title:
-                      //       "Serial for this model has been scanned already",
-                      //   });
-                      //   allowOutsideClick: false;
-                      //   return;
-                      // }
+                                  let serialTableBody = $("#basket-serial-table tbody");
 
-                      const rowKey = itemCode + "|" + item.ItemSerial;
-                      const itemKey = itemCode + "|" + model;
+                                  // find first empty preset row
+                                  let emptyRow = serialTableBody.find("tr").filter(function () {
+                                      return $(this).find("td").eq(0).text().trim() === "";
+                                  }).first();
 
-                      // check duplicate serial
-                      let existingRow = loadingTableBody.find(
-                        `tr[data-rowkey="${rowKey}"]`,
-                      );
+                                  // replace empty row one by one
+                                  if (emptyRow.length) {
+                                      emptyRow.replaceWith(serialRow);
+                                  } else {
+                                      // no empty rows left
+                                      serialTableBody.prepend(serialRow);
+                                  }
+                              }
 
-                      // check existing model/item row
-                      let existingItem = loadingTableBody.find(
-                        `tr[data-itemkey="${itemKey}"]`,
-                      );
+                            // DUPLICATE SERIAL
+                            // if (existingRow.length) {
+                            //   Swal.fire({
+                            //     icon: "error",
+                            //     title:
+                            //       "Serial for this model has been scanned already",
+                            //   });
+                            //   return;
+                            // }
 
-                      let serialRow = `
-                        <tr style="height: 40px; min-height: 40px; cursor: pointer">
-                          <td class="align-middle ps-3" style="background: #FFFBDF">${model}</td>
-                          <td class="align-middle ps-3" style="background: #FFFBDF">${itemCode}</td>
-                          <td class="align-middle ps-3" style="background: #FFFBDF">${item.ItemSerial}</td>
-                        </tr>
-                      `;
+                            // let maxAllowed = groupedItems[itemCode].allowedQty || 0;
+                            let currentLoaded = groupedItems[itemCode].loadedQty || 0;
 
-                      basketSerialTable.prepend(serialRow);
+                            // console.log(`ALLOWED QTY : ${maxAllowed}`)
+                            console.log(`ALLOWED QTY : ${totalActualPerModel}`)
+                            console.log(`CURRENT : ${currentLoaded}`)
+                            console.log(``)
 
-                      // DUPLICATE SERIAL
-                      if (existingRow.length) {
-                        Swal.fire({
-                          icon: "error",
-                          title:
-                            "Serial for this model has been scanned already",
-                        });
+                            // if (currentLoaded >= maxAllowed) {
+                            if (currentLoaded >= totalActualPerModel) {
+                              Swal.fire({
+                                icon: "error",
+                                title: "Limit reached",
+                                text: `This item has already reached its maximum allowed quantity.`,
+                              });
+                              return;
+                            }
 
-                        return;
-                      }
+                            totalQty += qty;
 
-                      // EXISTING ITEM -> ACCUMULATE QTY
-                      if (existingItem.length) {
-                        let qtyCell = existingItem.find("td:nth-child(5)");
+                            if (existingItem.length) {
+                              groupedItems[itemCode].loadedQty += 1;
+                              let qtyCell = existingItem.find("td:nth-child(5)");
 
-                        let currentQty = parseInt(qtyCell.text()) || 0;
+                              let currentQty = parseInt(qtyCell.text()) || 0;
 
-                        qtyCell.text(currentQty + 1);
+                              qtyCell.text(currentQty + 1);
 
-                        // append serials
-                        let existingSerials =
-                          existingItem.attr("data-serials") || "";
+                              // append serials
+                              let existingSerials =
+                                existingItem.attr("data-serials") || "";
 
-                        let serialArray = existingSerials
-                          ? existingSerials.split(",")
-                          : [];
+                              let serialArray = existingSerials
+                                ? existingSerials.split(",")
+                                : [];
 
-                        if (!serialArray.includes(item.ItemSerial)) {
-                          serialArray.push(item.ItemSerial);
-                        }
+                              if (!serialArray.includes(item.ItemSerial)) {
+                                serialArray.push(item.ItemSerial);
+                              }
 
-                        existingItem.attr(
-                          "data-serials",
-                          serialArray.join(","),
-                        );
+                              existingItem.attr(
+                                "data-serials",
+                                serialArray.join(","),
+                              );
 
-                        existingItem.attr(
-                          "data-bs-title",
-                          "Serials: <br>" + serialArray.join("<br>"),
-                        );
+                              existingItem.attr(
+                                "data-bs-title",
+                                "Serials: <br>" + serialArray.join("<br>"),
+                              );
 
-                        return;
-                      } else {
-                        // console.log(`SERIAL : ${item.ItemSerial}`)
-                        // console.log(`ITEM : ${item.Item_id}`);
-                        // console.log(`SERIALIZE ITEM: ${JSON.stringify(item)}`)
-                        // console.log(`item serials : ${item.serials}`);
-                        let counter =
-                          loadingTableBody.find("tr[data-itemcode]").length + 1;
-                        let newRow = `<tr data-itemkey="${itemKey}" 
-                            data-itemid="${itemId}" 
-                            data-picklist="${picklist}" 
-                            data-itemcode="${itemCode}" 
-                            data-serialbased="true" 
-                            data-serials="${item.ItemSerial}" 
-                            data-bs-toggle="tooltip" 
-                            data-bs-html="true" 
-                            data-bs-title="${"Serials: <br>" + item.ItemSerial}" 
-                            style="height: 40px; min-height: 40px; cursor: pointer">
-                            <td class="align-middle ps-3 text-center" style="background: #FFFBDF">${counter}</td>
-                            <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>
-                            <td class="align-middle ps-3" style="background:#FFFBDF">${model}</td>
-                            <td class="align-middle ps-3" style="background:#FFFBDF">${category}</td>
-                            <td class="align-middle ps-3" style="background:#FFFBDF">${qty}</td>
-                          </tr>`;
+                              // console.log(`LOADED QTY: ${item.loadedQty}`)
+                              // console.log(``)
+                              console.log("UPDATED LOADED QTY:", groupedItems[itemCode].loadedQty);
 
-                        let emptyRow = loadingTableBody
-                          .find("tr:not([data-itemcode])")
-                          .first();
-                        if (emptyRow.length) {
-                          emptyRow.replaceWith(newRow);
+                              return;
+                            } else {
+                              groupedItems[itemCode].loadedQty += 1;
+                              // console.log(`ITEM ID : ${itemId}`)
+                              // console.log(`LOADED QTY : ${item.loadedQty}`)
+                              let counter =
+                                loadingTableBody.find("tr[data-itemcode]").length + 1;
+                              let newRow = `<tr data-itemkey="${itemKey}" 
+                                  data-rowkey="${rowKey}"
+                                  data-itemid="${itemId}" 
+                                  data-picklist="${picklist}" 
+                                  data-itemcode="${itemCode}" 
+                                  data-serialbased="true" 
+                                  data-serials="${item.ItemSerial}" 
+                                  data-bs-toggle="tooltip" 
+                                  data-bs-html="true" 
+                                  data-bs-title="${"Serials: <br>" + item.ItemSerial}" 
+                                  style="height: 40px; min-height: 40px; cursor: pointer">
+                                  <td class="align-middle ps-3 text-center" style="background: #FFFBDF">${counter}</td>
+                                  <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>
+                                  <td class="align-middle ps-3" style="background:#FFFBDF">${model}</td>
+                                  <td class="align-middle ps-3" style="background:#FFFBDF">${category}</td>
+                                  <td class="align-middle ps-3" style="background:#FFFBDF">${qty}</td>
+                                </tr>`;
+
+                              let emptyRow = loadingTableBody
+                                .find("tr:not([data-itemcode])")
+                                .first();
+                              if (emptyRow.length) {
+                                emptyRow.replaceWith(newRow);
+                              } else {
+                                loadingTableBody.prepend(newRow);
+                              }
+                              // renumberRows();
+
+                              const tooltipTriggerList = document.querySelectorAll(
+                                '[data-bs-toggle="tooltip"]',
+                              );
+
+                              tooltipTriggerList.forEach((el) => {
+                                bootstrap.Tooltip.getInstance(el)?.dispose();
+                                new bootstrap.Tooltip(el);
+                              });
+                            }
+
+                            if ($.fn.DataTable.isDataTable("#loadBasketTable")) {
+                              $("#loadBasketTable").DataTable().destroy();
+                            }
+
+                            let exists = false;
+                            $("#loadBasketTable tbody tr").each(function () {
+                              let code = $(this).data("itemcode");
+                              if (code == itemCode) {
+                                exists = true;
+                                return false; // break loop
+                              }
+                            });
+                          });
+                          $("#serializeBtn").prop("disabled", false);
+                          $("#loadingQty").text(totalQty);
                         } else {
-                          loadingTableBody.prepend(newRow);
+                          console.log(`ITEM NOT FOUND`);
+                          // Swal.fire({
+                          //   icon: "error",
+                          //   title: "Item does not belong to this batch",
+                          //   showConfirmButton: true,
+                          //   confirmButtonText: "OKAY",
+                          // })
                         }
-                        // renumberRows();
-
-                        const tooltipTriggerList = document.querySelectorAll(
-                          '[data-bs-toggle="tooltip"]',
-                        );
-
-                        tooltipTriggerList.forEach((el) => {
-                          bootstrap.Tooltip.getInstance(el)?.dispose();
-                          new bootstrap.Tooltip(el);
+                      },
+                      error: function () {
+                        Swal.fire({
+                          icon: "warning",
+                          title: "No item exists on your request",
+                        }).then(() => {
+                          console.log("No response found on this item");
                         });
-                      }
-
-                      if ($.fn.DataTable.isDataTable("#loadBasketTable")) {
-                        $("#loadBasketTable").DataTable().destroy();
-                      }
-
-                      let exists = false;
-                      $("#loadBasketTable tbody tr").each(function () {
-                        let code = $(this).data("itemcode");
-                        if (code == itemCode) {
-                          exists = true;
-                          return false; // break loop
-                        }
-                      });
+                        return;
+                      },
                     });
-                    $("#loadingQty").text(totalQty);
-                  } else {
-                    console.log(`ITEM NOT FOUND`);
-                    // Swal.fire({
-                    //   icon: "error",
-                    //   title: "Item does not belong to this batch",
-                    //   showConfirmButton: true,
-                    //   confirmButtonText: "OKAY",
-                    // })
-                    return;
-                  }
-                },
-                error: function () {
-                  Swal.fire({
-                    icon: "warning",
-                    title: "No item exists on your request",
-                  }).then(() => {
-                    console.log("No response found on this item");
-                  });
-                  return;
-                },
-              });
+                }
+              })
+               
             });
           } else if (response.isSuccess === "Failed") {
             Swal.fire({
@@ -3163,6 +3110,7 @@ function serialDeliveryInput(Picklists) {
               title: response.Data,
               confirmButtonText: "OKAY",
             });
+            $("#serializeBtn").prop("disabled", false);
           }
         },
         error: function () {
@@ -3170,6 +3118,7 @@ function serialDeliveryInput(Picklists) {
             icon: "error",
             title: "Something went wrong",
           });
+          $("#serializeBtn").prop("disabled", false);
         },
       });
     }
@@ -3223,8 +3172,6 @@ function addNonSerialize(Picklists) {
             items.forEach((item) => {
               if (!item.ItemCode) return;
 
-              // console.log(`NON SERIALIZE ITEM : ${JSON.stringify(item)}`)
-
               if (!groupedItems[item.ItemCode]) {
                 groupedItems[item.ItemCode] = {
                   ...item,
@@ -3236,7 +3183,6 @@ function addNonSerialize(Picklists) {
               $.ajax({
                 url: "dirs/basket/dashboard/actions/get_dsplaybatch_models.php",
                 type: "POST",
-                // data: { BatchNumber: batch, ItemCode: item.ItemCode },
                 data: { Picklists: Picklists, ItemCode: item.ItemCode },
                 dataType: "json",
                 success: function (response) {
@@ -3371,6 +3317,23 @@ function addNonSerialize(Picklists) {
     });
 }
 
+function initializeEmptySerialRows() {
+  const tbody = $("#basket-serial-table tbody");
+
+  // prevent duplicate initialization
+  if (tbody.children().length > 0) return;
+
+  for (let i = 0; i < 5; i++) {
+    tbody.append(`
+      <tr class="empty-row" style="height: 40px; min-height: 40px;">
+        <td class="align-middle ps-3 text-muted" style="background: #FFFBDF">&nbsp;</td>
+        <td class="align-middle ps-3 text-muted" style="background: #FFFBDF">&nbsp;</td>
+        <td class="align-middle ps-3 text-muted" style="background: #FFFBDF">&nbsp;</td>
+      </tr>
+    `);
+  }
+}
+
 function submitLoadingBasket(Picklists) {
   $("#loadingBasketForm")
     .off("submit")
@@ -3378,7 +3341,8 @@ function submitLoadingBasket(Picklists) {
       e.preventDefault();
 
       const rowsWithItems = $("#loadBasketTable tbody tr").filter(function () {
-        return $(this).data("itemid") != null;
+        // return $(this).data("itemid") != null;
+        return $(this).attr("data-itemid");
       }).length;
 
       if (rowsWithItems === 0) {
@@ -3390,6 +3354,8 @@ function submitLoadingBasket(Picklists) {
 
         return;
       }
+      
+      console.log(`ROWS WITH ITEMS : ${rowsWithItems}`)
 
       let Item_Id = [];
       let ItemQty = [];

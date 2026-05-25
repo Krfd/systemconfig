@@ -160,21 +160,23 @@ try {
         </div>
     </footer>
     </div>
-
+    <!-- RELOGIN -->
     <div id="lockOverlay" class="lock-overlay">
         <div class="lock-box">
             <h2>Session Locked</h2>
             <p>Please login again to continue</p>
-            <input type="text" id="newUsername" class="form-control" placeholder="Username" />
-            <input type="password" id="newPassword" class="form-control" placeholder="Password" />
-            <div class="col form-check d-flex justify-content-start mt-2 ms-1">
-                <input class="form-check-input" type="checkbox" id="toggle-show-password" onclick="togglePassword()">
-                <label class="form-check-label text-muted ms-2" for="toggle-show-password">
-                    Show Password
-                </label>
-            </div>
-            <button type="submit" onclick="unlockScreen()" class="btn btn-primary btn-sm">Login</button>
-            <p id="errorMsg" class="error"></p>
+            <form id="relogin-frm" method="POST">
+                <input type="text" id="newUsername" class="form-control" placeholder="Username" />
+                <input type="password" id="newPassword" class="form-control" placeholder="Password" />
+                <div class="col form-check d-flex justify-content-start mt-2 ms-1">
+                    <input class="form-check-input" type="checkbox" id="toggle-show-password" onclick="togglePassword()">
+                    <label class="form-check-label text-muted ms-2" for="toggle-show-password">
+                        Show Password
+                    </label>
+                </div>
+                <button type="submit" onclick="unlockScreen()" class="btn btn-primary btn-sm">Login</button>
+                <p id="errorMsg" class="error"></p>
+            </form>
         </div>
     </div>
 
@@ -197,7 +199,7 @@ try {
     <script src="node_modules/uikit/dist/js/uikit.min.js"></script>
     <script src="node_modules/xlsx/dist/xlsx.full.min.js"></script>
     <script src="assets/js/script.js"></script>
-    <!-- <script src="assets/js/relogin.js"></script> -->
+    <script src="assets/js/relogin.js"></script>
     <?php include 'modal.php'; ?>
     <script>
         $(document).ready(function() {
@@ -213,6 +215,7 @@ try {
             let deliveryNum;
             let summaryTable;
             let srNumberMap = [];
+            const groupedItems = {};
         })
 
         function togglePassword() {

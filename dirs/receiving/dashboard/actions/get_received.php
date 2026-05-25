@@ -3,7 +3,6 @@ require_once "../../../../config/connection.php";
 session_start();
 
 $User = $_SESSION['Uid'] ?? null;
-// $response = array();
 
 try {
     $conn->beginTransaction();
@@ -15,16 +14,18 @@ try {
 
     $conn->commit();
 
-    if ($get_items) {
+    // if ($get_items) {
         $response = array(
             "isSuccess" => "success",
             "Data" => $get_items
         );
-    } else {
-        $response = array(
-            "isSuccess" => "failed",
-        );
-    }
+    // } 
+    // else {
+    //     $response = array(
+    //         "isSuccess" => "failed",
+    //         "Data" => "No data found."
+    //     );
+    // }
     echo json_encode($response);
 } catch (PDOException $e) {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());

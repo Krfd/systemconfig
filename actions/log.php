@@ -6,9 +6,7 @@ header('Content-Type: application/json');
 try {
     $User = $_SESSION['Uid'];
     $activity = $_POST['Activity'] ?? 'UNKNOWN';
-
-    $log = "User: {$User} | Activity: {$activity} | Time: " . date('Y-m-d H:i:s') . PHP_EOL;
-    file_put_contents("debug_log.txt", $log, FILE_APPEND);
+    $reference = $_POST['Reference'] ?? 'UNKNOWN';
 
     if (!isset($_SESSION['Uid'])) {
         echo json_encode([
@@ -18,8 +16,8 @@ try {
         exit;
     }
 
-    $stmt = $conn->prepare("EXEC dbo.[Activity_Logs] ?, ?");
-    $stmt->execute([$User, $activity]);
+    $stmt = $conn->prepare("EXEC dbo.[Activity_Logs] ?, ?, ?");
+    $stmt->execute([$User, $activity, $reference]);
 
     echo json_encode([
         "status" => "success",

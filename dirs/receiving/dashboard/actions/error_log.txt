@@ -1,0 +1,2 @@
+[2026-05-24 17:48:01] Error: [2] SQLSTATE[42000]: [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]User branch is not authorized for this delivery. in C:\xampp\htdocs\ishiftdemo\dirs\receiving\dashboard\actions\get_reviewdeliveryitems.php on line 12
+[2026-05-24 17:49:21] Error: [2] SQLSTATE[42000]: [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]User branch is not authorized for this delivery. in C:\xampp\htdocs\ishiftdemo\dirs\receiving\dashboard\actions\get_reviewdeliveryitems.php on line 12

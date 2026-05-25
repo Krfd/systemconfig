@@ -1,3 +1,21 @@
+<!-- <div id="receivingLoader" class="receiving-loader d-none">
+  <div class="loader-content">
+    <div class="spinner-border text-warning" role="status"></div>
+    <div class="mt-2 fw-semibold">Loading delivery details...</div>
+  </div>
+</div> -->
+<div id="receivingLoader" class="d-none position-fixed top-0 start-0 w-100 h-100 z-3" style="background: rgba(255, 255, 255, 0.75);">
+<!-- <div id="receivingLoader" class="d-none position-fixed top-0 start-0 w-100 h-100 bg-light bg-opacity-75 z-3"> -->
+  <div class="w-100 h-100 d-flex justify-content-center align-items-center">
+    <!-- <div class="bg-white rounded shadow p-4 text-center"> -->
+    <div class="text-center">
+      <div class="spinner-border text-warning" role="status"></div>
+      <div class="mt-2 fw-semibold">
+        Loading delivery details...
+      </div>
+    </div>
+  </div>
+</div>
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-start align-items-baseline gap-3">
         <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadDashboard()">
@@ -73,7 +91,6 @@
                                             <th class="text-secondary">Model</th>
                                             <th class="text-secondary">Category</th>
                                             <th class="text-secondary">Quantity</th>
-                                            <!-- <th class="text-secondary">Quantity Received</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -81,8 +98,6 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
-                                            <!-- <td style="background: #FFFBDF"></td> -->
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
@@ -90,8 +105,6 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
-                                            <!-- <td style="background: #FFFBDF"></td> -->
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
@@ -99,8 +112,6 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
-                                            <!-- <td style="background: #FFFBDF"></td> -->
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
@@ -108,8 +119,6 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
-                                            <!-- <td style="background: #FFFBDF"></td> -->
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
@@ -117,8 +126,6 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
-                                            <!-- <td style="background: #FFFBDF"></td> -->
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
@@ -126,8 +133,6 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
-                                            <!-- <td style="background: #FFFBDF"></td> -->
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
@@ -135,8 +140,6 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
-                                            <!-- <td style="background: #FFFBDF"></td> -->
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>
@@ -144,8 +147,6 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" hidden></td> -->
-                                            <!-- <td style="background: #FFFBDF"></td> -->
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                         </tr>

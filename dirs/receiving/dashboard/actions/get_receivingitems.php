@@ -1,6 +1,8 @@
 <?php
 require_once "../../../../config/connection.php";
+session_start();
 
+$User = $_SESSION['Uid'];
 $ItemSerial     = $_POST['ItemSerial'];
 $DeliveryNumber = $_POST['DeliveryNumber'];
 $response    = array();
@@ -8,8 +10,8 @@ $response    = array();
 try {
     $conn->beginTransaction();
 
-    $fetch_items = $conn->prepare("EXEC dbo.[Receiving_Serial] ?,?");
-    $fetch_items->execute([$ItemSerial, $DeliveryNumber]);
+    $fetch_items = $conn->prepare("EXEC dbo.[Receiving_Serial] ?,?,?");
+    $fetch_items->execute([$User, $ItemSerial, $DeliveryNumber]);
     $get_items = $fetch_items->fetchAll(PDO::FETCH_ASSOC);
 
     $conn->commit();

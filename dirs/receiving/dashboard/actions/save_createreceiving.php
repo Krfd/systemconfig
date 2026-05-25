@@ -123,6 +123,10 @@ try {
             continue;
         }
 
+        // if ($rownum === null || $rownum === '') {
+        //     continue;
+        // }
+
         $stmtCollect->execute([
             $User,
             $BatchNumberReceived,
@@ -152,10 +156,6 @@ try {
         $Branchorigin,
         $BranchWhscode
     ]);
-
-    /* =========================================================
-           COMMIT
-        ========================================================= */
     $conn->commit();
 
     echo json_encode([

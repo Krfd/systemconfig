@@ -107,10 +107,6 @@ function loadBasket() {
           let picklists = [...grouped[batch].picklists].join(", ");
           let branches = [...grouped[batch].branches].join(", ");
 
-          // console.log(`PICKLISTS : ${picklists}`);
-          // console.log(`BRANCHES : ${branches}`);
-          console.log(``);
-
           batchInfo[batch] = {
             picklists: [...grouped[batch].picklists],
             branches: [...grouped[batch].branches],
@@ -125,6 +121,7 @@ function loadBasket() {
           const formatted = date.toISOString().split("T")[0];
 
           // console.log(`BRANCHES : ${branches}`);
+          console.log(`BASKET ITEM : ${JSON.stringify(item)}`)
 
           rows.push([
             rowNum++,

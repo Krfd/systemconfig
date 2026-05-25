@@ -21,9 +21,16 @@ try {
     $stmtBatch->execute([$User]);
     $result = $stmtBatch->fetch(PDO::FETCH_ASSOC);
 
-    $stmtRefNum = $conn->prepare("EXEC dbo.[ReferenceNumber_Auto_Generate] ?");
-    $stmtRefNum->execute([$User]);
-    $refNum = $stmtRefNum->fetch(PDO::FETCH_ASSOC);
+    function generateReference($length = 6) {
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $reference = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $reference .= $characters[random_int(0, strlen($characters) - 1)];
+        }
+
+        return $reference;
+    }
 
     $fetch_drnumber = $conn->prepare("EXEC dbo.[DeliveryNumber_Auto_Generate] ?");
     $fetch_drnumber->execute([$User]);
@@ -35,12 +42,15 @@ try {
     }
 
     $BatchNumber = $result['BatchNumber'];
-    $stmtCollect = $conn->prepare("EXEC dbo.CreatePicklist_V2 ?,?,?,?,?,?");
+    $stmtCollect = $conn->prepare("EXEC dbo.CreatePicklist_V2 ?,?,?,?,?,?,?");
 
     foreach ($Item_Id as $key => $itmid) {
         if (empty($itmid)) {
             continue;
         }
+
+        $referenceNumber = generateReference();
+
         $serial     = $ItemSerial[$key] ?? null;
         $picklist   = $PickListnumber[$key] ?? null;
         $qty   = $ItemQty[$key] ?? null;
@@ -48,6 +58,7 @@ try {
         $stmtCollect->execute([
             $User,
             $itmid,
+            $referenceNumber,
             $BatchNumber,
             $picklist,
             $serial,

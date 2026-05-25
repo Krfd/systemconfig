@@ -45,7 +45,7 @@ try {
     $insertItem = $conn->prepare("EXEC dbo.[Collect_StockRequest_Items] ?,?,?,?,?,?,?,?,?,?");
 
     $updateStatus = $conn->prepare("UPDATE Stock_Transfer_Header_1 
-        SET RequestStatus = 'Processing'
+        SET RequestStatus = 'PROCESSING'
         WHERE SR_Number = ?");
 
     foreach ($DocEntries as $DocEntry) {

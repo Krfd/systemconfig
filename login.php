@@ -20,7 +20,7 @@
 </head>
 
 <body>
-  <form id="frm-login">
+  <form id="frm-login" method="POST">
     <div class="container d-flex justify-content-center align-items-center" style="height: 90vh;">
       <div class="login-card p-4 shadow bg-white">
         <div class="d-flex justify-content-center">
