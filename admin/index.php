@@ -14,7 +14,6 @@ try {
     $ua->execute([$User]);
     $user = $ua->fetch(PDO::FETCH_ASSOC);
 
-    echo 'USER : ' . $User;
 } catch (PDOException $e) {
     echo "<b>Database Error:</b> " . htmlspecialchars($e->getMessage());
     exit();
@@ -44,8 +43,7 @@ try {
     <link rel="stylesheet" href="../assets/plugins/datepicker/jquery-ui.structure.min.css">
     <link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="icon" href="../assets/image/logo/iap_icon.png">
-
+    <link rel="icon" href="./../assets/image/logo/iap_icon.png">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -69,10 +67,10 @@ try {
         <aside class="main-sidebar bg-primary-subtle elevation-5">
             <p class="text-center brand-link">
                 <a href="index.php" style="text-decoration: none; color: inherit;">
-                    <img src="../assets/image/logo/iap_icon.png" alt="iShift Admin" id="profile-image" style="width: 100px; height: 65px; object-fit: cover;">
+                    <img src="./../assets/image/logo/iap_icon.png" alt="iShift Admin" id="profile-image" style="width: 100px; height: 65px; object-fit: cover;">
                     <br>
                 </a>
-                <small><?php echo isset($user['Username']) ? $user['Username'] : 'Bonjing!'; ?></small>
+                <small><?php echo isset($user['Username']) ? $user['Username'] : ''; ?></small>
                 <br>
                 <span class="badge text-sm bg-primary" id="system-type"><?php echo (isset($user['UserRole']) ? $user['UserRole'] : '') . ' - ' . (isset($user['Branch']) ? $user['Branch'] : '') ?></span>
             </p>
@@ -143,24 +141,24 @@ try {
         </div>
     </footer>
     </div>
-
-    <!-- FOR INACTIVE USER -->
+    <!-- RELOGIN -->
     <div id="lockOverlay" class="lock-overlay">
         <div class="lock-box">
             <h2>Session Locked</h2>
             <p>Please login again to continue</p>
-            <input type="text" id="newUsername" class="form-control" placeholder="Username" />
-            <input type="password" id="newPassword" class="form-control" placeholder="Password" />
-            <div class="col form-check d-flex justify-content-start mt-2 ms-1">
-                <input class="form-check-input" type="checkbox" id="toggle-show-password" onclick="togglePassword()">
-                <label class="form-check-label text-muted ms-2" for="toggle-show-password">
-                    Show Password
-                </label>
-            </div>
-            <button type="submit" onclick="unlockScreen()" class="btn btn-primary btn-sm">Login</button>
-            <p id="errorMsg" class="error"></p>
+            <form id="relogin-frm" method="POST">            
+                <input type="text" id="newUsername" class="form-control" placeholder="Username" />
+                <input type="password" id="newPassword" class="form-control" placeholder="Password" />
+                <div class="col form-check d-flex justify-content-start mt-2 ms-1">
+                    <input class="form-check-input" type="checkbox" id="toggle-show-password" onclick="togglePassword()">
+                    <label class="form-check-label text-muted ms-2" for="toggle-show-password">
+                        Show Password
+                    </label>
+                </div>
+                <button type="submit" onclick="unlockScreen()" class="btn btn-primary btn-sm">Login</button>
+                <p id="errorMsg" class="error"></p>
+            </form>
         </div>
-    </div>
     </div>
 
 

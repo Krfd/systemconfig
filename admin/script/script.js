@@ -31,27 +31,32 @@ $("#main-menu")
 
   switch (menucode) {
     case "dashboard":
-      $maintitle = "Dashboard";
+      // $maintitle = "Dashboard";
+      $maintitle = "";
       $mainbreadcrumb = `<li class="breadcrumb-item active">Dashboard</li>`;
       $file = "dirs/dashboard/dashboard.php";
       break;
     case "requests":
-      $maintitle = "Requests";
+      // $maintitle = "Requests";
+      $maintitle = "";
       $mainbreadcrumb = `<li class="breadcrumb-item active">Requests</li>`;
       $file = "dirs/requests/requests.php";
       break;
     case "users":
-      $maintitle = "Users";
+      // $maintitle = "Users";
+      $maintitle = "";
       $mainbreadcrumb = `<li class="breadcrumb-item active">Users</li>`;
       $file = "dirs/users/users.php";
       break;
     case "findings":
-      $maintitle = "Findings";
+      // $maintitle = "Findings";
+      $maintitle = "";
       $mainbreadcrumb = `<li class="breadcrumb-item active">Findings</li>`;
-      $file = "dirs/findings/findings.php";
+      $file = "dirs/findings/dashboard/findings.php";
       break;
     case "settings":
-      $maintitle = "Settings";
+      // $maintitle = "Settings";
+      $maintitle = "";
       $mainbreadcrumb = `<li class="breadcrumb-item active">Settings</li>`;
       $file = "dirs/settings/settings.php";
       break;

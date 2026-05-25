@@ -1,5 +1,5 @@
 <div class="table-responsive-md">
-    <table class="table table-hover datatables col" id="dashboardTableDisplay">
+    <table class="table table-hover datatables col" id="findingsTableDisplay">
         <thead class="sticky-top">
             <tr>
                 <th class="text-secondary text-center">#</th>
