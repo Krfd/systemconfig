@@ -96,8 +96,8 @@ function loadOutgoing() {
             statusClass = "bg-primary";
           } else if (status === "CANCEL" || status === "CANCELLED") {
             statusClass = "bg-warning";
-          } else if (status === "PREPARING") {
-            statusClass = "bg-danger";
+          } else if (status === "RECEIVED") {
+            statusClass = "bg-success";
           } else if (status === "IN TRANSIT") {
             statusClass = "bg-primary";
           } else if (status === "TERMINATED") {

@@ -2,17 +2,34 @@
 require_once "../../../../config/connection.php";
 session_start();
 
-$data = json_decode($_POST['receivingData'], true);
+// $data = json_decode($_POST['receivingData'], true);
 
-/* =========================================================
-       SESSION
-    ========================================================= */
+$rawData = $_POST['receivingData'] ?? '';
+
+if (empty($rawData)) {
+    echo json_encode([
+        "isSuccess" => "Failed",
+        "message" => "No receiving data found."
+    ]);
+    exit;
+}
+
+$data = json_decode($rawData, true);
+
+if (json_last_error() !== JSON_ERROR_NONE) {
+    echo json_encode([
+        "isSuccess" => "Failed",
+        "message" => "Invalid JSON data."
+    ]);
+    exit;
+}
+
 $User = $_SESSION['Uid'] ?? null;
 
 /* =========================================================
        POST VALUES
     ========================================================= */
-$ReferenceNumber    = $data['ReferenceNumber'] ?? '';
+$DeliveryNumber    = $data['DeliveryNumber'] ?? '';
 $Deliverydate       = $data['ReceivingDate'] ?? '';
 $PostingDate        = $data['PostingDate'] ?? '';
 $Driver             = $data['Driver'] ?? '';
@@ -31,43 +48,43 @@ foreach ($items as $item) {
     $qty = $item['qty'];
 }
 
-$itemsLog = "";
+// $itemsLog = "";
 
-foreach ($items as $index => $item) {
+// foreach ($items as $index => $item) {
 
-    $itemCode = $item['itemCode'] ?? '';
-    $inTransitRowNum = $item['InTransitRowNum'] ?? '';
-    $qty = $item['qty'] ?? 0;
+//     $itemCode = $item['itemCode'] ?? '';
+//     $inTransitRowNum = $item['InTransitRowNum'] ?? '';
+//     $qty = $item['qty'] ?? 0;
 
-    $itemsLog .= "
-        Item #" . ($index + 1) . "
-        --------------------------------
-        ItemCode         : {$itemCode}
-        InTransitRowNum  : {$inTransitRowNum}
-        Qty              : {$qty}
+//     $itemsLog .= "
+//         Item #" . ($index + 1) . "
+//         --------------------------------
+//         ItemCode         : {$itemCode}
+//         InTransitRowNum  : {$inTransitRowNum}
+//         Qty              : {$qty}
 
-        ";
-}
+//         ";
+// }
 
-$logData = "
-ReferenceNumber : {$ReferenceNumber}
-Deliverydate    : {$Deliverydate}
-PostingDate     : {$PostingDate}
-Driver          : {$Driver}
-TruckCategory   : {$TruckCategory}
-TruckPlate      : {$TruckPlate}
-Remarks         : {$Remarks}
-Branchorigin    : {$Branchorigin}
-BranchWhscode   : {$BranchWhscode}
+// $logData = "
+// DeliveryNumber : {$DeliveryNumber}
+// Deliverydate    : {$Deliverydate}
+// PostingDate     : {$PostingDate}
+// Driver          : {$Driver}
+// TruckCategory   : {$TruckCategory}
+// TruckPlate      : {$TruckPlate}
+// Remarks         : {$Remarks}
+// Branchorigin    : {$Branchorigin}
+// BranchWhscode   : {$BranchWhscode}
 
-Items :
-{$itemsLog}
+// Items :
+// {$itemsLog}
 
-======================================================
-";
+// ======================================================
+// ";
 
-$filePath = "receiving_log.txt";
-file_put_contents($filePath, $logData, FILE_APPEND);
+// $filePath = "receiving_log.txt";
+// file_put_contents($filePath, $logData, FILE_APPEND);
 
 try {
 
@@ -113,7 +130,18 @@ try {
     /* =========================================================
            COLLECT RECEIVING ITEMS
         ========================================================= */
-    $stmtCollect = $conn->prepare("EXEC dbo.ReceivingItems_orders ?,?,?,?");
+    $stmtCollect = $conn->prepare("EXEC dbo.ReceivingItems_orders ?,?,?,?,?");
+
+
+    /* =========================================================
+       GET DESIRED QTY
+    ========================================================= */
+    $qtyValidation = $conn->prepare("EXEC dbo.ReceivingQtyValidation ?, ?, ?");
+
+    /* =========================================================
+       INSERT SHORTAGE
+    ========================================================= */
+    $findings = $conn->prepare("EXEC dbo.ReceivingFindings ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
 
     foreach ($items as $item) {
         $rownum = $item['InTransitRowNum'] ?? null;
@@ -123,13 +151,57 @@ try {
             continue;
         }
 
+        $qtyValidation->execute([
+            $User,
+            $DeliveryNumber,
+            $rownum
+        ]);
+        $validationData = $qtyValidation->fetch(PDO::FETCH_ASSOC);
+
         // if ($rownum === null || $rownum === '') {
         //     continue;
         // }
 
+        $desiredQty = $validationData['Deliver_Qty'] ?? 0;
+
+        if ($qty < $desiredQty) {
+            $difference = $desiredQty - $qty;
+            $findings->execute([
+                $User,
+                $ReceivedCode,
+                $DeliveryNumber,
+                $qty,
+                $difference,
+                'Lacking qty received : ' .  $difference,
+                'LACKING',
+                'DELIVERED',
+                $Driver,
+                $TruckCategory,
+                $TruckPlate,
+                $rownum
+            ]);
+        } elseif ($qty > $desiredQty) {
+            $difference = $qty - $desiredQty;
+            $findings->execute([
+                $User,
+                $ReceivedCode,
+                $DeliveryNumber,
+                $qty,
+                $difference,
+                'Excess qty received : ' .  $difference,
+                'EXCESS',
+                'DELIVERED',
+                $Driver,
+                $TruckCategory,
+                $TruckPlate,
+                $rownum
+            ]);
+        }
+
         $stmtCollect->execute([
             $User,
             $BatchNumberReceived,
+            $DeliveryNumber,
             $qty,
             $rownum
         ]);
@@ -144,7 +216,7 @@ try {
         ");
     $stmtHeader->execute([
         $User,
-        $ReferenceNumber,
+        $DeliveryNumber,
         $BatchNumberReceived,
         $ReceivedCode,
         $Deliverydate,

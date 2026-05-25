@@ -1,20 +1,12 @@
-<!-- <div id="receivingLoader" class="receiving-loader d-none">
-  <div class="loader-content">
-    <div class="spinner-border text-warning" role="status"></div>
-    <div class="mt-2 fw-semibold">Loading delivery details...</div>
-  </div>
-</div> -->
 <div id="receivingLoader" class="d-none position-fixed top-0 start-0 w-100 h-100 z-3" style="background: rgba(255, 255, 255, 0.75);">
-<!-- <div id="receivingLoader" class="d-none position-fixed top-0 start-0 w-100 h-100 bg-light bg-opacity-75 z-3"> -->
-  <div class="w-100 h-100 d-flex justify-content-center align-items-center">
-    <!-- <div class="bg-white rounded shadow p-4 text-center"> -->
-    <div class="text-center">
-      <div class="spinner-border text-warning" role="status"></div>
-      <div class="mt-2 fw-semibold">
-        Loading delivery details...
-      </div>
+    <div class="w-100 h-100 d-flex justify-content-center align-items-center">
+        <div class="text-center">
+            <div class="spinner-border text-warning" role="status"></div>
+            <div class="mt-2 fw-semibold">
+                Loading delivery details...
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-start align-items-baseline gap-3">
@@ -33,9 +25,10 @@
                         <form method="POST" id="receivingForm">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="d-flex flex-column gap-1 col-3">
+                                    <!-- <input type="hidden" id="batch"> -->
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="drNoRecForm" class="form-label text-dark-emphasis col-3"><small>DR No:</small></label>
-                                        <input type="text" name="drNoRecForm" id="drNoRecForm" class="form-control form-control-sm col" style="background: #FFFBDF">
+                                        <input type="text" name="drNoRecForm" id="drNoRecForm" class="form-control form-control-sm col" style="background: #FFFBDF" oninput="this.value = this.value.toUpperCase()">
                                     </div>
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
@@ -91,6 +84,7 @@
                                             <th class="text-secondary">Model</th>
                                             <th class="text-secondary">Category</th>
                                             <th class="text-secondary">Quantity</th>
+                                            <!-- <th class="text-secondary d-none"></th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -100,6 +94,7 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px">
                                             <td style="background: #FFFBDF"></td>
@@ -107,6 +102,7 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px">
                                             <td style="background: #FFFBDF"></td>
@@ -114,6 +110,7 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px">
                                             <td style="background: #FFFBDF"></td>
@@ -121,6 +118,7 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px">
                                             <td style="background: #FFFBDF"></td>
@@ -128,6 +126,7 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px">
                                             <td style="background: #FFFBDF"></td>
@@ -135,6 +134,7 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px">
                                             <td style="background: #FFFBDF"></td>
@@ -142,6 +142,7 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
                                         <tr style="height: 50px; min-height: 50px">
                                             <td style="background: #FFFBDF"></td>
@@ -149,6 +150,7 @@
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
+                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -184,7 +186,7 @@
                                         <textarea name="remarksRecForm" id="remarksRecForm" class="form-control form-control-sm col" rows="5" style="background: #f2f2f2; height: auto;" readonly></textarea>
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-primary" id="submitRecBtn">Received</button>
+                                <button type="submit" class="btn btn-primary" id="submitRecBtn">Receive</button>
                             </div>
                         </form>
                     </div>

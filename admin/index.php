@@ -15,40 +15,41 @@ try {
     $user = $ua->fetch(PDO::FETCH_ASSOC);
 
     echo 'USER : ' . $User;
-
 } catch (PDOException $e) {
     echo "<b>Database Error:</b> " . htmlspecialchars($e->getMessage());
-    exit(); 
+    exit();
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>iShift</title>
-  <link rel="stylesheet" href="../assets/plugins/fontawesome-free/css/all.min.css">
-  <link rel="stylesheet" type="text/css" href="../assets/plugins/bootstrap/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="../assets/css/adminlte.min.css">
-  <link rel="stylesheet" href="../assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
-  <link rel="stylesheet" href="../assets/plugins/daterangepicker/daterangepicker.css">
-  <link rel="stylesheet" href="../assets/plugins/bootstrap-icons/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="../assets/plugins/datatables/datatables.min.css">
-  <link rel="stylesheet" href="../assets/css/datatables.min.css">
-  <link rel="stylesheet" href="../assets/plugins/toastr/toastr.min.css">
-  <link rel="stylesheet" href="../assets/plugins/sweetalert2/sweetalert2.min.css">
-  <link rel="stylesheet" href="../assets/plugins/daterangepicker/daterangepicker.css">
-  <link rel="stylesheet" href="../assets/plugins/summernote/summernote-lite.min.css">
-  <link rel="stylesheet" href="../assets/plugins/leaflet/leaflet.css">
-  <link rel="stylesheet" href="../assets/plugins/datepicker/jquery-ui.structure.min.css">
-  <link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.min.css">
-  <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="icon" href="../assets/image/logo/iap_icon.png">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>iShift</title>
+    <link rel="stylesheet" href="../assets/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="../assets/plugins/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/adminlte.min.css">
+    <link rel="stylesheet" href="../assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+    <link rel="stylesheet" href="../assets/plugins/daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" href="../assets/plugins/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/plugins/datatables/datatables.min.css">
+    <link rel="stylesheet" href="../assets/css/datatables.min.css">
+    <link rel="stylesheet" href="../assets/plugins/toastr/toastr.min.css">
+    <link rel="stylesheet" href="../assets/plugins/sweetalert2/sweetalert2.min.css">
+    <link rel="stylesheet" href="../assets/plugins/daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" href="../assets/plugins/summernote/summernote-lite.min.css">
+    <link rel="stylesheet" href="../assets/plugins/leaflet/leaflet.css">
+    <link rel="stylesheet" href="../assets/plugins/datepicker/jquery-ui.structure.min.css">
+    <link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="icon" href="../assets/image/logo/iap_icon.png">
 
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed">
-     <div class="wrapper">
+    <div class="wrapper">
         <nav class="main-header navbar navbar-expand bg-light">
             <ul class="navbar-nav">
                 <li class="nav-item">
@@ -160,31 +161,31 @@ try {
             <p id="errorMsg" class="error"></p>
         </div>
     </div>
-</div>
+    </div>
 
 
-<script src="../assets/js/jquery.min.js"></script>
-<script src="../assets/plugins/sweetalert2/sweetalert2.min.js"></script>
-<script src="../assets/plugins/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../assets/plugins/toastr/toastr.min.js"></script>
-<script src="../assets/plugins/chart.js/Chart.min.js"></script>
-<script src="../assets/plugins/moment/moment.min.js"></script>
-<script src="../assets/plugins/daterangepicker/daterangepicker.js"></script>
-<script src="../assets/plugins/datatables/datatables.min.js"></script>
-<script src="../assets/plugins/daterangepicker/daterangepicker.js"></script>
-<script src="../assets/plugins/summernote/summernote-lite.min.js"></script>
-<script src="../assets/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
-<script src="../assets/plugins/elevatezoom-plus-master/src/jquery.ez-plus.js"></script>
-<script src="../assets/plugins/leaflet/leaflet.js"></script>
-<script src="../assets/js/adminlte.js"></script>
-<script src="../assets/js/global-scripts.js"></script>
-<script src="../assets/js/datatables.min.js"></script>
-<script src="../assets/plugins/datepicker/jquery-ui.min.js"></script>
-<script src="../node_modules/uikit/dist/js/uikit.min.js"></script>
-<script src="../node_modules/xlsx/dist/xlsx.full.min.js"></script>
-<script src="script/script.js"></script>
-<script src="..assets/script/relogin.js"></script>
-<?php include '../modal.php';?>
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <script src="../assets/plugins/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/plugins/toastr/toastr.min.js"></script>
+    <script src="../assets/plugins/chart.js/Chart.min.js"></script>
+    <script src="../assets/plugins/moment/moment.min.js"></script>
+    <script src="../assets/plugins/daterangepicker/daterangepicker.js"></script>
+    <script src="../assets/plugins/datatables/datatables.min.js"></script>
+    <script src="../assets/plugins/daterangepicker/daterangepicker.js"></script>
+    <script src="../assets/plugins/summernote/summernote-lite.min.js"></script>
+    <script src="../assets/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+    <script src="../assets/plugins/elevatezoom-plus-master/src/jquery.ez-plus.js"></script>
+    <script src="../assets/plugins/leaflet/leaflet.js"></script>
+    <script src="../assets/js/adminlte.js"></script>
+    <script src="../assets/js/global-scripts.js"></script>
+    <script src="../assets/js/datatables.min.js"></script>
+    <script src="../assets/plugins/datepicker/jquery-ui.min.js"></script>
+    <script src="../node_modules/uikit/dist/js/uikit.min.js"></script>
+    <script src="../node_modules/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="script/script.js"></script>
+    <!-- <script src="..assets/script/relogin.js"></script> -->
+    <?php include '../modal.php'; ?>
 </body>
-</html>
 
+</html>

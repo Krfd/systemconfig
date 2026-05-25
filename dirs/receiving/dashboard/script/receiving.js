@@ -31,7 +31,7 @@ function loadReceiving() {
           const date = new Date(item.ArrivalDate);
           const arrivalDate = date.toISOString().split("T")[0];
 
-          console.log(`RECEIVED ITEM: ${JSON.stringify(item)}`)
+          // console.log(`RECEIVED ITEM: ${JSON.stringify(item)}`);
 
           // const arrivalDate =
           // item.ArrivalDate && !isNaN(new Date(item.ArrivalDate).getTime())
@@ -376,9 +376,11 @@ function fetchOrderDetails() {
           // console.log(`RESPONSE : ${JSON.stringify(header)}`);
           // console.log(``);
 
+          // console.log(`BATCH : ${header.BatchNumber}`);
+
           if (response.isSuccess === "success") {
             $("#originRecForm").val(header.OriginBranch);
-            // $("#docDateRecForm").val(header.ArrivalDate);
+            // $("#batch").val(header.BatchNumber);
             $("#docDateRecForm").val(header.DeliveryDate);
             // $("#statusRecForm").val(header.DlvryStatus);
             $("#statusRecForm").val(header.DocStatus);
@@ -392,7 +394,7 @@ function fetchOrderDetails() {
             toggleReceivingButtons(false);
             Swal.fire({
               icon: "error",
-              title: response.message || "DR not found",
+              title: response.message || "Invalid delivery number",
             });
             return;
           }
@@ -428,8 +430,10 @@ function clearTable() {
   }).then((res) => {
     if (res.isConfirmed) {
       let row = [];
+      let serialRow = [];
 
       $("#receiving-form-table tbody").empty();
+      $("#receiving-serial-table tbody").empty();
 
       for (let i = 0; i < 8; i++) {
         row = `
@@ -445,6 +449,17 @@ function clearTable() {
         `;
 
         $("#receiving-form-table tbody").append(row);
+      }
+
+      for (let j = 0; j < 5; j++) {
+        serialRow = `
+          <tr class="height: 40px">
+            <td style="background: #FFFBDF;"></td>
+            <td style="background: #FFFBDF;"></td>
+            <td style="background: #FFFBDF;"></td>
+          </tr>
+        `;
+        $("#receiving-serial-table tbody").append(serialRow);
       }
     }
   });
@@ -615,6 +630,8 @@ function addNonSerialize() {
     });
 }
 
+const groupedItems = {};
+
 // FOR RECEIVING ITEM
 function serialDeliveryInput() {
   $(document).on("submit", "#serial-delivery", function (e) {
@@ -648,9 +665,9 @@ function serialDeliveryInput() {
             let existingTotal = parseInt($("#receivingQty").text()) || 0;
             let totalQty = existingTotal;
             let receivingBody = $("#receiving-form-table tbody");
-            // let receivingSerialTable = $("#receiving-serial-table tbody");
-            // let totalDelivery = 0;
-            const groupedItems = {};
+
+            const scanId = Date.now();
+
             items.forEach((item) => {
               // console.log(`RECEIVING ITEM : ${JSON.stringify(item)}`);
               if (!item.ItemCode) return;
@@ -660,46 +677,44 @@ function serialDeliveryInput() {
                   qty: 0,
                 };
               }
-            });
-            Object.values(groupedItems).forEach(function (item) {
-              let brand = item.ItemBrand;
-              // let model = item.ItemModel;
-              let model = item.ItemName;
-              let category = item.ItemCategory;
-              let itemCode = item.ItemCode;
-              // let itemRowNum = item.StckTransfr_RowNum;
-              let itemRowNum = item.ItemRowNum;
-              // let itemDeliveryQty = item.Dlvry_ItemQty;
-              let itemDeliveryQty = item.Deliver_Qty;
-              let qty = 1;
-              // let totalDelivery = 0;
 
-              // console.log(`DELIVERY QTY: ${itemDeliveryQty}`);
+              groupedItems[item.ItemCode]._scanId = scanId;
 
-              // console.log(`BRAND : ${brand}`)
-              // console.log(`MODEL : ${model}`)
-              // console.log(`CATEGORY : ${category}`)
-              // console.log(`ITEM CODE : ${itemCode}`)
-              // console.log(`ITEM ID: ${itemRowNum}`)
+              Object.values(groupedItems).forEach(function (item) {
+                let brand = item.ItemBrand;
+                let model = item.ItemName;
+                let category = item.ItemCategory;
+                let itemCode = item.ItemCode;
+                let itemRowNum = item.ItemRowNum;
+                let itemDeliveryQty = item.Deliver_Qty;
+                let qty = 1;
 
-              if (!brand || !model || !category || !itemCode) {
-                console.warn("Skipped item due to null/empty value:", item);
-                return;
-              }
-              totalQty += qty;
-              let existingRow = receivingBody.find(
-                `tr[data-itemcode="${itemCode}"]`,
-              );
+                if (item._scanId !== scanId) {
+                  return;
+                }
 
-              const serial = item.ItemSerial || Serial
+                // console.log(`RECEIVING ITEM: ${JSON.stringify(item)}`);
 
-              const tableElement = document.querySelector("#receiving-serial-table");
+                if (!brand || !model || !category || !itemCode) {
+                  console.warn("Skipped item due to null/empty value:", item);
+                  return;
+                }
+                totalQty += qty;
+                let existingRow = receivingBody.find(
+                  `tr[data-itemcode="${itemCode}"]`,
+                );
 
-              const serialExisted = Array.from(
-                tableElement.querySelectorAll("tbody tr td")
-              ).some(td => td.textContent.trim() === serial);
+                const serial = item.ItemSerial || Serial;
 
-              if (!serialExisted) {
+                const tableElement = document.querySelector(
+                  "#receiving-serial-table",
+                );
+
+                const serialExisted = Array.from(
+                  tableElement.querySelectorAll("tbody tr td"),
+                ).some((td) => td.textContent.trim() === serial);
+
+                if (!serialExisted) {
                   let serialRow = `
                       <tr style="height: 40px; min-height: 40px; cursor: pointer">
                           <td class="align-middle ps-3" style="background: #FFFBDF">${model}</td>
@@ -714,28 +729,31 @@ function serialDeliveryInput() {
                   // let emptyRow = receivingSerialTable.find("tr").filter(function () {
                   //     return $(this).find("td").eq(0).text().trim() === "";
                   // }).first();
-                  let emptyRow = receivingSerialTable.find("tr").filter(function () {
+                  let emptyRow = receivingSerialTable
+                    .find("tr")
+                    .filter(function () {
                       return $(this).text().trim() === "";
-                  }).first();
+                    })
+                    .first();
 
                   // replace empty row one by one
                   if (emptyRow.length) {
-                      emptyRow.replaceWith(serialRow);
+                    emptyRow.replaceWith(serialRow);
                   } else {
-                      // no empty rows left
-                      receivingSerialTable.prepend(serialRow);
+                    // no empty rows left
+                    receivingSerialTable.prepend(serialRow);
                   }
-              }
+                }
 
-              if (existingRow.length) {
-                let currentQty =
-                  parseInt(existingRow.find("td:nth-child(5)").text()) || 0;
-                existingRow.find("td:nth-child(5)").text(currentQty + 1);
-                existingRow.attr("data-itemcode", itemCode);
-              } else {
-                let counter =
-                  receivingBody.find("tr[data-itemcode]").length + 1;
-                let newRow = `
+                if (existingRow.length) {
+                  let currentQty =
+                    parseInt(existingRow.find("td:nth-child(5)").text()) || 0;
+                  existingRow.find("td:nth-child(5)").text(currentQty + 1);
+                  existingRow.attr("data-itemcode", itemCode);
+                } else {
+                  let counter =
+                    receivingBody.find("tr[data-itemcode]").length + 1;
+                  let newRow = `
                     <tr data-itemcode="${itemCode}" data-rownum="${itemRowNum}" data-serialbased="true" style="height: 40px; min-height: 40px; cursor: pointer">
                       <td class="align-middle ps-3 text-center" style="background: #FFFBDF">${counter}</td>
                       <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>
@@ -745,28 +763,29 @@ function serialDeliveryInput() {
                     </tr>
                   `;
 
-                // let emptyRow = receivingBody
-                //   .find("tr:not([data-itemcode])")
-                //   .first();
-                // if (emptyRow.length) {
-                //   emptyRow.replaceWith(newRow);
-                // } else {
+                  // let emptyRow = receivingBody
+                  //   .find("tr:not([data-itemcode])")
+                  //   .first();
+                  // if (emptyRow.length) {
+                  //   emptyRow.replaceWith(newRow);
+                  // } else {
                   receivingBody.prepend(newRow);
-                // }
-                renumberRows();
-              }
-
-              if ($.fn.DataTable.isDataTable("#receiving-form-table")) {
-                $("#receiving-form-table").DataTable().destroy();
-              }
-
-              let exists = false;
-              $("#receiving-form-table tbody tr").each(function () {
-                let code = $(this).data("itemcode");
-                if (code == itemCode) {
-                  exists = true;
-                  return false; // break loop
+                  // }
+                  renumberRows();
                 }
+
+                if ($.fn.DataTable.isDataTable("#receiving-form-table")) {
+                  $("#receiving-form-table").DataTable().destroy();
+                }
+
+                let exists = false;
+                $("#receiving-form-table tbody tr").each(function () {
+                  let code = $(this).data("itemcode");
+                  if (code == itemCode) {
+                    exists = true;
+                    return false; // break loop
+                  }
+                });
               });
             });
             $("#serializeBtn").prop("disabled", false);
@@ -816,14 +835,11 @@ function submitReceiving() {
       e.preventDefault();
 
       let formData = {
-        ReferenceNumber: $("#drNoRecForm").val(),
+        DeliveryNumber: $("#drNoRecForm").val(),
         Branchorigin: $('input[name="originRecForm"]').val(),
         BranchWhscode: $('input[name="origRecForm"]').val(),
-        // docDate: $("#docDateRecForm").val(),
         ReceivingDate: $("#docDateRecForm").val(),
         PostingDate: $("#postDate").val(),
-        // status: $("#statusRecForm").val(),
-        // receivedBy: $("#receiveByRecForm").val(),
         Driver: $("#driverRecForm").val(),
         TruckCategory: $("#truckCat").val(),
         TruckPlate: $("#plateRecForm").val(),
@@ -842,6 +858,7 @@ function submitReceiving() {
           model: row.find("td:eq(2)").text().trim(),
           category: row.find("td:eq(3)").text().trim(),
           qty: parseInt(row.find("td:eq(4)").text().trim()) || 0,
+          // totalQty: parseInt(row.find("td:eq(5)").text().trim()) || 0,
           serialBased: row.data("serialbased") || false,
           InTransitRowNum: row.data("rownum"),
         };
@@ -888,10 +905,19 @@ function submitReceiving() {
                 icon: "success",
                 title: "Items has been received",
               });
-              // $("#receivingForm")[0].reset();
-              console.log(formData);
-              loadDashboard();
-              // clearTable();
+              // OPEN PDF
+              window.open(
+                `pdf/receiving.php?batch=${formData.DeliveryNumber}`,
+                "_blank",
+              );
+
+              Swal.fire({
+                icon: "success",
+                title: "Items has been received",
+                // text: `Receiving #: ${response.ReceivingNumber || ""}`,
+              }).then(() => {
+                loadDashboard();
+              });
             } else {
               Swal.fire({
                 icon: "error",

@@ -61,18 +61,18 @@ function loadDelivery() {
             Number(b.DeliveryNumber || 0) - Number(a.DeliveryNumber || 0),
         );
 
-        // console.log(`DELIVERY DATA : ${JSON.stringify(sortedData)}`);
-        // console.log(``);
-
         sortedData.forEach((item) => {
-          // let status = item.DocStatus ? item.DocStatus.toUpperCase() : "";
-          let status = "IN TRANSIT";
+          // console.log(`DELIVERY ITEM: ${JSON.stringify(item)}`);
+          let status = item.DocStatus ? item.DocStatus.toUpperCase() : "";
+          // let status = "IN TRANSIT";
           let statusClass = "";
 
           if (status === "NEW" || status === "IN TRANSIT") {
             statusClass = "bg-primary";
           } else if (status === "CANCEL" || status === "CANCELLED") {
             statusClass = "bg-warning";
+          } else if (status === "DELIVERED") {
+            statusClass = "bg-success";
           } else if (status === "TERMINATED") {
             statusClass = "bg-secondary";
           } else if (status === "REJECTED") {
@@ -90,7 +90,6 @@ function loadDelivery() {
           // existingSeries.add(item.DeliveryNumber);
 
           rows.push([
-            // item.DocEntry || "",
             index++,
             item.DeliveryNumber || "",
             statusBadge,
@@ -1472,9 +1471,6 @@ function submitDelivery() {
         formData.append("PickListNum", $("#pcklstno").val());
         formData.append("Branch", $("#origin").val());
         formData.append("OrginWhscode", $("#whcode").val());
-        // formData.append("DeliveryDate", $("#deldate").val());
-        // formData.append("TruckPlateNum", $("#plate").val());
-        // formData.append("TruckDriver", $("#driver").val());
         formData.append("Remarks", $("#remarks").val());
 
         // SERIALIZED

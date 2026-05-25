@@ -10,23 +10,8 @@ session_start();
 $User = $_SESSION['Uid'];
 
 $batch = $_GET['batch'] ?? '';
-$branches = [];
 
-if (!empty($_GET['branches'])) {
-    $raw = explode(',', $_GET['branches']);
-
-    foreach ($raw as $b) {
-        $b = trim($b);
-
-        $b = trim($b, "[]\"'");
-
-        if ($b !== '') {
-            $branches[] = $b;
-        }
-    }
-}
-
-$stmt = $conn->prepare("EXEC dbo.[Print_Delivery_Items] ?, ?");
+$stmt = $conn->prepare("EXEC dbo.[Print_Receiving_Items] ?, ?");
 $stmt->execute([$User, $batch]);
 $header = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $stmt->nextRowset();
@@ -34,13 +19,13 @@ $itemData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $firstRow = $header[0] ?? [];
 
-$docDate  = $firstRow['DeliveryDate'] ?? date('Y-m-d');
+$docDate  = $firstRow['ArrivalDate'] ?? date('Y-m-d');
 
 $driver   = $firstRow['Driver'] ?? '';
 $truckCat = $firstRow['TruckCategory'] ?? '';
 $plate    = $firstRow['TruckPlate'] ?? '';
 
-$prepby   = $firstRow['ModifyBy'] ?? '';
+$prepby   = $firstRow['ReceivedBy'] ?? '';
 $remarks  = $firstRow['Remarks'] ?? 'N/A';
 
 class PDF extends FPDF
@@ -54,53 +39,6 @@ class PDF extends FPDF
         $this->branch = $branch;
         $this->series = $series;
     }
-
-    // function Header()
-    // {
-    //     $this->Image('../assets/image/logo/iap_icon.png', 10, 10, 30);
-    //     // $this->SetFont('Arial', 'B', 20);
-    //     $this->SetFont('Arial', 'B', 30);
-    //     $this->SetTextColor(64, 64, 64);
-    //     $pageWidth = $this->GetPageWidth();
-    //     $this->SetX(10);
-    //     $series = $this->series ?? 0;
-    //     $title = "DR-" . str_pad((string)$series, 5, "0", STR_PAD_LEFT);
-    //     $this->Cell($pageWidth - 10, 10, $title, 0, 1, 'C');
-    //     $this->Ln(5);
-    // }
-
-
-    // function Header()
-    // {
-    //     $logoX = 10;
-    //     $logoY = 10;
-    //     $logoW = 20;
-
-    //     $this->Image('../assets/image/logo/iap_icon.png', $logoX, $logoY, $logoW);
-
-    //     $this->SetFont('Arial', 'B', 30);
-    //     $this->SetTextColor(64, 64, 64);
-
-    //     $pageWidth = $this->GetPageWidth();
-
-    //     // $title = "DR-" . str_pad((string)($this->series ?? 0), 5, "0", STR_PAD_LEFT);
-    //     $title = $this->series;
-
-    //     // calculate true center of PAGE (not cell)
-    //     $textWidth = $this->GetStringWidth($title);
-    //     $centerX = ($pageWidth - $textWidth) / 2;
-
-    //     // avoid overlapping logo area
-    //     if ($centerX < ($logoX + $logoW + 5)) {
-    //         $centerX = $logoX + $logoW + 5;
-    //     }
-
-    //     // $this->SetXY($centerX, 15);
-    //     $this->SetXY($centerX, 10);
-    //     $this->Cell($textWidth, 10, $title, 0, 1, 'C');
-
-    //     // $this->Ln(5);
-    // }
 
     function Header()
     {
@@ -219,8 +157,8 @@ function headerDetails($pdf, $docDate, $branch)
     $leftWidth = $pageWidth / 2;
     $rightWidth = $pageWidth / 2;
 
-    $pdf->Cell($leftWidth, 6, 'Requesting Branch: ' . $branch, 0, 0, 'L');
-    $pdf->Cell($rightWidth, 6, 'Delivery Date: ' . $docDate, 0, 1, 'R');
+    $pdf->Cell($leftWidth, 6, 'Destination Branch: ' . $branch, 0, 0, 'L');
+    $pdf->Cell($rightWidth, 6, 'Arrival Date: ' . $docDate, 0, 1, 'R');
 
     $pdf->Ln(2);
 }
@@ -229,17 +167,10 @@ $itemsByBranch = [];
 $seriesByBranch = [];
 
 foreach ($itemData as $row) {
-    // $branchKey = $row['Branch'] ?? $row['RequestingBranch'] ?? 'UNKNOWN';
+    $branch = $row['DestinationBranch'] ?? $row['Branch'] ?? 'UNKNOWN';
 
-    // $itemsByBranch[$branchKey][] = $row;
-
-
-    $branch = $row['RequestingBranch'] ?? $row['Branch'] ?? 'UNKNOWN';
-
-    // group items per branch
     $itemsByBranch[$branch][] = $row;
 
-    // assign reference number per branch (first occurrence wins)
     if (!isset($seriesByBranch[$branch])) {
         $seriesByBranch[$branch] = $row['ReferenceNumber'] ?? '';
     }
@@ -274,10 +205,10 @@ function renderItemsTable($pdf, $itemData)
 
     foreach ($itemData as $row) {
 
-        $modelRaw = $row['ItemName'] ?? '';
+        $modelRaw = $row['ItemModel'] ?? '';
         $brandRaw = $row['ItemBrand'] ?? '';
         $categoryRaw = $row['ItemCategory'] ?? '';
-        $quantity = (int)($row['Deliver_Qty'] ?? 0);
+        $quantity = (int)($row['Recvd_ItemQty'] ?? 0);
 
         $key = $modelRaw . '|' . $brandRaw . '|' . $categoryRaw;
 
@@ -364,11 +295,7 @@ function footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks)
 }
 
 try {
-
-    foreach ($branches as $branch) {
-
-        $branchItems = $itemsByBranch[$branch] ?? [];
-
+    foreach ($itemsByBranch as $branch => $branchItems) {
         if (empty($branchItems)) {
             continue;
         }
@@ -383,6 +310,7 @@ try {
         renderItemsTable($pdf, $branchItems);
         footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks);
     }
+
     $pdf->Output('I', 'delivery' . '.pdf');
 } catch (PDOException $e) {
     $conn->rollBack();

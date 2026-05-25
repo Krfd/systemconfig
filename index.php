@@ -215,7 +215,8 @@ try {
             let deliveryNum;
             let summaryTable;
             let srNumberMap = [];
-            const groupedItems = {};
+            let groupedItems = {};
+            // const itemSummary = {};
         })
 
         function togglePassword() {
