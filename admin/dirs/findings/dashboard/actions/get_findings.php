@@ -1,14 +1,15 @@
 <?php 
 require_once "../../../../config/connection.php";
+session_start();
 
 try {
-    $stmt = $conn->prepare("EXEC Get_Requests");
+    $stmt = $conn->prepare("EXEC Get_Findings");
     $stmt->execute();
-    $requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $findings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $response = array(
         "isSuccess" => "success",
-        "Data" => $requests
+        "Data" => $findings
     );
 
     echo json_encode($response);

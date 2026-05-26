@@ -2779,7 +2779,7 @@ function loadToBasket(Picklists) {
   });
 }
 
-// const groupedItems = {};
+const groupedItems = {};
 
 function serialDeliveryInput(Picklists) {
   $(document).on("submit", "#serial-delivery", function (e) {
@@ -3100,6 +3100,7 @@ function serialDeliveryInput(Picklists) {
                         //   showConfirmButton: true,
                         //   confirmButtonText: "OKAY",
                         // })
+                        $("#serializeBtn").prop("disabled", false);
                       }
                     },
                     error: function () {
