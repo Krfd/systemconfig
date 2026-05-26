@@ -2877,11 +2877,16 @@ function serialDeliveryInput(Picklists) {
                         data.length > 0
                       ) {
                         Object.values(groupedItems).forEach(function (item) {
+                          // console.log(`ITEM : ${JSON.stringify(item)}`);
+                          console.log(
+                            `TOTAL REQ ITEM QTY: ${parseInt(data[0].Req_Item_Qty) || 0}`,
+                          );
                           let brand = item.ItemBrand;
                           let model = item.ItemName;
                           let category = item.ItemCategory;
                           let itemCode = item.Itemcode;
                           let qty = 1;
+                          let reqQty = parseInt(data[0].Req_Item_Qty) || 0;
 
                           if (item._scanId !== scanId) {
                             return;
@@ -2918,6 +2923,34 @@ function serialDeliveryInput(Picklists) {
                             `tr[data-itemkey="${itemKey}"]`,
                           );
 
+                          // DUPLICATE SERIAL
+                          // if (existingRow.length) {
+                          //   Swal.fire({
+                          //     icon: "error",
+                          //     title:
+                          //       "Serial for this model has been scanned already",
+                          //   });
+                          //   return;
+                          // }
+
+                          // let maxAllowed = groupedItems[itemCode].allowedQty || 0;
+                          let currentLoaded =
+                            groupedItems[itemCode].loadedQty || 0;
+
+                          console.log(`ALLOWED QTY : ${totalActualPerModel}`);
+                          console.log(`CURRENT : ${currentLoaded}`);
+                          console.log(``);
+
+                          // if (currentLoaded >= maxAllowed) {
+                          if (currentLoaded >= totalActualPerModel) {
+                            Swal.fire({
+                              icon: "error",
+                              title: "Limit reached",
+                              text: `This item has already reached its maximum allowed quantity.`,
+                            });
+                            return;
+                          }
+
                           const serial = item.ItemSerial;
 
                           // get the actual table element
@@ -2932,12 +2965,12 @@ function serialDeliveryInput(Picklists) {
 
                           if (!serialExisted) {
                             let serialRow = `
-                                      <tr style="height: 40px; min-height: 40px; cursor: pointer">
-                                          <td class="align-middle ps-3" style="background: #FFFBDF">${model}</td>
-                                          <td class="align-middle ps-3" style="background: #FFFBDF">${itemCode}</td>
-                                          <td class="align-middle ps-3" style="background: #FFFBDF">${serial}</td>
-                                      </tr>
-                                  `;
+                              <tr style="height: 40px; min-height: 40px; cursor: pointer">
+                                  <td class="align-middle ps-3" style="background: #FFFBDF">${model}</td>
+                                  <td class="align-middle ps-3" style="background: #FFFBDF">${itemCode}</td>
+                                  <td class="align-middle ps-3" style="background: #FFFBDF">${serial}</td>
+                              </tr>
+                            `;
 
                             let serialTableBody = $(
                               "#basket-serial-table tbody",
@@ -2960,35 +2993,6 @@ function serialDeliveryInput(Picklists) {
                               // no empty rows left
                               serialTableBody.prepend(serialRow);
                             }
-                          }
-
-                          // DUPLICATE SERIAL
-                          // if (existingRow.length) {
-                          //   Swal.fire({
-                          //     icon: "error",
-                          //     title:
-                          //       "Serial for this model has been scanned already",
-                          //   });
-                          //   return;
-                          // }
-
-                          // let maxAllowed = groupedItems[itemCode].allowedQty || 0;
-                          let currentLoaded =
-                            groupedItems[itemCode].loadedQty || 0;
-
-                          // console.log(`ALLOWED QTY : ${maxAllowed}`)
-                          console.log(`ALLOWED QTY : ${totalActualPerModel}`);
-                          console.log(`CURRENT : ${currentLoaded}`);
-                          console.log(``);
-
-                          // if (currentLoaded >= maxAllowed) {
-                          if (currentLoaded >= totalActualPerModel) {
-                            Swal.fire({
-                              icon: "error",
-                              title: "Limit reached",
-                              text: `This item has already reached its maximum allowed quantity.`,
-                            });
-                            return;
                           }
 
                           totalQty += qty;
@@ -3020,7 +3024,10 @@ function serialDeliveryInput(Picklists) {
 
                             existingItem.attr(
                               "data-bs-title",
-                              "Serials: <br>" + serialArray.join("<br>"),
+                              "Serials: <br>" +
+                                serialArray.join("<br>") +
+                                "<br>Requested: " +
+                                reqQty,
                             );
 
                             // console.log(`LOADED QTY: ${item.loadedQty}`)
@@ -3047,7 +3054,7 @@ function serialDeliveryInput(Picklists) {
                                   data-serials="${item.ItemSerial}" 
                                   data-bs-toggle="tooltip" 
                                   data-bs-html="true" 
-                                  data-bs-title="${"Serials: <br>" + item.ItemSerial}" 
+                                  data-bs-title="${"Serials: " + item.ItemSerial} <br>Requested: ${reqQty}" 
                                   style="height: 40px; min-height: 40px; cursor: pointer">
                                   <td class="align-middle ps-3 text-center" style="background: #FFFBDF">${counter}</td>
                                   <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>

@@ -15,10 +15,6 @@
                         <form method="POST" id="loadingBasketForm">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="d-flex flex-column gap-1 col-4">
-                                    <!-- <div class="d-flex align-items-baseline gap-3">
-                                        <label for="batch" class="form-label text-dark-emphasis col-3"><small>Batch No:</small></label>
-                                        <input type="text" name="batch" id="batch" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
-                                    </div> -->
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
@@ -80,8 +76,16 @@
                                 </table>
                             </div>
                             <div id="totalRowOutside" class="d-flex border-top fw-bold justify-content-end w-100" style="background: #FFFBDF">
-                                <div class=" p-2 text-end">Total Quantity:</div>
-                                <div class="p-2" style="width:120px;" id="loadingQty">0</div>
+                                <!-- <div class="d-flex">
+                                    <div class="d-flex">
+                                        <div class="p-2 text-end">Balance:</div>
+                                        <div class="p-2" style="width:120px;" id="balanceQty">0</div>
+                                    </div>
+                                </div> -->
+                                <div class="d-flex">
+                                    <div class=" p-2 text-end">Total Quantity:</div>
+                                    <div class="p-2" style="width:120px;" id="loadingQty">0</div>
+                                </div>
                             </div>
                             <div class="d-flex justify-content-start align-items-end mt-5 gap-1">
                                 <div class="d-flex flex-column gap-1 col-3">

@@ -89,13 +89,11 @@ function loadIncoming() {
           rows.push([
             `<input type="checkbox" name="checkbox" id="${item.RowNum}" data-srnumber="${item.SR_Number}" data-docentry="${item.DocEntry}" data-docstatus="${item.DocStatus}"
             class="form-check-input align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
-            // item.RowNum || "",
             index++,
             item.SR_Number || "",
             item.BranchDestination || "",
             statusBadge,
             item.EncodeDate || "",
-            // item.DocStatus || "",
           ]);
         });
 
@@ -120,7 +118,7 @@ function loadIncoming() {
             { title: "Status" },
             { title: "Date", className: "text-start" },
           ],
-          pageLength: 50,
+          pageLength: 25,
           paging: true,
           searching: true,
           info: true,
@@ -1843,16 +1841,16 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
                   addToBasket(PickListNum);
                 }
 
-                const groupByCategory = false;
-                const openPrint = () => {
-                  window.open(
-                    `pdf/requests.php?DocEntry=${DocEntry}` +
-                      `&executedBy=${encodeURIComponent(executedBy)}` +
-                      `&groupByCategory=${groupByCategory ? 1 : 0}`,
-                    "_blank",
-                  );
-                };
-                openPrint();
+                // const groupByCategory = false;
+                // const openPrint = () => {
+                //   window.open(
+                //     `pdf/requests.php?DocEntry=${DocEntry}` +
+                //       `&executedBy=${encodeURIComponent(executedBy)}` +
+                //       `&groupByCategory=${groupByCategory ? 1 : 0}`,
+                //     "_blank",
+                //   );
+                // };
+                // openPrint();
                 Swal.close();
                 setTimeout(() => {
                   loadBasketContent();

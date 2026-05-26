@@ -119,9 +119,14 @@ function loadBasket() {
 
           const date = new Date(item.DocDate);
           const formatted = date.toISOString().split("T")[0];
+          const formattedTime = date.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          });
 
-          // console.log(`BRANCHES : ${branches}`);
-          console.log(`BASKET ITEM : ${JSON.stringify(item)}`)
+          console.log(`BASKET ITEM : ${JSON.stringify(item)}`);
+          console.log(``);
 
           rows.push([
             rowNum++,
@@ -137,6 +142,7 @@ function loadBasket() {
               return `<span class="badge bg-${badgeClass}" >${status}</span>`;
             })(),
             formatted,
+            formattedTime,
             '<div class="dropdown dropstart">' +
               '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
               '<i class="bi bi-three-dots"></i></button>' +
@@ -165,6 +171,7 @@ function loadBasket() {
             { title: "Batch No.", className: "text-start ps-5" },
             { title: "Status", className: "ps-3" },
             { title: "Date", className: "text-start ps-3" },
+            { title: "Time", className: "text-start ps-3" },
             { title: "Action" },
           ],
           createdRow: function (row, data) {
@@ -208,7 +215,7 @@ function loadBasket() {
             for (let i = currentRows; i < 8; i++) {
               let $emptyRow = $(`
                   <tr class="empty-row">
-                    <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
+                    <td colspan="6" style="background: #FFFBDF">&nbsp;</td>
                   </tr>
                 `);
 

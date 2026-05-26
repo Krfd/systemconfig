@@ -6,6 +6,7 @@
                 <th class="text-secondary">Batch No.</th>
                 <th class="text-secondary">Status</th>
                 <th class="text-secondary text-start">Date</th>
+                <th class="text-secondary text-start">Time</th>
                 <th class="text-secondary">Action</th>
             </tr>
         </thead>

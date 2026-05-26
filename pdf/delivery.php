@@ -5,7 +5,10 @@ error_reporting(0);
 @ini_set('display_errors', 0);
 require_once "../config/connection.php";
 require_once "../assets/plugins/fpdf/fpdf.php";
+require_once "../vendor/autoload.php";
 session_start();
+
+use Picqer\Barcode\BarcodeGeneratorPNG;
 
 $User = $_SESSION['Uid'];
 
@@ -233,7 +236,6 @@ foreach ($itemData as $row) {
 
     // $itemsByBranch[$branchKey][] = $row;
 
-
     $branch = $row['RequestingBranch'] ?? $row['Branch'] ?? 'UNKNOWN';
 
     // group items per branch
@@ -364,7 +366,19 @@ function footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks)
 }
 
 try {
+    $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
 
+    $barcodeValue = $batch ?: 'NO_BATCH';
+
+    $barcodeData = $generator->getBarcode(
+        $barcodeValue,
+        $generator::TYPE_CODE_128
+    );
+
+    // save to temp file
+    $barcodeFile = sys_get_temp_dir() . "/barcode_" . session_id() . ".png";
+
+    file_put_contents($barcodeFile, $barcodeData);
     foreach ($branches as $branch) {
 
         $branchItems = $itemsByBranch[$branch] ?? [];
@@ -378,7 +392,7 @@ try {
         $pdf->setData($branch, $series);
         $pdf->AddPage();
         $pdf->Ln(15);
-
+        $pdf->Image($barcodeFile, 150, 10, 40, 15, 'PNG');
         headerDetails($pdf, $docDate, $branch);
         renderItemsTable($pdf, $branchItems);
         footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks);

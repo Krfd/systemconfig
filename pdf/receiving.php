@@ -2,10 +2,13 @@
 
 ob_start();
 error_reporting(0);
-@ini_set('display_errors', 0);
+@ini_set('display_errors', 0); // hides error
 require_once "../config/connection.php";
 require_once "../assets/plugins/fpdf/fpdf.php";
+require_once "../vendor/autoload.php";
 session_start();
+
+// use Picqer\Barcode\BarcodeGeneratorPNG;
 
 $User = $_SESSION['Uid'];
 
@@ -40,6 +43,40 @@ class PDF extends FPDF
         $this->series = $series;
     }
 
+    // function Header()
+    // {
+    //     $logoX = 10;
+    //     $logoY = 10;
+    //     // $logoY = 6;
+    //     $logoW = 20;
+
+    //     $this->Image('../assets/image/logo/iap_icon.png', $logoX, $logoY, $logoW);
+    //     $this->SetFont('Arial', 'B', 25);
+    //     $this->SetTextColor(64, 64, 64);
+
+    //     $pageWidth = $this->GetPageWidth();
+
+    //     $title = $this->series ?? '';
+
+    //     // true center of page
+    //     $textWidth = $this->GetStringWidth($title);
+    //     $centerX = ($pageWidth - $textWidth) / 2;
+
+    //     // logo constraint (left safe area)
+    //     $minX = $logoX + $logoW + 5;
+
+    //     if ($centerX < $minX) {
+    //         $centerX = $minX;
+    //     }
+
+    //     // 🔥 balance shift so it doesn't look "pushed right"
+    //     $shift = $centerX - $minX;
+    //     $centerX = $centerX - ($shift / 2);
+
+    //     $this->SetXY($centerX, 10);
+    //     $this->Cell($textWidth, 10, $title, 0, 0, 'C');
+    // }
+
     function Header()
     {
         $logoX = 10;
@@ -48,30 +85,35 @@ class PDF extends FPDF
 
         $this->Image('../assets/image/logo/iap_icon.png', $logoX, $logoY, $logoW);
 
-        $this->SetFont('Arial', 'B', 30);
+        $this->SetFont('Arial', 'B', 25);
         $this->SetTextColor(64, 64, 64);
 
         $pageWidth = $this->GetPageWidth();
-
         $title = $this->series ?? '';
 
-        // true center of page
+        // ===== horizontal centering =====
         $textWidth = $this->GetStringWidth($title);
         $centerX = ($pageWidth - $textWidth) / 2;
 
-        // logo constraint (left safe area)
         $minX = $logoX + $logoW + 5;
 
         if ($centerX < $minX) {
             $centerX = $minX;
         }
 
-        // 🔥 balance shift so it doesn't look "pushed right"
         $shift = $centerX - $minX;
         $centerX = $centerX - ($shift / 2);
 
-        $this->SetXY($centerX, 10);
-        $this->Cell($textWidth, 10, $title, 0, 0, 'C');
+        // ===== vertical alignment FIX =====
+        $logoHeight = $logoW; // since square logo
+        $logoCenterY = $logoY + ($logoHeight / 2);
+
+        // FPDF text height baseline correction (important part)
+        $textHeight = 10;
+        $textY = $logoCenterY - ($textHeight / 2);
+
+        $this->SetXY($centerX, $textY);
+        $this->Cell($textWidth, $textHeight, $title, 0, 0, 'C');
     }
 
     function Footer()
@@ -172,7 +214,7 @@ foreach ($itemData as $row) {
     $itemsByBranch[$branch][] = $row;
 
     if (!isset($seriesByBranch[$branch])) {
-        $seriesByBranch[$branch] = $row['ReferenceNumber'] ?? '';
+        $seriesByBranch[$branch] = 'Ref No: ' . ($row['ReferenceNumber'] ?? '');
     }
 }
 
@@ -295,6 +337,19 @@ function footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks)
 }
 
 try {
+    // $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
+
+    // $barcodeValue = $batch ?: 'NO_BATCH';
+
+    // $barcodeData = $generator->getBarcode(
+    //     $barcodeValue,
+    //     $generator::TYPE_CODE_128
+    // );
+
+    // // save to temp file
+    // $barcodeFile = "barcode_" . session_id() . ".png";
+
+    // file_put_contents($barcodeFile, $barcodeData);
     foreach ($itemsByBranch as $branch => $branchItems) {
         if (empty($branchItems)) {
             continue;
@@ -305,7 +360,7 @@ try {
         $pdf->setData($branch, $series);
         $pdf->AddPage();
         $pdf->Ln(15);
-
+        // $pdf->Image($barcodeFile, 150, 10, 40, 15, 'PNG');
         headerDetails($pdf, $docDate, $branch);
         renderItemsTable($pdf, $branchItems);
         footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks);

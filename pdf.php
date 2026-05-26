@@ -311,35 +311,35 @@ try {
 
     $groupedItems = [];
 
-        foreach ($itemData as $row) {
-            $category = $row->ItemCategory ?? 'Uncategorized';
-            $groupedItems[$category][] = $row;
-        }
+    foreach ($itemData as $row) {
+        $category = $row->ItemCategory ?? 'Uncategorized';
+        $groupedItems[$category][] = $row;
+    }
 
-        // CATEGORIZED ITEM
-        if ($grouped) {
-            foreach ($groupedItems as $category => $items) {
-                $pdf->categoryTitle = $category;
-                $pdf->AddPage();
-
-                headerDetails($pdf, $srn, $status, $date, $origin, $category);
-
-                $pdf->Ln(2);
-
-                // PASS CORRECT VARIABLE HERE
-                renderItemsTable($pdf, $items, $textColor, false);
-                bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $timestamp, $textColor);
-            }
-        }
-        
-        // NON-CATEGORIZED ITEM
-        else {
-            $pdf->categoryTitle = '';
+    // CATEGORIZED ITEM
+    if ($grouped) {
+        foreach ($groupedItems as $category => $items) {
+            $pdf->categoryTitle = $category;
             $pdf->AddPage();
-            headerDetails($pdf, $srn, $status, $date, $origin, '');
-            renderItemsTable($pdf, $itemData, $textColor, $grouped);
+
+            headerDetails($pdf, $srn, $status, $date, $origin, $category);
+
+            $pdf->Ln(2);
+
+            // PASS CORRECT VARIABLE HERE
+            renderItemsTable($pdf, $items, $textColor, false);
             bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $timestamp, $textColor);
         }
+    }
+
+    // NON-CATEGORIZED ITEM
+    else {
+        $pdf->categoryTitle = '';
+        $pdf->AddPage();
+        headerDetails($pdf, $srn, $status, $date, $origin, '');
+        renderItemsTable($pdf, $itemData, $textColor, $grouped);
+        bottomLeftDetails($pdf, $purpose, $requestedBy, $remarks, $timestamp, $textColor);
+    }
     /* ---------- OUTPUT ---------- */
 
     ob_end_clean();
