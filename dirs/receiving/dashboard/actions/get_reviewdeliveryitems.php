@@ -3,17 +3,19 @@ require_once "../../../../config/connection.php";
 session_start();
 
 $User = $_SESSION['Uid'];
-$DeliveryNumber = $_POST['DeliveryNumber'];
+// $DeliveryNumber = $_POST['DeliveryNumber'];
+$searchType = $_POST['searchType'];
+$searchValue = $_POST['searchValue'];
 
 try {
 
     $conn->beginTransaction();
-    $stmt = $conn->prepare("EXEC dbo.DeliveryComplete_Details ?, ?");
-    $stmt->execute([$User, $DeliveryNumber]);
+    // $stmt = $conn->prepare("EXEC dbo.DeliveryComplete_Details ?, ?");
+    $stmt = $conn->prepare("EXEC dbo.[Get_Delivery_Details] ?, ?, ?");
+    // $stmt->execute([$User, $DeliveryNumber]);
+    $stmt->execute([$User, $searchType, $searchValue]);
     $get_header = $stmt->fetch(PDO::FETCH_ASSOC);
-
     $stmt->nextRowset();
-
     $delivery_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $conn->commit();
 
@@ -21,6 +23,7 @@ try {
         $response = array(
             "isSuccess" => "success",
             "Header" => $get_header,
+            "Items" => $delivery_items
         );
     } else {
         $response = array(

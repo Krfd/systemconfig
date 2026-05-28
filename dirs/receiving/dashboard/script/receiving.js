@@ -345,14 +345,22 @@ $(document).on("input blur keyup", ".item-qty-received", function () {
 });
 
 function fetchOrderDetails() {
-  $("#drNoRecForm").on("keydown", function (e) {
+  // $("#drNoRecForm").on("keydown", function (e) {
+  $(".search-order-field").on("keydown", function (e) {
     // ENTER KEY
     if (e.key === "Enter") {
       e.preventDefault();
       e.stopPropagation();
-      let drNo = $(this).val().trim();
+      // let drNo = $(this).val().trim();
 
-      if (!drNo) {
+      let value = $(this).val().trim();
+      let field = $(this).data("field");
+
+      console.log(`VALUE : ${value}`)
+      console.log(`FIELD : ${field}`)
+
+      // if (!drNo) {
+      if (!field) {
         toggleReceivingButtons(false);
         Swal.fire({
           icon: "warning",
@@ -365,7 +373,11 @@ function fetchOrderDetails() {
       $.ajax({
         url: "dirs/receiving/dashboard/actions/get_reviewdeliveryitems.php",
         type: "POST",
-        data: { DeliveryNumber: drNo },
+        // data: { DeliveryNumber: drNo },
+        data: { 
+          searchType: field,
+          searchValue: value
+         },
         dataType: "json",
         beforeSend: function () {
           $("#submitRecBtn").prop("disabled", true);
@@ -373,16 +385,20 @@ function fetchOrderDetails() {
         },
         success: function (response) {
           let header = response.Header;
-          // console.log(`RESPONSE : ${JSON.stringify(header)}`);
-          // console.log(``);
-
-          // console.log(`BATCH : ${header.BatchNumber}`);
+          let items = response.Items
+          console.log(`RESPONSE : ${JSON.stringify(header)}`);
+          console.log(``);
+          console.log(`ITEMS : ${items}`)
 
           if (response.isSuccess === "success") {
+            if (field !== "deliveryNumber") {
+              $("#drNoRecForm").val(header.DeliveryNumber);
+            }
             $("#originRecForm").val(header.OriginBranch);
-            // $("#batch").val(header.BatchNumber);
+            $("#refNoRecForm").val(items[0].ReferenceNumber);
+            $("#stockReqNoRecForm").val(items[0].SR_Number);
+            
             $("#docDateRecForm").val(header.DeliveryDate);
-            // $("#statusRecForm").val(header.DlvryStatus);
             $("#statusRecForm").val(header.DocStatus);
 
             $("#driverRecForm").val(header.Driver || "");
@@ -453,10 +469,10 @@ function clearTable() {
 
       for (let j = 0; j < 5; j++) {
         serialRow = `
-          <tr class="height: 40px">
-            <td style="background: #FFFBDF;"></td>
-            <td style="background: #FFFBDF;"></td>
-            <td style="background: #FFFBDF;"></td>
+          <tr style="height: 40px">
+            <td style="background: #FFFBDF"></td>
+            <td style="background: #FFFBDF"></td>
+            <td style="background: #FFFBDF"></td>
           </tr>
         `;
         $("#receiving-serial-table tbody").append(serialRow);
@@ -669,7 +685,6 @@ function serialDeliveryInput() {
             const scanId = Date.now();
 
             items.forEach((item) => {
-              // console.log(`RECEIVING ITEM : ${JSON.stringify(item)}`);
               if (!item.ItemCode) return;
               if (!groupedItems[item.ItemCode]) {
                 groupedItems[item.ItemCode] = {
@@ -763,14 +778,26 @@ function serialDeliveryInput() {
                     </tr>
                   `;
 
-                  // let emptyRow = receivingBody
-                  //   .find("tr:not([data-itemcode])")
-                  //   .first();
-                  // if (emptyRow.length) {
-                  //   emptyRow.replaceWith(newRow);
-                  // } else {
-                  receivingBody.prepend(newRow);
-                  // }
+                  
+                  // receivingBody.prepend(newRow);
+                  // renumberRows();
+
+
+                  let emptyRow = receivingBody.find("tr").filter(function () {
+                      return (
+                        !$(this).attr("data-itemcode") &&
+                        $(this).text().trim() === ""
+                      );
+                    })
+                    .first();
+
+                  if (emptyRow.length) {
+                    emptyRow.replaceWith(newRow);
+                  } else {
+                    receivingBody.prepend(newRow);
+
+                  }
+
                   renumberRows();
                 }
 
@@ -910,6 +937,8 @@ function submitReceiving() {
                 `pdf/receiving.php?batch=${formData.DeliveryNumber}`,
                 "_blank",
               );
+
+              console.log(`SHOULD GENERATE RECEIVING REPORT`)
 
               Swal.fire({
                 icon: "success",

@@ -24,11 +24,19 @@
                     <div class="row">
                         <form method="POST" id="receivingForm">
                             <div class="d-flex justify-content-between align-items-start">
-                                <div class="d-flex flex-column gap-1 col-3">
+                                <div class="d-flex flex-column gap-1 col-4">
                                     <!-- <input type="hidden" id="batch"> -->
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="drNoRecForm" class="form-label text-dark-emphasis col-3"><small>DR No:</small></label>
-                                        <input type="text" name="drNoRecForm" id="drNoRecForm" class="form-control form-control-sm col" style="background: #FFFBDF" oninput="this.value = this.value.toUpperCase()">
+                                        <input type="text" name="drNoRecForm" id="drNoRecForm" class="form-control form-control-sm col search-order-field" data-field="deliveryNumber" style="background: #FFFBDF" oninput="this.value = this.value.toUpperCase()">
+                                    </div>
+                                    <div class="d-flex align-items-baseline gap-3">
+                                        <label for="refNoRecForm" class="form-label text-dark-emphasis col-3"><small>Reference No:</small></label>
+                                        <input type="text" name="refNoRecForm" id="refNoRecForm" class="form-control form-control-sm col search-order-field" data-field="referenceNumber" style="background: #FFFBDF" oninput="this.value = this.value.toUpperCase()">
+                                    </div>
+                                    <div class="d-flex align-items-baseline gap-3">
+                                        <label for="stockReqNoRecForm" class="form-label text-dark-emphasis col-3"><small>Stock Request No:</small></label>
+                                        <input type="text" name="stockReqNoRecForm" id="stockReqNoRecForm" class="form-control form-control-sm col search-order-field" data-field="stockReqNumber" style="background: #FFFBDF" oninput="this.value = this.value.toUpperCase()">
                                     </div>
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">

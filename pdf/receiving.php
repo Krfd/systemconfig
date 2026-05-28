@@ -1,8 +1,10 @@
 <?php
 
 ob_start();
-error_reporting(0);
-@ini_set('display_errors', 0); // hides error
+// error_reporting(0);
+// @ini_set('display_errors', 0); // hides error
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require_once "../config/connection.php";
 require_once "../assets/plugins/fpdf/fpdf.php";
 require_once "../vendor/autoload.php";
@@ -22,7 +24,10 @@ $itemData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $firstRow = $header[0] ?? [];
 
-$docDate  = $firstRow['ArrivalDate'] ?? date('Y-m-d');
+// $docDate  = $firstRow['ArrivalDate'];
+$docDate = isset($firstRow['ArrivalDate'])
+    ? date('M d, Y', strtotime($firstRow['ArrivalDate']))
+    : '';
 
 $driver   = $firstRow['Driver'] ?? '';
 $truckCat = $firstRow['TruckCategory'] ?? '';
@@ -30,6 +35,16 @@ $plate    = $firstRow['TruckPlate'] ?? '';
 
 $prepby   = $firstRow['ReceivedBy'] ?? '';
 $remarks  = $firstRow['Remarks'] ?? 'N/A';
+
+$origin = $firstRow['OriginBranch'] ?? 'UNKNOWN';
+$originwhscode = $firstRow['OriginWhscode'] ?? 'UNKNOWN';
+$receivedDate = isset($firstRow['SysTimeStamp'])
+    ? date('M d, Y', strtotime($firstRow['SysTimeStamp']))
+    : date('M d, Y');
+    $receivedTime = isset($firstRow['SysTimeStamp'])
+    ? date('h:i A', strtotime($firstRow['SysTimeStamp']))
+    : date('h:i A');
+$status = strtoupper($firstRow['ReceivedStatus'] ?? 'UNKNOWN');
 
 class PDF extends FPDF
 {
@@ -77,6 +92,51 @@ class PDF extends FPDF
     //     $this->Cell($textWidth, 10, $title, 0, 0, 'C');
     // }
 
+    // WORKING
+    // function Header()
+    // {
+    //     $logoX = 10;
+    //     $logoY = 10;
+    //     $logoW = 20;
+
+    //     $this->Image('../assets/image/logo/iap_icon.png', $logoX, $logoY, $logoW);
+
+    //     $this->SetFont('Arial', 'B', 20);
+    //     $this->SetTextColor(64, 64, 64);
+
+    //     $pageWidth = $this->GetPageWidth();
+    //     // $title = $this->series ?? '';
+        
+    //     $title = !empty($this->series)
+    //         ? 'Ref No: ' . $this->series
+    //         : '';
+
+    //     // ===== horizontal centering =====
+    //     $textWidth = $this->GetStringWidth($title);
+    //     $centerX = ($pageWidth - $textWidth) / 2;
+
+    //     $minX = $logoX + $logoW + 5;
+
+    //     if ($centerX < $minX) {
+    //         $centerX = $minX;
+    //     }
+
+    //     $shift = $centerX - $minX;
+    //     $centerX = $centerX - ($shift / 2);
+
+    //     // ===== vertical alignment FIX =====
+    //     $logoHeight = $logoW; // since square logo
+    //     $logoCenterY = $logoY + ($logoHeight / 2);
+
+    //     // FPDF text height baseline correction (important part)
+    //     $textHeight = 10;
+    //     $textY = $logoCenterY - ($textHeight / 2);
+
+    //     $this->SetXY($centerX, $textY);
+    //     $this->Cell($textWidth, $textHeight, $title, 0, 0, 'C');
+    // }
+
+    // WITH MAIN TITLE
     function Header()
     {
         $logoX = 10;
@@ -85,35 +145,50 @@ class PDF extends FPDF
 
         $this->Image('../assets/image/logo/iap_icon.png', $logoX, $logoY, $logoW);
 
-        $this->SetFont('Arial', 'B', 25);
-        $this->SetTextColor(64, 64, 64);
-
         $pageWidth = $this->GetPageWidth();
-        $title = $this->series ?? '';
 
-        // ===== horizontal centering =====
-        $textWidth = $this->GetStringWidth($title);
-        $centerX = ($pageWidth - $textWidth) / 2;
+        $mainTitle = 'Receiving Report';
+
+        $refTitle = !empty($this->series)
+            ? 'Ref No: ' . $this->series
+            : '';
 
         $minX = $logoX + $logoW + 5;
 
-        if ($centerX < $minX) {
-            $centerX = $minX;
+        // ===== MAIN TITLE =====
+        $this->SetFont('Arial', 'B', 20);
+        $this->SetTextColor(64, 64, 64);
+
+        $mainTextWidth = $this->GetStringWidth($mainTitle);
+        $mainCenterX = ($pageWidth - $mainTextWidth) / 5;
+
+        if ($mainCenterX < $minX) {
+            $mainCenterX = $minX;
         }
 
-        $shift = $centerX - $minX;
-        $centerX = $centerX - ($shift / 2);
+        // ===== REF TITLE =====
+        $this->SetFont('Arial', 'B', 14);
 
-        // ===== vertical alignment FIX =====
-        $logoHeight = $logoW; // since square logo
-        $logoCenterY = $logoY + ($logoHeight / 2);
+        $refTextWidth = $this->GetStringWidth($refTitle);
+        $refCenterX = ($pageWidth - $refTextWidth) / 2;
 
-        // FPDF text height baseline correction (important part)
-        $textHeight = 10;
-        $textY = $logoCenterY - ($textHeight / 2);
+        if ($refCenterX < $minX) {
+            $refCenterX = $minX;
+        }
 
-        $this->SetXY($centerX, $textY);
-        $this->Cell($textWidth, $textHeight, $title, 0, 0, 'C');
+        // ===== Vertical positioning =====
+        $mainTextY = 10;
+        $refTextY = 18;
+
+        // Draw main title
+        $this->SetFont('Arial', 'B', 20);
+        $this->SetXY($mainCenterX, $mainTextY);
+        $this->Cell($mainTextWidth, 8, $mainTitle, 0, 0, 'C');
+
+        // Draw ref no
+        $this->SetFont('Arial', 'B', 14);
+        $this->SetXY($refCenterX, $refTextY);
+        $this->Cell($refTextWidth, 6, $refTitle, 0, 0, 'C');
     }
 
     function Footer()
@@ -190,17 +265,28 @@ class PDF extends FPDF
 $pdf = new PDF();
 $pdf->AliasNbPages();
 
-function headerDetails($pdf, $docDate, $branch)
+function headerDetails($pdf, $docDate, $branch, $origin, $receivedDate, $receivedTime, $originwhscode, $status)
 {
     $pdf->SetFont('Arial', '', 9);
 
-    $pageWidth = $pdf->GetPageWidth() - 20;
+    $pageWidth = $pdf->GetPageWidth() - 24;
 
     $leftWidth = $pageWidth / 2;
     $rightWidth = $pageWidth / 2;
 
-    $pdf->Cell($leftWidth, 6, 'Destination Branch: ' . $branch, 0, 0, 'L');
-    $pdf->Cell($rightWidth, 6, 'Arrival Date: ' . $docDate, 0, 1, 'R');
+    $pdf->Cell($leftWidth, 6, sprintf('%-19s %s', 'Receiving Branch:', $branch), 0, 0, 'L');
+    $pdf->Cell($rightWidth, 6, sprintf('%-27s %s', 'Arrival Date:', $docDate), 0, 1, 'R');
+
+    $pdf->Cell($leftWidth, 6, sprintf('%-22s %s', 'Origin Branch:', $origin), 0, 0, 'L');
+    $pdf->Cell($rightWidth, 6, sprintf('%-18s %s', 'Received Date:', $receivedDate), 0, 1, 'R');
+
+    $pdf->Cell($leftWidth, 6, sprintf('%-20s %s', 'Origin Whcode:', $originwhscode), 0, 0, 'L');
+    $pdf->Cell($rightWidth, 6, sprintf('%-18s %s', 'Received Time:', $receivedTime), 0, 1, 'R');
+    
+    // $pdf->Cell(0, 6, 'Status: ' . $status, 0, 1, 'R');
+    
+    $pdf->SetX($pdf->GetPageWidth() - 55);
+    $pdf->Cell(40, 6, 'Status: ' . $status, 0, 1, 'R');
 
     $pdf->Ln(2);
 }
@@ -209,12 +295,13 @@ $itemsByBranch = [];
 $seriesByBranch = [];
 
 foreach ($itemData as $row) {
-    $branch = $row['DestinationBranch'] ?? $row['Branch'] ?? 'UNKNOWN';
+    $branch = $row['ReceivedBranch'] ?? $row['ReceivedBranch'] ?? 'UNKNOWN';
 
     $itemsByBranch[$branch][] = $row;
 
     if (!isset($seriesByBranch[$branch])) {
-        $seriesByBranch[$branch] = 'Ref No: ' . ($row['ReferenceNumber'] ?? '');
+        // $seriesByBranch[$branch] = 'Ref No: ' . ($row['ReferenceNumber'] ?? '');
+        $seriesByBranch[$branch] = $row['ReferenceNumber'] ?? '';
     }
 }
 
@@ -328,12 +415,31 @@ function renderItemsTable($pdf, $itemData)
 function footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks)
 {
     $pdf->Ln(5);
-    $pdf->SetFont('Arial', '', 10);
-    $pdf->Cell(0, 6, 'Driver: ' . $driver, 0, 1, 'L');
-    $pdf->Cell(0, 6, 'Truck Category: ' . $truckCat, 0, 1, 'L');
-    $pdf->Cell(0, 6, 'Plate No: ' . $plate, 0, 1, 'L');
-    $pdf->Cell(0, 6, 'Prepared By: ' . $prepby, 0, 1, 'L');
-    $pdf->Cell(0, 6, 'Remarks: ' . $remarks, 0, 1, 'L');
+    // $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('Arial', '', 9);
+
+    $labelWidth = 30;
+    $valueWidth = 120;
+
+    // DRIVER
+    $pdf->Cell($labelWidth, 6, 'Driver:', 0, 0, 'L');
+    $pdf->Cell($valueWidth, 6, $driver, 0, 1, 'L');
+
+    // TRUCK CATEGORY
+    $pdf->Cell($labelWidth, 6, 'Truck Category:', 0, 0, 'L');
+    $pdf->Cell($valueWidth, 6, $truckCat, 0, 1, 'L');
+
+    // PLATE NO
+    $pdf->Cell($labelWidth, 6, 'Plate No:', 0, 0, 'L');
+    $pdf->Cell($valueWidth, 6, $plate, 0, 1, 'L');
+
+    // PREPARED BY
+    $pdf->Cell($labelWidth, 6, 'Prepared By:', 0, 0, 'L');
+    $pdf->Cell($valueWidth, 6, $prepby, 0, 1, 'L');
+
+    // REMARKS
+    $pdf->Cell($labelWidth, 6, 'Remarks:', 0, 0, 'L');
+    $pdf->Cell($valueWidth, 6, $remarks, 0, 1, 'L');
 }
 
 try {
@@ -350,23 +456,65 @@ try {
     // $barcodeFile = "barcode_" . session_id() . ".png";
 
     // file_put_contents($barcodeFile, $barcodeData);
-    foreach ($itemsByBranch as $branch => $branchItems) {
-        if (empty($branchItems)) {
-            continue;
-        }
 
-        $series = $seriesByBranch[$branch] ?? '';
+    $fileName = 'delivery.pdf';
 
-        $pdf->setData($branch, $series);
-        $pdf->AddPage();
-        $pdf->Ln(15);
-        // $pdf->Image($barcodeFile, 150, 10, 40, 15, 'PNG');
-        headerDetails($pdf, $docDate, $branch);
-        renderItemsTable($pdf, $branchItems);
-        footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks);
+    reset($itemsByBranch);
+    $branch = key($itemsByBranch);
+    $branchItems = current($itemsByBranch);
+
+    // foreach ($itemsByBranch as $branch => $branchItems) {
+    //     if (empty($branchItems)) {
+    //         continue;
+    //     }
+
+    //     $series = $seriesByBranch[$branch] ?? '';
+
+    //     // SAFE FILE NAME (NO LABEL, NO SPECIAL CHARS)
+    //     $cleanBranch = preg_replace('/[^A-Za-z0-9_-]/', '', $branch);
+    //     $cleanSeries = preg_replace('/[^A-Za-z0-9_-]/', '', $series);
+
+    //     if (!empty($cleanSeries)) {
+    //         $fileName = $cleanBranch . '-' . $cleanSeries . '.pdf';
+    //     }
+
+    //     // PDF DISPLAY LABEL (KEEP "Ref No:")
+    //     $seriesLabel = !empty($series) ? 'Ref No: ' . $series : '';
+
+    //     $pdf->setData($branch, $series);
+    //     $pdf->AddPage();
+    //     $pdf->Ln(15);
+    //     // $pdf->Image($barcodeFile, 150, 10, 40, 15, 'PNG');
+    //     headerDetails($pdf, $docDate, $branch);
+    //     if (!empty($seriesLabel)) {
+    //         $pdf->Cell(0, 6, $seriesLabel, 0, 1, 'L');
+    //     }
+    //     renderItemsTable($pdf, $branchItems);
+    //     footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks);
+    // }
+
+if (!empty($branchItems)) {
+
+    $series = $seriesByBranch[$branch] ?? '';
+
+    $cleanBranch = preg_replace('/[^A-Za-z0-9_-]/', '', $branch);
+    $cleanSeries = preg_replace('/[^A-Za-z0-9_-]/', '', $series);
+
+    if (!empty($cleanSeries)) {
+        $fileName = $cleanBranch . '-' . $cleanSeries . '.pdf';
     }
 
-    $pdf->Output('I', 'delivery' . '.pdf');
+    $pdf->setData($branch, $series);
+    $pdf->AddPage();
+    $pdf->Ln(15);
+
+    headerDetails($pdf, $docDate, $branch, $origin, $receivedDate, $receivedTime, $originwhscode, $status);
+    renderItemsTable($pdf, $branchItems);
+    footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks);
+}
+
+    // $pdf->Output('I', 'delivery' . '.pdf');
+    $pdf->Output('I', $fileName);
 } catch (PDOException $e) {
     $conn->rollBack();
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());

@@ -45,7 +45,8 @@ async function unlockScreen() {
                 timerProgressBar: true,
                 showConfirmButton: false
             }).then(() => {
-                window.location.assign("index.php");
+                // window.location.assign("index.php");
+                window.location.reload();
             })
         } else if (response.isSuccess === "Failed") {
             Swal.fire({
