@@ -43,6 +43,23 @@ $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
 //   }, 200);
 // });
 
+$(document).on("click", ".print-dr", function () {
+  let branches = $(this).data("branches");
+
+  let branchArray = JSON.parse(
+    decodeURIComponent($(this).attr("data-branches")),
+  );
+  let batchNumber = $(this).attr("data-batch");
+
+  console.log(`BATCH: ${batchNumber}`);
+  console.log("BRANCH ARRAY:", branchArray);
+
+  window.open(
+    `pdf/delivery.php?batch=${batchNumber}&branches=${encodeURIComponent(JSON.stringify(branchArray))}`,
+    "_blank",
+  );
+});
+
 // DELIVERY DASHBOARD
 function loadDelivery() {
   $.ajax({
@@ -52,18 +69,51 @@ function loadDelivery() {
     success: function (response) {
       let rows = [];
       let header = response.Header;
+      let info = response.Info;
+      // console.log(`DELIVERY INFO : ${JSON.stringify(info)}`);
       // let existingSeries = new Set();
       let index = 1;
 
       if (response.isSuccess === "success") {
-        let sortedData = response.Header.sort(
-          (a, b) =>
-            Number(b.DeliveryNumber || 0) - Number(a.DeliveryNumber || 0),
-        );
+        let grouped = {};
+        let batchInfo = {};
 
-        sortedData.forEach((item) => {
-          // console.log(`DELIVERY ITEM: ${JSON.stringify(item)}`);
+        info.forEach(function (data) {
+          let batch = data.BatchBasket_Num;
+
+          if (!grouped[batch]) {
+            grouped[batch] = {
+              picklists: new Set(),
+              branches: new Set(),
+            };
+          }
+
+          grouped[batch].picklists.add(data.PKList_Number);
+          grouped[batch].branches.add(data.RequestingBranch);
+        });
+
+        Object.keys(grouped).forEach(function (batch) {
+          let picklists = [...grouped[batch].picklists].join(", ");
+          let branches = [...grouped[batch].branches].join(", ");
+
+          batchInfo[batch] = {
+            picklists: [...grouped[batch].picklists],
+            branches: [...grouped[batch].branches],
+          };
+        });
+
+        // let sortedData = response.Header.sort(
+        //   (a, b) =>
+        //     Number(b.DeliveryNumber || 0) - Number(a.DeliveryNumber || 0),
+        // );
+
+        // sortedData.forEach((item) => {
+        header.forEach((item) => {
+          // console.log("AVAILABLE :", Object.keys(batchInfo));
+          let branches = batchInfo[item.BatchNumber]?.branches || [];
+          // console.log(`BRANCHES : ${branches}`);
           // console.log(``);
+
           let status = item.DocStatus ? item.DocStatus.toUpperCase() : "";
           // let status = "IN TRANSIT";
           let statusClass = "";
@@ -98,12 +148,20 @@ function loadDelivery() {
             item.TruckCategory,
             item.TruckPlate,
             item.DeliveryDate || "",
+            '<div class="dropdown dropstart">' +
+              '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
+              '<i class="bi bi-three-dots"></i></button>' +
+              `<ul class="dropdown-menu">
+                    <li><a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}">Open</a></li>
+                    <li><a class="dropdown-item print-dr" href="#" data-batch="${item.BatchNumber}" data-branches="${encodeURIComponent(JSON.stringify(branches))}">Print DR</a></li>
+                  </ul>` +
+              "</div>",
           ]);
         });
 
         if (rows.length === 0) {
           for (let i = 0; i < 8; i++) {
-            rows.push(["", "", "", "", "", "", ""]);
+            rows.push(["", "", "", "", "", "", "", ""]);
           }
         }
 
@@ -122,6 +180,7 @@ function loadDelivery() {
             { title: "Truck" },
             { title: "Plate No.", className: "ps-3" },
             { title: "Delivery Date", className: "text-start ps-3" },
+            { title: "Action", className: "text-center" },
           ],
           pageLength: 50,
           paging: true,
@@ -162,7 +221,7 @@ function loadDelivery() {
             for (let i = currentRows; i < 8; i++) {
               let $emptyRow = $(`
                 <tr class="empty-row">
-                  <td colspan="7" style="background:#FFFBDF"></td>
+                  <td colspan="8" style="background:#FFFBDF"></td>
                 </tr>
               `);
 

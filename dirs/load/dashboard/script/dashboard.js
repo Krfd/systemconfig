@@ -64,8 +64,8 @@ $(document).on("click", ".print-dr", function () {
   );
   let batchNumber = $(this).attr("data-batch");
 
-  console.log(`BATCH: ${batchNumber}`);
-  console.log("BRANCH ARRAY:", branchArray);
+  // console.log(`BATCH: ${batchNumber}`);
+  // console.log("BRANCH ARRAY:", branchArray);
 
   window.open(
     `pdf/delivery.php?batch=${batchNumber}&branches=${encodeURIComponent(JSON.stringify(branchArray))}`,
@@ -125,9 +125,6 @@ function loadBasket() {
             hour12: true,
           });
 
-          console.log(`BASKET ITEM : ${JSON.stringify(item)}`);
-          console.log(``);
-
           rows.push([
             rowNum++,
             item.BatchNumber,
@@ -156,7 +153,7 @@ function loadBasket() {
 
         if (rows.length === 0) {
           for (let i = 0; i < 8; i++) {
-            rows.push(["", "", "", "", ""]);
+            rows.push(["", "", "", "", "", ""]);
           }
         }
 
@@ -214,7 +211,7 @@ function loadBasket() {
 
             for (let i = currentRows; i < 8; i++) {
               let $emptyRow = $(`
-                  <tr class="empty-row">
+                  <tr class="empty-row" data-bs-toggle="false">
                     <td colspan="6" style="background: #FFFBDF">&nbsp;</td>
                   </tr>
                 `);
@@ -239,6 +236,16 @@ function loadBasket() {
             const selectionMode =
               $("#loadingBasketTableDisplay").data("selectionMode") || false;
             $("#loadingBasketTableDisplay tbody tr").each(function () {
+              // SKIP EMPTY ROWS
+              if ($(this).hasClass("empty-row")) {
+                return;
+              }
+
+              // SKIP ROWS WITHOUT BATCH DATA
+              if (!$(this).attr("data-batch")) {
+                return;
+              }
+
               const dropdownBtn = $(this).find(
                 "button[data-bs-toggle='dropdown']",
               );
@@ -256,6 +263,36 @@ function loadBasket() {
                 html: true,
               });
             });
+
+            $("#loadingBasketTableDisplay tbody")
+              .off("show.bs.dropdown")
+              .on("show.bs.dropdown", ".dropdown", function () {
+                const row = $(this).closest("tr")[0];
+
+                const tooltipInstance = bootstrap.Tooltip.getInstance(row);
+
+                if (tooltipInstance) {
+                  tooltipInstance.hide();
+                }
+              })
+              .on("hide.bs.dropdown", ".dropdown", function () {
+                const row = $(this).closest("tr")[0];
+
+                const tooltipInstance = bootstrap.Tooltip.getInstance(row);
+
+                if (tooltipInstance) {
+                  tooltipInstance.hide();
+                }
+              }) // REMOVE TOOLTIP WHEN ANY DROPDOWN ITEM IS CLICKED
+              .on("click.dropdownAction", ".dropdown-item", function () {
+                const row = $(this).closest("tr")[0];
+
+                const tooltipInstance = bootstrap.Tooltip.getInstance(row);
+
+                if (tooltipInstance) {
+                  tooltipInstance.hide();
+                }
+              });
           },
         });
       } else {

@@ -30,18 +30,18 @@ function loadReceiving() {
         data.forEach(function (item) {
           const date = new Date(item.ArrivalDate);
           const arrivalDate = date.toISOString().split("T")[0];
+          const timestamp = new Date().toLocaleString();
 
-          // console.log(`RECEIVED ITEM: ${JSON.stringify(item)}`);
-
-          // const arrivalDate =
-          // item.ArrivalDate && !isNaN(new Date(item.ArrivalDate).getTime())
-          //   ? new Date(item.ArrivalDate).toISOString().split("T")[0]
-          //   : "";
+          const formattedTimestamp =
+            `${String(new Date(arrivalDate).getMonth() + 1).padStart(2, "0")}-` +
+            `${String(new Date(arrivalDate).getDate()).padStart(2, "0")}-` +
+            `${String(new Date(arrivalDate).getFullYear()).slice(-2)} ` +
+            `${new Date(timestamp).toLocaleTimeString()}`;
 
           rows.push([
             counter++,
             item.ReceivedNumber,
-            arrivalDate,
+            formattedTimestamp,
             item.OriginBranch,
             (() => {
               let status = item.ReceivedStatus;
@@ -356,8 +356,8 @@ function fetchOrderDetails() {
       let value = $(this).val().trim();
       let field = $(this).data("field");
 
-      console.log(`VALUE : ${value}`)
-      console.log(`FIELD : ${field}`)
+      console.log(`VALUE : ${value}`);
+      console.log(`FIELD : ${field}`);
 
       // if (!drNo) {
       if (!field) {
@@ -374,10 +374,10 @@ function fetchOrderDetails() {
         url: "dirs/receiving/dashboard/actions/get_reviewdeliveryitems.php",
         type: "POST",
         // data: { DeliveryNumber: drNo },
-        data: { 
+        data: {
           searchType: field,
-          searchValue: value
-         },
+          searchValue: value,
+        },
         dataType: "json",
         beforeSend: function () {
           $("#submitRecBtn").prop("disabled", true);
@@ -385,10 +385,10 @@ function fetchOrderDetails() {
         },
         success: function (response) {
           let header = response.Header;
-          let items = response.Items
+          let items = response.Items;
           console.log(`RESPONSE : ${JSON.stringify(header)}`);
           console.log(``);
-          console.log(`ITEMS : ${items}`)
+          console.log(`ITEMS : ${items}`);
 
           if (response.isSuccess === "success") {
             if (field !== "deliveryNumber") {
@@ -397,7 +397,7 @@ function fetchOrderDetails() {
             $("#originRecForm").val(header.OriginBranch);
             $("#refNoRecForm").val(items[0].ReferenceNumber);
             $("#stockReqNoRecForm").val(items[0].SR_Number);
-            
+
             $("#docDateRecForm").val(header.DeliveryDate);
             $("#statusRecForm").val(header.DocStatus);
 
@@ -778,12 +778,12 @@ function serialDeliveryInput() {
                     </tr>
                   `;
 
-                  
                   // receivingBody.prepend(newRow);
                   // renumberRows();
 
-
-                  let emptyRow = receivingBody.find("tr").filter(function () {
+                  let emptyRow = receivingBody
+                    .find("tr")
+                    .filter(function () {
                       return (
                         !$(this).attr("data-itemcode") &&
                         $(this).text().trim() === ""
@@ -795,7 +795,6 @@ function serialDeliveryInput() {
                     emptyRow.replaceWith(newRow);
                   } else {
                     receivingBody.prepend(newRow);
-
                   }
 
                   renumberRows();
@@ -938,7 +937,7 @@ function submitReceiving() {
                 "_blank",
               );
 
-              console.log(`SHOULD GENERATE RECEIVING REPORT`)
+              console.log(`SHOULD GENERATE RECEIVING REPORT`);
 
               Swal.fire({
                 icon: "success",
