@@ -117,7 +117,16 @@ function loadOutgoing() {
             item.BranchOrigin || "",
             item.BranchDestination || "",
             statusBadge,
-            item.EncodeDate || "N/A",
+            // item.EncodeDate || "N/A",
+            item.EncodeDate
+              ? new Date(item.EncodeDate)
+                  .toLocaleDateString("en-US", {
+                    month: "2-digit",
+                    day: "2-digit",
+                    year: "2-digit",
+                  })
+                  .replace(/\//g, "-")
+              : "",
 
             '<div class="dropdown">' +
               '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +

@@ -93,7 +93,16 @@ function loadIncoming() {
             item.SR_Number || "",
             item.BranchDestination || "",
             statusBadge,
-            item.EncodeDate || "",
+            // item.EncodeDate || "",
+            item.EncodeDate
+              ? new Date(item.EncodeDate)
+                  .toLocaleDateString("en-US", {
+                    month: "2-digit",
+                    day: "2-digit",
+                    year: "2-digit",
+                  })
+                  .replace(/\//g, "-")
+              : "",
           ]);
         });
 

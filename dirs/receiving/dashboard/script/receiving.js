@@ -408,10 +408,22 @@ function fetchOrderDetails() {
             toggleReceivingButtons(true);
           } else {
             toggleReceivingButtons(false);
+
+            let errorMessage = "Invalid input";
+
+            if (field === "deliveryNumber") {
+              errorMessage = "Invalid delivery number";
+            } else if (field === "referenceNumber") {
+              errorMessage = "Invalid reference number";
+            } else if (field === "stockReqNumber") {
+              errorMessage = "Invalid stock request number";
+            }
+
             Swal.fire({
               icon: "error",
-              title: response.message || "Invalid delivery number",
+              title: response.message || errorMessage,
             });
+            clearTable();
             return;
           }
         },
@@ -646,7 +658,7 @@ function addNonSerialize() {
     });
 }
 
-const groupedItems = {};
+// const groupedItems = {};
 
 // FOR RECEIVING ITEM
 function serialDeliveryInput() {
@@ -686,16 +698,16 @@ function serialDeliveryInput() {
 
             items.forEach((item) => {
               if (!item.ItemCode) return;
-              if (!groupedItems[item.ItemCode]) {
-                groupedItems[item.ItemCode] = {
+              if (!receivingGroupedItems[item.ItemCode]) {
+                receivingGroupedItems[item.ItemCode] = {
                   ...item,
                   qty: 0,
                 };
               }
 
-              groupedItems[item.ItemCode]._scanId = scanId;
+              receivingGroupedItems[item.ItemCode]._scanId = scanId;
 
-              Object.values(groupedItems).forEach(function (item) {
+              Object.values(receivingGroupedItems).forEach(function (item) {
                 let brand = item.ItemBrand;
                 let model = item.ItemName;
                 let category = item.ItemCategory;
@@ -708,7 +720,7 @@ function serialDeliveryInput() {
                   return;
                 }
 
-                // console.log(`RECEIVING ITEM: ${JSON.stringify(item)}`);
+                console.log(`RECEIVING ITEM: ${JSON.stringify(item)}`);
 
                 if (!brand || !model || !category || !itemCode) {
                   console.warn("Skipped item due to null/empty value:", item);

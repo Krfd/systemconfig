@@ -215,9 +215,10 @@ try {
             let deliveryNum;
             let summaryTable;
             let srNumberMap = [];
-            let groupedItems = {};
-            // const itemSummary = {};
         })
+
+        let groupedItems = {};
+        let receivingGroupedItems = {}
 
         function togglePassword() {
             const passwordField = document.getElementById('newPassword');

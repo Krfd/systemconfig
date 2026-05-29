@@ -64,9 +64,6 @@ $(document).on("click", ".print-dr", function () {
   );
   let batchNumber = $(this).attr("data-batch");
 
-  // console.log(`BATCH: ${batchNumber}`);
-  // console.log("BRANCH ARRAY:", branchArray);
-
   window.open(
     `pdf/delivery.php?batch=${batchNumber}&branches=${encodeURIComponent(JSON.stringify(branchArray))}`,
     "_blank",
@@ -118,7 +115,14 @@ function loadBasket() {
           const isDisabled = item.DocStatus === "IN TRANSIT" ? "disabled" : "";
 
           const date = new Date(item.DocDate);
-          const formatted = date.toISOString().split("T")[0];
+          // const formatted = date.toISOString().split("T")[0];
+          const formatted = date
+            .toLocaleDateString("en-US", {
+              month: "2-digit",
+              day: "2-digit",
+              year: "2-digit",
+            })
+            .replace(/\//g, "-");
           const formattedTime = date.toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",

@@ -21,7 +21,8 @@ try {
     $stmtBatch->execute([$User]);
     $result = $stmtBatch->fetch(PDO::FETCH_ASSOC);
 
-    function generateReference($length = 6) {
+    function generateReference($length = 6)
+    {
         $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         $reference = '';
 
@@ -41,19 +42,44 @@ try {
         throw new Exception("Failed to generate batch number.");
     }
 
+    function getBranch($conn, $itemId, $picklist)
+    {
+        $stmt = $conn->prepare("SELECT Req_Branch
+            FROM Pick_List_Item_Collection
+            WHERE Item_id = ?
+            AND PKList_Number = ?
+            ORDER BY ItemRowNum DESC
+    ");
+
+        $stmt->execute([$itemId, $picklist]);
+        return $stmt->fetchColumn();
+    }
+
     $BatchNumber = $result['BatchNumber'];
+
     $stmtCollect = $conn->prepare("EXEC dbo.CreatePicklist_V2 ?,?,?,?,?,?,?");
+
+    // $logLines = [];
+
+    $referenceMap = [];
 
     foreach ($Item_Id as $key => $itmid) {
         if (empty($itmid)) {
             continue;
         }
 
-        $referenceNumber = generateReference();
-
         $serial     = $ItemSerial[$key] ?? null;
         $picklist   = $PickListnumber[$key] ?? null;
         $qty   = $ItemQty[$key] ?? null;
+
+        $branch = getBranch($conn, $itmid, $picklist);
+
+        // ✅ KEY = branch (NOT picklist)
+        if (!isset($referenceMap[$branch])) {
+            $referenceMap[$branch] = generateReference();
+        }
+
+        $referenceNumber = $referenceMap[$branch];
 
         $stmtCollect->execute([
             $User,
@@ -64,7 +90,14 @@ try {
             $serial,
             $qty
         ]);
+
+        // $logLines[] = "PickList: {$picklist} | Item ID: {$itmid}";
     }
+
+    // $fileName = "picklist_log_" . date('Ymd_His') . ".txt";
+    // $filePath = $fileName;
+
+    // file_put_contents($filePath, implode(PHP_EOL, $logLines));
 
     $stmtHeader = $conn->prepare("EXEC dbo.CreateLoadingBasket_headerV2 ?, ?, ?, ?, ?, ?, ?, ?, ?");
 

@@ -2607,7 +2607,7 @@ function loadToBasket(Picklists) {
   $.post("dirs/basket/dashboard/loadToBasket.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
 
-    console.log(`PICKLISTS : ${Picklists}`);
+    // console.log(`PICKLISTS : ${Picklists}`);
 
     $.ajax({
       url: "dirs/basket/dashboard/actions/get_user.php",
@@ -2779,8 +2779,6 @@ function loadToBasket(Picklists) {
   });
 }
 
-const groupedItems = {};
-
 function serialDeliveryInput(Picklists) {
   $(document).on("submit", "#serial-delivery", function (e) {
     e.preventDefault();
@@ -2877,10 +2875,6 @@ function serialDeliveryInput(Picklists) {
                         data.length > 0
                       ) {
                         Object.values(groupedItems).forEach(function (item) {
-                          // console.log(`ITEM : ${JSON.stringify(item)}`);
-                          console.log(
-                            `TOTAL REQ ITEM QTY: ${parseInt(data[0].Req_Item_Qty) || 0}`,
-                          );
                           let brand = item.ItemBrand;
                           let model = item.ItemName;
                           let category = item.ItemCategory;
@@ -2888,25 +2882,36 @@ function serialDeliveryInput(Picklists) {
                           let qty = 1;
                           let reqQty = parseInt(data[0].Req_Item_Qty) || 0;
 
-                          if (item._scanId !== scanId) {
-                            return;
-                          }
+                          // let itemId = data?.Item_id || data?.[0]?.Item_id || null;
+                          // let itemId = data?.[0]?.Item_id ?? null;
+                          // groupedItems[itemCode].Item_id = itemId;
 
-                          let itemId =
-                            data?.Item_id || data?.[0]?.Item_id || null;
+                          let itemId = data.map((row) => row.Item_id);
                           groupedItems[itemCode].Item_id = itemId;
 
-                          let picklist =
-                            data?.PKList_Number ||
-                            data?.[0]?.PKList_Number ||
-                            null;
+                          // let picklist =
+                          //   data?.PKList_Number ||
+                          //   data?.[0]?.PKList_Number ||
+                          //   null;
+                          let picklist = data?.[0]?.PKList_Number ?? null;
+
                           groupedItems[itemCode].PKList_Number = picklist;
+                          groupedItems[itemCode].picklist = picklist;
+
+                          // console.log(`ITEM : ${JSON.stringify(item)}`);
+                          // console.log(``);
+                          // console.log(`DATA : ${JSON.stringify(data)}`);
+                          // console.log(``);
 
                           if (!brand || !model || !category || !itemCode) {
                             console.warn(
                               "Skipped item due to null/empty value:",
                               item,
                             );
+                            return;
+                          }
+
+                          if (item._scanId !== scanId) {
                             return;
                           }
 
@@ -2937,9 +2942,9 @@ function serialDeliveryInput(Picklists) {
                           let currentLoaded =
                             groupedItems[itemCode].loadedQty || 0;
 
-                          console.log(`ALLOWED QTY : ${totalActualPerModel}`);
-                          console.log(`CURRENT : ${currentLoaded}`);
-                          console.log(``);
+                          // console.log(`ALLOWED QTY : ${totalActualPerModel}`);
+                          // console.log(`CURRENT : ${currentLoaded}`);
+                          // console.log(``);
 
                           // if (currentLoaded >= maxAllowed) {
                           if (currentLoaded >= totalActualPerModel) {
@@ -3030,8 +3035,6 @@ function serialDeliveryInput(Picklists) {
                                 reqQty,
                             );
 
-                            // console.log(`LOADED QTY: ${item.loadedQty}`)
-                            // console.log(``)
                             console.log(
                               "UPDATED LOADED QTY:",
                               groupedItems[itemCode].loadedQty,
@@ -3040,8 +3043,6 @@ function serialDeliveryInput(Picklists) {
                             return;
                           } else {
                             groupedItems[itemCode].loadedQty += 1;
-                            // console.log(`ITEM ID : ${itemId}`)
-                            // console.log(`LOADED QTY : ${item.loadedQty}`)
                             let counter =
                               loadingTableBody.find("tr[data-itemcode]")
                                 .length + 1;
@@ -3378,8 +3379,6 @@ function submitLoadingBasket(Picklists) {
         return;
       }
 
-      console.log(`ROWS WITH ITEMS : ${rowsWithItems}`);
-
       let Item_Id = [];
       let ItemQty = [];
       let ItemSerial = [];
@@ -3401,17 +3400,54 @@ function submitLoadingBasket(Picklists) {
         let picklist = $(this).data("picklist");
 
         if (item_id) {
-          Item_Id.push(item_id);
-          // ItemSerial.push(serials);
-          ItemQty.push(qty);
-          PickListnumber.push(picklist);
-          if (serialBased) {
-            ItemSerial.push(serials || "");
-          } else {
-            ItemSerial.push(null);
+          // parse JSON string if needed
+          if (typeof item_id === "string") {
+            try {
+              item_id = JSON.parse(item_id);
+            } catch {
+              item_id = item_id.split(",");
+            }
           }
+
+          // ensure array
+          if (!Array.isArray(item_id)) {
+            item_id = [item_id];
+          }
+
+          item_id.forEach((id) => {
+            // dissect comma separated values
+            if (typeof id === "string" && id.includes(",")) {
+              id.split(",").forEach((singleId) => {
+                // Item_Id.push(singleId.trim());
+                Item_Id.push(Number(singleId.trim()));
+
+                ItemQty.push(qty);
+                PickListnumber.push(picklist);
+
+                if (serialBased) {
+                  ItemSerial.push(serials || "");
+                } else {
+                  ItemSerial.push(null);
+                }
+              });
+            } else {
+              // Item_Id.push(String(id).trim());
+              Item_Id.push(Number(id));
+
+              ItemQty.push(qty);
+              PickListnumber.push(picklist);
+
+              if (serialBased) {
+                ItemSerial.push(serials || "");
+              } else {
+                ItemSerial.push(null);
+              }
+            }
+          });
         }
       });
+
+      console.log(`ITEM ID: ${JSON.stringify(Item_Id)}`);
 
       Swal.fire({
         icon: "question",
@@ -3446,12 +3482,12 @@ function submitLoadingBasket(Picklists) {
                 // .then(() => {
                 //   console.log("loading dashboard");
                 // console.log(`LOAD DASHBOARD: ${loadDashboard}`);
-                loadDeliveryBasket(
-                  "#basketTableDashboard",
-                  "dirs/incoming/dashboard/actions/picklisteditems.php",
-                );
+                // loadDeliveryBasket(
+                //   "#basketTableDashboard",
+                //   "dirs/incoming/dashboard/actions/picklisteditems.php",
+                // );
                 // loadDashboard();
-                // loadDeliveryBasketContent();
+                loadDeliveryBasketContent();
                 // })
 
                 // loadDeliveryBasketContent();

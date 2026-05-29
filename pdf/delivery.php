@@ -36,8 +36,6 @@ $stmt->nextRowset();
 $itemData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $firstRow = $header[0] ?? [];
-
-// $deliveryDate  = $firstRow['DeliveryDate'] ?? date('Y-m-d');
 $deliveryDate  = isset($firstRow['DeliveryDate']) ? date('M d, Y', strtotime($firstRow['DocDate'])) : "N/A";
 
 $driver   = $firstRow['Driver'] ?? '';
@@ -247,9 +245,6 @@ $itemsByBranch = [];
 $seriesByBranch = [];
 
 foreach ($itemData as $row) {
-    // $branchKey = $row['Branch'] ?? $row['RequestingBranch'] ?? 'UNKNOWN';
-
-    // $itemsByBranch[$branchKey][] = $row;
 
     $branch = $row['RequestingBranch'] ?? $row['Branch'] ?? 'UNKNOWN';
 
@@ -258,7 +253,15 @@ foreach ($itemData as $row) {
 
     // assign reference number per branch (first occurrence wins)
     if (!isset($seriesByBranch[$branch])) {
-        $seriesByBranch[$branch] = $row['ReferenceNumber'] ?? '';
+        // $seriesByBranch[$branch] = $row['ReferenceNumber'] ?? '';
+
+        $get_ref = $conn->prepare("EXEC Get_Branch_Reference ?, ?");
+        $get_ref->execute([$batch, $branch]);
+
+        $refResult = $get_ref->fetch(PDO::FETCH_ASSOC);
+        if ($refResult && !empty($refResult['ReferenceNumber'])) {
+            $seriesByBranch[$branch] = $refResult['ReferenceNumber'];
+        }
     }
 }
 
@@ -294,7 +297,7 @@ function renderItemsTable($pdf, $itemData)
         $modelRaw = $row['ItemName'] ?? '';
         $brandRaw = $row['ItemBrand'] ?? '';
         $categoryRaw = $row['ItemCategory'] ?? '';
-        $quantity = (int)($row['Deliver_Qty'] ?? 0);
+        $quantity = (int)($row['AllocatedQty'] ?? 0);
 
         $key = $modelRaw . '|' . $brandRaw . '|' . $categoryRaw;
 
