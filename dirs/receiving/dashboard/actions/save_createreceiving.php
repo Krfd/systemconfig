@@ -114,12 +114,13 @@ try {
     {
         do {
             $ReceivedCode = generateAppCode($length);
-            $stmt = $conn->prepare("
-                    SELECT TOP 1 1
-                    FROM ReceivedOrder_H
-                    WHERE ReceivedCode = ?
-                ");
+            // $stmt = $conn->prepare("
+            //         SELECT TOP 1 1
+            //         FROM ReceivedOrder_H
+            //         WHERE ReceivedCode = ?
+            //     ");
 
+            $stmt = $conn->prepare("EXEC dbo.Generate_Unique_Appcode ?");
             $stmt->execute([$ReceivedCode]);
         } while ($stmt->fetch());
         return $ReceivedCode;
@@ -131,7 +132,6 @@ try {
            COLLECT RECEIVING ITEMS
         ========================================================= */
     $stmtCollect = $conn->prepare("EXEC dbo.ReceivingItems_orders ?,?,?,?,?");
-
 
     /* =========================================================
        GET DESIRED QTY

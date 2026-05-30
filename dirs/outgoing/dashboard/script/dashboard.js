@@ -98,6 +98,8 @@ function loadOutgoing() {
             statusClass = "bg-warning";
           } else if (status === "RECEIVED") {
             statusClass = "bg-success";
+          } else if (status === "PARTIAL") {
+            statusClass = "bg-warning";
           } else if (status === "IN TRANSIT") {
             statusClass = "bg-primary";
           } else if (status === "TERMINATED") {

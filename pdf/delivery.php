@@ -34,6 +34,8 @@ $stmt->execute([$User, $batch]);
 $header = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $stmt->nextRowset();
 $itemData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->nextRowSet();
+$printedStatus = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $firstRow = $header[0] ?? [];
 $deliveryDate  = isset($firstRow['DeliveryDate']) ? date('M d, Y', strtotime($firstRow['DocDate'])) : "N/A";
@@ -47,11 +49,15 @@ $remarks  = $firstRow['Remarks'] ?? 'N/A';
 $origin   = $firstRow['BranchSet'] ?? "N/A";
 $status   = $firstRow['DocStatus'] ?? "N/A";
 $docDate  = isset($firstRow['DocDate']) ? date('M d, Y', strtotime($firstRow['DocDate'])) : "N/A";
+
+$printed = (int)($printedStatus['Printed'] ?? 0);
+
 class PDF extends FPDF
 {
 
     public $branch;
     public $series;
+    public $isReprint = false;
 
     function setData($branch, $series)
     {
@@ -222,6 +228,9 @@ class PDF extends FPDF
 $pdf = new PDF();
 $pdf->AliasNbPages();
 
+$isReprint = ($printed > 0);
+$pdf->isReprint = $isReprint;
+
 function headerDetails($pdf, $deliveryDate, $branch, $origin, $status, $docDate)
 {
     $pdf->SetFont('Arial', '', 9);
@@ -268,6 +277,46 @@ foreach ($itemData as $row) {
 function renderItemsTable($pdf, $itemData)
 {
     $pdf->Ln(3);
+    $tableStartY = $pdf->GetY();
+
+    if ($pdf->isReprint) {
+
+        $tableStartY = $pdf->GetY();
+
+        $watermarkWidth = 100;
+        $x = ($pdf->GetPageWidth() - $watermarkWidth) / 2;
+        $y = $tableStartY + 60;
+
+        $pdf->Image(
+            '../assets/image/logo/crowns.png',
+            $x,
+            $y,
+            $watermarkWidth,
+            0,
+            'PNG'
+        );
+
+        // Calculate center of image
+        $imageHeight = $watermarkWidth; // adjust if image isn't square
+        $centerX = $x + ($watermarkWidth / 2);
+        $centerY = $y + ($imageHeight / 2);
+
+        // Watermark text
+        $pdf->SetFont('Arial', 'B', 24);
+        // $pdf->SetTextColor(230, 230, 230);
+        $pdf->SetTextColor(220, 220, 220);
+
+        $text = 'REPRINTED';
+
+        for ($i = -40; $i <= 60; $i += 15) {
+            $pdf->Text($x + $i, $y + $i, $text);
+        }
+
+        $pdf->SetTextColor(0, 0, 0);
+
+        $pdf->SetXY(10, $tableStartY);
+    }
+
     $pdf->SetFont('Arial', 'B', 9);
 
     $headers = [

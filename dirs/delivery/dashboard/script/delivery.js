@@ -112,7 +112,6 @@ function loadDelivery() {
           // console.log("AVAILABLE :", Object.keys(batchInfo));
           let branches = batchInfo[item.BatchNumber]?.branches || [];
           // console.log(`BRANCHES : ${branches}`);
-          // console.log(``);
 
           let status = item.DocStatus ? item.DocStatus.toUpperCase() : "";
           // let status = "IN TRANSIT";
@@ -147,7 +146,16 @@ function loadDelivery() {
             item.Driver,
             item.TruckCategory,
             item.TruckPlate,
-            item.DeliveryDate || "",
+            // item.DeliveryDate || "",
+            item.DeliveryDate
+              ? new Date(item.DeliveryDate)
+                  .toLocaleDateString("en-US", {
+                    month: "2-digit",
+                    day: "2-digit",
+                    year: "2-digit",
+                  })
+                  .replace(/\//g, "-")
+              : "",
             '<div class="dropdown dropstart">' +
               '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
               '<i class="bi bi-three-dots"></i></button>' +
