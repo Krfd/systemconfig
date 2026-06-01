@@ -25,6 +25,12 @@
                                             <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f2f2f2" value="NEWWHS" readonly>
                                         </div>
                                     </div>
+                                    <!-- <div class="input-group col p-0 d-flex gap-1">
+                                        <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
+                                            <label for="eta" class="form-label text-dark-emphasis col-6"><small>ETA:</small></label>
+                                            <input type="datetime-local" id="eta" class="form-control form-control-sm col" style="background: #FFFBDF" required>
+                                        </div>
+                                    </div> -->
                                 </div>
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-items-baseline gap-3">
@@ -101,23 +107,19 @@
                                         <label for="truckCat" class="form-label text-dark-emphasis col-4">
                                             <small>Truck Category:</small>
                                         </label>
-                                        <select name="truckCat" id="truckCat" class="form-select form-select-sm col" style="background: #FFFBDF" required>
-                                            <option value="">Select Category</option>
-                                            <option value="4 Wheeler">4 Wheeler</option>
-                                            <option value="6 Wheeler">6 Wheeler</option>
-                                            <option value="10 Wheeler">10 Wheeler</option>
+                                        <select name="truckCat" id="truckCat" class="form-select form-select-sm col" style="background: #FFFBDF; appearance: auto" required>
                                         </select>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="plate" class="form-label text-dark-emphasis col-4">
                                             <small>Truck Plate No:</small>
                                         </label>
-                                        <select name="plate" id="plate" class="form-select form-select-sm col" style="background: #FFFBDF" required>
-                                            <option value="">Select Plate</option>
+                                        <select name="plate" id="plate" class="form-select form-select-sm col" style="background: #FFFBDF; appearance: auto" required>
+                                            <option value="">Select Category first</option>
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-2">
+                                <div class="col-2 mb-auto">
                                     <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
                                     <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto; resize: horizontal"></textarea>
                                 </div>

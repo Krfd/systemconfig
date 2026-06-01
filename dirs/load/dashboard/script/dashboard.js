@@ -323,11 +323,23 @@ function getBatchItems(batch, tableSelector) {
       let batchTable = $(`${tableSelector} tbody`);
       batchTable.empty();
 
+      console.log(`HEADER : ${JSON.stringify(header)}`);
+      const formattedDate = header.DocDate.split(" ")[0];
+
+      $("#formattedDate").val(formattedDate);
+
       if (response.isSuccess === "success") {
         // USER DETAILS
         $("#batch").val(batch);
         $("#user-origin").val(header.BranchSet);
         $("#prepby").val(header.PickedBy);
+        $("#formattedDate").val(formattedDate);
+        $("#statusForm").val(header.DocStatus);
+
+        $("#driver").val(header.Driver);
+        $("#truckCat").val(header.TruckCategory);
+        $("#plate").val(header.TruckPlate);
+        $("#remarks").val(header.Remarks);
 
         let groupedItems = {};
 
@@ -336,32 +348,24 @@ function getBatchItems(batch, tableSelector) {
           let pk = item.PKList_Number;
           let qty = parseInt(item.Deliver_Qty) || 0;
 
-          // GROUP BY MODEL
           if (!groupedItems[model]) {
             groupedItems[model] = {
               ...item,
-              Deliver_Qty: 0,
+              Deliver_Qty: qty, // take ONLY first row value
               PKList_Numbers: [],
               processedPKs: {},
             };
           }
 
-          // ADD PK ONLY ONCE
+          // track PKs only
           if (!groupedItems[model].PKList_Numbers.includes(pk)) {
             groupedItems[model].PKList_Numbers.push(pk);
           }
 
-          // ADD QTY ONLY ONCE PER PK
-          // prevents duplicated API rows from inflating qty
-          if (!groupedItems[model].processedPKs[pk]) {
-            groupedItems[model].Deliver_Qty += qty;
-            groupedItems[model].processedPKs[pk] = true;
-          }
+          groupedItems[model].processedPKs[pk] = true;
         });
 
         Object.values(groupedItems).forEach((item) => {
-          // console.log(`DELIVERY QTY : ${item.Deliver_Qty}`);
-          // console.log(``);
           counter += 1;
 
           totalQty += item.Deliver_Qty;

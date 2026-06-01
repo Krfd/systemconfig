@@ -65,41 +65,6 @@ class PDF extends FPDF
         $this->series = $series;
     }
 
-    // function Header()
-    // {
-    //     $logoX = 10;
-    //     $logoY = 10;
-    //     $logoW = 20;
-
-    //     $this->Image('../assets/image/logo/iap_icon.png', $logoX, $logoY, $logoW);
-
-    //     $this->SetFont('Arial', 'B', 30);
-    //     $this->SetTextColor(64, 64, 64);
-
-    //     $pageWidth = $this->GetPageWidth();
-
-    //     $title = $this->series ?? '';
-
-    //     // true center of page
-    //     $textWidth = $this->GetStringWidth($title);
-    //     $centerX = ($pageWidth - $textWidth) / 2;
-
-    //     // logo constraint (left safe area)
-    //     $minX = $logoX + $logoW + 5;
-
-    //     if ($centerX < $minX) {
-    //         $centerX = $minX;
-    //     }
-
-    //     // 🔥 balance shift so it doesn't look "pushed right"
-    //     $shift = $centerX - $minX;
-    //     $centerX = $centerX - ($shift / 2);
-
-    //     $this->SetXY($centerX, 10);
-    //     $this->Cell($textWidth, 10, $title, 0, 0, 'C');
-    // }
-
-
     function Header()
     {
         $logoX = 10;
@@ -240,12 +205,15 @@ function headerDetails($pdf, $deliveryDate, $branch, $origin, $status, $docDate)
     $leftWidth = $pageWidth / 2;
     $rightWidth = $pageWidth / 2;
 
+    $labelWidth = 22;
+
     $pdf->Cell($leftWidth, 6, sprintf('%-19s %s', 'Requesting Branch: ', $branch), 0, 0, 'L');
-    $pdf->Cell($rightWidth, 6, sprintf('%-15s %s', 'Status: ', $status), 0, 1, 'R');
-    $pdf->Cell($leftWidth, 6, sprintf('%-24s %s', 'Origin Branch: ', $origin), 0, 0, 'L');
-    $pdf->Cell($rightWidth, 6, sprintf('%-20s %s', 'Delivery Date: ', $deliveryDate), 0, 1, 'R');
-    $pdf->SetX($pdf->GetPageWidth() - 55);
-    $pdf->Cell(41, 6, sprintf('%-20s %s', 'Document Date: ', $docDate), 0, 1, 'R');
+    $pdf->Cell($leftWidth - $labelWidth, 6, 'Delivery Date: ', 0, 0, 'R');
+    $pdf->Cell($labelWidth, 6, $deliveryDate, 0, 1, 'L');
+
+    $pdf->Cell($rightWidth, 6, sprintf('%-24s %s', 'Origin Branch: ', $origin), 0, 0, 'L');
+    $pdf->Cell($rightWidth - $labelWidth, 6, 'Document Date: ', 0, 0, 'R');
+    $pdf->Cell($labelWidth, 6, $docDate, 0, 1, 'L');
 
     $pdf->Ln(2);
 }
@@ -284,6 +252,7 @@ function renderItemsTable($pdf, $itemData)
         $tableStartY = $pdf->GetY();
 
         $watermarkWidth = 100;
+        $watermarkHeight = 100;
         $x = ($pdf->GetPageWidth() - $watermarkWidth) / 2;
         $y = $tableStartY + 60;
 
@@ -296,21 +265,35 @@ function renderItemsTable($pdf, $itemData)
             'PNG'
         );
 
-        // Calculate center of image
-        $imageHeight = $watermarkWidth; // adjust if image isn't square
-        $centerX = $x + ($watermarkWidth / 2);
-        $centerY = $y + ($imageHeight / 2);
-
-        // Watermark text
         $pdf->SetFont('Arial', 'B', 24);
-        // $pdf->SetTextColor(230, 230, 230);
         $pdf->SetTextColor(220, 220, 220);
 
         $text = 'REPRINTED';
 
-        for ($i = -40; $i <= 60; $i += 15) {
-            $pdf->Text($x + $i, $y + $i, $text);
+        // center of image
+        $centerX = $x + ($watermarkWidth / 2);
+        $centerY = $y + ($watermarkHeight / 2);
+
+        // IMPORTANT: correct text centering
+        $textWidth = $pdf->GetStringWidth($text);
+        $textX = $centerX - ($textWidth / 2);
+
+        // baseline correction (vertical centering fix)
+        $textY = $centerY - 15;
+
+        // 3 centered stamps (still inside logo)
+        $step = 18;
+        $positions = [-$step, 0, $step];
+
+        foreach ($positions as $offset) {
+            $pdf->Text(
+                $textX + $offset,
+                $textY + $offset,
+                $text
+            );
         }
+
+        $pdf->SetTextColor(0, 0, 0);
 
         $pdf->SetTextColor(0, 0, 0);
 

@@ -25,7 +25,7 @@
                                     </div>
                                     <div class="col p-0 d-flex align-items-baseline">
                                         <label for="desCodeForm" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
-                                        <select name="desCodeForm" id="desCodeForm" class="form-select form-select-sm col" style="background: #FFFBDF;" required>
+                                        <select name="desCodeForm" id="desCodeForm" class="form-select form-select-sm col" style="background: #FFFBDF; appearance: auto;" required>
                                         </select>
                                     </div>
                                 </div>
@@ -44,13 +44,13 @@
                                 <div class="input-group col p-0 d-flex align-items-baseline gap-1">
                                     <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                         <label for="user-origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
-                                        <select name="user-origin" id="user-origin" class="form-control form-control-sm col ms-3" style="background: #FFFBDF">
+                                        <select name="user-origin" id="user-origin" class="form-control form-control-sm col ms-3" style="background: #FFFBDF; appearance: auto">
                                             <option value="NEWSC1" selected>NEWSC1</option>
                                         </select>
                                     </div>
                                     <div class="col p-0 d-flex align-items-baseline">
                                         <label for="originCodeForm" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
-                                        <select name="originCodeForm" id="originCodeForm" class="form-select form-select-sm col" style="background: #FFFBDF" required>
+                                        <select name="originCodeForm" id="originCodeForm" class="form-select form-select-sm col" style="background: #FFFBDF; appearance: auto" required>
                                             <option value="NEWWHS" selected>NEWWHS</option>
                                         </select>
                                     </div>
@@ -96,8 +96,8 @@
                             <div class="d-flex flex-column gap-1 col-4">
                                 <div class="d-flex align-items-baseline gap-3">
                                     <label for="purposeForm" class="form-label text-dark-emphasis col-4"><small>Purpose of Request:</small></label>
-                                    <select name="purposeForm" id="purposeForm" class="form-select form-select-sm col" style="background: #FFFBDF" required>
-                                        <option value="" selected></option>
+                                    <select name="purposeForm" id="purposeForm" class="form-select form-select-sm col" style="background: #FFFBDF; appearance: auto" required>
+                                        <option value="" selected>Select purpose</option>
                                         <option value="Stock Refill">Stock Refill</option>
                                         <option value="Customer's Order">Customer's Order</option>
                                     </select>
@@ -182,7 +182,7 @@
                     title: "Success",
                     text: "Request submitted successfully",
                     showConfirmButton: true,
-                    confirmButtonText: "OKAY"   
+                    confirmButtonText: "OKAY"
                 }).then(() => {
                     $.post("./actions/log.php", {
                         Activity: "REQUESTED",

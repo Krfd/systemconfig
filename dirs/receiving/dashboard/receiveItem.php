@@ -113,11 +113,8 @@
                             </div>
                         </form>
                     </div>
+                </div>
             </section>
         </div>
     </div>
 </div>
-<?php
-include("deliveryModal.php");
-include("branchModal.php");
-?>

@@ -9,13 +9,13 @@
                 <div class="modal-body">
                     <div class="form-input mb-2">
                         <label for="newBrand" class="form-label text-dark-emphasis"><small>Brand:</small></label>
-                        <select class="form-select" id="newBrand" style="background: #FFFBDF" required>
+                        <select class="form-select" id="newBrand" style="background: #FFFBDF; appearance: auto" required>
                             <option selected value="">--Choose Brand--</option>
                         </select>
                     </div>
                     <div class="form-input mb-2">
                         <label for="newModel" class="form-label text-dark-emphasis"><small>Model:</small></label>
-                        <select class="form-select" id="newModel" style="background: #FFFBDF" required>
+                        <select class="form-select" id="newModel" style="background: #FFFBDF; appearance: auto" required>
                             <option selected value="">--Choose Model--</option>
                         </select>
                     </div>

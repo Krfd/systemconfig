@@ -60,7 +60,11 @@ function loadIncoming() {
 
           if (status === "NEW" || status === "IN TRANSIT") {
             statusClass = "bg-primary";
-          } else if (status === "CANCEL" || status === "CANCELLED" || status === "PARTIAL") {
+          } else if (
+            status === "CANCEL" ||
+            status === "CANCELLED" ||
+            status === "PARTIAL"
+          ) {
             statusClass = "bg-warning";
           } else if (status === "RECEIVED") {
             status = "DELIVERED";
@@ -1258,6 +1262,8 @@ function loadBasket() {
             rows.push([
               item.PKList_Number || "",
               item.RequestItemQty || "",
+              encoded,
+              formatted || "",
               '<div class="dropdown dropstart">' +
                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
                 '<i class="bi bi-three-dots"></i></button>' +
@@ -1274,8 +1280,6 @@ function loadBasket() {
                   ${actualQtyOption}
                 </ul>
               </div>`,
-              encoded,
-              formatted || "",
             ]);
           });
 
@@ -1845,6 +1849,11 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
 
               if (res.status === "success") {
                 const DocEntry = PicklistEntry;
+
+                Swal.fire({
+                  icon: "success",
+                  title: "Actual quantity has been saved",
+                });
 
                 if (srnMap && srnMap.length === 1) {
                   addToBasket(PickListNum);

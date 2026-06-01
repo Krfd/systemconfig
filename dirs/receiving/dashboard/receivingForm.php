@@ -10,7 +10,8 @@
 </div>
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-start align-items-baseline gap-3">
-        <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadDashboard()">
+        <!-- <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadDashboard()"> -->
+        <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadReceiving()">
             <i class="bi bi-arrow-left"></i>
         </button>
         <div class="d-flex justify-content-start align-items-start gap-3">
@@ -25,7 +26,6 @@
                         <form method="POST" id="receivingForm">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="d-flex flex-column gap-1 col-4">
-                                    <!-- <input type="hidden" id="batch"> -->
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="drNoRecForm" class="form-label text-dark-emphasis col-3"><small>DR No:</small></label>
                                         <input type="text" name="drNoRecForm" id="drNoRecForm" class="form-control form-control-sm col search-order-field" data-field="deliveryNumber" style="background: #FFFBDF" oninput="this.value = this.value.toUpperCase()">

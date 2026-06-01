@@ -58,50 +58,6 @@ class PDF extends FPDF
         $this->series = $series;
     }
 
-    // WORKING
-    // function Header()
-    // {
-    //     $logoX = 10;
-    //     $logoY = 10;
-    //     $logoW = 20;
-
-    //     $this->Image('../assets/image/logo/iap_icon.png', $logoX, $logoY, $logoW);
-
-    //     $this->SetFont('Arial', 'B', 20);
-    //     $this->SetTextColor(64, 64, 64);
-
-    //     $pageWidth = $this->GetPageWidth();
-    //     // $title = $this->series ?? '';
-
-    //     $title = !empty($this->series)
-    //         ? 'Ref No: ' . $this->series
-    //         : '';
-
-    //     // ===== horizontal centering =====
-    //     $textWidth = $this->GetStringWidth($title);
-    //     $centerX = ($pageWidth - $textWidth) / 2;
-
-    //     $minX = $logoX + $logoW + 5;
-
-    //     if ($centerX < $minX) {
-    //         $centerX = $minX;
-    //     }
-
-    //     $shift = $centerX - $minX;
-    //     $centerX = $centerX - ($shift / 2);
-
-    //     // ===== vertical alignment FIX =====
-    //     $logoHeight = $logoW; // since square logo
-    //     $logoCenterY = $logoY + ($logoHeight / 2);
-
-    //     // FPDF text height baseline correction (important part)
-    //     $textHeight = 10;
-    //     $textY = $logoCenterY - ($textHeight / 2);
-
-    //     $this->SetXY($centerX, $textY);
-    //     $this->Cell($textWidth, $textHeight, $title, 0, 0, 'C');
-    // }
-
     // WITH MAIN TITLE
     function Header()
     {
@@ -231,6 +187,27 @@ class PDF extends FPDF
 $pdf = new PDF();
 $pdf->AliasNbPages();
 
+// function headerDetails($pdf, $docDate, $branch, $origin, $receivedDate, $receivedTime, $originwhscode, $status, $srNumber)
+// {
+//     $pdf->SetFont('Arial', '', 9);
+
+//     $pageWidth = $pdf->GetPageWidth() - 24;
+
+//     $leftWidth = $pageWidth / 2;
+//     $rightWidth = $pageWidth / 2;
+
+//     $pdf->Cell($leftWidth, 6, sprintf('%-19s %s', 'Receiving Branch:', $branch), 0, 0, 'L');
+//     $pdf->Cell($rightWidth, 6, sprintf('%-15s %s', 'Status:', $status), 0, 1, 'R');
+
+//     $pdf->Cell($leftWidth, 6, sprintf('%-21s %s', 'SR Number:', $srNumber), 0, 0, 'L');
+//     $pdf->Cell($rightWidth, 6, sprintf('%-18s %s', 'Delivery Date:', $receivedDate), 0, 1, 'R');
+//     $pdf->Cell($leftWidth, 6, sprintf('%-22s %s', 'Origin Branch:', $origin), 0, 0, 'L');
+
+//     $pdf->SetX($pdf->GetPageWidth() - 55);
+//     $pdf->Cell(41, 6, sprintf('%-18s %s', 'Document Date:', $docDate), 0, 1, 'R');
+
+//     $pdf->Ln(2);
+// }
 function headerDetails($pdf, $docDate, $branch, $origin, $receivedDate, $receivedTime, $originwhscode, $status, $srNumber)
 {
     $pdf->SetFont('Arial', '', 9);
@@ -240,25 +217,25 @@ function headerDetails($pdf, $docDate, $branch, $origin, $receivedDate, $receive
     $leftWidth = $pageWidth / 2;
     $rightWidth = $pageWidth / 2;
 
+    $labelWidth = 25; // fixed width for right-side labels
+
+    // Row 1
     $pdf->Cell($leftWidth, 6, sprintf('%-19s %s', 'Receiving Branch:', $branch), 0, 0, 'L');
-    $pdf->Cell($rightWidth, 6, sprintf('%-15s %s', 'Status:', $status), 0, 1, 'R');
-    // $pdf->Cell($rightWidth, 6, sprintf('%-17s %s', 'Arrival Date:', $docDate), 0, 1, 'R');
 
+    $pdf->Cell($rightWidth - $labelWidth, 6, 'Delivery Date:', 0, 0, 'R');
+    $pdf->Cell($labelWidth, 6, $receivedDate, 0, 1, 'L');
+
+    // Row 2
     $pdf->Cell($leftWidth, 6, sprintf('%-21s %s', 'SR Number:', $srNumber), 0, 0, 'L');
-    $pdf->Cell($rightWidth, 6, sprintf('%-18s %s', 'Delivery Date:', $receivedDate), 0, 1, 'R');
 
+    $pdf->Cell($rightWidth - $labelWidth, 6, 'Document Date:', 0, 0, 'R');
+    $pdf->Cell($labelWidth, 6, $docDate, 0, 1, 'L');
+
+    // Row 3
     $pdf->Cell($leftWidth, 6, sprintf('%-22s %s', 'Origin Branch:', $origin), 0, 0, 'L');
 
 
-    // $pdf->Cell($leftWidth, 6, sprintf('%-20s %s', 'Origin Whcode:', $originwhscode), 0, 0, 'L');
-    // $pdf->Cell(50, 6, sprintf('%-24s %s', 'Document Date:', $docDate), 0, 1, 'R');
-
-    // $pdf->Cell(0, 6, 'Status: ' . $status, 0, 1, 'R');
-
-    $pdf->SetX($pdf->GetPageWidth() - 55);
-    $pdf->Cell(41, 6, sprintf('%-18s %s', 'Document Date:', $docDate), 0, 1, 'R');
-
-    $pdf->Ln(2);
+    $pdf->Ln(5);
 }
 
 $itemsByBranch = [];

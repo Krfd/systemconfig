@@ -1,32 +1,24 @@
 <?php
 require_once "../../../../config/connection.php";
 
+$category = $_POST['category'];
+
 try {
     $conn->beginTransaction();
 
-    $fetch_truckrecord = $conn->prepare("
-      SELECT 
-        Truck_id, 
-        TruckName, 
-        TruckModel,
-        TruckCategory,
-        EngineNumber,
-        PlateNumber,
-        TruckSize
-      FROM Truck_Record WITH (NOLOCK)
-      ORDER BY Truck_id DESC
-    ");
-    $fetch_truckrecord->execute();
-    $get_trucks = $fetch_truckrecord->fetchAll(PDO::FETCH_ASSOC);
+    $fetch_truckplates = $conn->prepare("EXEC dbo.Get_Plates ?");
+    $fetch_truckplates->execute([$category]);
+    $categories = $fetch_truckplates->fetchAll(PDO::FETCH_ASSOC);
 
     $conn->commit();
 
     $response = array(
         "isSuccess" => 'success',
-        "Data" => $get_trucks
+        "Plates" => $categories,
     );
     echo json_encode($response);
 } catch (PDOException $e) {
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollback();
     $response = array(
         "isSuccess" => 'Failed',

@@ -12,8 +12,9 @@ $(document).ready(function () {
 
 function loadDashboard() {
   $.post("dirs/receiving/dashboard/components/main.php", {}, function (data) {
-    $("#main-content").html(data);
+    $("#receiving_content").html(data);
     loadReceiving();
+    console.log(`SHOULD REDIRECT TO DASHBOARD`);
   });
 }
 
@@ -287,6 +288,153 @@ function receivingForm() {
     200);
 }
 
+function receivedForm() {
+  $("#main-content").html(spinner);
+  (setTimeout(function () {
+    $.post("dirs/receiving/dashboard/receivingForm.php", {}, function (data) {
+      $("#main-content").html(data);
+
+      toggleReceivingButtons(false);
+      fetchOrderDetails();
+      // receiveItem();
+      formattedDate();
+      loadImperialBrands();
+      addNonSerialize();
+      serialDeliveryInput();
+
+      $("#newBrand").on("change", function () {
+        $("#newModel").html('<option value="">Select Model</option>');
+        $("#newCategory").val("");
+        $("#itemcode").val("");
+        loadImperialModel();
+      });
+
+      $("#newModel").on("change", function () {
+        const selected = $(this).find(":selected");
+        $("#newCategory").val(selected.data("category") || "");
+        $("#itemcode").val(selected.data("itemcode") || "");
+      });
+
+      function toggler() {
+        const toggler = document.getElementById("serialToggler");
+        const knob = document.querySelector(".switch-knob");
+        const manual = document.querySelector(".switch-track .manual");
+        const scan = document.querySelector(".switch-track .scan");
+        const serialInput = document.getElementById("newSerial");
+
+        function preventTyping(e) {
+          const allowedKeys = [
+            "Enter",
+            "Tab",
+            "Backspace",
+            "Delete",
+            "ArrowLeft",
+            "ArrowRight",
+          ];
+
+          if (!allowedKeys.includes(e.key)) {
+            e.preventDefault();
+          }
+        }
+
+        function updateKnob() {
+          scan.style.transition = "opacity 0.3s ease";
+          manual.style.transition = "opacity 0.3s ease";
+
+          if (toggler.checked) {
+            // SCAN MODE
+            toggler.dataset.value = "Scan";
+
+            knob.style.width = "55px";
+            knob.style.transform = "translateX(8px)";
+
+            scan.style.opacity = "1";
+            manual.style.opacity = "0";
+
+            scan.style.pointerEvents = "auto";
+            manual.style.pointerEvents = "none";
+
+            // console.log("SCAN");
+
+            serialInput.value = "";
+            serialInput.focus();
+
+            // Prevent manual typing
+            serialInput.addEventListener("keydown", preventTyping);
+          } else {
+            // MANUAL MODE
+            toggler.dataset.value = "Manual";
+
+            knob.style.width = "60px";
+            knob.style.transform = "translateX(0px)";
+
+            manual.style.opacity = "1";
+            scan.style.opacity = "0";
+
+            manual.style.pointerEvents = "auto";
+            scan.style.pointerEvents = "none";
+
+            // console.log("MANUAL");
+
+            serialInput.value = "";
+            serialInput.focus();
+
+            // Allow manual typing
+            serialInput.removeEventListener("keydown", preventTyping);
+          }
+        }
+
+        updateKnob();
+
+        toggler.addEventListener("change", updateKnob);
+      }
+
+      const addBtn = document.getElementById("addDeliveryModalBtn");
+      const newItemModal = new bootstrap.Modal(
+        document.getElementById("addDeliveryModal"),
+      );
+
+      let allowNonserialize = false;
+
+      addBtn.addEventListener("click", function () {
+        if (allowNonserialize) {
+          newItemModal.show();
+          return;
+        }
+
+        Swal.fire({
+          title: "Enter non-serialize items?",
+          text: "Please confirm before proceeding.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Allow",
+          cancelButtonText: "Cancel",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            allowNonserialize = true;
+            newItemModal.show();
+          }
+        });
+      });
+
+      function adjustTotalWidth() {
+        const summaryTable = document.getElementById("receiving-form-table");
+        const totalRow = document.getElementById("totalRowOutside");
+
+        if (summaryTable && totalRow) {
+          totalRow.style.width = summaryTable.offsetWidth + "px";
+        }
+      }
+
+      toggler();
+      adjustTotalWidth();
+      window.addEventListener("resize", adjustTotalWidth);
+      submitReceiving();
+    });
+  }),
+    200);
+}
+
 function validateNumber(el) {
   let value = $(el).text().trim();
 
@@ -379,7 +527,6 @@ function fetchOrderDetails() {
       $.ajax({
         url: "dirs/receiving/dashboard/actions/get_reviewdeliveryitems.php",
         type: "POST",
-        // data: { DeliveryNumber: drNo },
         data: {
           searchType: field,
           searchValue: value,
@@ -394,15 +541,29 @@ function fetchOrderDetails() {
           let items = response.Items;
           console.log(`RESPONSE : ${JSON.stringify(header)}`);
           console.log(``);
-          console.log(`ITEMS : ${items}`);
+          console.log(`ITEMS : ${JSON.stringify(items)}`);
+
+          if (response.Header?.Status === "failed") {
+            Swal.fire({
+              icon: "error",
+              title: "Error fetching delivery details.",
+            });
+            return;
+          }
 
           if (response.isSuccess === "success") {
             if (field !== "deliveryNumber") {
               $("#drNoRecForm").val(header.DeliveryNumber);
             }
             $("#originRecForm").val(header.OriginBranch);
-            $("#refNoRecForm").val(items[0].ReferenceNumber);
-            $("#stockReqNoRecForm").val(items[0].SR_Number);
+            // $("#refNoRecForm").val(items[0].ReferenceNumber || header.ReferenceNumber);
+            if (field === "deliveryNumber") {
+              $("#refNoRecForm").val(header.ReferenceNumber);
+            } else {
+              $("#refNoRecForm").val(items[0].ReferenceNumber);
+              $("#stockReqNoRecForm").val(items[0].SR_Number);
+            }
+            // $("#stockReqNoRecForm").val(items[0].SR_Number);
 
             $("#docDateRecForm").val(header.DeliveryDate);
             $("#statusRecForm").val(header.DocStatus);
@@ -429,7 +590,7 @@ function fetchOrderDetails() {
               icon: "error",
               title: response.message || errorMessage,
             });
-            clearTable();
+            // clearTable();
             return;
           }
         },
@@ -955,15 +1116,15 @@ function submitReceiving() {
                 "_blank",
               );
 
-              console.log(`SHOULD GENERATE RECEIVING REPORT`);
-
               Swal.fire({
                 icon: "success",
                 title: "Items has been received",
                 // text: `Receiving #: ${response.ReceivingNumber || ""}`,
-              }).then(() => {
-                loadDashboard();
               });
+              // .then(() => {
+              //   loadDashboard();
+              // });
+              loadReceiving();
             } else {
               Swal.fire({
                 icon: "error",

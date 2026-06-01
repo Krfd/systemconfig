@@ -119,7 +119,11 @@ function loadDelivery() {
 
           if (status === "NEW" || status === "IN TRANSIT") {
             statusClass = "bg-primary";
-          } else if (status === "CANCEL" || status === "CANCELLED" || status === "PARTIAL") {
+          } else if (
+            status === "CANCEL" ||
+            status === "CANCELLED" ||
+            status === "PARTIAL"
+          ) {
             statusClass = "bg-warning";
           } else if (status === "DELIVERED") {
             statusClass = "bg-success";
@@ -145,7 +149,6 @@ function loadDelivery() {
             item.Driver,
             item.TruckCategory,
             item.TruckPlate,
-<<<<<<< HEAD
             // item.DeliveryDate || "",
             item.DeliveryDate
               ? new Date(item.DeliveryDate)
@@ -156,10 +159,8 @@ function loadDelivery() {
                   })
                   .replace(/\//g, "-")
               : "",
-=======
             item.DeliveryDate || "",
             statusBadge,
->>>>>>> 4fc96e3 (upadted the statuses)
             '<div class="dropdown dropstart">' +
               '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
               '<i class="bi bi-three-dots"></i></button>' +

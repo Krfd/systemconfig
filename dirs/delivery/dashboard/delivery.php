@@ -3,9 +3,6 @@
         <div class="d-flex justify-content-start align-items-start gap-3">
             <h3 class="fw-bold text-primary">Delivery</h3>
         </div>
-        <!-- <button class="btn btn-primary" type="button" onclick="loadDeliveryBasket()">
-            <i class="bi bi-truck"></i>
-        </button> -->
     </div>
     <div id="delivery_content"></div>
 </div>

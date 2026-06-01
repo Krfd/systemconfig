@@ -2377,47 +2377,77 @@ function submitDelivery() {
 }
 
 function getDeliveryDetails() {
-  const truckData = {
-    "4 Wheeler": ["ABC-123", "DEF-456"],
-    "6 Wheeler": ["GHI-789", "JKL-012"],
-    "10 Wheeler": ["MNO-345", "PQR-678"],
-  };
+  $.ajax({
+    url: "dirs/basket/dashboard/actions/get_truckcategories.php",
+    type: "POST",
+    dataType: "json",
+    success: function (response) {
+      if (response.isSuccess === "success") {
+        const categories = response.Categories;
 
-  document.getElementById("truckCat").addEventListener("change", function () {
-    const plateSelect = document.getElementById("plate");
-    const selectedCategory = this.value;
+        $("#truckCat")
+          .empty()
+          .append('<option value="">Select Category</option>');
+        categories.forEach((cat) => {
+          $("#truckCat").append(
+            $("<option>", {
+              value: cat.category,
+              text: cat.category,
+            }),
+          );
+        });
+      }
+    },
+  });
+}
 
-    // Clear existing options
-    plateSelect.innerHTML = '<option value="">Select Plate</option>';
+$(document).on("change", "#truckCat", function () {
+  $("#newModel").html('<option value="">Select Plate Number</option>');
+  loadTruckPlates();
+});
 
-    if (truckData[selectedCategory]) {
-      truckData[selectedCategory].forEach((plate) => {
-        const option = document.createElement("option");
-        option.value = plate;
-        option.textContent = plate;
-        plateSelect.appendChild(option);
-      });
-    }
+async function loadTruckPlates() {
+  let truckCategory = $("#truckCat").val();
+  console.log("Category sent:", truckCategory);
+  $("#plate").html('<option value="">Loading...</option>');
 
-    // const plateSelect = document.getElementById("plate");
-    // const selectedCategory = this.value;
+  if (!truckCategory) {
+    $("#plate").html('<option value="">Select Category first</option>');
+    return;
+  }
 
-    // // Clear existing options
-    // plateSelect.innerHTML = '<option value="">Select Plate</option>';
+  $.ajax({
+    url: "dirs/basket/dashboard/actions/get_truckplates.php",
+    type: "POST",
+    dataType: "json",
+    data: {
+      category: truckCategory,
+    },
+    success: function (response) {
+      if (response.isSuccess === "success") {
+        const plates = response.Plates;
 
-    // if (truckData[selectedCategory]) {
-
-    //   truckData[selectedCategory].forEach((plate) => {
-
-    //     const option = document.createElement("option");
-
-    //     option.value = plate;
-    //     option.textContent = plate;
-
-    //     plateSelect.appendChild(option);
-
-    //   });
-    // }
+        try {
+          $("#plate")
+            .empty()
+            .append('<option value="">Select Plate Number</option>');
+          plates.forEach((plate) => {
+            $("#plate").append(
+              $("<option>", {
+                value: plate.plate,
+                text: plate.plate,
+              }),
+            );
+          });
+        } catch (e) {
+          console.error("Failed to parse truck plates response:", e);
+        }
+      }
+    },
+    error: function (xhr) {
+      console.log("AJAX ERROR");
+      console.log(xhr.responseText);
+    },
   });
 }
 
