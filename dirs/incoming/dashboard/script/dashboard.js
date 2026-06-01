@@ -60,7 +60,7 @@ function loadIncoming() {
 
           if (status === "NEW" || status === "IN TRANSIT") {
             statusClass = "bg-primary";
-          } else if (status === "CANCEL" || status === "CANCELLED") {
+          } else if (status === "CANCEL" || status === "CANCELLED" || status === "PARTIAL") {
             statusClass = "bg-warning";
           } else if (status === "RECEIVED") {
             status = "DELIVERED";
@@ -1257,8 +1257,6 @@ function loadBasket() {
 
             rows.push([
               item.PKList_Number || "",
-              encoded,
-              formatted || "",
               item.RequestItemQty || "",
               '<div class="dropdown dropstart">' +
                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
@@ -1276,6 +1274,8 @@ function loadBasket() {
                   ${actualQtyOption}
                 </ul>
               </div>`,
+              encoded,
+              formatted || "",
             ]);
           });
 
@@ -1298,9 +1298,9 @@ function loadBasket() {
                 title: "Picklist No.",
                 className: "text-start open-picklist ps-5",
               },
+              { title: "Quantity", className: "text-center" },
               { title: "Status" },
               { title: "Date", className: "text-start ps-5" },
-              { title: "Quantity", className: "text-center" },
               { title: "", orderable: false },
             ],
             createdRow: function (row, data, dataIndex) {

@@ -94,7 +94,7 @@ function loadOutgoing() {
 
           if (status === "NEW") {
             statusClass = "bg-primary";
-          } else if (status === "CANCEL" || status === "CANCELLED") {
+          } else if (status === "CANCEL" || status === "CANCELLED" || status === "PARTIAL") {
             statusClass = "bg-warning";
           } else if (status === "RECEIVED") {
             statusClass = "bg-success";

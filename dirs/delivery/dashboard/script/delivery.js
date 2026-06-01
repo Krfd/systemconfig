@@ -119,7 +119,7 @@ function loadDelivery() {
 
           if (status === "NEW" || status === "IN TRANSIT") {
             statusClass = "bg-primary";
-          } else if (status === "CANCEL" || status === "CANCELLED") {
+          } else if (status === "CANCEL" || status === "CANCELLED" || status === "PARTIAL") {
             statusClass = "bg-warning";
           } else if (status === "DELIVERED") {
             statusClass = "bg-success";
@@ -142,10 +142,10 @@ function loadDelivery() {
           rows.push([
             index++,
             item.DeliveryNumber || "",
-            statusBadge,
             item.Driver,
             item.TruckCategory,
             item.TruckPlate,
+<<<<<<< HEAD
             // item.DeliveryDate || "",
             item.DeliveryDate
               ? new Date(item.DeliveryDate)
@@ -156,6 +156,10 @@ function loadDelivery() {
                   })
                   .replace(/\//g, "-")
               : "",
+=======
+            item.DeliveryDate || "",
+            statusBadge,
+>>>>>>> 4fc96e3 (upadted the statuses)
             '<div class="dropdown dropstart">' +
               '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
               '<i class="bi bi-three-dots"></i></button>' +
@@ -183,11 +187,11 @@ function loadDelivery() {
           columns: [
             { title: "#", className: "text-center" },
             { title: "DR No." },
-            { title: "Status" },
             { title: "Driver" },
             { title: "Truck" },
             { title: "Plate No.", className: "ps-3" },
             { title: "Delivery Date", className: "text-start ps-3" },
+            { title: "Status" },
             { title: "Action", className: "text-center" },
           ],
           pageLength: 50,

@@ -29,6 +29,17 @@ function loadDashboard() {
     //     order: [0, "desc"],
     //   });
     // });
+
+    $.post("dirs/dashboard/actions/get_dashboard.php", {}, function () {
+
+      
+
+    })
+
+
+
+    // GET DATA FOR DASHBOARD
+
   });
 }
 

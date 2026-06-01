@@ -132,6 +132,8 @@ function loadBasket() {
           rows.push([
             rowNum++,
             item.BatchNumber,
+            formatted,
+            formattedTime,
             (() => {
               let status = item.DocStatus || "";
               let badgeClass = "primary";
@@ -142,8 +144,6 @@ function loadBasket() {
 
               return `<span class="badge bg-${badgeClass}" >${status}</span>`;
             })(),
-            formatted,
-            formattedTime,
             '<div class="dropdown dropstart">' +
               '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
               '<i class="bi bi-three-dots"></i></button>' +
@@ -170,9 +170,9 @@ function loadBasket() {
           columns: [
             { title: "#", className: "text-center" },
             { title: "Batch No.", className: "text-start ps-5" },
-            { title: "Status", className: "ps-3" },
             { title: "Date", className: "text-start ps-3" },
             { title: "Time", className: "text-start ps-3" },
+            { title: "Status", className: "ps-3" },
             { title: "Action" },
           ],
           createdRow: function (row, data) {

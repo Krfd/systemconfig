@@ -129,6 +129,28 @@ try {
     $ReceivedCode = generateUniqueAppCode($conn);
 
     /* =========================================================
+           INSERT RECEIVING HEADER
+        ========================================================= */
+    $stmtHeader = $conn->prepare("
+            EXEC dbo.ReceivingDelivered_items
+                ?,?,?,?,?,?,?,?,?,?,?,?
+        ");
+    $stmtHeader->execute([
+        $User,
+        $DeliveryNumber,
+        $BatchNumberReceived,
+        $ReceivedCode,
+        $Deliverydate,
+        $PostingDate,
+        $Driver,
+        $TruckCategory,
+        $TruckPlate,
+        $Remarks,
+        $Branchorigin,
+        $BranchWhscode
+    ]);
+
+    /* =========================================================
            COLLECT RECEIVING ITEMS
         ========================================================= */
     $stmtCollect = $conn->prepare("EXEC dbo.ReceivingItems_orders ?,?,?,?,?");
@@ -207,27 +229,27 @@ try {
         ]);
     }
 
-    /* =========================================================
-           INSERT RECEIVING HEADER
-        ========================================================= */
-    $stmtHeader = $conn->prepare("
-            EXEC dbo.ReceivingDelivered_items
-                ?,?,?,?,?,?,?,?,?,?,?,?
-        ");
-    $stmtHeader->execute([
-        $User,
-        $DeliveryNumber,
-        $BatchNumberReceived,
-        $ReceivedCode,
-        $Deliverydate,
-        $PostingDate,
-        $Driver,
-        $TruckCategory,
-        $TruckPlate,
-        $Remarks,
-        $Branchorigin,
-        $BranchWhscode
-    ]);
+    // /* =========================================================
+    //        INSERT RECEIVING HEADER
+    //     ========================================================= */
+    // $stmtHeader = $conn->prepare("
+    //         EXEC dbo.ReceivingDelivered_items
+    //             ?,?,?,?,?,?,?,?,?,?,?,?
+    //     ");
+    // $stmtHeader->execute([
+    //     $User,
+    //     $DeliveryNumber,
+    //     $BatchNumberReceived,
+    //     $ReceivedCode,
+    //     $Deliverydate,
+    //     $PostingDate,
+    //     $Driver,
+    //     $TruckCategory,
+    //     $TruckPlate,
+    //     $Remarks,
+    //     $Branchorigin,
+    //     $BranchWhscode
+    // ]);
     $conn->commit();
 
     echo json_encode([

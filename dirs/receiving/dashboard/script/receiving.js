@@ -45,7 +45,13 @@ function loadReceiving() {
             item.OriginBranch,
             (() => {
               let status = item.ReceivedStatus;
-              return `<span class="badge bg-success">${status}</span>`;
+              let bgClass = "";
+              if (status === "RECEIVED") {
+                bgClass = "bg-success";
+              } else if (status === "PARTIAL") {
+                bgClass = "bg-warning";
+              }
+              return `<span class="badge ${bgClass}">${status}</span>`;
             })(),
           ]);
         });
