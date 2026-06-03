@@ -40,13 +40,13 @@ $("#main-menu")
       // $maintitle = "Requests";
       $maintitle = "";
       $mainbreadcrumb = `<li class="breadcrumb-item active">Requests</li>`;
-      $file = "dirs/requests/requests.php";
+      $file = "dirs/requests/dashboard/requests.php";
       break;
     case "users":
       // $maintitle = "Users";
       $maintitle = "";
       $mainbreadcrumb = `<li class="breadcrumb-item active">Users</li>`;
-      $file = "dirs/users/users.php";
+      $file = "dirs/users/dashboard/users.php";
       break;
     case "findings":
       // $maintitle = "Findings";
@@ -59,6 +59,12 @@ $("#main-menu")
       $maintitle = "";
       $mainbreadcrumb = `<li class="breadcrumb-item active">Settings</li>`;
       $file = "dirs/settings/settings.php";
+      break;
+    case "logs":
+      // $maintitle = "Logs";
+      $maintitle = "";
+      $mainbreadcrumb = `<li class="breadcrumb-item active">Logs</li>`;
+      $file = "dirs/logs/dashboard/logs.php";
       break;
     default:
     return;

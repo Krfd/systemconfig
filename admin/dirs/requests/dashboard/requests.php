@@ -7,4 +7,4 @@
     <div id="dashboard_content"></div>
 </div>
 <script src="../assets/js/load.js"></script>
-<script src="dirs/requests/dashboard/script/scripts.js"></script>
+<script src="dirs/requests/dashboard/script/script.js"></script>

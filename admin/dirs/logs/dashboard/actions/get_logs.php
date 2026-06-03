@@ -1,6 +1,6 @@
 <?php
-
-require_once "../../../../config/connection.php";
+// require_once "../../../../config/connection.php";
+require_once __DIR__ . "/../../../../../config/connection.php";
 
 try {
     $conn->beginTransaction();
@@ -16,7 +16,7 @@ try {
         $response = array(
             "isSuccess" => "success",
             "Data" => $get_logs
-        )
+        );
     }
 
     echo json_encode($response);

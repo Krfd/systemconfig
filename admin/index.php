@@ -13,7 +13,6 @@ try {
     $ua = $conn->prepare("EXEC dbo.[Session_Account] ?");
     $ua->execute([$User]);
     $user = $ua->fetch(PDO::FETCH_ASSOC);
-
 } catch (PDOException $e) {
     echo "<b>Database Error:</b> " . htmlspecialchars($e->getMessage());
     exit();
@@ -43,7 +42,8 @@ try {
     <link rel="stylesheet" href="../assets/plugins/datepicker/jquery-ui.structure.min.css">
     <link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="icon" href="./../assets/image/logo/iap_icon.png">
+    <link rel="stylesheet" href="../assets/css/custom.css">
+    <!-- <link rel="icon" href="../assets/image/logo/iap_icon.png"> -->
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -67,7 +67,7 @@ try {
         <aside class="main-sidebar bg-primary-subtle elevation-5">
             <p class="text-center brand-link">
                 <a href="index.php" style="text-decoration: none; color: inherit;">
-                    <img src="./../assets/image/logo/iap_icon.png" alt="iShift Admin" id="profile-image" style="width: 100px; height: 65px; object-fit: cover;">
+                    <!-- <img src="../assets/image/logo/iap_icon.png" alt="iShift Admin" id="profile-image" style="width: 100px; height: 65px; object-fit: cover;"> -->
                     <br>
                 </a>
                 <small><?php echo isset($user['Username']) ? $user['Username'] : ''; ?></small>
@@ -105,6 +105,12 @@ try {
                             <a href="#" class="nav-link" name="menu" menucode="settings">
                                 <i class="nav-icon bi bi-truck"></i>
                                 <p>Settings</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" name="menu" menucode="logs">
+                                <i class="nav-icon bi bi-truck"></i>
+                                <p>Logs</p>
                             </a>
                         </li>
                         <hr>
@@ -183,7 +189,9 @@ try {
     <script src="../node_modules/xlsx/dist/xlsx.full.min.js"></script>
     <script src="script/script.js"></script>
     <!-- <script src="..assets/script/relogin.js"></script> -->
-    <?php include '../modal.php'; ?>
+    <?php
+    //  include '../modal.php';
+      ?>
 </body>
 
 </html>

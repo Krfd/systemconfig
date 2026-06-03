@@ -45,11 +45,12 @@ $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
 function loadFindings() {
   $.ajax({
     url: "dirs/findings/dashboard/actions/get_findings.php",
-    type: "POST",
+    type: "GET",
     dataType: "json",
     success: function (response) {
       let rows = [];
       let items = response.Data;
+      let index = 1
 
       if (response.isSuccess === "success" && Array.isArray(response.Data)) {
 
@@ -65,13 +66,20 @@ function loadFindings() {
           let driver = item.driver;
           let truckCategory = item.truckCategory;
           let truckPlate = item.truckPlate;
-          let encodeDate = item.docDate;
-          encodeDate.toLocaleString();
+          // let encodeDate = item.docDate;
+          // encodeDate.toLocaleString();
 
-          let status = item.RequestStatus
-            ? item.RequestStatus.toUpperCase()
-            : "";
-          let statusClass = "";
+          let encodeDate = new Date(item.docDate);
+
+let formattedEncodeDate =
+    `${String(encodeDate.getMonth() + 1).padStart(2, "0")}-` +
+    `${String(encodeDate.getDate()).padStart(2, "0")}-` +
+    `${String(encodeDate.getFullYear()).slice(-2)} ` +
+    `${String(encodeDate.getHours()).padStart(2, "0")}:` +
+    `${String(encodeDate.getMinutes()).padStart(2, "0")}:` +
+    `${String(encodeDate.getSeconds()).padStart(2, "0")}`;
+
+      let statusClass = "";
 
           if (status === "LACKING" || status === "EXCEEDING") {
             statusClass = "bg-danger";
@@ -94,7 +102,8 @@ function loadFindings() {
             driver,
             truckCategory,
             truckPlate,
-            encodeDate,
+            // encodeDate,
+            formattedEncodeDate,
 
             // '<div class="dropdown">' +
             //   '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
@@ -136,9 +145,9 @@ function loadFindings() {
           { title: "#"},
           { title: "Ref. #", className: "text-center" },
           { title: "Branch" },
-          { title: "Serial" },
-          { title: "To Deliver" },
-          { title: "Qty" },
+          { title: "Serial", className: "text-start" },
+          { title: "To Deliver", className: "text-start" },
+          { title: "Qty", className: "text-start" },
           { title: "Diff.", className: "text-start" },
           { title: "Status", className: "text-center" },
           { title: "Transaction" },
