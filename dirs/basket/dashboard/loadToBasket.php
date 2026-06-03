@@ -16,7 +16,7 @@
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="d-flex flex-column gap-1 col-4">
                                     <div class="input-group col p-0 d-flex gap-1">
-                                        <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
+                                        <div class="p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
                                             <input type="text" id="origin" class="form-control form-control-sm col ms-3" style="background: #f2f2f2" value="NEWSC1" readonly>
                                         </div>
@@ -25,17 +25,19 @@
                                             <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f2f2f2" value="NEWWHS" readonly>
                                         </div>
                                     </div>
-                                    <!-- <div class="input-group col p-0 d-flex gap-1">
-                                        <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
-                                            <label for="eta" class="form-label text-dark-emphasis col-6"><small>ETA:</small></label>
-                                            <input type="datetime-local" id="eta" class="form-control form-control-sm col" style="background: #FFFBDF" required>
-                                        </div>
+                                    <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
+                                        <label for="eta" class="form-label text-dark-emphasis col-5"><small>Expected Arrival:</small></label>
+                                        <input type="date" id="eta" class="form-control form-control-sm col ms-3" style="background: #FFFBDF" required>
+                                    </div>
+                                    <!-- <div class="p-0 d-flex align-items-baseline gap-1 col">
+                                        <label for="status" class="form-label text-dark-emphasis col-3"><small>Status:</small></label>
+                                        <input type="text" name="status" id="status" class="form-control form-control-sm col ms-2" style="background: #f2f2f2" value="ASSIGNED" readonly>
                                     </div> -->
                                 </div>
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="docdate" class="form-label text-dark-emphasis col-4"><small>Document Date:</small></label>
-                                        <input type="text" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
+                                        <input type="date" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="deldate" class="form-label text-dark-emphasis col-4"><small>Delivery Date:</small></label>
@@ -43,7 +45,7 @@
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="status" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>
-                                        <input type="text" name="status" id="status" class="form-control form-control-sm col" style="background: #f2f2f2" value="IN TRANSIT" readonly>
+                                        <input type="text" name="status" id="status" class="form-control form-control-sm col" style="background: #f2f2f2" value="ASSIGNED" readonly>
                                     </div>
                                 </div>
                             </div>

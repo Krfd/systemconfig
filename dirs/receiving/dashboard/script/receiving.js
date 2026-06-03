@@ -14,9 +14,20 @@ function loadDashboard() {
   $.post("dirs/receiving/dashboard/components/main.php", {}, function (data) {
     $("#receiving_content").html(data);
     loadReceiving();
-    console.log(`SHOULD REDIRECT TO DASHBOARD`);
   });
 }
+
+function returnReceiving() {
+  $.post("dirs/receiving/dashboard/received.php", {}, function (data) {
+    $("#main-content").html(data);
+  });
+}
+
+$(document).on("dblclick", "#receivingTable tbody tr", function (e) {
+  if ($(e.target).closest(".dropdown").length) return;
+  let rcvdNumber = $(this).data("rcvdnumber");
+  openReceivedForm(rcvdNumber);
+});
 
 function loadReceiving() {
   $.ajax({
@@ -51,6 +62,8 @@ function loadReceiving() {
                 bgClass = "bg-success";
               } else if (status === "PARTIAL") {
                 bgClass = "bg-warning";
+              } else if (status === "TERMINATED") {
+                bgClass = "bg-secondary";
               }
               return `<span class="badge ${bgClass}">${status}</span>`;
             })(),
@@ -79,7 +92,6 @@ function loadReceiving() {
               className: "ps-3",
             },
           ],
-          // createdRow: function (row, data) {}
           paging: true,
           searching: true,
           info: true,
@@ -94,6 +106,21 @@ function loadReceiving() {
               "min-height": "40px",
               cursor: "pointer",
             });
+            // let receivedNumber = data[0];
+            let receivedNumber = null;
+
+            if (
+              data &&
+              Array.isArray(data) &&
+              data.length > 0 &&
+              data[0] !== null &&
+              data[0] !== undefined &&
+              data[0] !== ""
+            ) {
+              receivedNumber = data[1];
+            }
+            // console.log(`RECEIVED NUMBER: ${receivedNumber}`);
+            $(row).data("rcvdnumber", receivedNumber);
             $("td:eq(1)", row).addClass("text-primary ps-2");
 
             $(row).hover(
@@ -147,6 +174,7 @@ function receivingForm() {
     $.post("dirs/receiving/dashboard/receivingForm.php", {}, function (data) {
       $("#main-content").html(data);
 
+      userDetails();
       toggleReceivingButtons(false);
       fetchOrderDetails();
       // receiveItem();
@@ -288,151 +316,114 @@ function receivingForm() {
     200);
 }
 
-function receivedForm() {
+function openReceivedForm(rcvdNumber) {
   $("#main-content").html(spinner);
-  (setTimeout(function () {
-    $.post("dirs/receiving/dashboard/receivingForm.php", {}, function (data) {
-      $("#main-content").html(data);
+  $.post("dirs/receiving/dashboard/receivedForm.php", function (data) {
+    $("#main-content").html(data);
+    $.ajax({
+      url: "dirs/receiving/dashboard/actions/get_receivedForm.php",
+      type: "POST",
+      data: { rcvdNumber: rcvdNumber },
+      dataType: "json",
+      success: function (response) {
+        if (response.isSuccess === "success") {
+          let header = response.Header;
+          let items = response.Items;
+          let rowCount = response.Items.length;
+          let totalQty = 0;
 
-      toggleReceivingButtons(false);
-      fetchOrderDetails();
-      // receiveItem();
-      formattedDate();
-      loadImperialBrands();
-      addNonSerialize();
-      serialDeliveryInput();
+          $("#rcvdNumber").text(rcvdNumber);
+          $("#drNoRecForm").val(header.ReferenceNumber);
+          $("#refNoRecForm").val(items[0].ReferenceNumber);
+          $("#stockReqNoRecForm").val(items[0].SRNumber);
+          $("#originRecForm").val(header.OriginBranch);
+          $("#origRecForm").val(header.OriginWhscode);
 
-      $("#newBrand").on("change", function () {
-        $("#newModel").html('<option value="">Select Model</option>');
-        $("#newCategory").val("");
-        $("#itemcode").val("");
-        loadImperialModel();
-      });
+          const docDate = header.SysTimeStamp
+            ? new Date(header.SysTimeStamp)
+                .toLocaleDateString("en-US", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  year: "2-digit",
+                })
+                .replace(/\//g, "-")
+            : "";
 
-      $("#newModel").on("change", function () {
-        const selected = $(this).find(":selected");
-        $("#newCategory").val(selected.data("category") || "");
-        $("#itemcode").val(selected.data("itemcode") || "");
-      });
+          $("#docDateRecForm").val(docDate);
+          const postDate = header.PostingDate
+            ? new Date(header.PostingDate)
+                .toLocaleDateString("en-US", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  year: "2-digit",
+                })
+                .replace(/\//g, "-")
+            : "";
 
-      function toggler() {
-        const toggler = document.getElementById("serialToggler");
-        const knob = document.querySelector(".switch-knob");
-        const manual = document.querySelector(".switch-track .manual");
-        const scan = document.querySelector(".switch-track .scan");
-        const serialInput = document.getElementById("newSerial");
+          $("#postDate").val(postDate);
+          $("#statusRecForm").val(header.ReceivedStatus);
 
-        function preventTyping(e) {
-          const allowedKeys = [
-            "Enter",
-            "Tab",
-            "Backspace",
-            "Delete",
-            "ArrowLeft",
-            "ArrowRight",
-          ];
+          $("#receiveByRecForm").val(header.ReceivedBy);
+          $("#driverRecForm").val(header.Driver);
+          $("#truckCat").val(header.TruckCategory);
+          $("#plateRecForm").val(header.TruckPlate);
+          $("#remarksRecForm").val(header.Remarks);
 
-          if (!allowedKeys.includes(e.key)) {
-            e.preventDefault();
+          let rows = "";
+          items.forEach(function (item, index) {
+            let qty = parseFloat(item.Recvd_ItemQty) || 0;
+            totalQty += qty;
+
+            // console.log(`ITEM TYPE: ${item.ItemType}`);
+            let itemType = item.ItemType;
+            if (itemType === "S") {
+              itemType = '<span class="badge bg-success">Serialize</span>';
+            } else {
+              itemType = '<span class="badge bg-danger">Non-serialize</span>';
+            }
+
+            rows += `
+              <tr>
+                <td style="background:#FFFBDF" class="text-center">${index + 1}</td>
+                <td style="background:#FFFBDF">${item.ItemBrand}</td>
+                <td style="background:#FFFBDF">${item.ItemModel}</td>
+                <td style="background:#FFFBDF">${item.ItemCategory}</td>
+                <td style="background:#FFFBDF">${Number(item.Recvd_ItemQty).toFixed(0)}</td>
+                <td style="background:#FFFBDF">${itemType}</td>
+              </tr>
+            `;
+          });
+
+          $("#totalReceivingQty").text(totalQty);
+          $("#receiving-form-table tbody").html(rows);
+
+          if (rowCount < 8) {
+            let emptyRows = 8 - rowCount;
+
+            for (let i = 0; i < emptyRows; i++) {
+              let emptyRow = `
+              <tr class="item-row empty-row" style="height: 50px; min-height: 50px;">
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+              </tr>
+              `;
+              $("#receiving-form-table tbody").append(emptyRow);
+            }
+            $("#totalReceivingQty").text(totalQty);
           }
+        } else {
+          console.warn(`NO DATA FOR THIS RECEIVING FORM`);
         }
-
-        function updateKnob() {
-          scan.style.transition = "opacity 0.3s ease";
-          manual.style.transition = "opacity 0.3s ease";
-
-          if (toggler.checked) {
-            // SCAN MODE
-            toggler.dataset.value = "Scan";
-
-            knob.style.width = "55px";
-            knob.style.transform = "translateX(8px)";
-
-            scan.style.opacity = "1";
-            manual.style.opacity = "0";
-
-            scan.style.pointerEvents = "auto";
-            manual.style.pointerEvents = "none";
-
-            // console.log("SCAN");
-
-            serialInput.value = "";
-            serialInput.focus();
-
-            // Prevent manual typing
-            serialInput.addEventListener("keydown", preventTyping);
-          } else {
-            // MANUAL MODE
-            toggler.dataset.value = "Manual";
-
-            knob.style.width = "60px";
-            knob.style.transform = "translateX(0px)";
-
-            manual.style.opacity = "1";
-            scan.style.opacity = "0";
-
-            manual.style.pointerEvents = "auto";
-            scan.style.pointerEvents = "none";
-
-            // console.log("MANUAL");
-
-            serialInput.value = "";
-            serialInput.focus();
-
-            // Allow manual typing
-            serialInput.removeEventListener("keydown", preventTyping);
-          }
-        }
-
-        updateKnob();
-
-        toggler.addEventListener("change", updateKnob);
-      }
-
-      const addBtn = document.getElementById("addDeliveryModalBtn");
-      const newItemModal = new bootstrap.Modal(
-        document.getElementById("addDeliveryModal"),
-      );
-
-      let allowNonserialize = false;
-
-      addBtn.addEventListener("click", function () {
-        if (allowNonserialize) {
-          newItemModal.show();
-          return;
-        }
-
-        Swal.fire({
-          title: "Enter non-serialize items?",
-          text: "Please confirm before proceeding.",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "Allow",
-          cancelButtonText: "Cancel",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            allowNonserialize = true;
-            newItemModal.show();
-          }
-        });
-      });
-
-      function adjustTotalWidth() {
-        const summaryTable = document.getElementById("receiving-form-table");
-        const totalRow = document.getElementById("totalRowOutside");
-
-        if (summaryTable && totalRow) {
-          totalRow.style.width = summaryTable.offsetWidth + "px";
-        }
-      }
-
-      toggler();
-      adjustTotalWidth();
-      window.addEventListener("resize", adjustTotalWidth);
-      submitReceiving();
+      },
+      error: function (xhr) {
+        console.error(xhr.responseText);
+      },
     });
-  }),
-    200);
+  });
 }
 
 function validateNumber(el) {
@@ -498,14 +489,24 @@ $(document).on("input blur keyup", ".item-qty-received", function () {
   }
 });
 
+function userDetails() {
+  $.ajax({
+    url: "dirs/receiving/dashboard/actions/get_userDetails.php",
+    type: "GET",
+    dataType: "json",
+    success: function (response) {
+      if (response.isSuccess) {
+        $("#receiveByRecForm").val(response.Data.Fullname);
+      }
+    },
+  });
+}
+
 function fetchOrderDetails() {
-  // $("#drNoRecForm").on("keydown", function (e) {
   $(".search-order-field").on("keydown", function (e) {
-    // ENTER KEY
     if (e.key === "Enter") {
       e.preventDefault();
       e.stopPropagation();
-      // let drNo = $(this).val().trim();
 
       let value = $(this).val().trim();
       let field = $(this).data("field");
@@ -513,7 +514,6 @@ function fetchOrderDetails() {
       console.log(`VALUE : ${value}`);
       console.log(`FIELD : ${field}`);
 
-      // if (!drNo) {
       if (!field) {
         toggleReceivingButtons(false);
         Swal.fire({
@@ -555,15 +555,16 @@ function fetchOrderDetails() {
             if (field !== "deliveryNumber") {
               $("#drNoRecForm").val(header.DeliveryNumber);
             }
-            $("#originRecForm").val(header.OriginBranch);
-            // $("#refNoRecForm").val(items[0].ReferenceNumber || header.ReferenceNumber);
+            // $("#originRecForm").val(header.OriginBranch);
+            $("#originRecForm").val(items[0].OriginBranch);
             if (field === "deliveryNumber") {
-              $("#refNoRecForm").val(header.ReferenceNumber);
+              // $("#refNoRecForm").val(header.ReferenceNumber);
+              $("#refNoRecForm").val(items[0].ReferenceNumber);
+              $("#stockReqNoRecForm").val(items[0].SR_Number);
             } else {
               $("#refNoRecForm").val(items[0].ReferenceNumber);
               $("#stockReqNoRecForm").val(items[0].SR_Number);
             }
-            // $("#stockReqNoRecForm").val(items[0].SR_Number);
 
             $("#docDateRecForm").val(header.DeliveryDate);
             $("#statusRecForm").val(header.DocStatus);
@@ -590,7 +591,6 @@ function fetchOrderDetails() {
               icon: "error",
               title: response.message || errorMessage,
             });
-            // clearTable();
             return;
           }
         },

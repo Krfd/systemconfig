@@ -222,7 +222,6 @@ $itemsByBranch = [];
 $seriesByBranch = [];
 
 foreach ($itemData as $row) {
-
     $branch = $row['RequestingBranch'] ?? $row['Branch'] ?? 'UNKNOWN';
 
     // group items per branch

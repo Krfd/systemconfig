@@ -143,6 +143,26 @@ function loadDelivery() {
 
           // existingSeries.add(item.DeliveryNumber);
 
+          let dropdownItems = `
+            <li>
+              <a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}">
+                Open
+              </a>
+            </li>
+          `;
+
+          if (status !== "TERMINATED") {
+            dropdownItems += `
+              <li>
+                <a class="dropdown-item print-dr" href="#"
+                  data-batch="${item.BatchNumber}"
+                  data-branches="${encodeURIComponent(JSON.stringify(branches))}">
+                  Print DR
+                </a>
+              </li>
+            `;
+          }
+
           rows.push([
             index++,
             item.DeliveryNumber || "",
@@ -159,18 +179,20 @@ function loadDelivery() {
                   })
                   .replace(/\//g, "-")
               : "",
-            item.DeliveryDate || "",
+            // item.DeliveryDate || "",
             statusBadge,
             '<div class="dropdown dropstart">' +
               '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
               '<i class="bi bi-three-dots"></i></button>' +
               `<ul class="dropdown-menu">
-                    <li><a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}">Open</a></li>
-                    <li><a class="dropdown-item print-dr" href="#" data-batch="${item.BatchNumber}" data-branches="${encodeURIComponent(JSON.stringify(branches))}">Print DR</a></li>
+                    ${dropdownItems}
                   </ul>` +
               "</div>",
           ]);
         });
+
+        // <li><a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}">Open</a></li>
+        // <li><a class="dropdown-item print-dr" href="#" data-batch="${item.BatchNumber}" data-branches="${encodeURIComponent(JSON.stringify(branches))}">Print DR</a></li>
 
         if (rows.length === 0) {
           for (let i = 0; i < 8; i++) {

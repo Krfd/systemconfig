@@ -2,7 +2,6 @@
 require_once "../../../../config/connection.php";
 session_start();
 
-
 $User     = $_SESSION['Uid'];
 
 try {

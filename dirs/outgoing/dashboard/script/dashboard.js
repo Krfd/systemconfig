@@ -94,7 +94,11 @@ function loadOutgoing() {
 
           if (status === "NEW") {
             statusClass = "bg-primary";
-          } else if (status === "CANCEL" || status === "CANCELLED" || status === "PARTIAL") {
+          } else if (
+            status === "CANCEL" ||
+            status === "CANCELLED" ||
+            status === "PARTIAL"
+          ) {
             statusClass = "bg-warning";
           } else if (status === "RECEIVED") {
             statusClass = "bg-success";
@@ -138,11 +142,15 @@ function loadOutgoing() {
               (item.RequestStatus?.toUpperCase() === "NEW"
                 ? '<li><a class="dropdown-item cancel-outgoing" data-srn="' +
                   item.SR_Number +
+                  '" data-entry="' +
+                  item.DocEntry +
                   '" href="#">Cancel</a></li>'
                 : "") +
               (item.RequestStatus?.toUpperCase() === "PARTIAL"
                 ? '<li><a class="dropdown-item terminate-item" data-srn="' +
                   item.SR_Number +
+                  '" data-entry="' +
+                  item.DocEntry +
                   '" href="#">Terminate</a></li>'
                 : "") +
               '<li><a class="dropdown-item print-pdf" href="#" target="_blank" data-srn="' +
@@ -252,7 +260,6 @@ $(document).on("dblclick", "#outgoingTableDisplay tbody tr", function (e) {
   if ($(e.target).closest(".dropdown").length) return;
   let docEntry = $(this).data("docentry");
   openOutgoingForm(docEntry);
-  // loadOutgoingDetails(docEntry);
 });
 
 // TRIGGER TO OPEN A REQUEST
@@ -262,7 +269,6 @@ $(document).on("click", ".open-item", function (e) {
 
   let docEntry = $(this).closest("tr").data("docentry");
   openOutgoingForm(docEntry);
-  // loadOutgoingDetails(docEntry);
 });
 
 // TRIGGER TO TERMINATE A REQUEST
@@ -271,7 +277,8 @@ $(document).on("click", ".terminate-item", function (e) {
   e.stopPropagation();
 
   let SRN = $(this).data("srn");
-  terminateOutgoingForm(SRN);
+  let DocEntry = $(this).data("entry");
+  terminateOutgoingForm(DocEntry, SRN);
 });
 
 function returnOutgoing() {
@@ -369,10 +376,13 @@ $(document).on("click", ".cancel-outgoing", function (e) {
   e.stopPropagation();
 
   let SRN = $(this).data("srn");
-  cancelOutgoingForm(SRN);
+  let DocEntry = $(this).data("entry");
+  console.log(`CANCEL SRN : ${SRN}`);
+  console.log(`CANCEL ENTRY : ${DocEntry}`);
+  cancelOutgoingForm(DocEntry, SRN);
 });
 
-function cancelOutgoingForm(SRN) {
+function cancelOutgoingForm(DocEntry, SRN) {
   if (!SRN) {
     Swal.fire({
       icon: "error",
@@ -395,7 +405,9 @@ function cancelOutgoingForm(SRN) {
       $.post(
         "dirs/outgoing/dashboard/actions/update_stockrequest_action.php",
         {
+          DocEntry: DocEntry,
           SRN: SRN,
+          Action: "CANCELLED",
         },
         function (data) {
           let res;
@@ -428,12 +440,12 @@ function cancelOutgoingForm(SRN) {
   });
 }
 
-function terminateOutgoingForm(SRN) {
-  if (!SRN) {
+function terminateOutgoingForm(DocEntry, SRN) {
+  if (!SRN || !DocEntry) {
     Swal.fire({
       icon: "error",
-      title: "Missing SRN",
-      text: "Make sure that the SRN exists!",
+      title: "Missing Information",
+      // text: "Make sure that both SRN and DocEntry exist!",
       confirmButtonText: "OKAY",
     });
     return;
@@ -452,7 +464,9 @@ function terminateOutgoingForm(SRN) {
       $.post(
         "dirs/outgoing/dashboard/actions/update_stockrequest_action.php",
         {
+          DocEntry: DocEntry,
           SRN: SRN,
+          Action: "TERMINATED",
         },
         function (data) {
           let res;

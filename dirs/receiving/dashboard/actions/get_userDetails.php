@@ -2,21 +2,20 @@
 require_once "../../../../config/connection.php";
 session_start();
 
-$User = $_SESSION['Uid'] ?? null;
+$User = $_SESSION['Uid'];
 
 try {
     $conn->beginTransaction();
 
-    $get_receiving = $conn->prepare("EXEC dbo.[Received] ?");
-    $get_receiving->execute([$User]);
-
-    $get_items = $get_receiving->fetchAll(PDO::FETCH_ASSOC);
+    $get_user = $conn->prepare("EXEC dbo.[Get_UserDetails] ?");
+    $get_user->execute([$User]);
+    $get_details = $get_user->fetch(PDO::FETCH_ASSOC);
 
     $conn->commit();
 
     $response = array(
         "isSuccess" => "success",
-        "Data" => $get_items
+        "Data" => $get_details
     );
     echo json_encode($response);
 } catch (PDOException $e) {

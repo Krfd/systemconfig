@@ -14,18 +14,10 @@ try {
 
     $conn->commit();
 
-    // if ($get_items) {
-        $response = array(
-            "isSuccess" => "success",
-            "Data" => $get_items
-        );
-    // } 
-    // else {
-    //     $response = array(
-    //         "isSuccess" => "failed",
-    //         "Data" => "No data found."
-    //     );
-    // }
+    $response = array(
+        "isSuccess" => "success",
+        "Data" => $get_items
+    );
     echo json_encode($response);
 } catch (PDOException $e) {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());

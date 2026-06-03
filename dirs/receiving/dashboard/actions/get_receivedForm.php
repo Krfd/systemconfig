@@ -3,20 +3,23 @@ require_once "../../../../config/connection.php";
 session_start();
 
 $User = $_SESSION['Uid'] ?? null;
+$RcvdNumber = $_POST['rcvdNumber'];
 
 try {
     $conn->beginTransaction();
 
-    $get_receiving = $conn->prepare("EXEC dbo.[Received] ?");
-    $get_receiving->execute([$User]);
-
-    $get_items = $get_receiving->fetchAll(PDO::FETCH_ASSOC);
+    $get_receivedForm = $conn->prepare("EXEC dbo.[Received_Form] ?, ?");
+    $get_receivedForm->execute([$User, $RcvdNumber]);
+    $get_receivedHeader = $get_receivedForm->fetch(PDO::FETCH_ASSOC);
+    $get_receivedForm->nextRowset();
+    $get_receivedItems = $get_receivedForm->fetchAll(PDO::FETCH_ASSOC);
 
     $conn->commit();
 
     $response = array(
         "isSuccess" => "success",
-        "Data" => $get_items
+        "Header" => $get_receivedHeader,
+        "Items" => $get_receivedItems
     );
     echo json_encode($response);
 } catch (PDOException $e) {

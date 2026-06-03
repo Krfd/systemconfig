@@ -3,6 +3,7 @@ require_once "../../../../config/connection.php";
 session_start();
 
 $User = $_SESSION['Uid'] ?? null;
+$Eta                = $_POST['Eta'] ?? [];
 $Item_Id            = $_POST['Item_Id'] ?? [];
 $ItemSerial         = $_POST['ItemSerial'] ?? [];
 $PickListnumber     = $_POST['PickListnumber'] ?? [];
@@ -48,8 +49,7 @@ try {
             FROM Pick_List_Item_Collection
             WHERE Item_id = ?
             AND PKList_Number = ?
-            ORDER BY ItemRowNum DESC
-    ");
+            ORDER BY ItemRowNum DESC");
 
         $stmt->execute([$itemId, $picklist]);
         return $stmt->fetchColumn();
@@ -99,10 +99,11 @@ try {
 
     // file_put_contents($filePath, implode(PHP_EOL, $logLines));
 
-    $stmtHeader = $conn->prepare("EXEC dbo.CreateLoadingBasket_headerV2 ?, ?, ?, ?, ?, ?, ?, ?, ?");
+    $stmtHeader = $conn->prepare("EXEC dbo.CreateLoadingBasket_headerV2 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
 
     $stmtHeader->execute([
         $User,
+        $Eta,
         $BatchNumber,
         $DRNumber,
         $DeliveryDate,

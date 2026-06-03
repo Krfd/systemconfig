@@ -42,7 +42,7 @@ try {
     <!-- <link rel="stylesheet" href="node_modules/uikit/dist/css/uikit.min.css"> -->
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/custom.css">
-    <!-- <link rel="icon" href="assets/image/logo/iap_icon.png"> -->
+    <link rel="icon" href="assets/image/logo/iap_icon.png">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -66,7 +66,7 @@ try {
         <aside class="main-sidebar bg-primary-subtle elevation-5">
             <p class="text-center brand-link">
                 <a href="index.php" style="text-decoration: none; color: inherit;">
-                    <!-- <img src="assets/image/logo/iap_icon.png" alt="iShift Admin" id="profile-image" style="width: 100px; height: 65px; object-fit: cover;"> -->
+                    <img src="assets/image/logo/iap_icon.png" alt="iShift Admin" id="profile-image" style="width: 100px; height: 65px; object-fit: cover;">
                     <br>
                 </a>
                 <small><?php echo isset($user['Username']) ? $user['Username'] : 'Bonjing!'; ?></small>

@@ -2197,6 +2197,9 @@ function deliveryDate() {
   // Disable previous dates
   document.getElementById("docdate").min = todayStr;
   document.getElementById("deldate").min = todayStr;
+
+  // Disable previous dates for ETA only
+  document.getElementById("eta").min = todayStr;
 }
 
 // function getBatchItems(batchContainer) {
@@ -2928,11 +2931,6 @@ function serialDeliveryInput(Picklists) {
                           groupedItems[itemCode].PKList_Number = picklist;
                           groupedItems[itemCode].picklist = picklist;
 
-                          // console.log(`ITEM : ${JSON.stringify(item)}`);
-                          // console.log(``);
-                          // console.log(`DATA : ${JSON.stringify(data)}`);
-                          // console.log(``);
-
                           if (!brand || !model || !category || !itemCode) {
                             console.warn(
                               "Skipped item due to null/empty value:",
@@ -2971,10 +2969,6 @@ function serialDeliveryInput(Picklists) {
                           // let maxAllowed = groupedItems[itemCode].allowedQty || 0;
                           let currentLoaded =
                             groupedItems[itemCode].loadedQty || 0;
-
-                          // console.log(`ALLOWED QTY : ${totalActualPerModel}`);
-                          // console.log(`CURRENT : ${currentLoaded}`);
-                          // console.log(``);
 
                           // if (currentLoaded >= maxAllowed) {
                           if (currentLoaded >= totalActualPerModel) {
@@ -3413,6 +3407,7 @@ function submitLoadingBasket(Picklists) {
       let ItemQty = [];
       let ItemSerial = [];
       let PickListnumber = [];
+      let Eta = $("#eta").val();
       let DeliveryDate = $("#deldate").val();
       let PrepBy = $("#prepby").val();
       let Driver = $("#driver").val();
@@ -3477,8 +3472,6 @@ function submitLoadingBasket(Picklists) {
         }
       });
 
-      console.log(`ITEM ID: ${JSON.stringify(Item_Id)}`);
-
       Swal.fire({
         icon: "question",
         title: "Load the following item(s)?",
@@ -3492,6 +3485,7 @@ function submitLoadingBasket(Picklists) {
             type: "POST",
             dataType: "json",
             data: {
+              Eta,
               Item_Id,
               ItemSerial,
               PickListnumber,
@@ -3509,18 +3503,7 @@ function submitLoadingBasket(Picklists) {
                   icon: "success",
                   title: "Items has been saved to loading basket",
                 });
-                // .then(() => {
-                //   console.log("loading dashboard");
-                // console.log(`LOAD DASHBOARD: ${loadDashboard}`);
-                // loadDeliveryBasket(
-                //   "#basketTableDashboard",
-                //   "dirs/incoming/dashboard/actions/picklisteditems.php",
-                // );
-                // loadDashboard();
                 loadDeliveryBasketContent();
-                // })
-
-                // loadDeliveryBasketContent();
               } else {
                 Swal.fire({
                   icon: "error",
