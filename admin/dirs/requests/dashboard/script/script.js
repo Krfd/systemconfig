@@ -45,33 +45,36 @@ $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
 function loadRequests() {
   $.ajax({
     url: "dirs/requests/dashboard/actions/get_requests.php",
-    type: "POST",
+    type: "GET",
     dataType: "json",
     success: function (response) {
       let rows = [];
+      // let header = response.Header;
       let items = response.Data;
 
+      let index = 1;
+
+      // if (response.isSuccess === "success" && Array.isArray(response.Data)) {
       if (response.isSuccess === "success" && Array.isArray(response.Data)) {
 
         items.forEach((item) => {
-          let srn = item.SRNumber;
-          let origin = item.origin;
-          let destination = item.requestingBranch;
-          let status = item.docStatus;
-          let driver = item.driver;
-          let truckCategory = item.TruckCategory;
-          let truckPlate = item.TruckPlate;
-          let reqDate = item.ReqDate;
-          let recDate = item.DocDate;
-          reqDate.toLocaleString();
-          recDate.toLocaleString();
 
+          let srn = item.SR_Number;
+          let origin = item.BranchOrigin;
+          let destination = item.BranchOrigin;
+          // let status = item.docStatus;
+          let driver = item.driver || "N/A";
+          let truckCategory = item.TruckCategory || "N/A";
+          let truckPlate = item.TruckPlate || "N/A";
+          let reqDate = formatDate(item.EncodeDate);
+          let recDate = formatDate(item.RecDate);
+          
           let status = item.RequestStatus
             ? item.RequestStatus.toUpperCase()
             : "";
           let statusClass = "";
 
-          if (status === "NEW") {
+          if (status === "NEW" || status === "IN TRANSIT") {
             statusClass = "bg-primary";
           } else if (status === "PARTIAL") {
             statusClass = "bg-warning";
@@ -102,11 +105,11 @@ function loadRequests() {
 
       if (rows.length === 0) {
         for (let i = 0; i < 8; i++) {
-          rows.push(["", "", "", "", "", "", "", ""]);
+          rows.push(["", "", "", "", "", "", "", "", "", ""]);
         }
       }
 
-      if ($.fn.DataTable.isDataTable("#outgoingTableDisplay")) {
+      if ($.fn.DataTable.isDataTable("#requestsTableDisplay")) {
         $("#requestsTableDisplay").DataTable().clear().destroy();
         $("#requestsTableDisplay tbody").empty();
       }
@@ -114,7 +117,8 @@ function loadRequests() {
       $("#requestsTableDisplay").DataTable({
         data: rows,
         columns: [
-          { title: "#", visible: false },
+          // { title: "#", visible: false },
+          { title: "#", className: "text-center" },
           { title: "SRN", className: "text-center" },
           { title: "Stock Origin" },
           { title: "Requesting Branch" },
@@ -192,4 +196,16 @@ function loadRequests() {
       console.error("Error loading outgoing data: ", error);
     },
   });
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return "N/A";
+
+  const date = new Date(dateStr);
+
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const year = String(date.getFullYear()).slice(-2);
+
+  return `${month}-${day}-${year}`;
 }

@@ -1,0 +1,3 @@
+[2026-06-02 18:24:08] Error: [2] SQLSTATE[IMSSP]: The active result for the query contains no fields. in C:\xampp\htdocs\ishiftdemo\dirs\receiving\dashboard\actions\get_reviewdeliveryitems.php on line 17
+[2026-06-02 18:24:12] Error: [2] SQLSTATE[IMSSP]: The active result for the query contains no fields. in C:\xampp\htdocs\ishiftdemo\dirs\receiving\dashboard\actions\get_reviewdeliveryitems.php on line 17
+[2026-06-02 18:24:48] Error: [2] SQLSTATE[IMSSP]: The active result for the query contains no fields. in C:\xampp\htdocs\ishiftdemo\dirs\receiving\dashboard\actions\get_reviewdeliveryitems.php on line 17

@@ -14,17 +14,17 @@ $(document).ready(function () {
 
 function loadDashboard() {
   $("#dashboard_content").html(spinner);
-  $.post("dirs/logs/dashboard/components/main.php", {}, function (data) {
+  $.post("dirs/users/dashboard/components/main.php", {}, function (data) {
     $("#dashboard_content").html(data);
 
-    $("#logsTableDisplay tbody").html(`
+    $("#usersTableDisplay tbody").html(`
       <tr>
         <td colspan="100%" class="text-center">${spinner}</td>
       </tr>
     `);
 
-    loadLogs(() => {
-      $("#logsTableDisplay").DataTable({
+    loadUsers(() => {
+      $("#usersTableDisplay").DataTable({
         pageLength: 50,
         order: [0, "desc"],
       });
@@ -42,65 +42,65 @@ $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
     });
 };
 
-function loadLogs() {
+function loadUsers() {
   $.ajax({
-    url: "dirs/logs/dashboard/actions/get_logs.php",
+    url: "dirs/users/dashboard/actions/get_users.php",
     type: "GET",
     dataType: "json",
     success: function (response) {
       let rows = [];
+      // let header = response.Header;
       let items = response.Data;
 
       let index = 1;
 
       if (response.isSuccess === "success" && Array.isArray(response.Data)) {
-        items.forEach((item) => {
-          let reference = item.Reference;
-          let branch = item.Branch;
-          let userCode = item.UserCode;
-          let name = item.Name;
-          let role = item.Role;
-          let position = item.Position;
-          let LogTime = item.logTime;
-          let action = item.Action;
 
+        // console.log(`USERS : ${JSON.stringify(items)}`)
+        items.forEach((item) => {
+
+          let userCode = item.UserCode;
+          let branch = item.Branch;
+          let branchCode = item.BranchCode;
+          let username = item.Username;
+          let fullname = item.Fullname;
+          let role = item.UserRole;
+          let position = item.User_Position;
+  
           rows.push([
             index++,
-            reference,
-            branch,
             userCode,
-            name,
+            branch,
+            branchCode,
+            // username,
+            fullname,
             role,
             position,
-            LogTime,
-            action
           ]);
         });
       }
 
       if (rows.length === 0) {
         for (let i = 0; i < 8; i++) {
-          rows.push(["", "", "", "", "", "", "", "", ""]);
+          rows.push(["", "", "", "", "", "", ""]);
         }
       }
 
-      if ($.fn.DataTable.isDataTable("#logsTableDisplay")) {
-        $("#logsTableDisplay").DataTable().clear().destroy();
-        $("#logsTableDisplay tbody").empty();
+      if ($.fn.DataTable.isDataTable("#usersTableDisplay")) {
+        $("#usersTableDisplay").DataTable().clear().destroy();
+        $("#usersTableDisplay tbody").empty();
       }
 
-      $("#logsTableDisplay").DataTable({
+      $("#usersTableDisplay").DataTable({
         data: rows,
         columns: [
           { title: "#", className: "text-center" },
-          { title: "Reference", className: "text-center" },
+          { title: "UserCode", className: "text-center" },
           { title: "Branch", className: "text-center" },
-          { title: "User Code" },
-          { title: "Name" },
+          { title: "Branch Code" },
+          { title: "User" },
           { title: "Role" },
           { title: "Position" },
-          { title: "Log Time" },
-          { title: "Action" },
         ],
         pageLength: 8,
         paging: true,
@@ -130,13 +130,13 @@ function loadLogs() {
           );
         },
         drawCallback: function () {
-          let tableBody = $("#logsTableDisplay tbody");
+          let tableBody = $("#usersTableDisplay tbody");
           let currentRows = tableBody.find("tr").length;
 
           for (let i = currentRows; i < 8; i++) {
             let $emptyRow = $(`
               <tr class="empty-row">
-                <td colspan="9" style="background: #FFFBDF">&nbsp;</td>
+                <td colspan="7" style="background: #FFFBDF">&nbsp;</td>
               </tr>
             `);
             $emptyRow.css({
