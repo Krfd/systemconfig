@@ -30,8 +30,116 @@ function loadDashboard() {
     //   });
     // });
 
-    $.post("dirs/dashboard/actions/get_dashboard.php", {}, function () {
+// TOP REQUESTORS
+    $.ajax({
+      url: "dirs/dashboard/actions/get_top_requestors.php",
+      type: "GET",
+      dataType: "json",
+      success: function (response) {
+        if (response.isSuccess === "success" && Array.isArray(response.Data)) {
+          // console.log(`REQUESTORS RESPONSE : ${JSON.stringify(response.Data)}`)
 
+          let html = "";
+
+          response.Data.forEach(item => {
+            html += `
+              <a class="icon-link icon-link-hover fw-bold text-decoration-none list-group-item d-flex align-items-center">
+                ${item.Branch}
+                <i class="bi bi-arrow-right align-self-start ms-1"></i>
+
+                <span class="text-end ms-auto badge text-bg-primary rounded-pill">
+                  ${item.TotalRequests}
+                </span>
+              </a>
+            `;
+          });
+
+          $("#topRequestorsList").html(html);
+        } else {
+          $("#topRequestorsList").html(`
+            <li class="list-group-item text-muted">No data available</li>
+          `);
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error("Error loading top requestors:", error);
+      }
+    })
+    
+    // STATS
+    $.ajax({
+      url: "dirs/dashboard/actions/stats.php",
+      type: "GET",
+      dataType: "json",
+      success: function (response) {
+        if (response.isSuccess === "success") {
+
+          $("#overall").text(`${response.overall.overall || 0}`)
+          $("#delivered").text(`${response.delivered.delivered || 0}`)
+          $("#processing").text(`${response.processing.processing || 0}`)
+          $("#rejected").text(`${response.rejected.rejected || 0}`)
+        }
+      }
+    })
+
+
+    // STATS
+    $.ajax({
+      url: "dirs/dashboard/actions/get_recent_activities.php",
+      type: "GET",
+      dataType: "json",
+      success: function (response) {
+        if (response.isSuccess === "success") {
+          // console.log(`RECENT ACTIVITIES RESPONSE: ${JSON.stringify(response.Data)}`)
+
+          console.log(`RECENT ACTIVITIES RESPONSE: ${JSON.stringify(response.Data)}`);
+
+          let html = "";
+
+          response.Data.forEach(item => {
+
+            // format time (e.g. "June 6, 2026")
+            let formattedTime = new Date(item.RequestDate).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric"
+            });
+
+            // ${item.Action}
+
+            html += `
+              <li class="list-group-item">
+                ${item.RequestedBy} <span class="fw-bold">requested</span> <span class="badge bg-success">${Math.trunc(item.ItemTotal_Qty)}</span> items
+                <span class="text-muted small float-end">${formattedTime}</span>
+              </li>
+            `;
+          });
+
+          $("#activityList").html(html);
+
+        } else {
+          $("#activityList").html(`
+            <li class="list-group-item text-muted">No recent activities</li>
+          `);
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error("Error loading activities:", error);
+      }
+    })
+
+
+    $.post("dirs/dashboard/actions/get_dashboard.php", {}, function () {
+      // $.ajax({
+      //   url: "dirs/dashboard/actions/stats.php",
+      //   type: "GET",
+      //   dataType: "json",
+      //   success: function (response) {
+      //     if (response.isSuccess === "success") {
+      //       console.log(`SHOULD DISPLAY STATS`)
+      //     }
+      //   }
+      // })
       
 
     })
@@ -216,3 +324,6 @@ function loadDashboard() {
 //     },
 //   });
 // }
+
+
+

@@ -56,13 +56,16 @@ function loadIncoming() {
           let status = item.RequestStatus
             ? item.RequestStatus.toUpperCase()
             : "";
+
+            if (status === "CANCELLED" || status === "REJECTED") {
+              return;
+            }
+
           let statusClass = "";
 
           if (status === "NEW" || status === "IN TRANSIT") {
             statusClass = "bg-primary";
           } else if (
-            status === "CANCEL" ||
-            status === "CANCELLED" ||
             status === "PARTIAL"
           ) {
             statusClass = "bg-warning";
@@ -71,8 +74,6 @@ function loadIncoming() {
             statusClass = "bg-success";
           } else if (status === "TERMINATED") {
             statusClass = "bg-secondary";
-          } else if (status === "REJECTED") {
-            statusClass = "bg-danger";
           } else if (status === "PROCESSING") {
             statusClass = "bg-info";
           }
@@ -353,44 +354,20 @@ function toggleCheckboxes() {
     cancelButtonText: "Back",
   }).then((result) => {
     if (result.isConfirmed) {
-      // $.ajax({
-      //   url: "dirs/incoming/dashboard/actions/save_createpicklist.php",
-      //   type: "POST",
-      //   data: {
-      //     DocEntry: DocEntries,
-      //   },
-      //   dataType: "json",
-      //   success: function (response) {
-      //     if (response.status === "success") {
-      //       Swal.fire({
-      //         icon: "success",
-      //         title: "Picklist has been created",
-      //         confirmButtonText: "OKAY",
-      //       });
-      //       $("#incomingTableDisplay tbody .checkbox")
-      //         .hide()
-      //         .prop("checked", false);
-      //       createPicklistBtn.textContent = "Create Picklist";
-      //       loadIncoming();
-      //     } else {
-      //       Swal.fire({
-      //         icon: "error",
-      //         title: response.message,
-      //         confirmButtonText: "OKAY",
-      //         confirmButtonColor: "#d33",
-      //       });
-      //     }
-      //   },
-      //   error: function (xhr) {
-      //     Swal.fire({
-      //       icon: "error",
-      //       title: "Server Error",
-      //       text: "Something went wrong while processing the request.",
-      //     });
-      //   },
-      // });
-      setTimeout(function () {
+      // $("#previewTableDisplay tbody").html(`
+      //   <tr>
+      //     <td colspan="100%" class="text-center">${spinner}</td>
+      //   </tr>
+      // `);
+
+    setTimeout(function () {
         $("#main-content").html(spinner);
+      //   $("#previewTableDisplay tbody").html(`
+      //   <tr>
+      //     <td colspan="100%" class="text-center">${spinner}</td>
+      //   </tr>
+      // `);
+      console.log(`SPINNER : ${spinner}`)
         loadPreview(SRNumbers);
       }, 200);
     }
@@ -398,7 +375,12 @@ function toggleCheckboxes() {
 }
 
 function loadPreview(SRNumbers) {
-  $("main-content").html(spinner);
+  // $("main-content").html(spinner);
+  $("#previewTableDisplay tbody").html(`
+        <tr>
+          <td colspan="100%" class="text-center">${spinner}</td>
+        </tr>
+      `);
   $.post("dirs/incoming/dashboard/preview.php", function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
 
@@ -886,7 +868,15 @@ $(document).on("click", ".dropdown .enter-actual-qty", function (e) {
   picklistNumRef = picklistNum;
 
   $("#main-content").html(spinner);
+
+
+
   setTimeout(function () {
+    $("#encodeQtyTable tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
     encodeQty(picklistNum, rowNum);
   }, 200);
 });
@@ -903,6 +893,11 @@ $(document).on("click", ".dropdown .edit-actual-qty", function (e) {
 
   $("#main-content").html(spinner);
   setTimeout(function () {
+    $("#editEncodedQtyTable tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
     editEncodedQty(picklistNum, rowNum);
   }, 200);
 });
@@ -1797,6 +1792,10 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
         if (result.isConfirmed) {
           let encodedItems = [];
 
+          let submitBtn = $(this).find("button[type='submit'].save-btn");
+          console.log(submitBtn.length);
+          submitBtn.prop("disabled", true).html(`<span class="spinner-border spinner-border-sm"></span> Saving`)
+
           let tableSelector =
             $(this).attr("id") === "editEncodedQty"
               ? "#editEncodedQtyTable"
@@ -1890,6 +1889,8 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
               });
             },
           });
+
+          submitBtn.prop("disabled", false)
         }
       });
     });

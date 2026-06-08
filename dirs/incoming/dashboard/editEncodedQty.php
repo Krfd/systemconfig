@@ -53,7 +53,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <button class="btn btn-primary d-block ms-auto mt-5" type="submit">Save</button>
+                            <button class="btn btn-primary d-block ms-auto mt-5 save-btn" type="submit">Save</button>
                         </form>
                     </div>
                 </div>

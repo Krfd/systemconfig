@@ -45,12 +45,7 @@ try {
 
     function getBranch($conn, $itemId, $picklist)
     {
-        $stmt = $conn->prepare("SELECT Req_Branch
-            FROM Pick_List_Item_Collection
-            WHERE Item_id = ?
-            AND PKList_Number = ?
-            ORDER BY ItemRowNum DESC");
-
+        $stmt = $conn->prepare("EXEC dbo.[Get_Branch] ?, ?");
         $stmt->execute([$itemId, $picklist]);
         return $stmt->fetchColumn();
     }

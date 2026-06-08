@@ -42,6 +42,12 @@ $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
     });
 };
 
+function returnOutgoing() {
+  $.post("dirs/requests/dashboard/requests.php", {}, function (data) {
+    $("#main-content").html(data);
+  });
+}
+
 function loadRequests() {
   $.ajax({
     url: "dirs/requests/dashboard/actions/get_requests.php",
@@ -49,23 +55,32 @@ function loadRequests() {
     dataType: "json",
     success: function (response) {
       let rows = [];
-      // let header = response.Header;
       let items = response.Data;
+      let details = response.DriverDetails
 
-      let index = 1;
+      let rowCount = 1;
 
-      // if (response.isSuccess === "success" && Array.isArray(response.Data)) {
+      console.log(`DETAILS: ${JSON.stringify(details)}`)
+
+      let detailMap = {};
+
+      details.forEach(detail => {
+          detailMap[detail.BatchNumber] = detail;
+      });
+
       if (response.isSuccess === "success" && Array.isArray(response.Data)) {
 
-        items.forEach((item) => {
+        items.forEach((item, index) => {
+
+          let detail = detailMap[item.BatchNumber] || {};
 
           let srn = item.SR_Number;
           let origin = item.BranchOrigin;
           let destination = item.BranchOrigin;
           // let status = item.docStatus;
-          let driver = item.driver || "N/A";
-          let truckCategory = item.TruckCategory || "N/A";
-          let truckPlate = item.TruckPlate || "N/A";
+          let driver = detail.Driver || "N/A";
+          let truckCategory = detail.TruckCategory || "N/A";
+          let truckPlate = detail.TruckPlate || "N/A";
           let reqDate = formatDate(item.EncodeDate);
           let recDate = formatDate(item.RecDate);
           
@@ -81,7 +96,7 @@ function loadRequests() {
           } else if (status === "PROCESSING") {
             statusClass = "bg-info";    
           } else if (status === "CANCELLED") {
-            statusClass = "bg-secondary";
+            statusClass = "bg-warning";
           } else if (status === "DELIVERED" || status === "RECEIVED") {
             statusClass = "bg-success";
           } 
@@ -89,7 +104,7 @@ function loadRequests() {
           let statusBadge = `<span class="badge ${statusClass}">${status || ""}</span>`;
 
           rows.push([
-            index++,
+            rowCount++,
             srn,
             origin,
             destination,
@@ -99,13 +114,58 @@ function loadRequests() {
             truckPlate,
             reqDate,
             recDate,
+            '<div class="dropdown">' +
+              '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
+              '<i class="bi bi-three-dots"></i></button>' +
+              '<ul class="dropdown-menu">' +
+              '<li><a class="dropdown-item open-item" href="#">Open</a></li>' +
+                '<li><a class="dropdown-item cancel-outgoing" data-srn="' +
+                  item.SR_Number +
+                  '" data-entry="' +
+                  item.DocEntry +
+                  '" href="#">Cancel</a></li>' +
+                   '<li><a class="dropdown-item print-pdf" href="#" target="_blank" data-srn="' +
+                item.SR_Number +
+                '">Print</a></li>' +
+                '<li><a class="dropdown-item terminate-item" data-srn="' +
+                  item.SR_Number +
+                  '" data-entry="' +
+                  item.DocEntry +
+                  '" href="#">Terminate</a></li>' +
+              "</ul></div>",
           ]);
         });
       }
 
+      // '<div class="dropdown">' +
+      //         '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
+      //         '<i class="bi bi-three-dots"></i></button>' +
+      //         '<ul class="dropdown-menu">' +
+      //         '<li><a class="dropdown-item open-item" href="#">Open</a></li>' +
+      //         (item.RequestStatus?.toUpperCase() === "NEW"
+      //           ? '<li><a class="dropdown-item cancel-outgoing" data-srn="' +
+      //             item.SR_Number +
+      //             '" data-entry="' +
+      //             item.DocEntry +
+      //             '" href="#">Cancel</a></li>'
+      //           : "") +
+      //         (item.RequestStatus?.toUpperCase() === "PARTIAL"
+      //           ? '<li><a class="dropdown-item terminate-item" data-srn="' +
+      //             item.SR_Number +
+      //             '" data-entry="' +
+      //             item.DocEntry +
+      //             '" href="#">Terminate</a></li>'
+      //           : "") +
+      //         '<li><a class="dropdown-item print-pdf" href="#" target="_blank" data-srn="' +
+      //         item.SR_Number +
+      //         '">Print</a></li>' +
+      //         "</ul></div>",
+
+      
+
       if (rows.length === 0) {
         for (let i = 0; i < 8; i++) {
-          rows.push(["", "", "", "", "", "", "", "", "", ""]);
+          rows.push(["", "", "", "", "", "", "", "", "", "", ""]);
         }
       }
 
@@ -128,6 +188,7 @@ function loadRequests() {
           { title: "Truck Plate", className: "text-start" },
           { title: "Date Requested", className: "text-start" },
           { title: "Date Received", className: "text-start" },
+          { title: "Action", className: "text-start" },
         ],
         pageLength: 8,
         paging: true,
@@ -147,11 +208,11 @@ function loadRequests() {
             "min-height": "40px",
             cursor: "pointer",
           });
-        //   let docEntry = data[0];
-        //   $(row).attr("data-docentry", docEntry);
-        //   $("td:eq(0)", row).css("text-align", "center");
-        //   $("td:eq(1)", row).addClass("text-primary");
-        //   $("td:eq(5)", row).css("text-align", "start");
+          let docEntry = data[0];
+          $(row).attr("data-docentry", docEntry);
+          $("td:eq(0)", row).css("text-align", "center");
+          $("td:eq(1)", row).addClass("text-primary");
+          $("td:eq(5)", row).css("text-align", "start");
 
           // Add hover effect to empty rows too
           $(row).hover(
@@ -170,7 +231,7 @@ function loadRequests() {
           for (let i = currentRows; i < 8; i++) {
             let $emptyRow = $(`
               <tr class="empty-row">
-                <td colspan="10" style="background: #FFFBDF">&nbsp;</td>
+                <td colspan="11" style="background: #FFFBDF">&nbsp;</td>
               </tr>
             `);
             $emptyRow.css({
@@ -208,4 +269,104 @@ function formatDate(dateStr) {
   const year = String(date.getFullYear()).slice(-2);
 
   return `${month}-${day}-${year}`;
+}
+
+$(document).on("dblclick", "#requestsTableDisplay tbody tr", function (e) {
+  if ($(e.target).closest(".dropdown").length) return;
+  let docEntry = $(this).data("docentry");
+  openForm(docEntry);
+});
+
+function openForm(DocEntry) {
+  $("#main-content").html(spinner);
+  setTimeout(function () {
+    openRequest(DocEntry);
+  }, 200);
+}
+
+// TRIGGER TO OPEN A REQUEST
+$(document).on("click", ".open-item", function (e) {
+  e.preventDefault(); // prevent # jump
+  e.stopPropagation(); // stop row click behavior
+
+  let docEntry = $(this).closest("tr").data("docentry");
+  openForm(docEntry);
+});
+
+function openRequest(DocEntry) {
+  $("#main-content").html(spinner);
+  $.post("../dirs/outgoing/dashboard/request.php", function (data) {
+    $("#main-content").html(data);
+
+    $.ajax({
+      url: "../dirs/outgoing/dashboard/actions/get_openrequest.php",
+      type: "POST",
+      data: { DocEntry: DocEntry },
+      dataType: "json",
+      success: function (response) {
+        if (response.isSuccess === "success") {
+          let rowCount = response.Items.length;
+          let totalQty = 0;
+
+          let header = response.Header;
+          let items = response.Items;
+
+          $("#srn-title").text(header.SR_Number);
+
+          $("#srn").val(header.SR_Number);
+          $("#destination").val(header.BranchDestination);
+          $("#branchWhCode").val(header.BranchDestination_Whscode);
+          $("#origin").val(header.BranchOrigin);
+          $("#whcode").val(header.BranchOrigin_Whscode);
+
+          $("#date").val(header.EncodeDate);
+          $("#status").val(header.RequestStatus);
+          $("#purpose").val(header.PurposeRequest);
+          $("#reqBy").val(header.RequestedBy);
+          $("#remarks").val(header.Remarks);
+
+          let rows = "";
+          items.forEach(function (item, index) {
+            let quantity = parseFloat(item.Request_Qty) || 0;
+            totalQty += quantity;
+            rows += `
+            <tr>
+              <td style="background:#FFFBDF">${index + 1}</td>
+              <td style="background:#FFFBDF">${item.ItemBrand}</td>
+              <td style="background:#FFFBDF">${item.ItemName}</td>
+              <td style="background:#FFFBDF">${item.ItemCategory}</td>
+              <td style="background:#FFFBDF">${item.Request_Qty}</td>
+            </tr>
+            `;
+          });
+
+          $("#totalReqQuantity").text(totalQty);
+          $("#openIncomingTable tbody").html(rows);
+
+          if (rowCount < 8) {
+            let emptyRows = 8 - rowCount;
+
+            for (let i = 0; i < emptyRows; i++) {
+              let emptyRow = `
+              <tr class="item-row empty-row" style="height: 50px; min-height: 50px;">
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+                <td style="background: #FFFBDF"></td>
+              </tr>
+              `;
+              $("#openIncomingTable tbody").append(emptyRow);
+            }
+            $("#totalQuantity").text(totalQty);
+          }
+        } else {
+          console.warn(`NO DATA FROM ROWNUM`);
+        }
+      },
+      error: function (xhr) {
+        console.error(xhr.responseText);
+      },
+    });
+  });
 }

@@ -6,5 +6,6 @@
     </div>
     <div id="dashboard_content"></div>
 </div>
+<?php include("modal.php") ?>
 <script src="../assets/js/load.js"></script>
 <script src="dirs/users/dashboard/script/users.js"></script>

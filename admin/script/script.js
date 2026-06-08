@@ -58,7 +58,19 @@ $("#main-menu")
       // $maintitle = "Settings";
       $maintitle = "";
       $mainbreadcrumb = `<li class="breadcrumb-item active">Settings</li>`;
-      $file = "dirs/settings/settings.php";
+      $file = "dirs/settings/dashboard/settings.php";
+      break;
+    case "profile":
+      // $maintitle = "Profile";
+      $maintitle = "";
+      $mainbreadcrumb = `<li class="breadcrumb-item active">Profile</li>`;
+      $file = "dirs/profile/dashboard/profile.php";
+      break;
+    case "report":
+      // $maintitle = "Logs";
+      $maintitle = "";
+      $mainbreadcrumb = `<li class="breadcrumb-item active">Report</li>`;
+      $file = "dirs/report/dashboard/report.php";
       break;
     case "logs":
       // $maintitle = "Logs";
@@ -102,3 +114,46 @@ function logout() {
       }
   });
 }
+
+// DASHBOARD COUNTER SECTION
+document.addEventListener("DOMContentLoaded", () => {
+  // Function to animate the counter for each element
+  function animateCounter(counterElement) {
+    let count = 0;
+    const target = parseInt(counterElement.textContent) || count; // Set target to current textContent or default to 100
+
+    // Increase the count over time
+    const interval = setInterval(() => {
+      if (count < target) {
+        count++;
+        counterElement.textContent = count; // Update the counter's text
+      } else {
+        clearInterval(interval);
+      }
+    }, 50); // You can adjust the speed by changing this value
+  }
+
+  // Set up the Intersection Observer
+  const observer = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const counterElement = entry.target; // Get the element that is in view
+          animateCounter(counterElement); // Trigger animation for that specific element
+          observer.unobserve(counterElement); // Stop observing once the counter is triggered
+        }
+      });
+    },
+    {
+      threshold: 0.5, // The counter will trigger when 50% of the section is in view
+    }
+  );
+
+  // Get all elements with class "counter" (or any other common class you assign)
+  const counterElements = document.querySelectorAll(".counter");
+
+  // Start observing each counter element
+  counterElements.forEach((counterElement) => {
+    observer.observe(counterElement); // Start observing each element
+  });
+});

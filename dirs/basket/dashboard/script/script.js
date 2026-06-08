@@ -3236,11 +3236,14 @@ function addNonSerialize(Picklists) {
                 success: function (response) {
                   let data = response.Data;
 
+                  if (response.isSuccess !== "success") {
+                    return;
+                  }
+
                   console.log(`NON SERIALIZE DATA: ${JSON.stringify(data)}`);
 
-                  // if (response.isSuccess === "success" && data && data.length > 0) {
                   if (
-                    response.isSuccess === "success" &&
+                    response.isSuccess === "success" && 
                     data &&
                     data.length > 0
                   ) {
@@ -3250,12 +3253,18 @@ function addNonSerialize(Picklists) {
                       let category = item.ItemCategory;
                       let itemCode = item.ItemCode;
 
-                      let itemId = data?.Item_id || data?.[0]?.Item_id || null;
+                      // let itemId = data?.Item_id || data?.[0]?.Item_id || null;
+                      // groupedItems[itemCode].Item_id = itemId;
+                      // let itemId = data.map((row) => row.Item_id);
+                      let itemId = data[0]?.Item_id || null;
                       groupedItems[itemCode].Item_id = itemId;
 
-                      let picklist =
-                        data?.PKList_Number || data?.[0]?.PKList_Number || null;
+                      // let picklist = data?.PKList_Number || data?.[0]?.PKList_Number || null;
+                      let picklist = data?.[0]?.PKList_Number ?? null;
+                      // groupedItems[itemCode].PKList_Number = picklist;
+
                       groupedItems[itemCode].PKList_Number = picklist;
+                      groupedItems[itemCode].picklist = picklist;
 
                       if (!brand || !model || !category || !itemCode) {
                         console.warn(
@@ -3265,14 +3274,20 @@ function addNonSerialize(Picklists) {
                         return;
                       }
 
-                      totalQty += quantity;
-
                       // let existingRow = loadingTableBody.find(`tr[data-itemcode="${itemCode}"]`,);
 
+                      // const rowKey = itemCode + "|" + item.ItemName;
+
                       const rowKey = itemCode + "|" + item.ItemName;
+                      const itemKey = itemCode + "|" + model;
+
                       let existingRow = loadingTableBody.find(
                         `tr[data-rowkey="${rowKey}"]`,
                       );
+
+                      let existingItem = loadingTableBody.find(`tr[data-itemkey="${itemKey}"]`)
+
+                      totalQty += quantity;
 
                       if (existingRow.length) {
                         let currentQty =
@@ -3281,6 +3296,15 @@ function addNonSerialize(Picklists) {
                           ) || 0;
                         existingRow.attr("data-itemcode", itemCode);
                         existingRow.attr("data-itemid", itemId);
+
+                        // console.log(
+                        //       "UPDATED LOADED QTY:",
+                        //       groupedItems[itemCode].loadedQty,
+                        //     );
+
+                            console.log(`UPDATED LOADED QTY : ${quantity}`)
+
+                          return
                       } else {
                         let counter =
                           loadingTableBody.find("tr[data-itemcode]").length + 1;
@@ -3309,6 +3333,16 @@ function addNonSerialize(Picklists) {
                           loadingTableBody.prepend(newRow);
                         }
                         // renumberRows();
+
+                        const tooltipTriggerList =
+                              document.querySelectorAll(
+                                '[data-bs-toggle="tooltip"]',
+                              );
+
+                          tooltipTriggerList.forEach((el) => {
+                          bootstrap.Tooltip.getInstance(el)?.dispose();
+                          new bootstrap.Tooltip(el);
+                        });
                       }
 
                       if ($.fn.DataTable.isDataTable("#loadBasketTable")) {
@@ -3324,6 +3358,7 @@ function addNonSerialize(Picklists) {
                         }
                       });
                     });
+
                     $("#loadingQty").text(totalQty);
 
                     $("#newQuantity").val("");
@@ -3480,6 +3515,11 @@ function submitLoadingBasket(Picklists) {
         cancelButtonText: "Back",
       }).then((result) => {
         if (result.isConfirmed) {
+
+          // $("#branchAssignmentBtn")
+          let commitBtn = $(this).find("button[type='submit']");
+          commitBtn.prop("disabled", true).html(`<span class="spinner-border spinner-border-sm"></span> Loading`)
+
           $.ajax({
             url: "dirs/basket/dashboard/actions/save_create_loading_basketv2.php",
             type: "POST",
@@ -3517,6 +3557,8 @@ function submitLoadingBasket(Picklists) {
               console.log(xhr.responseText);
             },
           });
+
+          commitBtn.prop("disabled", false)
         }
       });
     });

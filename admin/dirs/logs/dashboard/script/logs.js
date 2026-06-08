@@ -64,6 +64,40 @@ function loadLogs() {
           let LogTime = item.logTime;
           let action = item.Action;
 
+          let formattedDate = new Date(LogTime).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+          });
+
+           let positionClass = "";
+
+          if (position === "Audit") {
+            positionClass = "bg-warning"
+          } else if (position === "Administrator") {
+            positionClass = "bg-secondary"
+          } else if (position === "PDG") {
+            positionClass = "bg-danger"
+          } else if (position === "Warehouseman") {
+            positionClass = "bg-primary"
+          } else {
+            positionClass = "bg-success"
+          }
+
+          let positionBadge = `<span class="badge ${positionClass}">${position}</span>`
+
+          let actionClass = ""
+
+          if (action === "REQUESTED") {
+            actionClass = "bg-info"
+          } else if (action === "DELIVERED") {
+            actionClass = "bg-success"
+          } else if (action === "") {
+            
+          }
+
+          let actionBadge = `<span class="badge ${actionClass}">${action}</span>`
+
           rows.push([
             index++,
             reference,
@@ -71,9 +105,10 @@ function loadLogs() {
             userCode,
             name,
             role,
-            position,
-            LogTime,
-            action
+            positionBadge,
+            // LogTime,
+            formattedDate,
+            actionBadge
           ]);
         });
       }

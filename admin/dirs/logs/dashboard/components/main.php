@@ -1,4 +1,21 @@
-<div class="table-responsive-md">
+<!-- <div class="container-fluid my-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="col">
+            <h3 class="fw-semibold"><i class="bi bi-clock bg-danger-subtle border-danger rounded-5 py-2 px-3"></i> Overall logs</h3>
+        </div>
+        <div class="col">
+            <h3 class="fw-semibold"><i class="bi bi-truck bg-primary-subtle border-primary rounded-5 py-2 px-3"></i> Total In Transit</h3>
+        </div>       
+        <div class="col">
+            <h3 class="fw-semibold"><i class="bi bi-truck-front-fill bg-success-subtle border-success rounded-5 py-2 px-3"></i> Total Trucks</h3>
+        </div>       
+        <div class="col">
+            <h3 class="fw-semibold"><i class="bi bi-truck"></i> Total In Transit</h3>
+        </div>       
+    </div>
+</div> -->
+<!-- SHOULD BE ANALYTICS (LINE GRAPH HERE) -->
+<div class="table-responsive-md mt-3">
     <table class="table table-hover datatables col" id="logsTableDisplay">
         <thead class="sticky-top">
             <tr>

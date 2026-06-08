@@ -1,3 +1,5 @@
+<h2 class="fw-bold">Total Requests <span class="text-muted">| 2,458</span></h2>
+<p class="fw-semibold">vs. previous month <span class="text-muted">| 1,202</span> May 30, 2026</p>
 <div class="table-responsive-md">
     <table class="table table-hover datatables col" id="requestsTableDisplay">
         <thead class="sticky-top">
@@ -12,6 +14,7 @@
                 <th class="text-secondary">Truck Plate</th>
                 <th class="text-secondary">Date Requested</th>
                 <th class="text-secondary">Date Received</th>
+                <th class="text-secondary">Action</th>
             </tr>
         </thead>
         <tbody>

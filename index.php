@@ -213,6 +213,11 @@ try {
             let deliveryNum;
             let summaryTable;
             let srNumberMap = [];
+            let statusColors = {
+                Processing: "#FFDD57",
+                Approved: "#81C784",
+                Rejected: "#FF8A80",
+            };
         })
 
         let groupedItems = {};

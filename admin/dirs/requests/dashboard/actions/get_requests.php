@@ -9,23 +9,18 @@ try {
     $stmt = $conn->prepare("EXEC dbo.Get_Requests");
     $stmt->execute();
     $header = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    // $stmt->nextRowset();
-    // $requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->nextRowset();
+    $driverDetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $conn->commit();
 
     $response = array(
         "isSuccess" => "success",
-        // "Header" => $requests,
-        "Data" => $header
+        "Data" => $header,
+        "DriverDetails" => $driverDetails
     );
 
     echo json_encode($response);
-    // if ($conn) {
-    //     echo "Connected";
-    // } else {
-    //     echo "Not Connected";
-    // }
 } catch(PDOException $e) {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollBack();

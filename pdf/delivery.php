@@ -1,8 +1,10 @@
 <?php
 
-ob_start();
-error_reporting(0);
-@ini_set('display_errors', 0);
+// ob_start();
+// error_reporting(0);
+// @ini_set('display_errors', 0);
+error_reporting(E_ALL);
+@ini_set('display_errors', 1);
 require_once "../config/connection.php";
 require_once "../assets/plugins/fpdf/fpdf.php";
 require_once "../vendor/autoload.php";
@@ -480,8 +482,8 @@ try {
     $barcodeFile = sys_get_temp_dir() . "/barcode_" . session_id() . ".png";
 
     file_put_contents($barcodeFile, $barcodeData);
-    foreach ($branches as $branch) {
 
+    foreach ($branches as $branch) {
         $branchItems = $itemsByBranch[$branch] ?? [];
 
         if (empty($branchItems)) {

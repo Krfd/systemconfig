@@ -79,26 +79,37 @@ try {
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <li class="nav-item">
                             <a href="#" class="nav-link active" name="menu" menucode="dashboard">
-                                <i class="nav-icon bi bi-box-arrow-in-left"></i>
+                                <!-- <i class="nav-icon bi bi-box-arrow-in-left"></i> -->
+                                <i class="bi bi-grid"></i>
                                 <p>Dashboard</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="requests">
-                                <i class="nav-icon bi bi-box-arrow-in-right"></i>
+                                <!-- <i class="nav-icon bi bi-box-arrow-in-right"></i> -->
+                                <i class="bi bi-clipboard-check"></i>
                                 <p>Requests</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="users">
-                                <i class="bi bi-card-checklist"></i>
+                                <!-- <i class="bi bi-card-checklist"></i> -->
+                                <i class="bi bi-people"></i>
                                 <p>Users</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="findings">
-                                <i class="nav-icon bi bi-cart"></i>
+                                <!-- <i class="nav-icon bi bi-cart"></i> -->
+                                <i class="bi bi-search"></i>
                                 <p>Findings</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" name="menu" menucode="profile">
+                                <!-- <i class="bi bi-person-square"></i> -->
+                                <i class="bi bi-person"></i>
+                                <p>Profile</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -109,8 +120,15 @@ try {
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="logs">
-                                <i class="nav-icon bi bi-truck"></i>
+                                <!-- <i class="nav-icon bi bi-truck"></i> -->
+                                <i class="bi bi-clock-history"></i>
                                 <p>Logs</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" name="menu" menucode="report">
+                                <i class="bi bi-flag"></i>
+                                <p>Report</p>
                             </a>
                         </li>
                         <hr>
@@ -167,12 +185,12 @@ try {
         </div>
     </div>
 
-
     <script src="../assets/js/jquery.min.js"></script>
     <script src="../assets/plugins/sweetalert2/sweetalert2.min.js"></script>
     <script src="../assets/plugins/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/plugins/toastr/toastr.min.js"></script>
     <script src="../assets/plugins/chart.js/Chart.min.js"></script>
+    <script src="../assets/plugins/echarts/echarts.min.js"></script>
     <script src="../assets/plugins/moment/moment.min.js"></script>
     <script src="../assets/plugins/daterangepicker/daterangepicker.js"></script>
     <script src="../assets/plugins/datatables/datatables.min.js"></script>
@@ -189,9 +207,6 @@ try {
     <script src="../node_modules/xlsx/dist/xlsx.full.min.js"></script>
     <script src="script/script.js"></script>
     <!-- <script src="..assets/script/relogin.js"></script> -->
-    <?php
-    //  include '../modal.php';
-      ?>
 </body>
 
 </html>
