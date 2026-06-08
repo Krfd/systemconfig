@@ -26,7 +26,7 @@ function loadDashboard() {
     loadOutgoing(() => {
       $("#outgoingTableDisplay").DataTable({
         pageLength: 50,
-        order: [0, "desc"],
+        // order: [0, "asc"],
       });
     });
   });
@@ -86,7 +86,7 @@ function loadOutgoing() {
           (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
         );
 
-        sortedData.forEach((item) => {
+        sortedData.forEach((item, index) => {
           let status = item.RequestStatus
             ? item.RequestStatus.toUpperCase()
             : "";
@@ -118,7 +118,8 @@ function loadOutgoing() {
 
           rows.push([
             item.DocEntry,
-            item.RowNum !== undefined ? item.RowNum.toString() : "",
+            // item.RowNum !== undefined ? item.RowNum.toString() : "",
+            index + 1,
             item.SR_Number || "",
             item.BranchOrigin || "",
             item.BranchDestination || "",
@@ -190,7 +191,7 @@ function loadOutgoing() {
         info: true,
         processing: false,
         autoWidth: false,
-        order: [[0, "desc"]],
+        // order: [[0, "desc"]],
         language: {
           emptyTable: "", // 🔥 removes "No data available in table"
         },

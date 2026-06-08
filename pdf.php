@@ -20,14 +20,18 @@ try {
     $item = $conn->prepare("SELECT * FROM Stock_Transfer_Items_3 WHERE SR_Number = ?");
     $item->execute([$srn]);
 
+    $routes = $conn->prepare("SELECT BranchOrigin FROM Stock_Transfer_Route_2 WHERE SR_Number = ?");
+    $routes->execute([$srn]);
+
     $srnData = $stmt->fetch(PDO::FETCH_OBJ);
     $itemData = $item->fetchAll(PDO::FETCH_OBJ);
+    $routeData = $routes->fetch(PDO::FETCH_OBJ);
 
     $status = $srnData->RequestStatus;
     $date = isset($srnData->RequestDate)
         ? date("m/d/y", strtotime($srnData->RequestDate))
         : "N/A";
-    $origin = $itemData[0]->BranchOrigin;
+    $origin = $routeData->BranchOrigin;
     $purpose = $srnData->PurposeRequest;
     $requestedBy = $srnData->RequestedBy;
     $remarks = empty($srnData->Remarks) ? "N/A" : $srnData->Remarks;
@@ -40,15 +44,11 @@ try {
         public $categoryTitle = '';
         function Header()
         {
-            // $this->Image('assets/image/logo/iap_icon.png', 10, 10, 30);
             $this->Image('assets/image/logo/iap_icon.png', 10, 10, 20);
-            // $this->SetFont('Arial', 'B', 20);
             $this->SetFont('Arial', 'B', 32);
             $this->SetTextColor(64, 64, 64);
             $pageWidth = $this->GetPageWidth();
-            // $this->SetX(10);
             $this->SetX(12);
-            // $this->Cell($pageWidth - 10, 20, 'STOCK REQUEST', 0, 0, 'C');
             $this->Cell($pageWidth - 15, 20, 'STOCK REQUEST', 0, 0, 'C');
             $this->Ln(25);
         }
@@ -129,7 +129,6 @@ try {
 
     $pdf = new PDF();
     $pdf->AliasNbPages();
-    // $pdf->AddPage();
 
     function headerDetails($pdf, $srn, $status, $date, $origin, $category = '')
     {
@@ -141,7 +140,6 @@ try {
         $colonWidth = 3;
         $valueWidth = 60;
 
-        // total width of right block
         $rightBlockWidth = $labelWidth + $colonWidth + $valueWidth;
 
         $pdf->SetFont('Arial', 'B', 9);

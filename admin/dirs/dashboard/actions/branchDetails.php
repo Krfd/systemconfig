@@ -2,15 +2,17 @@
 
 require_once __DIR__ . "/../../../../config/connection.php";
 
-try {
-    $stmt = $conn->prepare("EXEC [Request_Analytics]");
-    $stmt->execute();
+$branch = $_POST['branch'];
 
-    $daily = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    $stmt = $conn->prepare("EXEC [Get_Branch_Details] ?");
+    $stmt->execute([$branch]);
+
+    $branchDetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $response = array(
         "isSuccess" => "success",
-        "Data" => $daily
+        "Data" => $branchDetails
     );
 
     echo json_encode($response);

@@ -8,4 +8,4 @@
 </div>
 <script src="../assets/js/load.js"></script>
 <script src="dirs/dashboard/script/scripts.js"></script>
-<script src="dirs/dashboard/script/analytics.js"></script>
+<!-- <script src="dirs/dashboard/script/analytics.js"></script> -->

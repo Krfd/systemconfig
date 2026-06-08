@@ -10,7 +10,6 @@
 </div>
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-start align-items-baseline gap-3">
-        <!-- <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadDashboard()"> -->
         <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="loadReceiving()">
             <i class="bi bi-arrow-left"></i>
         </button>
@@ -92,73 +91,64 @@
                                             <th class="text-secondary">Model</th>
                                             <th class="text-secondary">Category</th>
                                             <th class="text-secondary">Quantity</th>
-                                            <!-- <th class="text-secondary d-none"></th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr style="height: 50px; min-height: 50px">
+                                        <tr style="height: 40px; min-height: 40px">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px">
+                                        <tr style="height: 40px; min-height: 40px">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px">
+                                        <tr style="height: 40px; min-height: 40px">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px">
+                                        <tr style="height: 40px; min-height: 40px">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px">
+                                        <tr style="height: 40px; min-height: 40px">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px">
+                                        <tr style="height: 40px; min-height: 40px">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px">
+                                        <tr style="height: 40px; min-height: 40px">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px">
+                                        <tr style="height: 40px; min-height: 40px">
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
                                             <td style="background: #FFFBDF"></td>
-                                            <!-- <td style="background: #FFFBDF" class="d-none"></td> -->
                                         </tr>
                                     </tbody>
                                 </table>

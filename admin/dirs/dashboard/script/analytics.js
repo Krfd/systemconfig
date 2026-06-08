@@ -1,30 +1,28 @@
 fetch("dirs/dashboard/actions/daily.php")
   .then((response) => response.json())
   .then((result) => {
-    console.log("Fetched data:", result);
-
     const data = result.Data;
 
-    if (!Array.isArray(data) || data.length === 0) {
+    // if (!Array.isArray(data) || data.length === 0) {
+    if (data.length === 0) {
       renderEmptyLineChart("dailyRequests");
       return;
     }
 
-    const weeks = data.map(item => `Week ${item.WeekOfMonth}`);
-    const totals = data.map(item => Number(item.TotalQty));
+    const weeks = data.map((item) => `Week ${item.WeekOfMonth}`);
+    const totals = data.map((item) => Number(item.TotalQty));
 
     const now = new Date();
 
     const monthName = now.toLocaleString("default", { month: "long" });
     const year = now.getFullYear();
 
-    const chartTitle = `Weekly Requests (${monthName} ${year})`;
+    const chartTitle = `Overall Weekly Requests (${monthName} ${year})`;
 
     const chart = echarts.init(document.getElementById("dailyRequests"));
 
     chart.setOption({
       title: {
-        // text: "Weekly Requests (Current Month)",
         text: chartTitle,
         left: "center",
       },
@@ -139,12 +137,6 @@ fetch("dirs/dashboard/actions/daily.php")
 //     console.error(err);
 //     renderEmptyLineChart("dailyRequests");
 //   });
-
-// const statusColors = {
-//   Processing: "#FFDD57",
-//   Approved: "#81C784",
-//   Rejected: "#FF8A80",
-// };
 
 // fetch("charts/status.php")
 //   .then((response) => response.json())
@@ -261,10 +253,9 @@ fetch("dirs/dashboard/actions/daily.php")
 
 // Function to render an empty Line Chart (for Proposal)
 function renderEmptyLineChart(chartId) {
-  console.log("Rendering empty line chart for", chartId); // Ensure this function is called
   const chartDom = document.getElementById(chartId);
   if (!chartDom) {
-    console.error("Chart DOM element not found. Unable to render empty chart.");
+    console.error(`Chart DOM element '${chartId}' not found.`);
     return;
   }
 
@@ -305,68 +296,66 @@ function renderEmptyLineChart(chartId) {
   myLineChart.setOption(option);
 }
 
-// Function to render an empty Bar Chart (for Proposal Status)
-function renderEmptyBarChart(chartId) {
-  const chartDom = document.getElementById(chartId);
-  if (!chartDom) return;
+// function renderEmptyBarChart(chartId) {
+//   const chartDom = document.getElementById(chartId);
+//   if (!chartDom) return;
 
-  const myChart = echarts.init(chartDom);
+//   const myChart = echarts.init(chartDom);
 
-  const option = {
-    title: {
-      text: "No Data Available",
-      left: "center",
-    },
-    tooltip: {
-      trigger: "axis",
-    },
-    xAxis: {
-      type: "category",
-      data: ["No Data"],
-    },
-    yAxis: {
-      type: "value",
-      min: 0,
-    },
-    series: [
-      {
-        data: [0],
-        type: "bar",
-        itemStyle: {
-          color: "#ccc", // Light gray for the empty bar
-        },
-      },
-    ],
-  };
+//   const option = {
+//     title: {
+//       text: "No Data Available",
+//       left: "center",
+//     },
+//     tooltip: {
+//       trigger: "axis",
+//     },
+//     xAxis: {
+//       type: "category",
+//       data: ["No Data"],
+//     },
+//     yAxis: {
+//       type: "value",
+//       min: 0,
+//     },
+//     series: [
+//       {
+//         data: [0],
+//         type: "bar",
+//         itemStyle: {
+//           color: "#ccc", // Light gray for the empty bar
+//         },
+//       },
+//     ],
+//   };
 
-  myChart.setOption(option);
-}
+//   myChart.setOption(option);
+// }
 
-// Function to render an empty Pie Chart (for Ownership)
-function renderEmptyPieChart(chartId) {
-  const chartDom = document.getElementById(chartId);
-  if (!chartDom) return;
+// function renderEmptyPieChart(chartId) {
+//   const chartDom = document.getElementById(chartId);
+//   if (!chartDom) return;
 
-  const myChart = echarts.init(chartDom);
+//   const myChart = echarts.init(chartDom);
 
-  const option = {
-    title: {
-      text: "No Data Available",
-      left: "center",
-    },
-    tooltip: {
-      trigger: "item",
-      formatter: "{a} <br/>{b}: {c} ({d}%)",
-    },
-    series: [
-      {
-        name: "No Data",
-        type: "pie",
-        radius: "50%",
-        data: [{ value: 0, name: "No Data" }],
-      },
-    ],
-  };
+//   const option = {
+//     title: {
+//       text: "No Data Available",
+//       left: "center",
+//     },
+//     tooltip: {
+//       trigger: "item",
+//       formatter: "{a} <br/>{b}: {c} ({d}%)",
+//     },
+//     series: [
+//       {
+//         name: "No Data",
+//         type: "pie",
+//         radius: "50%",
+//         data: [{ value: 0, name: "No Data" }],
+//       },
+//     ],
+//   };
 
-  myChart.setOption(option);
-}
+//   myChart.setOption(option);
+// }

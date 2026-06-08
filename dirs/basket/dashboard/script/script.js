@@ -300,8 +300,6 @@ function loadDeliveryBasket(tableId, url) {
       let grouped = {};
 
       sortedData.forEach((item) => {
-        if (!item.Actual_Item_Qty) return;
-
         let key = item.PKList_Number;
 
         if (!grouped[key]) {
@@ -325,6 +323,18 @@ function loadDeliveryBasket(tableId, url) {
       if (response.isSuccess === "success") {
         Object.values(grouped).forEach((item) => {
           let branches = Array.from(item.Req_Branch).join(", ");
+
+          const hasInvalidQty = item.items.some((row) => {
+            const qty = row.Actual_Item_Qty;
+
+            return (
+              qty === null || qty === undefined || String(qty).trim() === ""
+            );
+          });
+
+          if (hasInvalidQty) {
+            return;
+          }
 
           const isDisabledAttr =
             item.PickListStatus !== "PROCESSING" ? "disabled" : "";
@@ -352,10 +362,6 @@ function loadDeliveryBasket(tableId, url) {
               '<i class="bi bi-three-dots"></i></button>' +
               `<ul class="dropdown-menu">
                   <li><a class="dropdown-item open-picklisted" href="#">Open</a></li>
-                  ${
-                    item.PickListStatus !== "IT"
-                      ? // item.PickListStatus !== "NEW"
-                        `
                     <li>
                       <a class="dropdown-item ${
                         item.PickListStatus === "ASSIGNED"
@@ -373,15 +379,36 @@ function loadDeliveryBasket(tableId, url) {
                         }
                       </a>
                     </li>
-                  `
-                      : ""
-                  }
                 </ul>
               </div>`,
           ]);
           // END OF NEWLY ADDED LOOP
           // });
         });
+
+        // ${
+        //             item.PickListStatus !== "IT"
+        //               ?
+        //                 `
+        //             <li>
+        //               <a class="dropdown-item ${
+        //                 item.PickListStatus === "ASSIGNED"
+        //                   ? "edit-branch"
+        //                   : "assign-branch"
+        //               }"
+        //                 href="#"
+        //                 data-picklist="${item.PKList_Number}"
+        //                 data-lbNum="${item.DocEntry}"
+        //                 data-branches="${branches}">
+        //                 ${
+        //                   item.PickListStatus === "ASSIGNED"
+        //                     ? "Edit Assignment"
+        //                     : "Set Assignment"
+        //                 }
+        //               </a>
+        //             </li>
+        //             `
+        //               : ""
 
         if (rows.length === 0) {
           for (let i = 0; i < 8; i++) {
@@ -1006,6 +1033,7 @@ function updateRowAndBalance(activeCell, selector = "#summaryTable") {
   });
 
   let balance = totalActual - totalAssigned;
+  // $("#balanceQty").text(balance >= 0 ? balance : 0);
   $("#balanceQty").text(balance >= 0 ? balance : 0);
 }
 
@@ -1095,8 +1123,18 @@ function assignBranch(picklist, branchees) {
 
           $("#summaryTable thead").html(headerRow);
 
+          const date = new Date(header.DocDate);
+
+          const formattedDate =
+            String(date.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(date.getDate()).padStart(2, "0") +
+            "-" +
+            String(date.getFullYear()).slice(-2);
+
           $("#pcklstno").val(header.PKList_Number);
-          $("#docdate").val(header.DocDate.substring(0, 10));
+          // $("#docdate").val(header.DocDate.substring(0, 10));
+          $("#docdate").val(formattedDate);
           $("#origin").val(header.Picked_Branch || "");
           $("#status").val(header.PickListStatus);
           $("#prepby").val(header.CollectedBy);
@@ -1523,7 +1561,7 @@ function submitBranchAssignment() {
         Swal.fire({
           icon: "error",
           title: "Invalid Quantity",
-          text: "Some values does not match the actual quantity.",
+          text: "Entered values does not match the actual quantity.",
         });
         return;
       }
@@ -2850,15 +2888,14 @@ function serialDeliveryInput(Picklists) {
 
               Swal.fire({
                 icon: "error",
-                title: "No data found",
-                text: "No record with this serial",
+                title: "No item(s) found",
+                text: "No record for this serial",
                 confirmButtonText: "OKAY",
                 allowEnterKey: true,
                 allowEscapeKey: false,
               }).then(() => {
                 serialInput.focus();
               });
-
               return false;
             }
 
@@ -3240,10 +3277,10 @@ function addNonSerialize(Picklists) {
                     return;
                   }
 
-                  console.log(`NON SERIALIZE DATA: ${JSON.stringify(data)}`);
+                  // console.log(`NON SERIALIZE DATA: ${JSON.stringify(data)}`);
 
                   if (
-                    response.isSuccess === "success" && 
+                    response.isSuccess === "success" &&
                     data &&
                     data.length > 0
                   ) {
@@ -3285,7 +3322,9 @@ function addNonSerialize(Picklists) {
                         `tr[data-rowkey="${rowKey}"]`,
                       );
 
-                      let existingItem = loadingTableBody.find(`tr[data-itemkey="${itemKey}"]`)
+                      let existingItem = loadingTableBody.find(
+                        `tr[data-itemkey="${itemKey}"]`,
+                      );
 
                       totalQty += quantity;
 
@@ -3302,9 +3341,9 @@ function addNonSerialize(Picklists) {
                         //       groupedItems[itemCode].loadedQty,
                         //     );
 
-                            console.log(`UPDATED LOADED QTY : ${quantity}`)
+                        console.log(`UPDATED LOADED QTY : ${quantity}`);
 
-                          return
+                        return;
                       } else {
                         let counter =
                           loadingTableBody.find("tr[data-itemcode]").length + 1;
@@ -3334,12 +3373,11 @@ function addNonSerialize(Picklists) {
                         }
                         // renumberRows();
 
-                        const tooltipTriggerList =
-                              document.querySelectorAll(
-                                '[data-bs-toggle="tooltip"]',
-                              );
+                        const tooltipTriggerList = document.querySelectorAll(
+                          '[data-bs-toggle="tooltip"]',
+                        );
 
-                          tooltipTriggerList.forEach((el) => {
+                        tooltipTriggerList.forEach((el) => {
                           bootstrap.Tooltip.getInstance(el)?.dispose();
                           new bootstrap.Tooltip(el);
                         });
@@ -3515,10 +3553,13 @@ function submitLoadingBasket(Picklists) {
         cancelButtonText: "Back",
       }).then((result) => {
         if (result.isConfirmed) {
-
           // $("#branchAssignmentBtn")
           let commitBtn = $(this).find("button[type='submit']");
-          commitBtn.prop("disabled", true).html(`<span class="spinner-border spinner-border-sm"></span> Loading`)
+          commitBtn
+            .prop("disabled", true)
+            .html(
+              `<span class="spinner-border spinner-border-sm"></span> Loading`,
+            );
 
           $.ajax({
             url: "dirs/basket/dashboard/actions/save_create_loading_basketv2.php",
@@ -3558,7 +3599,7 @@ function submitLoadingBasket(Picklists) {
             },
           });
 
-          commitBtn.prop("disabled", false)
+          commitBtn.prop("disabled", false);
         }
       });
     });

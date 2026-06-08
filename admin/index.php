@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once "../config/connection.php";
-require_once "../config/functions.php";
+require_once __DIR__ . "/../config/connection.php";
+require_once __DIR__ . "/../config/functions.php";
 
 if (!isset($_SESSION['Uid'])) {
     header('Location: ../login.php');
@@ -43,7 +43,7 @@ try {
     <link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/custom.css">
-    <!-- <link rel="icon" href="../assets/image/logo/iap_icon.png"> -->
+    <link rel="icon" href="../../assets/image/logo/iap_icon.png">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -67,7 +67,7 @@ try {
         <aside class="main-sidebar bg-primary-subtle elevation-5">
             <p class="text-center brand-link">
                 <a href="index.php" style="text-decoration: none; color: inherit;">
-                    <!-- <img src="../assets/image/logo/iap_icon.png" alt="iShift Admin" id="profile-image" style="width: 100px; height: 65px; object-fit: cover;"> -->
+                    <img src="../assets/image/logo/iap_icon.png" alt="iShift Admin" id="profile-image" style="width: 100px; height: 65px; object-fit: cover;">
                     <br>
                 </a>
                 <small><?php echo isset($user['Username']) ? $user['Username'] : ''; ?></small>
@@ -79,35 +79,30 @@ try {
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <li class="nav-item">
                             <a href="#" class="nav-link active" name="menu" menucode="dashboard">
-                                <!-- <i class="nav-icon bi bi-box-arrow-in-left"></i> -->
                                 <i class="bi bi-grid"></i>
                                 <p>Dashboard</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="requests">
-                                <!-- <i class="nav-icon bi bi-box-arrow-in-right"></i> -->
                                 <i class="bi bi-clipboard-check"></i>
                                 <p>Requests</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="users">
-                                <!-- <i class="bi bi-card-checklist"></i> -->
                                 <i class="bi bi-people"></i>
                                 <p>Users</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="findings">
-                                <!-- <i class="nav-icon bi bi-cart"></i> -->
                                 <i class="bi bi-search"></i>
                                 <p>Findings</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="profile">
-                                <!-- <i class="bi bi-person-square"></i> -->
                                 <i class="bi bi-person"></i>
                                 <p>Profile</p>
                             </a>
@@ -120,7 +115,6 @@ try {
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="logs">
-                                <!-- <i class="nav-icon bi bi-truck"></i> -->
                                 <i class="bi bi-clock-history"></i>
                                 <p>Logs</p>
                             </a>
@@ -170,7 +164,7 @@ try {
         <div class="lock-box">
             <h2>Session Locked</h2>
             <p>Please login again to continue</p>
-            <form id="relogin-frm" method="POST">            
+            <form id="relogin-frm" method="POST">
                 <input type="text" id="newUsername" class="form-control" placeholder="Username" />
                 <input type="password" id="newPassword" class="form-control" placeholder="Password" />
                 <div class="col form-check d-flex justify-content-start mt-2 ms-1">

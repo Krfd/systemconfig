@@ -1,0 +1,2 @@
+[2026-06-08 17:15:15] Error: [2] Undefined array key "InTransitRowNum" in C:\xampp\htdocs\iShiftDemo\dirs\receiving\dashboard\actions\save_createreceiving.php on line 47
+[2026-06-08 17:15:15] Error: [2] Undefined array key "InTransitRowNum" in C:\xampp\htdocs\iShiftDemo\dirs\receiving\dashboard\actions\save_createreceiving.php on line 47

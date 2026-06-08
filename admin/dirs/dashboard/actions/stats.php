@@ -1,8 +1,8 @@
 <?php
 
-require_once "../../../../config/connection.php";
+require_once __DIR__ . "/../../../../config/connection.php";
 
-try{
+try {
     $stmt = $conn->prepare("EXEC [Get_Stats]");
     $stmt->execute();
 
@@ -23,7 +23,7 @@ try{
     );
 
     echo json_encode($response);
-} catch(PDOException $e) {
+} catch (PDOException $e) {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollBack();
 }

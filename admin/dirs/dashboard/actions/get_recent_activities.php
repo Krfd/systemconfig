@@ -1,6 +1,6 @@
 <?php
 
-require_once "../../../../config/connection.php";
+require_once __DIR__ .  "/../../../../config/connection.php";
 
 try {
     $stmt = $conn->prepare("EXEC [GEt_Recent_Activities]");
@@ -14,7 +14,7 @@ try {
     );
 
     echo json_encode($response);
-} catch(PDOException $e) {
+} catch (PDOException $e) {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollBack();
 }

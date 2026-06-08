@@ -39,7 +39,7 @@
                             <div class="d-flex flex-column gap-1 col-2">
                                 <div class="d-flex align-items-baseline gap-3">
                                     <label for="date" class="form-label text-dark-emphasis col-4"><small>Date:</small></label>
-                                    <input type="date" name="date" id="formattedDate" class="form-control form-control-sm col" style="background: #FFFBDF" value="<?php echo date('Y-m-d'); ?>">
+                                    <input type="date" name="date" id="formattedDate" class="form-control form-control-sm col" style="background: #F7F7F7" readonly value="<?php echo date('Y-m-d'); ?>" required>
                                 </div>
                                 <div class="d-flex align-items-baseline gap-3">
                                     <label for="statusForm" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>

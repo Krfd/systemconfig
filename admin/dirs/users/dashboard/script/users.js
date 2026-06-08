@@ -50,36 +50,44 @@ function loadUsers() {
     success: function (response) {
       let rows = [];
       let items = response.Data;
-      let totals = response.Total
+      let totals = response.Total;
 
       let index = 1;
 
       $("#positionCards").html(spinner);
-      console.log(`SPINNER BEFORE USER DATA`)
 
       if (response.isSuccess === "success" && Array.isArray(response.Data)) {
-
-        let totals = response.Total
+        let totals = response.Total;
         let html = "";
 
         const positionColors = {
-          "PDG": "danger",
-          "Warehouseman": "primary",
-          "Audit": "warning",
-          "Software Developer": "success"
+          PDG: "danger",
+          Warehouseman: "primary",
+          Audit: "warning",
+          "Software Developer": "success",
+        };
+
+        const buttonClasses = {
+          danger: "bg-danger-subtle text-danger border-danger-subtle",
+          primary: "bg-primary-subtle text-primary border-primary-subtle",
+          warning: "bg-warning-subtle text-warning border-warning-subtle",
+          success: "bg-success-subtle text-success border-success-subtle",
+          secondary:
+            "bg-secondary-subtle text-secondary border-secondary-subtle",
         };
 
         totals.forEach((item) => {
+          let color = positionColors[item.User_Position] || "secondary";
 
-            let color = positionColors[item.User_Position] || "secondary";
+          let btnClass = buttonClasses[color] || buttonClasses.secondary;
 
-            html += `
+          html += `
                 <div class="col-md-3">
-                    <div class="card shadow-sm rounded-2 h-100 p-3">
+                    <div class="card shadow-sm rounded-2 h-auto p-3">
                         <div class="d-flex align-items-center gap-1">
-                            <h3 class="fw-bold">${item.User_Position}</h3>
+                            <h3 class="fw-bold text-dark-emphasis">${item.User_Position}</h3>
                         </div>
-                        <div class="d-flex gap-3">
+                        <div class="d-flex gap-3 mb-5">
                             <div class="rounded-5 shadow fw-semibold p-3 bg-${color} text-center text-white display-6"
                                   style="min-width:90px">
                                 ${item.TotalUsers}
@@ -89,7 +97,7 @@ function loadUsers() {
                                     | Total Users
                                 </small>
                                 <br>
-                                <button class="btn btn-sm mt-3 btn-${color} w-auto ms-auto" 
+                                <button class="btn btn-sm mt-3 ${btnClass} w-auto ms-auto" 
                                   data-bs-toggle="modal"
                                   data-bs-target="#user-form"
                                   type="button"
@@ -98,31 +106,19 @@ function loadUsers() {
                                 </button>
                             </div>
                         </div>
-                        
-
-                        
                     </div>
                 </div>
             `;
         });
 
-        // <button class="btn btn-sm btn-${color} w-auto ms-auto" 
-        //                   data-bs-toggle="modal"
-        //                   data-bs-target="#user-form"
-        //                   type="button"
-        //                   data-position="${item.User_Position}">
-        //                     + Add member
-        //                 </button>
-
-        $('#user-form').on('show.bs.modal', function (event) {
+        $("#user-form").on("show.bs.modal", function (event) {
           const button = $(event.relatedTarget); // the clicked button
-          const position = button.data('position');
+          const position = button.data("position");
 
-          $('#newPosition').val(position);
+          $("#newPosition").val(position);
         });
 
         $("#positionCards").html(html);
-
 
         items.forEach((item) => {
           let userId = item.Uid;
@@ -137,21 +133,21 @@ function loadUsers() {
           let roleClass = "";
 
           if (position === "Audit") {
-            positionBadge = "bg-warning"
+            positionBadge = "bg-warning";
           } else if (position === "Administrator") {
-            positionBadge = "bg-secondary"
+            positionBadge = "bg-secondary";
           } else if (position === "PDG") {
-            positionBadge = "bg-danger"
+            positionBadge = "bg-danger";
           } else if (position === "Warehouseman") {
-            positionBadge = "bg-primary"
+            positionBadge = "bg-primary";
           } else {
-            positionBadge = "bg-success"
+            positionBadge = "bg-success";
           }
 
-          let roleBadge = `<span class="badge ${positionBadge}">${position}</span>`
+          let roleBadge = `<span class="badge ${positionBadge}">${position}</span>`;
 
           rows.push([
-            userId, 
+            userId,
             index++,
             userCode,
             branch,
@@ -169,7 +165,7 @@ function loadUsers() {
                 <li><a class="dropdown-item reset" href="#">Reset Password</a></li>
               </ul>
             </div>
-            `
+            `,
           ]);
         });
       }
@@ -269,48 +265,45 @@ function loadUsers() {
 
 // RESET USER PASSWORD
 $("#usersTableDisplay tbody").on("click", ".reset", function (e) {
-    e.preventDefault();
-    e.stopPropagation();
+  e.preventDefault();
+  e.stopPropagation();
 
-    let id = $(this).data("id");
-    let user = $(this).data("user");
+  let id = $(this).data("id");
+  let user = $(this).data("user");
 
-    Swal.fire({
-        title: "Are you sure?",
-        text: "Reset " + user + "'s Password?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#28a745",
-        confirmButtonText: "Confirm",
-        cancelButtonColor: "#dc3545"
-    }).then((result) => {
-        if (result.isConfirmed) {
-
-            $.ajax({
-                type: "POST",
-                url: "dirs/users/dashboard/actions/reset_user_password.php",
-                data: { id: id },
-                dataType: "json",
-                success: function (response) {
-
-                    if (response.isSuccess === "success") {
-                        Swal.fire({
-                            icon: "success",
-                            title: "Password has been reset",
-                            timer: 2000,
-                            showConfirmButton: false
-                        }).then(() => {
-                            loadUsers();
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Something went wrong!"
-                        });
-                    }
-                }
+  Swal.fire({
+    title: "Are you sure?",
+    text: "Reset " + user + "'s Password?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#28a745",
+    confirmButtonText: "Confirm",
+    cancelButtonColor: "#dc3545",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        type: "POST",
+        url: "dirs/users/dashboard/actions/reset_user_password.php",
+        data: { id: id },
+        dataType: "json",
+        success: function (response) {
+          if (response.isSuccess === "success") {
+            Swal.fire({
+              icon: "success",
+              title: "Password has been reset",
+              timer: 2000,
+              showConfirmButton: false,
+            }).then(() => {
+              loadUsers();
             });
-        }
-    });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Something went wrong!",
+            });
+          }
+        },
+      });
+    }
+  });
 });
-  

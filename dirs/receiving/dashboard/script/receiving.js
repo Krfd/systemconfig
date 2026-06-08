@@ -316,6 +316,16 @@ function receivingForm() {
     200);
 }
 
+function formatDateMMDDYY(dateString) {
+  const date = new Date(dateString);
+
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  const yy = String(date.getFullYear()).slice(-2);
+
+  return `${mm}-${dd}-${yy}`;
+}
+
 function openReceivedForm(rcvdNumber) {
   $("#main-content").html(spinner);
   $.post("dirs/receiving/dashboard/receivedForm.php", function (data) {
@@ -340,27 +350,38 @@ function openReceivedForm(rcvdNumber) {
           $("#origRecForm").val(header.OriginWhscode);
 
           const docDate = header.SysTimeStamp
-            ? new Date(header.SysTimeStamp)
-                .toLocaleDateString("en-US", {
-                  month: "2-digit",
-                  day: "2-digit",
-                  year: "2-digit",
-                })
-                .replace(/\//g, "-")
+            ? formatDateMMDDYY(header.SysTimeStamp)
             : "";
-
           $("#docDateRecForm").val(docDate);
           const postDate = header.PostingDate
-            ? new Date(header.PostingDate)
-                .toLocaleDateString("en-US", {
-                  month: "2-digit",
-                  day: "2-digit",
-                  year: "2-digit",
-                })
-                .replace(/\//g, "-")
+            ? formatDateMMDDYY(header.PostingDate)
             : "";
 
           $("#postDate").val(postDate);
+          // console.log(`DATES FORMATTED`);
+
+          // const docDate = header.SysTimeStamp
+          //   ? new Date(header.SysTimeStamp)
+          //       .toLocaleDateString("en-US", {
+          //         month: "2-digit",
+          //         day: "2-digit",
+          //         year: "2-digit",
+          //       })
+          //       .replace(/\//g, "-")
+          //   : "";
+
+          // $("#docDateRecForm").val(docDate);
+          // const postDate = header.PostingDate
+          //   ? new Date(header.PostingDate)
+          //       .toLocaleDateString("en-US", {
+          //         month: "2-digit",
+          //         day: "2-digit",
+          //         year: "2-digit",
+          //       })
+          //       .replace(/\//g, "-")
+          //   : "";
+
+          // $("#postDate").val(postDate);
           $("#statusRecForm").val(header.ReceivedStatus);
 
           $("#receiveByRecForm").val(header.ReceivedBy);
@@ -511,9 +532,6 @@ function fetchOrderDetails() {
       let value = $(this).val().trim();
       let field = $(this).data("field");
 
-      console.log(`VALUE : ${value}`);
-      console.log(`FIELD : ${field}`);
-
       if (!field) {
         toggleReceivingButtons(false);
         Swal.fire({
@@ -539,9 +557,9 @@ function fetchOrderDetails() {
         success: function (response) {
           let header = response.Header;
           let items = response.Items;
-          console.log(`RESPONSE : ${JSON.stringify(header)}`);
-          console.log(``);
-          console.log(`ITEMS : ${JSON.stringify(items)}`);
+          // console.log(`RESPONSE : ${JSON.stringify(header)}`);
+          // console.log(``);
+          // console.log(`ITEMS : ${JSON.stringify(items)}`);
 
           if (response.Header?.Status === "failed") {
             Swal.fire({
@@ -566,7 +584,9 @@ function fetchOrderDetails() {
               $("#stockReqNoRecForm").val(items[0].SR_Number);
             }
 
-            $("#docDateRecForm").val(header.DeliveryDate);
+            $("#docDateRecForm").val(
+              header.DeliveryDate ? formatDateMMDDYY(header.DeliveryDate) : "",
+            );
             $("#statusRecForm").val(header.DocStatus);
 
             $("#driverRecForm").val(header.Driver || "");
@@ -656,20 +676,24 @@ function clearTable() {
         `;
         $("#receiving-serial-table tbody").append(serialRow);
       }
+
+      $("#receivingQty").text("0");
     }
   });
 }
 
 function formattedDate() {
   const today = new Date();
-  const yyyy = today.getFullYear();
+  const yy = String(today.getFullYear()).slice(-2);
   const mm = String(today.getMonth() + 1).padStart(2, "0");
   const dd = String(today.getDate()).padStart(2, "0");
 
-  const formattedDate = `${yyyy}-${mm}-${dd}`;
+  // const formattedDate = `${yyyy}-${mm}-${dd}`;
+  const formattedDate = `${mm}-${dd}-${yy}`;
 
   // document.getElementById("docDateRecForm").value = formattedDate;
   document.getElementById("postDate").value = formattedDate;
+  console.log(`RECEIVING FORMATTED DATE : ${formattedDate}`);
 }
 
 function loadImperialBrands() {
@@ -754,78 +778,152 @@ async function loadImperialModel() {
 }
 
 function addNonSerialize() {
-  $("#frm-add-delivery")
-    .off("submit")
-    .on("submit", function (e) {
-      e.preventDefault();
+  $(document).on("submit", "#frm-add-delivery", function (e) {
+    e.preventDefault();
 
-      let Brand = $("#newBrand").val();
-      let Model = $("#newModel").val();
-      let Category = $("#newCategory").val();
-      let Quantity = parseInt($("#newQuantity").val()) || 1;
+    let Brand = $("#newBrand").val();
+    let Model = $("#newModel").val();
+    let Category = $("#newCategory").val();
+    let Quantity = parseInt($("#newQuantity").val()) || 1;
 
-      console.log(
-        `BRAND: ${Brand} - MODEL: ${Model} - CATEGORY - ${Category} - QUANTITY: ${Quantity}`,
-      );
+    if (Brand && Model) {
+      $.ajax({
+        url: "dirs/receiving/dashboard/actions/get_nonserialize.php",
+        type: "POST",
+        data: {
+          brand: Brand,
+          model: Model,
+        },
+        dataType: "json",
+        success: function (response) {
+          if (response.isSuccess === "success") {
+            let items = response.Data;
+            let rows = [];
+            let existingTotal = parseInt($("#receivingQty").text()) || 0;
+            let totalQty = existingTotal;
+            let receivingBody = $("#receiving-form-table tbody");
 
-      // let rows = [];
-      // //       let existingTotal = parseInt($("#summaryQty").text()) || 0;
-      // //       let totalQty = existingTotal;
-      // let $receivingTbody = $("#receiving-form-table tbody");
+            if (!items || items.length === 0) {
+              e.stopPropagation();
+              e.stopImmediatePropagation();
+              Swal.fire({
+                icon: "error",
+                title: "No item(s) found",
+                text: "No record for this item",
+                confirmButtonText: "OKAY",
+                allowEnterKey: true,
+                allowEscapeKey: false,
+              });
+              return false;
+            }
 
-      // let counter =
-      //   $receivingTbody.find("tr").filter(function () {
-      //     // check if row has meaningful content (not empty)
-      //     return (
-      //       $(this)
-      //         .find("td")
-      //         .filter(function () {
-      //           return $(this).text().trim() !== "";
-      //         }).length > 0
-      //     );
-      //   }).length + 1;
+            // console.log(`RECEIVING ITEMS : ${JSON.stringify(items)}`);
 
-      // rows += `
-      //   <tr style="height: 40px; min-height: 40px; cursor: pointer">
-      //     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${counter}</td>
-      //     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${Brand}</td>
-      //     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${Model}</td>
-      //     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${Category}</td>
-      //     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${Quantity}</td>
-      //     <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px" contenteditable="true" class="item-qty-received editable-cell" onfocus="this.style.outline='none'; this.style.boxShadow='none';" oninput="validateNumber(this)"></td>
-      //   </tr>`;
+            // SECOND VALIDATION HERE (UTILIZE ITEM CODE HERE)
+            // $.ajax({
+            //   url : "",
+            //   type: "POST",
+            //   data: {
+            //     ItemCode : item.Itemcode
+            //   }
+            // })
 
-      // let $rows = $receivingTbody.find("tr");
+            items.forEach((item) => {
+              if (!item.Itemcode) return;
+              // if (!receivingGroupedItems[item.Itemcode]) {
+              //   receivingGroupedItems[item.Itemcode] = {
+              //     ...item,
+              //     qty: 0,
+              //   };
+              // }
 
-      // // filter non-empty rows
-      // let $nonEmptyRows = $rows.filter(function () {
-      //   return (
-      //     $(this)
-      //       .find("td")
-      //       .filter(function () {
-      //         return $(this).text().trim() !== "";
-      //       }).length > 0
-      //   );
-      // });
+              console.log(`ITEM CODE : ${item.Itemcode}`);
+              console.log(``);
 
-      // // insert after last non-empty row
-      // if ($nonEmptyRows.length > 0) {
-      //   $nonEmptyRows.last().after(rows);
-      // } else {
-      //   // fallback if somehow all rows are empty
-      //   $receivingTbody.prepend(rows);
-      // }
+              // Object.values(receivingGroupedItems).forEach(function (item) {
+              let brand = item.ItemBrand;
+              let model = item.ItemName;
+              let category = item.ItemCategory;
+              let itemCode = item.Itemcode;
 
-      // // $("#newItemCode").val("");
-      // $("#newQuantity").val("");
-      // $("#newBrand").val("");
-      // $("#newModel").val("");
-      // $("#newCategory").val("").prop("disabled", true);
-      // $("#addDeliveryModal").modal("hide");
-    });
+              if (!brand || !model || !category || !itemCode) {
+                console.warn("Skipped item due to null/empty value:", item);
+                return;
+              }
+
+              let existingRow = receivingBody.find(
+                `tr[data-itemcode="${itemCode}"]`,
+              );
+
+              if (existingRow.length) {
+                let currentQty =
+                  parseInt(existingRow.find("td:nth-child(4)").text()) || 0;
+                existingRow.find("td:nth-child(5)").text(currentQty + Quantity);
+                existingRow.attr("data-itemcode", itemCode);
+              } else {
+                let counter =
+                  receivingBody.find("tr[data-itemcode]").length + 1;
+
+                rows += `
+                    <tr data-itemcode="${itemCode}" style="height: 40px; min-height: 40px; cursor: pointer">
+                      <td class="align-middle ps-3 text-center" style="background:#FFFBDF">${counter}</td>
+                      <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>
+                      <td class="align-middle ps-3" style="background:#FFFBDF">${model}</td>
+                      <td class="align-middle ps-3" style="background:#FFFBDF">${category}</td>
+                      <td class="align-middle ps-3" style="background:#FFFBDF">${Quantity}</td>
+                    </tr>`;
+              }
+
+              totalQty += Quantity;
+
+              let emptyRow = receivingBody
+                .find("tr")
+                .filter(function () {
+                  return (
+                    !$(this).attr("data-itemcode") &&
+                    $(this).text().trim() === ""
+                  );
+                })
+                .first();
+              if (emptyRow.length) {
+                emptyRow.replaceWith(rows);
+              } else {
+                receivingBody.prepend(rows);
+              }
+
+              renumberRows();
+
+              if ($.fn.DataTable.isDataTable("#receiving-form-table")) {
+                $("#receiving-form-table").DataTable().destroy();
+              }
+
+              // $("#newItemCode").val("");
+              $("#newQuantity").val("");
+              $("#newBrand").val("");
+              $("#newModel").val("");
+              $("#newCategory").val("").prop("disabled", true);
+              $("#addDeliveryModal").modal("hide");
+              // });
+              $("#receivingQty").text(totalQty);
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: response.Data,
+              confirmButtonText: "OKAY",
+            });
+          }
+        },
+        error: function () {
+          Swal.fire({
+            icon: "error",
+            title: "Something went wrong",
+          });
+        },
+      });
+    }
+  });
 }
-
-// const groupedItems = {};
 
 // FOR RECEIVING ITEM
 function serialDeliveryInput() {

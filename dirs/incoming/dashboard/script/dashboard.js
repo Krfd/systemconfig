@@ -57,17 +57,15 @@ function loadIncoming() {
             ? item.RequestStatus.toUpperCase()
             : "";
 
-            if (status === "CANCELLED" || status === "REJECTED") {
-              return;
-            }
+          if (status === "CANCELLED" || status === "REJECTED") {
+            return;
+          }
 
           let statusClass = "";
 
           if (status === "NEW" || status === "IN TRANSIT") {
             statusClass = "bg-primary";
-          } else if (
-            status === "PARTIAL"
-          ) {
+          } else if (status === "PARTIAL") {
             statusClass = "bg-warning";
           } else if (status === "RECEIVED") {
             status = "DELIVERED";
@@ -360,14 +358,13 @@ function toggleCheckboxes() {
       //   </tr>
       // `);
 
-    setTimeout(function () {
+      setTimeout(function () {
         $("#main-content").html(spinner);
-      //   $("#previewTableDisplay tbody").html(`
-      //   <tr>
-      //     <td colspan="100%" class="text-center">${spinner}</td>
-      //   </tr>
-      // `);
-      console.log(`SPINNER : ${spinner}`)
+        //   $("#previewTableDisplay tbody").html(`
+        //   <tr>
+        //     <td colspan="100%" class="text-center">${spinner}</td>
+        //   </tr>
+        // `);
         loadPreview(SRNumbers);
       }, 200);
     }
@@ -375,12 +372,14 @@ function toggleCheckboxes() {
 }
 
 function loadPreview(SRNumbers) {
-  // $("main-content").html(spinner);
   $("#previewTableDisplay tbody").html(`
-        <tr>
-          <td colspan="100%" class="text-center">${spinner}</td>
-        </tr>
-      `);
+    <tr>
+      <td colspan="100%" class="text-center">${spinner}</td>
+    </tr>
+  `);
+
+  console.log(`PREVIEWING BASKET`);
+
   $.post("dirs/incoming/dashboard/preview.php", function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
 
@@ -398,15 +397,23 @@ function loadPreview(SRNumbers) {
           $("#previewTableDisplay").data("srnumbers", SRNumbers);
           let previewBody = $("#previewTableDisplay tbody");
 
-          const isDisabled = "";
+          // const isDisabled = "";
+
+          // <td class="ps-5" style="width: 80px; max-width: 80px">
+          //           <input type="checkbox" name="checkbox" id="${item.DocEntry}" data-docentry="${item.DocEntry}"
+          //           class="form-check-input align-self-center mx-auto checkbox border border-primary" ${isDisabled}>
+          //         </td>
 
           previewData.forEach((item, index) => {
-            // console.log(`PREVIEW ITEM: ${JSON.stringify(item)}`);
+            if (item.PickedStatus === "Y") {
+              return;
+            }
+
             row += `
                 <tr style="cursor: pointer" data-docentry="${item.DocEntry}" data-picklisted="${item.PickedStatus}">
                   <td class="ps-5" style="width: 80px; max-width: 80px">
                     <input type="checkbox" name="checkbox" id="${item.DocEntry}" data-docentry="${item.DocEntry}"
-                    class="form-check-input align-self-center mx-auto checkbox border border-primary" ${isDisabled}>
+                    class="form-check-input align-self-center mx-auto checkbox border border-primary">
                   </td>
                   <td class="align-middle ps-3" style="background: #f7f7f7">${index + 1}</td>
                   <td class="align-middle ps-3" style="background: #f7f7f7">${item.ItemBrand}</td>
@@ -473,9 +480,7 @@ function togglePreview() {
       const row = $(this);
 
       if (!row.hasClass("empty-row")) {
-        // if (hasPicklist === "") {
         availableItems++;
-        // }
       }
     });
 
@@ -492,14 +497,14 @@ function togglePreview() {
     $("#previewTableDisplay tbody tr").each(function () {
       const row = $(this);
       const checkbox = row.find(".checkbox");
-      const picklistedStatus = row.data("picklisted");
+      // const picklistedStatus = row.data("picklisted");
 
       if (checkbox) {
-        if (picklistedStatus === "Y") {
-          checkbox.prop("disabled", true);
-        } else {
-          checkbox.prop("disabled", false);
-        }
+        // if (picklistedStatus === "Y") {
+        //   checkbox.prop("disabled", true);
+        // } else {
+        //   checkbox.prop("disabled", false);
+        // }
         checkbox.show();
       } else {
         checkbox.hide();
@@ -868,8 +873,6 @@ $(document).on("click", ".dropdown .enter-actual-qty", function (e) {
   picklistNumRef = picklistNum;
 
   $("#main-content").html(spinner);
-
-
 
   setTimeout(function () {
     $("#encodeQtyTable tbody").html(`
@@ -1794,7 +1797,11 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
 
           let submitBtn = $(this).find("button[type='submit'].save-btn");
           console.log(submitBtn.length);
-          submitBtn.prop("disabled", true).html(`<span class="spinner-border spinner-border-sm"></span> Saving`)
+          submitBtn
+            .prop("disabled", true)
+            .html(
+              `<span class="spinner-border spinner-border-sm"></span> Saving`,
+            );
 
           let tableSelector =
             $(this).attr("id") === "editEncodedQty"
@@ -1890,7 +1897,7 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
             },
           });
 
-          submitBtn.prop("disabled", false)
+          submitBtn.prop("disabled", false);
         }
       });
     });

@@ -1,49 +1,57 @@
 <div class="container-fluid gap-5 d-flex justify-content-between align-items-start">
     <div class="card shadow-sm rounded-2 col">
         <div class="card-body">
-            <h3 class="text-start fw-bold">Top Requesting Branch</h3>
+            <h3 class="text-start fw-bold text-dark-emphasis">Top Requesting Branch</h3>
             <ul class="list-group list-group-flush" id="topRequestorsList">
             </ul>
         </div>
     </div>
     <div class="col">
-         <div class="d-flex flex-column gap-3">
-                <div class="row gap-3">
-                    <div class="col p-3 bg-primary">
-                        <span class="fw-bold">Overall Requests</span>
-                        <div class="d-flex justify-content-end">
-                            <div class="rounded-5 text-white shadow p-3 w-auto ms-auto ms-auto bg-light text-center" style="min-width: 60px"><span class="fw-semibold counter-section" id="overall"></span></div>
-                        </div>
-                    </div>
-                    <div class="col p-3 bg-success">
-                        <span class="fw-bold">Delivered</span>    
-                        <div class="d-flex justify-content-end">
-                            <div class="rounded-5 text-white shadow p-3 w-auto ms-auto ms-auto bg-light text-center" style="min-width: 60px"><span class="fw-semibold counter-section" id="delivered"></span></div>
-                        </div>
-                    </div>
-                </div>
+        <div class="d-flex flex-column gap-3">
             <div class="row gap-3">
-                <div class="col p-3 bg-info">
-                    <span class="fw-bold">Processing</span>
+                <div class="col p-3 bg-primary-subtle shadow-sm border border-primary rounded-2">
+                    <h4 class="fw-bold text-dark-emphasis">Overall Requests</h4>
                     <div class="d-flex justify-content-end">
-                        <div class="rounded-5 text-white shadow p-3 w-auto ms-auto ms-auto bg-light text-center" style="min-width: 60px"><span class="fw-semibold counter-section" id="processing"></span></div>
+                        <div class="rounded-5 text-white shadow p-3 w-auto ms-auto ms-auto bg-primary text-center" style="min-width: 60px">
+                            <span class="fw-semibold counter-section" id="overall"></span>
+                        </div>
                     </div>
                 </div>
-                <div class="col p-3 bg-danger">
-                    <span class="fw-bold">Rejected</span>
+                <div class="col p-3 bg-success-subtle shadow-sm border border-success rounded-2">
+                    <h4 class="fw-bold text-dark-emphasis">Delivered</h4>
                     <div class="d-flex justify-content-end">
-                        <div class="rounded-5 text-white shadow p-3 w-auto ms-auto ms-auto bg-light text-center" style="min-width: 60px"><span class="fw-semibold counter-section" id="rejected"></span></div>
+                        <div class="rounded-5 text-white shadow p-3 w-auto ms-auto ms-auto bg-success text-center" style="min-width: 60px">
+                            <span class="fw-semibold counter-section" id="delivered"></span>
+                        </div>
                     </div>
                 </div>
             </div>
-         </div>
+            <div class="row gap-3">
+                <div class="col p-3 bg-info-subtle shadow-sm border border-info rounded-2">
+                    <h4 class="fw-bold text-dark-emphasis">Processing</h4>
+                    <div class="d-flex justify-content-end">
+                        <div class="rounded-5 text-white shadow p-3 w-auto ms-auto ms-auto bg-info text-center" style="min-width: 60px">
+                            <span class="fw-semibold counter-section" id="processing"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col p-3 bg-danger-subtle shadow-sm border border-danger rounded-2">
+                    <h4 class="fw-bold text-dark-emphasis">Rejected</h4>
+                    <div class="d-flex justify-content-end">
+                        <div class="rounded-5 text-white shadow p-3 w-auto ms-auto ms-auto bg-danger text-center" style="min-width: 60px">
+                            <span class="fw-semibold counter-section" id="rejected"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="col">
         <h3 class="fw-bold">Recent Activities</h3>
         <ul class="list-group list-group-flush bg-primary" id="activityList">
         </ul>
-     </div>
-</div> 
+    </div>
+</div>
 <div class="container-fluid mt-3 mt-md-5 p-3">
     <div id="dailyRequests" style="height:400px;"></div>
 </div>
@@ -68,3 +76,5 @@
         </tbody>
     </table>
 </div> -->
+
+<script src="dirs/dashboard/script/analytics.js"></script>

@@ -1,19 +1,20 @@
 <?php
-// Include your database connection code here
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-// Database connection parameters
 
-include("../../config/conn.php");
+require_once __DIR__ . "/../../../../config/connection.php";
 
-$sql = "SELECT DISTINCT status, COUNT(status) AS count FROM form WHERE cancelled = 0 AND MONTH(created) = MONTH(created) GROUP BY status";
-$result = $conn->query($sql);
+try {
+    // $stmt = $conn->prepare("EXEC [Get_Branch_Details]");
+    // $stmt->execute();
 
-$data = array();
-foreach ($result as $row) {
-    $data[] = $row;
+    // $branchDetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // $response = array(
+    //     "isSuccess" => "success",
+    //     "Data" => $branchDetails
+    // );
+
+    // echo json_encode($response);
+} catch (PDOException $e) {
+    errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
+    $conn->rollBack();
 }
-
-echo json_encode($data);
-
-$conn = null;
