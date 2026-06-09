@@ -1,0 +1,6 @@
+PickList: PL10001 | Item ID: 3
+PickList: PL10001 | Item ID: 6
+PickList: PL10001 | Item ID: 9
+PickList: PL10001 | Item ID: 1
+PickList: PL10001 | Item ID: 5
+PickList: PL10002 | Item ID: 7

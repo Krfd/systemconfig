@@ -693,7 +693,6 @@ function formattedDate() {
 
   // document.getElementById("docDateRecForm").value = formattedDate;
   document.getElementById("postDate").value = formattedDate;
-  console.log(`RECEIVING FORMATTED DATE : ${formattedDate}`);
 }
 
 function loadImperialBrands() {
@@ -785,6 +784,7 @@ function addNonSerialize() {
     let Model = $("#newModel").val();
     let Category = $("#newCategory").val();
     let Quantity = parseInt($("#newQuantity").val()) || 1;
+    let refNum = $("#refNoRecForm").val();
 
     if (Brand && Model) {
       $.ajax({
@@ -817,94 +817,104 @@ function addNonSerialize() {
               return false;
             }
 
-            // console.log(`RECEIVING ITEMS : ${JSON.stringify(items)}`);
-
             // SECOND VALIDATION HERE (UTILIZE ITEM CODE HERE)
-            // $.ajax({
-            //   url : "",
-            //   type: "POST",
-            //   data: {
-            //     ItemCode : item.Itemcode
-            //   }
-            // })
+            $.ajax({
+              url: "dirs/receiving/dashboard/actions/get_display.php",
+              type: "POST",
+              data: {
+                refNum: refNum,
+                ItemCode: items[0].Itemcode,
+              },
+              dataType: "json",
+              success: function (response) {
+                let data = response.Data;
 
-            items.forEach((item) => {
-              if (!item.Itemcode) return;
-              // if (!receivingGroupedItems[item.Itemcode]) {
-              //   receivingGroupedItems[item.Itemcode] = {
-              //     ...item,
-              //     qty: 0,
-              //   };
-              // }
+                if (response.isSuccess !== "success") {
+                  return;
+                }
 
-              console.log(`ITEM CODE : ${item.Itemcode}`);
-              console.log(``);
+                if (response.isSuccess === "success" && data.length > 0) {
+                  items.forEach((item) => {
+                    if (!item.Itemcode) return;
 
-              // Object.values(receivingGroupedItems).forEach(function (item) {
-              let brand = item.ItemBrand;
-              let model = item.ItemName;
-              let category = item.ItemCategory;
-              let itemCode = item.Itemcode;
+                    let brand = item.ItemBrand;
+                    let model = item.ItemName;
+                    let category = item.ItemCategory;
+                    let itemCode = item.Itemcode;
+                    // let itemRowNum = item.ItemRowNum;
+                    let itemRowNum = data[0].ItemRowNum;
 
-              if (!brand || !model || !category || !itemCode) {
-                console.warn("Skipped item due to null/empty value:", item);
-                return;
-              }
+                    console.log(`NON SERIALIZE ROW NUM: ${itemRowNum}`);
 
-              let existingRow = receivingBody.find(
-                `tr[data-itemcode="${itemCode}"]`,
-              );
+                    console.log(`RECEIVING ITEM : ${JSON.stringify(item)}`);
 
-              if (existingRow.length) {
-                let currentQty =
-                  parseInt(existingRow.find("td:nth-child(4)").text()) || 0;
-                existingRow.find("td:nth-child(5)").text(currentQty + Quantity);
-                existingRow.attr("data-itemcode", itemCode);
-              } else {
-                let counter =
-                  receivingBody.find("tr[data-itemcode]").length + 1;
+                    if (!brand || !model || !category || !itemCode) {
+                      console.warn(
+                        "Skipped item due to null/empty value:",
+                        item,
+                      );
+                      return;
+                    }
 
-                rows += `
-                    <tr data-itemcode="${itemCode}" style="height: 40px; min-height: 40px; cursor: pointer">
-                      <td class="align-middle ps-3 text-center" style="background:#FFFBDF">${counter}</td>
-                      <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>
-                      <td class="align-middle ps-3" style="background:#FFFBDF">${model}</td>
-                      <td class="align-middle ps-3" style="background:#FFFBDF">${category}</td>
-                      <td class="align-middle ps-3" style="background:#FFFBDF">${Quantity}</td>
-                    </tr>`;
-              }
+                    let existingRow = receivingBody.find(
+                      `tr[data-itemcode="${itemCode}"]`,
+                    );
 
-              totalQty += Quantity;
+                    if (existingRow.length) {
+                      let currentQty =
+                        parseInt(existingRow.find("td:nth-child(4)").text()) ||
+                        0;
+                      existingRow
+                        .find("td:nth-child(5)")
+                        .text(currentQty + Quantity);
+                      existingRow.attr("data-itemcode", itemCode);
+                    } else {
+                      let counter =
+                        receivingBody.find("tr[data-itemcode]").length + 1;
 
-              let emptyRow = receivingBody
-                .find("tr")
-                .filter(function () {
-                  return (
-                    !$(this).attr("data-itemcode") &&
-                    $(this).text().trim() === ""
-                  );
-                })
-                .first();
-              if (emptyRow.length) {
-                emptyRow.replaceWith(rows);
-              } else {
-                receivingBody.prepend(rows);
-              }
+                      rows += `
+                  <tr data-itemcode="${itemCode}" data-rownum="${itemRowNum}" style="height: 40px; min-height: 40px; cursor: pointer">
+                    <td class="align-middle ps-3 text-center" style="background:#FFFBDF">${counter}</td>
+                    <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>
+                    <td class="align-middle ps-3" style="background:#FFFBDF">${model}</td>
+                    <td class="align-middle ps-3" style="background:#FFFBDF">${category}</td>
+                    <td class="align-middle ps-3" style="background:#FFFBDF">${Quantity}</td>
+                  </tr>`;
+                    }
 
-              renumberRows();
+                    totalQty += Quantity;
 
-              if ($.fn.DataTable.isDataTable("#receiving-form-table")) {
-                $("#receiving-form-table").DataTable().destroy();
-              }
+                    let emptyRow = receivingBody
+                      .find("tr")
+                      .filter(function () {
+                        return (
+                          !$(this).attr("data-itemcode") &&
+                          $(this).text().trim() === ""
+                        );
+                      })
+                      .first();
+                    if (emptyRow.length) {
+                      emptyRow.replaceWith(rows);
+                    } else {
+                      receivingBody.prepend(rows);
+                    }
 
-              // $("#newItemCode").val("");
-              $("#newQuantity").val("");
-              $("#newBrand").val("");
-              $("#newModel").val("");
-              $("#newCategory").val("").prop("disabled", true);
-              $("#addDeliveryModal").modal("hide");
-              // });
-              $("#receivingQty").text(totalQty);
+                    renumberRows();
+
+                    if ($.fn.DataTable.isDataTable("#receiving-form-table")) {
+                      $("#receiving-form-table").DataTable().destroy();
+                    }
+
+                    $("#newQuantity").val("");
+                    $("#newBrand").val("");
+                    $("#newModel").val("");
+                    $("#newCategory").val("").prop("disabled", true);
+                    $("#addDeliveryModal").modal("hide");
+
+                    $("#receivingQty").text(totalQty);
+                  });
+                }
+              },
             });
           } else {
             Swal.fire({
@@ -1207,6 +1217,8 @@ function submitReceiving() {
               Swal.fire({
                 icon: "success",
                 title: "Items has been received",
+              }).then(() => {
+                returnReceiving();
               });
               // OPEN PDF
               window.open(
@@ -1214,15 +1226,16 @@ function submitReceiving() {
                 "_blank",
               );
 
-              Swal.fire({
-                icon: "success",
-                title: "Items has been received",
-                // text: `Receiving #: ${response.ReceivingNumber || ""}`,
-              });
+              // Swal.fire({
+              //   icon: "success",
+              //   title: "Items has been received",
+              //   // text: `Receiving #: ${response.ReceivingNumber || ""}`,
+              // });
               // .then(() => {
               //   loadDashboard();
               // });
-              loadReceiving();
+              // returnReceiving();
+              console.log(`RECEIVED!`);
             } else {
               Swal.fire({
                 icon: "error",

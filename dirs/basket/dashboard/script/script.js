@@ -2449,7 +2449,7 @@ $(document).on("change", "#truckCat", function () {
 
 async function loadTruckPlates() {
   let truckCategory = $("#truckCat").val();
-  console.log("Category sent:", truckCategory);
+  // console.log("Category sent:", truckCategory);
   $("#plate").html('<option value="">Loading...</option>');
 
   if (!truckCategory) {
@@ -2678,15 +2678,12 @@ function loadToBasket(Picklists) {
   $.post("dirs/basket/dashboard/loadToBasket.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
 
-    // console.log(`PICKLISTS : ${Picklists}`);
-
     $.ajax({
       url: "dirs/basket/dashboard/actions/get_user.php",
       type: "POST",
       dataType: "json",
       success: function (user) {
         let pickedBy = user.Data.Fullname;
-
         $("#prepby").val(pickedBy);
       },
     });
@@ -2952,11 +2949,16 @@ function serialDeliveryInput(Picklists) {
                           let qty = 1;
                           let reqQty = parseInt(data[0].Req_Item_Qty) || 0;
 
+                          // console.log(
+                          //   `TOTAL REQ PER MODEL : ${totalActualPerModel}`,
+                          // );
+
                           // let itemId = data?.Item_id || data?.[0]?.Item_id || null;
                           // let itemId = data?.[0]?.Item_id ?? null;
                           // groupedItems[itemCode].Item_id = itemId;
 
                           let itemId = data.map((row) => row.Item_id);
+                          // console.log(`SERIALIZE ITEM ID: ${itemId}`);
                           groupedItems[itemCode].Item_id = itemId;
 
                           // let picklist =
@@ -3093,7 +3095,8 @@ function serialDeliveryInput(Picklists) {
                               "Serials: <br>" +
                                 serialArray.join("<br>") +
                                 "<br>Requested: " +
-                                reqQty,
+                                // reqQty,
+                                totalActualPerModel,
                             );
 
                             console.log(
@@ -3116,7 +3119,7 @@ function serialDeliveryInput(Picklists) {
                                   data-serials="${item.ItemSerial}" 
                                   data-bs-toggle="tooltip" 
                                   data-bs-html="true" 
-                                  data-bs-title="${"Serials: " + item.ItemSerial} <br>Requested: ${reqQty}" 
+                                  data-bs-title="${"Serials: " + item.ItemSerial} <br>Requested: ${totalActualPerModel}" 
                                   style="height: 40px; min-height: 40px; cursor: pointer">
                                   <td class="align-middle ps-3 text-center" style="background: #FFFBDF">${counter}</td>
                                   <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>
@@ -3277,77 +3280,63 @@ function addNonSerialize(Picklists) {
                     return;
                   }
 
-                  // console.log(`NON SERIALIZE DATA: ${JSON.stringify(data)}`);
-
                   if (
                     response.isSuccess === "success" &&
                     data &&
                     data.length > 0
                   ) {
-                    Object.values(groupedItems).forEach(function (item) {
-                      let brand = item.ItemBrand;
-                      let model = item.ItemName;
-                      let category = item.ItemCategory;
-                      let itemCode = item.ItemCode;
+                    // Object.values(groupedItems).forEach(function (item) {
+                    let brand = item.ItemBrand;
+                    let model = item.ItemName;
+                    let category = item.ItemCategory;
+                    let itemCode = item.ItemCode;
 
-                      // let itemId = data?.Item_id || data?.[0]?.Item_id || null;
-                      // groupedItems[itemCode].Item_id = itemId;
-                      // let itemId = data.map((row) => row.Item_id);
-                      let itemId = data[0]?.Item_id || null;
-                      groupedItems[itemCode].Item_id = itemId;
+                    let itemId = data[0]?.Item_id || null;
+                    // let itemId = data.map((row) => row.Item_id);
+                    // console.log(`ITEM id : ${itemId}`);
+                    groupedItems[itemCode].Item_id = itemId;
 
-                      // let picklist = data?.PKList_Number || data?.[0]?.PKList_Number || null;
-                      let picklist = data?.[0]?.PKList_Number ?? null;
-                      // groupedItems[itemCode].PKList_Number = picklist;
+                    let picklist = data?.[0]?.PKList_Number ?? null;
+                    // console.log(`PICK LIST : ${picklist}`);
 
-                      groupedItems[itemCode].PKList_Number = picklist;
-                      groupedItems[itemCode].picklist = picklist;
+                    groupedItems[itemCode].PKList_Number = picklist;
+                    groupedItems[itemCode].picklist = picklist;
 
-                      if (!brand || !model || !category || !itemCode) {
-                        console.warn(
-                          "Skipped item due to null/empty value:",
-                          item,
-                        );
-                        return;
-                      }
-
-                      // let existingRow = loadingTableBody.find(`tr[data-itemcode="${itemCode}"]`,);
-
-                      // const rowKey = itemCode + "|" + item.ItemName;
-
-                      const rowKey = itemCode + "|" + item.ItemName;
-                      const itemKey = itemCode + "|" + model;
-
-                      let existingRow = loadingTableBody.find(
-                        `tr[data-rowkey="${rowKey}"]`,
+                    if (!brand || !model || !category || !itemCode) {
+                      console.warn(
+                        "Skipped item due to null/empty value:",
+                        item,
                       );
+                      return;
+                    }
 
-                      let existingItem = loadingTableBody.find(
-                        `tr[data-itemkey="${itemKey}"]`,
-                      );
+                    const rowKey = itemCode + "|" + item.ItemName;
+                    const itemKey = itemCode + "|" + model;
 
-                      totalQty += quantity;
+                    let existingRow = loadingTableBody.find(
+                      `tr[data-rowkey="${rowKey}"]`,
+                    );
 
-                      if (existingRow.length) {
-                        let currentQty =
-                          parseInt(
-                            existingRow.find("td:nth-child(5)").text(),
-                          ) || 0;
-                        existingRow.attr("data-itemcode", itemCode);
-                        existingRow.attr("data-itemid", itemId);
+                    let existingItem = loadingTableBody.find(
+                      `tr[data-itemkey="${itemKey}"]`,
+                    );
 
-                        // console.log(
-                        //       "UPDATED LOADED QTY:",
-                        //       groupedItems[itemCode].loadedQty,
-                        //     );
+                    totalQty += quantity;
 
-                        console.log(`UPDATED LOADED QTY : ${quantity}`);
+                    if (existingRow.length) {
+                      let currentQty =
+                        parseInt(existingRow.find("td:nth-child(5)").text()) ||
+                        0;
+                      existingRow.attr("data-itemcode", itemCode);
+                      existingRow.attr("data-itemid", itemId);
 
-                        return;
-                      } else {
-                        let counter =
-                          loadingTableBody.find("tr[data-itemcode]").length + 1;
-                        let newRow = `
+                      // console.log(`UPDATED LOADED QTY : ${quantity}`);
+
+                      return;
+                    } else {
+                      let counter =
+                        loadingTableBody.find("tr[data-itemcode]").length + 1;
+                      let newRow = `
                             <tr
                             data-rowkey="${rowKey}" 
                             data-itemid="${itemId}"
@@ -3363,39 +3352,39 @@ function addNonSerialize(Picklists) {
                             </tr>
                           `;
 
-                        let emptyRow = loadingTableBody
-                          .find("tr:not([data-itemcode])")
-                          .first();
-                        if (emptyRow.length) {
-                          emptyRow.replaceWith(newRow);
-                        } else {
-                          loadingTableBody.prepend(newRow);
-                        }
-                        // renumberRows();
-
-                        const tooltipTriggerList = document.querySelectorAll(
-                          '[data-bs-toggle="tooltip"]',
-                        );
-
-                        tooltipTriggerList.forEach((el) => {
-                          bootstrap.Tooltip.getInstance(el)?.dispose();
-                          new bootstrap.Tooltip(el);
-                        });
+                      let emptyRow = loadingTableBody
+                        .find("tr:not([data-itemcode])")
+                        .first();
+                      if (emptyRow.length) {
+                        emptyRow.replaceWith(newRow);
+                      } else {
+                        loadingTableBody.prepend(newRow);
                       }
+                      // renumberRows();
 
-                      if ($.fn.DataTable.isDataTable("#loadBasketTable")) {
-                        $("#loadBasketTable").DataTable().destroy();
-                      }
+                      const tooltipTriggerList = document.querySelectorAll(
+                        '[data-bs-toggle="tooltip"]',
+                      );
 
-                      let exists = false;
-                      $("#loadBasketTable tbody tr").each(function () {
-                        let code = $(this).data("itemcode");
-                        if (code == itemCode) {
-                          exists = true;
-                          return false; // break loop
-                        }
+                      tooltipTriggerList.forEach((el) => {
+                        bootstrap.Tooltip.getInstance(el)?.dispose();
+                        new bootstrap.Tooltip(el);
                       });
+                    }
+
+                    if ($.fn.DataTable.isDataTable("#loadBasketTable")) {
+                      $("#loadBasketTable").DataTable().destroy();
+                    }
+
+                    let exists = false;
+                    $("#loadBasketTable tbody tr").each(function () {
+                      let code = $(this).data("itemcode");
+                      if (code == itemCode) {
+                        exists = true;
+                        return false; // break loop
+                      }
                     });
+                    // });
 
                     $("#loadingQty").text(totalQty);
 
@@ -3462,7 +3451,6 @@ function submitLoadingBasket(Picklists) {
       e.preventDefault();
 
       const rowsWithItems = $("#loadBasketTable tbody tr").filter(function () {
-        // return $(this).data("itemid") != null;
         return $(this).attr("data-itemid");
       }).length;
 
@@ -3498,7 +3486,6 @@ function submitLoadingBasket(Picklists) {
         let picklist = $(this).data("picklist");
 
         if (item_id) {
-          // parse JSON string if needed
           if (typeof item_id === "string") {
             try {
               item_id = JSON.parse(item_id);
@@ -3513,10 +3500,8 @@ function submitLoadingBasket(Picklists) {
           }
 
           item_id.forEach((id) => {
-            // dissect comma separated values
             if (typeof id === "string" && id.includes(",")) {
               id.split(",").forEach((singleId) => {
-                // Item_Id.push(singleId.trim());
                 Item_Id.push(Number(singleId.trim()));
 
                 ItemQty.push(qty);
@@ -3529,7 +3514,6 @@ function submitLoadingBasket(Picklists) {
                 }
               });
             } else {
-              // Item_Id.push(String(id).trim());
               Item_Id.push(Number(id));
 
               ItemQty.push(qty);
@@ -3545,6 +3529,11 @@ function submitLoadingBasket(Picklists) {
         }
       });
 
+      console.log(`PICKLISTS : ${PickListnumber}`);
+      console.log("ITEM SERIAL: ", ItemSerial);
+      console.log(`ITEM ID: ${Item_Id}`);
+      console.log(``);
+
       Swal.fire({
         icon: "question",
         title: "Load the following item(s)?",
@@ -3553,7 +3542,6 @@ function submitLoadingBasket(Picklists) {
         cancelButtonText: "Back",
       }).then((result) => {
         if (result.isConfirmed) {
-          // $("#branchAssignmentBtn")
           let commitBtn = $(this).find("button[type='submit']");
           commitBtn
             .prop("disabled", true)

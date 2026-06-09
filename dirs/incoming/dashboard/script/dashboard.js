@@ -1740,6 +1740,8 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
       let hasEmpty = false;
       let hasExceeded = false;
 
+      const form = this;
+
       $(this)
         .find(".editable-cell")
         .each(function () {
@@ -1795,7 +1797,8 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
         if (result.isConfirmed) {
           let encodedItems = [];
 
-          let submitBtn = $(this).find("button[type='submit'].save-btn");
+          let submitBtn = $(form).find("button[type='submit'].save-btn");
+          // let submitBtn = $(this).find(".save-btn");
           console.log(submitBtn.length);
           submitBtn
             .prop("disabled", true)
@@ -1875,7 +1878,7 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
                 //   );
                 // };
                 // openPrint();
-                Swal.close();
+                // Swal.close();
                 setTimeout(() => {
                   loadBasketContent();
                 }, 300);

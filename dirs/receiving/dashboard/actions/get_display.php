@@ -3,27 +3,24 @@ require_once "../../../../config/connection.php";
 session_start();
 
 $User = $_SESSION['Uid'];
-$Picklists = isset($_POST['Picklists']) ? $_POST['Picklists'] : [];
+$refNum = $_POST['refNum'];
 $ItemCode = $_POST['ItemCode'];
 
 try {
-
     $conn->beginTransaction();
 
-    $picklistString = implode(',', $Picklists);
-
-    $stmt = $conn->prepare("EXEC dbo.[Get_Display_Models] ?, ?, ?");
+    $stmt = $conn->prepare("EXEC dbo.[Get_Nonserialize_Display] ?, ?, ?");
     $stmt->execute([
         $User,
-        $picklistString,
+        $refNum,
         $ItemCode
     ]);
 
-    $get_header = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $get_nonserialize = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $response = array(
         "isSuccess" => "success",
-        "Data" => $get_header
+        "Data" => $get_nonserialize
     );
 
     echo json_encode($response);

@@ -54,7 +54,7 @@ try {
 
     $stmtCollect = $conn->prepare("EXEC dbo.CreatePicklist_V2 ?,?,?,?,?,?,?");
 
-    // $logLines = [];
+    $logLines = [];
 
     $referenceMap = [];
 
@@ -69,7 +69,6 @@ try {
 
         $branch = getBranch($conn, $itmid, $picklist);
 
-        // ✅ KEY = branch (NOT picklist)
         if (!isset($referenceMap[$branch])) {
             $referenceMap[$branch] = generateReference();
         }
@@ -86,13 +85,13 @@ try {
             $qty
         ]);
 
-        // $logLines[] = "PickList: {$picklist} | Item ID: {$itmid}";
+        $logLines[] = "PickList: {$picklist} | Item ID: {$itmid}";
     }
 
-    // $fileName = "picklist_log_" . date('Ymd_His') . ".txt";
-    // $filePath = $fileName;
+    $fileName = "picklist_log_" . date('Ymd_His') . ".txt";
+    $filePath = $fileName;
 
-    // file_put_contents($filePath, implode(PHP_EOL, $logLines));
+    file_put_contents($filePath, implode(PHP_EOL, $logLines));
 
     $stmtHeader = $conn->prepare("EXEC dbo.CreateLoadingBasket_headerV2 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
 
