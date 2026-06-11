@@ -3,7 +3,6 @@
 </div>
 <?php
 include("deliveryModal.php");
-include("branchModal.php");
 ?>
 <script src="assets/js/load.js"></script>
 <script src="dirs/basket/dashboard/script/script.js"></script>

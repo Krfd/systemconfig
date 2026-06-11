@@ -9,12 +9,24 @@ $Category = $_POST['Category'];
 try {
     $conn->beginTransaction();
 
-    $fetch_items = $conn->prepare("SELECT ItemSerial, ItemCode, ItemName, ItemBrand, ItemCategory FROM DEMO_DATA_WAREHOUSE 
-    WHERE ItemBrand = ? AND ItemName = ? AND ItemCategory = ?");
-    $fetch_items->execute([$Brand, $Model, $Category]);
+    // $fetch_items = $conn->prepare("SELECT ItemSerial, ItemCode, ItemName, ItemBrand, ItemCategory 
+    // FROM DEMO_DATA_WAREHOUSE 
+    // WHERE ItemBrand = ? AND ItemName = ? AND ItemCategory = ?");
+    $fetch_items = $conn->prepare("EXEC Get_Nonserialize ?, ?");
+    // $fetch_items->execute([$Brand, $Model, $Category]);
+    $fetch_items->execute([$Brand, $Model]);
     $get_items = $fetch_items->fetchAll(PDO::FETCH_ASSOC);
 
     $conn->commit();
+
+    if (count($get_items) === 0) {
+        echo json_encode([
+            "isSuccess" => "no_nonserialized",
+            "message" => "Selected item is serialized or unavailable.",
+            "Data" => []
+        ]);
+        exit;
+    }
 
     $response = array(
         "isSuccess" => 'success',

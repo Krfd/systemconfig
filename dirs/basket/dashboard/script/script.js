@@ -691,7 +691,7 @@ function toggleDelivery() {
 
   Swal.fire({
     icon: "question",
-    title: "Add selected item(s) to loading basket?",
+    title: "Add selected pickist(s) to loading basket?",
     confirmButtonText: "Add",
     showCancelButton: true,
     cancelButtonText: "Back",
@@ -1034,7 +1034,7 @@ function updateRowAndBalance(activeCell, selector = "#summaryTable") {
 
   let balance = totalActual - totalAssigned;
   // $("#balanceQty").text(balance >= 0 ? balance : 0);
-  $("#balanceQty").text(balance >= 0 ? balance : 0);
+  $("#balanceQty").text(balance);
 }
 
 $(document).on(
@@ -2982,7 +2982,8 @@ function serialDeliveryInput(Picklists) {
                             return;
                           }
 
-                          const rowKey = itemCode + "|" + item.ItemSerial;
+                          // const rowKey = itemCode + "|" + item.ItemSerial;
+                          const rowKey = itemCode + "|" + Serial;
                           const itemKey = itemCode + "|" + model;
 
                           // check duplicate serial
@@ -2995,15 +2996,18 @@ function serialDeliveryInput(Picklists) {
                             `tr[data-itemkey="${itemKey}"]`,
                           );
 
+                          console.log("rowKey:", rowKey);
+                          console.log("existingRow.length:", existingRow.length);
+
                           // DUPLICATE SERIAL
-                          // if (existingRow.length) {
-                          //   Swal.fire({
-                          //     icon: "error",
-                          //     title:
-                          //       "Serial for this model has been scanned already",
-                          //   });
-                          //   return;
-                          // }
+                          if (existingRow.length) {
+                            Swal.fire({
+                              icon: "error",
+                              title:
+                                "Serial number has already been scanned",
+                            });
+                            return;
+                          }
 
                           // let maxAllowed = groupedItems[itemCode].allowedQty || 0;
                           let currentLoaded =
@@ -3027,16 +3031,23 @@ function serialDeliveryInput(Picklists) {
                           );
 
                           // check if serial already exists
-                          const serialExisted = Array.from(
-                            tableElement.querySelectorAll("tbody tr td"),
-                          ).some((td) => td.textContent.trim() === serial);
+                          // const serialExisted = Array.from(
+                          //   tableElement.querySelectorAll("tbody tr td"),
+                          // ).some((td) => td.textContent.trim() === serial);
+
+                          const serialExisted = $(
+                            "#basket-serial-table tbody tr td:nth-child(3)"
+                          ).toArray()
+                          .some((td) => $(td).text().trim() === Serial);
+
+                          // console.log(`SERIAL EXISTED : ${serialExisted}`)
 
                           if (!serialExisted) {
                             let serialRow = `
                               <tr style="height: 40px; min-height: 40px; cursor: pointer">
                                   <td class="align-middle ps-3" style="background: #FFFBDF">${model}</td>
                                   <td class="align-middle ps-3" style="background: #FFFBDF">${itemCode}</td>
-                                  <td class="align-middle ps-3" style="background: #FFFBDF">${serial}</td>
+                                  <td class="align-middle ps-3" style="background: #FFFBDF">${Serial}</td>
                               </tr>
                             `;
 
@@ -3182,6 +3193,7 @@ function serialDeliveryInput(Picklists) {
                       }).then(() => {
                         console.log("No response found on this item");
                       });
+                      $("#serializeBtn").prop("disabled", false);
                       return;
                     },
                   });
@@ -3194,6 +3206,7 @@ function serialDeliveryInput(Picklists) {
               title: "Unavailable stock for this model",
               confirmButtonText: "OKAY",
             });
+            $("#serializeBtn").prop("disabled", false);
           } else {
             Swal.fire({
               icon: "error",
@@ -3241,6 +3254,15 @@ function addNonSerialize(Picklists) {
         success: function (response) {
           if (response.isSuccess === "success") {
             let items = response.Data;
+
+            if (response.isSuccess === "no_nonserialized") {
+              Swal.fire({
+                icon: "warning",
+                title: "Serialized Item",
+                text: "This item is serialized and cannot be loaded through this process.",
+              });
+              return;
+            }
 
             if (response.Data.length === 0) {
               Swal.fire({
@@ -3499,7 +3521,15 @@ function submitLoadingBasket(Picklists) {
             item_id = [item_id];
           }
 
-          item_id.forEach((id) => {
+          try {
+              serials = JSON.parse(serials);
+          } catch {
+              serials = [];
+          }
+
+          console.log(`SERIALS: ${serials}`)
+
+          item_id.forEach((id, idx) => {
             if (typeof id === "string" && id.includes(",")) {
               id.split(",").forEach((singleId) => {
                 Item_Id.push(Number(singleId.trim()));
@@ -3519,8 +3549,13 @@ function submitLoadingBasket(Picklists) {
               ItemQty.push(qty);
               PickListnumber.push(picklist);
 
+              // if (serialBased) {
+              //   ItemSerial.push(serials || "");
+              // } else {
+              //   ItemSerial.push(null);
+              // }
               if (serialBased) {
-                ItemSerial.push(serials || "");
+                ItemSerial.push(serials[idx] || null);
               } else {
                 ItemSerial.push(null);
               }
@@ -3529,10 +3564,15 @@ function submitLoadingBasket(Picklists) {
         }
       });
 
-      console.log(`PICKLISTS : ${PickListnumber}`);
-      console.log("ITEM SERIAL: ", ItemSerial);
-      console.log(`ITEM ID: ${Item_Id}`);
-      console.log(``);
+      console.table({
+        Item_Id,
+        ItemSerial
+      });
+
+      // console.log(`PICKLISTS : ${PickListnumber}`);
+      // console.log("ITEM SERIAL: ", ItemSerial);
+      // console.log(`ITEM ID: ${Item_Id}`);
+      // console.log(``);
 
       Swal.fire({
         icon: "question",
@@ -3542,52 +3582,61 @@ function submitLoadingBasket(Picklists) {
         cancelButtonText: "Back",
       }).then((result) => {
         if (result.isConfirmed) {
-          let commitBtn = $(this).find("button[type='submit']");
+          let commitBtn = $(this).find("button[type='submit'].commit-btn");
           commitBtn
             .prop("disabled", true)
             .html(
               `<span class="spinner-border spinner-border-sm"></span> Loading`,
             );
 
-          $.ajax({
-            url: "dirs/basket/dashboard/actions/save_create_loading_basketv2.php",
-            type: "POST",
-            dataType: "json",
-            data: {
-              Eta,
-              Item_Id,
-              ItemSerial,
-              PickListnumber,
-              ItemQty,
-              DeliveryDate,
-              PrepBy,
-              Driver,
-              TruckCat,
-              Plate,
-              Remarks,
-            },
-            success: function (res) {
-              if (res.isSuccess === "success") {
-                Swal.fire({
-                  icon: "success",
-                  title: "Items has been saved to loading basket",
-                });
-                loadDeliveryBasketContent();
-              } else {
-                Swal.fire({
-                  icon: "error",
-                  title: "Server error",
-                  html: res,
-                });
-              }
-            },
-            error: function (xhr, status, error) {
-              console.log("ERROR");
-              console.log(xhr.responseText);
-            },
-          });
-
-          commitBtn.prop("disabled", false);
+          // $.ajax({
+          //   url: "dirs/basket/dashboard/actions/save_create_loading_basketv2.php",
+          //   type: "POST",
+          //   dataType: "json",
+          //   data: {
+          //     Eta,
+          //     Item_Id,
+          //     ItemSerial,
+          //     PickListnumber,
+          //     ItemQty,
+          //     DeliveryDate,
+          //     PrepBy,
+          //     Driver,
+          //     TruckCat,
+          //     Plate,
+          //     Remarks,
+          //   },
+          //   success: function (res) {
+          //     if (res.isSuccess === "success") {
+          //       Swal.fire({
+          //         icon: "success",
+          //         title: "Items has been saved to loading basket",
+          //       });
+          //       loadDeliveryBasketContent();
+          //     } else {
+          //       Swal.fire({
+          //         icon: "error",
+          //         title: "Server error",
+          //         html: res,
+          //       });
+          //       commitBtn
+          //       .prop("disabled", false)
+          //       .html("Load");
+          //     }
+          //   },
+          //   error: function (xhr, status, error) {
+          //     console.log("ERROR");
+          //     console.log(xhr.responseText);
+          //     commitBtn
+          //       .prop("disabled", false)
+          //       .html("Load");
+          //   },
+          //   complete: function () {
+          //     commitBtn
+          //       .prop("disabled", false)
+          //       .html("Load");
+          //   }
+          // });
         }
       });
     });

@@ -9,9 +9,6 @@
         <button class="btn btn-primary" type="button" onclick="toggleDelivery()" id="loadDeliveryBtn">
             Load Items
         </button>
-        <!-- <button class="btn btn-primary" type="button" onclick="loadingItems()" id="createDeliveryBtn">
-            <i class="bi bi-cart-check"></i>
-        </button> -->
     </div>
 </div>
 <ul class="nav nav-tabs nav-tabs-bordered d-flex mt-5" id="borderedTabJustified" role="tablist">

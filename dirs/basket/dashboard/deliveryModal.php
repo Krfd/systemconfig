@@ -40,38 +40,6 @@
      </div>
  </form>
 
- <!-- SUMMARY -->
- <!-- <div class="modal fade" tabindex="-1" id="deliverySummary">
-     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-         <div class="modal-content">
-             <div class="modal-header">
-                 <h4 class="modal-title text-secondary">Delivery Summary</h4>
-                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-             </div>
-             <div class="modal-body">
-                 <div class="table-responsive-md">
-                     <table class="table datatables" id="summaryDeliveryTable">
-                         <thead class="sticky-top">
-                             <tr>
-                                 <th class="text-secondary">#</th>
-                                 <th class="text-secondary">Branch</th>
-                                 <th class="text-secondary">Serial</th>
-                                 <th class="text-secondary">Brand</th>
-                                 <th class="text-secondary">Model</th>
-                                 <th class="text-secondary">Category</th>
-                                 <th class="text-secondary">Quantity</th>
-                                 <th class="text-secondary d-none">Item Code</th>
-                             </tr>
-                         </thead>
-                         <tbody>
-                         </tbody>
-                     </table>
-                 </div>
-             </div>
-         </div>
-     </div>
- </div> -->
-
  <!-- NON-SERTIALIZE TABLE -->
  <div class="modal fade" tabindex="-1" id="nonSerializeSummary">
      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">

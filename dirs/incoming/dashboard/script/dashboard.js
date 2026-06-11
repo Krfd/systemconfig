@@ -745,9 +745,16 @@ function openIncoming(DocEntry) {
           selectedValue("#origin", header.BranchOrigin);
           selectedValue("#whcode", header.BranchOrigin_Whscode);
 
+          const date = new Date(header.EncodeDate);
+
+          const formattedDate =
+            String(date.getMonth() + 1).padStart(2, '0') + '-' +
+            String(date.getDate()).padStart(2, '0') + '-' +
+            String(date.getFullYear()).slice(-2);
+
           // ================= HEADER =================
           $("#srn").val(header.SR_Number);
-          $("#date").val(header.EncodeDate);
+          $("#date").val(formattedDate);
           $("#status").val(header.RequestStatus);
           $("#purpose").val(header.PurposeRequest);
           $("#reqBy").val(header.RequestedBy);
@@ -1618,7 +1625,7 @@ function encodeQty(picklistNum) {
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemName}</td>
                   <td class="align-middle ps-3 text-start" style="background: #F7F7F7;">${item.Req_ItemCategory}</td>
                   <td class="align-middle text-center" style="background: #F7F7F7;">${item.totalQty}</td>
-                  <td class="align-middle ps-3 editable-cell" style="background: #FFFBDF" contenteditable="true" onfocus="handleFocus(this)" oninput="validateNumber(this)" style="width: 100px; max-width: 100px"></td>
+                  <td class="align-middle ps-3 editable-cell" style="background: #FFFBDF" contenteditable="true" onfocus="handleFocus(this)" oninput="validateNumber(this)" onkeydown="preventEnter(event)" style="width: 100px; max-width: 100px"></td>
                 </tr>
               `;
             });
@@ -1703,6 +1710,12 @@ function handleFocus(el) {
   el.style.boxShadow = "none";
 
   $(el).removeClass("border border-danger");
+}
+
+function preventEnter(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+  }
 }
 
 function validateNumber(el) {
@@ -1798,8 +1811,6 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
           let encodedItems = [];
 
           let submitBtn = $(form).find("button[type='submit'].save-btn");
-          // let submitBtn = $(this).find(".save-btn");
-          console.log(submitBtn.length);
           submitBtn
             .prop("disabled", true)
             .html(
@@ -1898,9 +1909,14 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
                 text: "Please check console for details",
               });
             },
+            complete: function () {
+              submitBtn
+                .prop("disabled", false)
+                .html("Save");
+            }
           });
 
-          submitBtn.prop("disabled", false);
+          // submitBtn.prop("disabled", false);
         }
       });
     });
@@ -2000,7 +2016,7 @@ function editEncodedQty(picklistNum) {
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemName}</td>
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemCategory}</td>
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.totalQty}</td>
-                  <td class="align-middle ps-3 editable-cell" style="background: #FFFBDF" contenteditable="true" onfocus="handleFocus(this)" oninput="validateNumber(this)">${item.Actual_Item_Qty}</td>
+                  <td class="align-middle ps-3 editable-cell" style="background: #FFFBDF" contenteditable="true" onfocus="handleFocus(this)" oninput="validateNumber(this)" onkeydown="preventEnter(event)">${item.Actual_Item_Qty}</td>
                 </tr>
               `;
             });

@@ -348,7 +348,7 @@ function loadItems() {
             // Create new row
             let row = `<tr class="item-row">
                      <td class="ps-2 align-middle d-none" name="temp-itemnum[]">${item.ItemNum}</td>
-                    <td class="ps-2 align-middle" style="background: #FFFBDF; padding: 3px">${item.DisplayRowNumber}</td>
+                    <td class="ps-2 align-middle text-center" style="background: #FFFBDF; padding: 3px">${item.DisplayRowNumber}</td>
                     <td class="ps-2 align-middle item-brand" style="background: #FFFBDF; padding: 3px">${item.ItemBrand}</td>
                     <td class="ps-2 align-middle item-model" style="background: #FFFBDF; padding: 3px">${item.ItemName}</td>
                     <td class="ps-2 align-middle item-category" style="background: #FFFBDF; padding: 3px">${item.ItemGroup}</td>

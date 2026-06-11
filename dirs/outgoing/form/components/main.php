@@ -55,7 +55,7 @@
                             <table class="table table-hover" id="outgoingTable">
                                 <thead class="sticky-top">
                                     <tr>
-                                        <th class="text-secondary">#</th>
+                                        <th class="text-secondary text-center">#</th>
                                         <th class="text-secondary">Brand</th>
                                         <th class="text-secondary">Model</th>
                                         <th class="text-secondary">Category</th>
