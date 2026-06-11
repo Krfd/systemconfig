@@ -341,28 +341,55 @@ function getBatchItems(batch, tableSelector) {
         $("#plate").val(header.TruckPlate);
         $("#remarks").val(header.Remarks);
 
+        // let groupedItems = {};
+
+        // items.forEach((item) => {
+        //   let model = item.Model;
+        //   let pk = item.PKList_Number;
+        //   let qty = parseInt(item.Deliver_Qty) || 0;
+
+        //   if (!groupedItems[model]) {
+        //     groupedItems[model] = {
+        //       ...item,
+        //       Deliver_Qty: qty, // take ONLY first row value
+        //       PKList_Numbers: [],
+        //       processedPKs: {},
+        //     };
+        //   }
+
+        //   // track PKs only
+        //   if (!groupedItems[model].PKList_Numbers.includes(pk)) {
+        //     groupedItems[model].PKList_Numbers.push(pk);
+        //   }
+
+        //   groupedItems[model].processedPKs[pk] = true;
+        // });
+
         let groupedItems = {};
 
         items.forEach((item) => {
-          let model = item.Model;
+          let itemCode = item.ItemCode;
           let pk = item.PKList_Number;
           let qty = parseInt(item.Deliver_Qty) || 0;
 
-          if (!groupedItems[model]) {
-            groupedItems[model] = {
+          if (!groupedItems[itemCode]) {
+            groupedItems[itemCode] = {
               ...item,
-              Deliver_Qty: qty, // take ONLY first row value
+              Deliver_Qty: 0,
               PKList_Numbers: [],
               processedPKs: {},
             };
           }
 
-          // track PKs only
-          if (!groupedItems[model].PKList_Numbers.includes(pk)) {
-            groupedItems[model].PKList_Numbers.push(pk);
+          // SUM quantity per ItemCode
+          groupedItems[itemCode].Deliver_Qty += qty;
+
+          // track unique PKs
+          if (!groupedItems[itemCode].PKList_Numbers.includes(pk)) {
+            groupedItems[itemCode].PKList_Numbers.push(pk);
           }
 
-          groupedItems[model].processedPKs[pk] = true;
+          groupedItems[itemCode].processedPKs[pk] = true;
         });
 
         Object.values(groupedItems).forEach((item) => {
@@ -375,24 +402,19 @@ function getBatchItems(batch, tableSelector) {
               class="item-row"
               style="height: 40px; min-height: 40px; cursor: pointer"
               data-pklist='${JSON.stringify(item.PKList_Numbers)}'
-              data-itemid="${item.ItemRowNum}"
-              >
+              data-itemid="${item.ItemRowNum}">
               <td class="align-middle ps-3" style="background: #FFFBDF">
                 ${counter}
               </td>
-
               <td class="align-middle ps-3 text-primary" style="background: #FFFBDF">
                 ${item.Brand}
               </td>
-
               <td class="align-middle ps-3" style="background: #FFFBDF">
                 ${item.Model}
               </td>
-
               <td class="align-middle ps-3" style="background: #FFFBDF">
                 ${item.Category}
               </td>
-
               <td class="align-middle ps-3" style="background: #FFFBDF">
                 ${item.Deliver_Qty}
               </td>

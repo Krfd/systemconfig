@@ -15,6 +15,17 @@ $TruckCat           = $_POST['TruckCat'] ?? '';
 $Plate              = $_POST['Plate'] ?? '';
 $Remarks            = $_POST['Remarks'] ?? '';
 
+$debugText = "=== Item_Id ===\n";
+$debugText .= print_r($Item_Id, true);
+
+$debugText .= "\n=== ItemSerial ===\n";
+$debugText .= print_r($ItemSerial, true);
+
+$debugText .= "\n=== PickListnumber ===\n";
+$debugText .= print_r($PickListnumber, true);
+
+file_put_contents('post_debug.txt', $debugText);
+
 try {
     $conn->beginTransaction();
 
@@ -46,8 +57,9 @@ try {
     function getBranch($conn, $itemId, $picklist)
     {
         $stmt = $conn->prepare("EXEC dbo.[Get_Branch] ?, ?");
-        $stmt->execute([$itemId, $picklist]);
-        return $stmt->fetchColumn();
+        $stmt->execute([$itemId,  $picklist]);
+        $branch = $stmt->fetchColumn();
+        return trim((string)$branch);
     }
 
     $BatchNumber = $result['BatchNumber'];
@@ -58,6 +70,10 @@ try {
 
     $referenceMap = [];
 
+
+    $groupedItems = [];
+
+
     foreach ($Item_Id as $key => $itmid) {
         if (empty($itmid)) {
             continue;
@@ -67,7 +83,34 @@ try {
         $picklist   = $PickListnumber[$key] ?? null;
         $qty   = $ItemQty[$key] ?? null;
 
+
+
         $branch = getBranch($conn, $itmid, $picklist);
+        // $logLines[] = "PAIR => key={$key} | Item={$itmid} | Picklist=" . ($picklist ?? 'NULL');
+        if ($branch === '') {
+            throw new Exception("Branch not found for Item ID {$itmid} and Picklist {$picklist}");
+        }
+
+        // FOR LOGS
+        if (!isset($groupedItems[$itmid])) {
+            $groupedItems[$itmid] = [
+                'ItemId' => $itmid,
+                'TotalQty' => 0,
+                'Branch' => $branch,
+                'Picklists' => [],
+                'Serials' => []
+            ];
+        }
+
+        $groupedItems[$itmid]['TotalQty'] += (float)$qty;
+
+        if (!empty($picklist)) {
+            $groupedItems[$itmid]['Picklists'][] = $picklist;
+        }
+
+        if (!empty($serial)) {
+            $groupedItems[$itmid]['Serials'][] = $serial;
+        }
 
         if (!isset($referenceMap[$branch])) {
             $referenceMap[$branch] = generateReference();
@@ -82,15 +125,28 @@ try {
             $BatchNumber,
             $picklist,
             $serial,
-            $qty
+            // $qty
+            $groupedItems[$itmid]['TotalQty']
         ]);
+    }
 
-        $logLines[] = "PickList: {$picklist} | Item ID: {$itmid}";
+    $logLines[] = "\n=== GROUPED ITEM SUMMARY ===";
+
+    foreach ($groupedItems as $item) {
+
+        $uniquePicklists = array_unique($item['Picklists']);
+        $uniqueSerials   = array_unique($item['Serials']);
+
+        $logLines[] =
+            "Item ID: {$item['ItemId']} | " .
+            "Total Qty: {$item['TotalQty']} | " .
+            "Branch: {$item['Branch']} | " .
+            "Picklists: " . implode(', ', $uniquePicklists) . " | " .
+            "Serials: " . implode(', ', $uniqueSerials);
     }
 
     $fileName = "picklist_log_" . date('Ymd_His') . ".txt";
     $filePath = $fileName;
-
     file_put_contents($filePath, implode(PHP_EOL, $logLines));
 
     $stmtHeader = $conn->prepare("EXEC dbo.CreateLoadingBasket_headerV2 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");

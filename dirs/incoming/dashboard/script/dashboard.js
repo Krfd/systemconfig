@@ -748,8 +748,10 @@ function openIncoming(DocEntry) {
           const date = new Date(header.EncodeDate);
 
           const formattedDate =
-            String(date.getMonth() + 1).padStart(2, '0') + '-' +
-            String(date.getDate()).padStart(2, '0') + '-' +
+            String(date.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(date.getDate()).padStart(2, "0") +
+            "-" +
             String(date.getFullYear()).slice(-2);
 
           // ================= HEADER =================
@@ -1910,10 +1912,8 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
               });
             },
             complete: function () {
-              submitBtn
-                .prop("disabled", false)
-                .html("Save");
-            }
+              submitBtn.prop("disabled", false).html("Save");
+            },
           });
 
           // submitBtn.prop("disabled", false);
