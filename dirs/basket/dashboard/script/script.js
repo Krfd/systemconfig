@@ -1549,6 +1549,7 @@ function editAssignBranch(picklist, branchees) {
 
 // SUBMIT BRANCH ASSIGNMENT
 function submitBranchAssignment() {
+  // let commitBtn = document.getElementById("branchAssignmentBtn");
   let commitBtn = document.getElementById("branchAssignmentBtn");
 
   commitBtn.addEventListener("click", function (e) {
@@ -1592,7 +1593,7 @@ function submitBranchAssignment() {
         let items = [];
 
         // let commitButton = $(this).find("button[type='submit'].commit-btn")
-        commitBtn.prop("disabled", true).html(`<span class="spinner-border spinner-border-sm"></span> Commit`)
+        // commitButton.prop("disabled", true).html(`<span class="spinner-border spinner-border-sm"></span> Commit`)
 
         let hasUnassigned = false;
 
@@ -1644,7 +1645,7 @@ function submitBranchAssignment() {
             title: "Unassigned Items Found",
             text: "Please assign all items before submitting.",
           });
-          commitButton.prop("disabled", false).html("Commit")
+          // commitButton.prop("disabled", false).html("Commit")
           return;
         }
 
@@ -1655,7 +1656,7 @@ function submitBranchAssignment() {
             title: "No items on summary",
             text: "No item(s) found on the summary",
           });
-          commitButton.prop("disabled", false).html("Commit")
+          // commitButton.prop("disabled", false).html("Commit")
           return;
         }
 
@@ -1732,7 +1733,7 @@ function submitBranchAssignment() {
             });
           },
         });
-        commitButton.prop("disabled", false).html("Commit")
+        // commitButton.prop("disabled", false).html("Commit")
       }
     });
   });

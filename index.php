@@ -32,8 +32,9 @@ try {
     <link rel="stylesheet" href="assets/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
     <link rel="stylesheet" href="assets/plugins/daterangepicker/daterangepicker.css">
     <link rel="stylesheet" href="assets/plugins/bootstrap-icons/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/plugins/datatables/datatables.min.css">
-    <!-- <link rel="stylesheet" href="assets/css/datatables.min.css"> -->
+    <!-- <link rel="stylesheet" href="assets/plugins/datatables/datatables.min.css"> -->
+    <link rel="stylesheet" href="assets/plugins/datatabless/dataTables.css">
+    <link rel="stylesheet" href="assets/css/datatables.min.css">
     <link rel="stylesheet" href="assets/plugins/toastr/toastr.min.css">
     <link rel="stylesheet" href="assets/plugins/sweetalert2/sweetalert2.min.css">
     <link rel="stylesheet" href="assets/plugins/daterangepicker/daterangepicker.css">
@@ -186,6 +187,7 @@ try {
     <script src="assets/plugins/moment/moment.min.js"></script>
     <script src="assets/plugins/daterangepicker/daterangepicker.js"></script>
     <script src="assets/plugins/datatables/datatables.min.js"></script>
+    <script src="assets/plugins/datatabless/dataTables.js"></script>
     <script src="assets/plugins/daterangepicker/daterangepicker.js"></script>
     <script src="assets/plugins/summernote/summernote-lite.min.js"></script>
     <script src="assets/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>

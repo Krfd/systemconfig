@@ -11,12 +11,21 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
+  $("#incoming_content").html(spinner);
   $.post("dirs/incoming/dashboard/components/main.php", {}, function (data) {
     $("#incoming_content").html(data);
-    loadIncoming();
-    $("#incomingTableDisplay").DataTable({
-      pageLength: 50,
-      order: [0, "desc"],
+    
+    $("#incomingTableDisplay tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
+    
+    loadIncoming(() => {
+      $("#incomingTableDisplay").DataTable({
+        pageLength: 50,
+        order: [0, "desc"],
+      });
     });
   });
   cancelPicklist();
@@ -141,7 +150,8 @@ function loadIncoming() {
           },
           rowCallback: function (row, data, index) {
             $("td:not(:first-child)", row).css({
-              background: "#FFFBDF",
+              // background: "#FFFBDF",
+              background: "#fcf7d4",
               padding: "3px",
               height: "40px",
               "min-height": "40px",
@@ -157,7 +167,8 @@ function loadIncoming() {
                 $(this).css("background", "#FFF4C2");
               },
               function () {
-                $(this).css("background", "#FFFBDF");
+                // $(this).css("background", "#FFFBDF");
+                $(this).css("background", "#fcf7d4");
               },
             );
           },
@@ -182,7 +193,8 @@ function loadIncoming() {
                   $("td:not(:first-child)", this).css("background", "#FFF4C2");
                 },
                 function () {
-                  $("td:not(:first-child)", this).css("background", "#FFFBDF");
+                  // $("td:not(:first-child)", this).css("background", "#FFFBDF");
+                  $("td:not(:first-child)", this).css("background", "#fcf7d4");
                 },
               );
               tableBody.append($emptyRow);
@@ -815,16 +827,37 @@ function openIncoming(DocEntry) {
 }
 
 function picklistBasket() {
-  if ($.fn.DataTable.isDataTable("#basketTable")) {
-    $("#basketTable").DataTable().clear().destroy();
-  }
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
-      $("#main-content").hide().html(data).fadeIn(200);
-      loadBasket();
-    });
-  }, 200);
+  $("#incoming_content").html(spinner);
+  $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
+    $("#main-content").html(data);
+  // if ($.fn.DataTable.isDataTable("#basketTable")) {
+  //   $("#basketTable").DataTable().clear().destroy();
+  // }
+  // $("#main-content").html(spinner);
+
+    $("#basketTable tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
+
+    // console.log(`SHOULD LOAD SPINNER HERE`)
+
+  // setTimeout(function () {
+  //   $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
+  //     $("#main-content").hide().html(data).fadeIn(200);
+      // loadBasket();
+  //   });
+  // // }, 200);
+
+  loadBasket(() => {
+    $("#basketTable").DataTable({
+        pageLength: 50,
+        order: [0, "desc"],
+      });
+  }, 200)
+
+})
 }
 
 function loadIncomingDashboard() {
@@ -852,9 +885,27 @@ $(document).on("dblclick", "#basketTable tbody .open-picklist", function (e) {
 
   $("#main-content").html(spinner);
 
-  setTimeout(function () {
+  // setTimeout(function () {
+    $("#picklistItemTable tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
     openPicklist(picklistNum);
-  }, 200);
+
+
+    //  $.post(
+    //   "dirs/incoming/dashboard/picklistItem.php",
+    //   { picklistNum: picklistNumRef },
+    //   function (data) {
+    //     $("#main-content").html(data);
+
+    //     $("#picklistItemTable tbody").html(`
+    //       <tr>
+    //         <td colspan="100%" class="text-center">${spinner}</td>
+    //       </tr>
+    //     `);
+  // }, 200);
 });
 
 $(document).on("click", ".dropdown .open-picklist-items", function (e) {
@@ -867,6 +918,11 @@ $(document).on("click", ".dropdown .open-picklist-items", function (e) {
 
   $("#main-content").html(spinner);
   setTimeout(function () {
+    $("#basketTable tbody").html(`
+        <tr>
+          <td colspan="100%" class="text-center">${spinner}</td>
+        </tr>
+      `);
     openPicklist(picklistNum);
   }, 200);
 });
@@ -929,6 +985,7 @@ $(document).on("click", ".dropdown .single-dr", function (e) {
 });
 
 function openPicklist(picklistNum) {
+  console.log(`OPENING PICKLIST`)
   $.post(
     "dirs/incoming/dashboard/picklistItem.php",
     { picklistNum: picklistNum },
@@ -1033,16 +1090,31 @@ function openPicklist(picklistNum) {
 
 // DISPLAY PICKLIST
 function loadPicklistItems() {
-  $("#main-content").html(spinner);
-  setTimeout(function () {
+  $("#incoming_content").html(spinner);
+
+  // $("#picklistItemTable tbody").html(`
+  //   <tr>
+  //     <td colspan="100%" class="text-center">${spinner}</td>
+  //   </tr>
+  // `);
+
+  // setTimeout(function () {
+
     $.post(
       "dirs/incoming/dashboard/picklistItem.php",
       { picklistNum: picklistNumRef },
       function (data) {
+        $("#main-content").html(data);
+
+        $("#picklistItemTable tbody").html(`
+          <tr>
+            <td colspan="100%" class="text-center">${spinner}</td>
+          </tr>
+        `);
         openPicklist(picklistNumRef);
       },
     );
-  }, 200);
+  // }, 200);
 }
 
 // CANCEL PICKLIST
@@ -1074,13 +1146,20 @@ function cancelPicklist() {
 
 // PICKLIST ITEMS
 function loadBasketContent() {
-  $("#main-content").html(spinner);
-  setTimeout(function () {
+  // $("#main-content").html(spinner);
+  $("#incoming_content").html(spinner);
+  // setTimeout(function () {
     $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
       $("#main-content").hide().html(data).fadeIn(200);
+
+      $("#basketTable tbody").html(`
+        <tr>
+          <td colspan="100%" class="text-center">${spinner}</td>
+        </tr>
+      `);
       loadBasket();
     });
-  }, 200);
+  // }, 200);
 }
 
 // ALREADY HAS A PICKLIST NUMBER
@@ -1174,8 +1253,8 @@ function openPicklistedForm(SR_Number) {
 
 // DISPLAY BASKET
 function loadBasket() {
-  $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
-    $("#main-content").html(data);
+  // $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
+  //   $("#main-content").html(data);
 
     $.ajax({
       url: "dirs/incoming/dashboard/actions/picklisteditems.php",
@@ -1340,7 +1419,8 @@ function loadBasket() {
               const isEmptyRow = !data[0];
 
               $("td", row).css({
-                background: "#FFFBDF",
+                // background: "#FFFBDF",
+                background: "#fcf7d4",
                 padding: "3px",
                 height: "40px",
                 "min-height": "40px",
@@ -1359,7 +1439,8 @@ function loadBasket() {
                   $(this).css("background", "#FFF4C2");
                 },
                 function () {
-                  $(this).css("background", "#FFFBDF");
+                  // $(this).css("background", "#FFFBDF");
+                  $(this).css("background", "#fcf7d4");
                 },
               );
             },
@@ -1368,12 +1449,17 @@ function loadBasket() {
               let currentRows = tableBody.find("tr").length;
 
               for (let i = currentRows; i < 8; i++) {
+                // let $emptyRow = $(`
+                // <tr class="empty-row" style="background: #FFFBDF">
+                //   <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
+                // </tr>`);
                 let $emptyRow = $(`
-                <tr class="empty-row" style="background: #FFFBDF">
-                  <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
+                <tr class="empty-row">
+                  <td colspan="5" style="background: #fcf7d4">&nbsp;</td>
                 </tr>`);
                 $emptyRow.css({
-                  background: "#FFFBDF",
+                  // background: "#FFFBDF",
+                  background: "#fcf7d4",
                   height: "50px",
                   "min-height": "50px",
                 });
@@ -1382,7 +1468,8 @@ function loadBasket() {
                     $(this).css("background", "#FFF4C2");
                   },
                   function () {
-                    $(this).css("background", "#FFFBDF");
+                    // $(this).css("background", "#FFFBDF");
+                    $(this).css("background", "#fcf7d4");
                   },
                 );
                 tableBody.append($emptyRow);
@@ -1505,7 +1592,7 @@ function loadBasket() {
         console.error("Error loading outgoing data: ", error);
       },
     });
-  });
+  // });
 }
 
 function formattedDate() {
@@ -2300,7 +2387,17 @@ function submitDelivery(srn) {
                 "_blank",
               );
 
-              loadBasket();
+              $("#incoming_content").html(spinner);
+                $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
+                  $("#main-content").hide().html(data).fadeIn(200);
+
+                  $("#basketTable tbody").html(`
+                    <tr>
+                      <td colspan="100%" class="text-center">${spinner}</td>
+                    </tr>
+                  `);
+                loadBasket();
+              })
             });
           }
 
