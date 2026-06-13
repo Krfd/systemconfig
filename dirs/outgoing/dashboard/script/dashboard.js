@@ -26,7 +26,7 @@ function loadDashboard() {
     loadOutgoing(() => {
       $("#outgoingTableDisplay").DataTable({
         pageLength: 50,
-        // order: [0, "asc"],
+        order: [0, "asc"],
       });
     });
   });

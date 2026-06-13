@@ -15,17 +15,6 @@ $TruckCat           = $_POST['TruckCat'] ?? '';
 $Plate              = $_POST['Plate'] ?? '';
 $Remarks            = $_POST['Remarks'] ?? '';
 
-$debugText = "=== Item_Id ===\n";
-$debugText .= print_r($Item_Id, true);
-
-$debugText .= "\n=== ItemSerial ===\n";
-$debugText .= print_r($ItemSerial, true);
-
-$debugText .= "\n=== PickListnumber ===\n";
-$debugText .= print_r($PickListnumber, true);
-
-file_put_contents('post_debug.txt', $debugText);
-
 try {
     $conn->beginTransaction();
 
@@ -70,39 +59,92 @@ try {
 
     $referenceMap = [];
 
-
     $groupedItems = [];
 
+    // foreach ($Item_Id as $key => $itmid) {
+    //     if (empty($itmid)) {
+    //         continue;
+    //     }
+
+    //     $serial     = $ItemSerial[$key] ?? null;
+    //     $picklist   = $PickListnumber[$key] ?? null;
+    //     // $qty   = $ItemQty[$key] ?? null;
+    //     $qty = (float)($ItemQty[$key] ?? 0);
+
+    //     $branch = getBranch($conn, $itmid, $picklist);
+    //     if ($branch === '') {
+    //         throw new Exception("Branch not found for Item ID {$itmid} and Picklist {$picklist}");
+    //     }
+
+    //     // FOR LOGS
+    //     if (!isset($groupedItems[$itmid])) {
+    //         $groupedItems[$itmid] = [
+    //             'ItemId' => $itmid,
+    //             'TotalQty' => 0,
+    //             'Branch' => $branch,
+    //             'Picklists' => [],
+    //             'Serials' => []
+    //         ];
+    //     }
+
+    //     $groupedItems[$itmid]['TotalQty'] += $qty;
+
+    //     if (!empty($picklist)) {
+    //         $groupedItems[$itmid]['Picklists'][] = $picklist;
+    //     }
+
+    //     if (!empty($serial)) {
+    //         $groupedItems[$itmid]['Serials'][] = $serial;
+    //     }
+
+    //     if (!isset($referenceMap[$branch])) {
+    //         $referenceMap[$branch] = generateReference();
+    //     }
+
+    //     $referenceNumber = $referenceMap[$branch];
+
+    //     $stmtCollect->execute([
+    //         $User,
+    //         $itmid,
+    //         $referenceNumber,
+    //         $BatchNumber,
+    //         $picklist,
+    //         $serial,
+    //         $qty
+    //         // $groupedItems[$itmid]['TotalQty']
+    //     ]);
+    // }
 
     foreach ($Item_Id as $key => $itmid) {
+
         if (empty($itmid)) {
             continue;
         }
 
-        $serial     = $ItemSerial[$key] ?? null;
-        $picklist   = $PickListnumber[$key] ?? null;
-        $qty   = $ItemQty[$key] ?? null;
-
-
+        $serial   = $ItemSerial[$key] ?? null;
+        $picklist = $PickListnumber[$key] ?? null;
+        $qty      = (float)($ItemQty[$key] ?? 0);
 
         $branch = getBranch($conn, $itmid, $picklist);
-        // $logLines[] = "PAIR => key={$key} | Item={$itmid} | Picklist=" . ($picklist ?? 'NULL');
+
         if ($branch === '') {
-            throw new Exception("Branch not found for Item ID {$itmid} and Picklist {$picklist}");
+            throw new Exception(
+                "Branch not found for Item ID {$itmid} and Picklist {$picklist}"
+            );
         }
 
-        // FOR LOGS
         if (!isset($groupedItems[$itmid])) {
+
             $groupedItems[$itmid] = [
-                'ItemId' => $itmid,
-                'TotalQty' => 0,
-                'Branch' => $branch,
+                'ItemId'    => $itmid,
+                'TotalQty'  => 0,
+                'Branch'    => $branch,
                 'Picklists' => [],
-                'Serials' => []
+                'Serials'   => []
             ];
         }
 
-        $groupedItems[$itmid]['TotalQty'] += (float)$qty;
+        $groupedItems[$itmid]['TotalQty'] += $qty;
 
         if (!empty($picklist)) {
             $groupedItems[$itmid]['Picklists'][] = $picklist;
@@ -111,6 +153,17 @@ try {
         if (!empty($serial)) {
             $groupedItems[$itmid]['Serials'][] = $serial;
         }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | EXECUTE STORED PROCEDURE ONCE PER GROUPED ITEM
+    |--------------------------------------------------------------------------
+    */
+
+    foreach ($groupedItems as $item) {
+
+        $branch = $item['Branch'];
 
         if (!isset($referenceMap[$branch])) {
             $referenceMap[$branch] = generateReference();
@@ -120,13 +173,12 @@ try {
 
         $stmtCollect->execute([
             $User,
-            $itmid,
+            $item['ItemId'],
             $referenceNumber,
             $BatchNumber,
-            $picklist,
-            $serial,
-            // $qty
-            $groupedItems[$itmid]['TotalQty']
+            $item['Picklists'][0] ?? null,
+            $item['Serials'][0] ?? null,
+            $item['TotalQty']
         ]);
     }
 

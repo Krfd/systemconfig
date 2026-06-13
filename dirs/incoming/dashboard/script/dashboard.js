@@ -950,16 +950,17 @@ function openPicklist(picklistNum) {
             );
 
             sortedData.forEach((item) => {
-              console.log(`ITEM : ${JSON.stringify(item)}`);
+              // console.log(`ITEM : ${JSON.stringify(item)}`);
               rows.push([
                 index++,
                 item.Brand || "",
                 item.Model || "",
                 item.Category || "",
                 item.Quantity ? Math.floor(Number(item.Quantity)) : "",
-                item.Actual_Quantity
-                  ? Math.floor(Number(item.Actual_Quantity))
-                  : "",
+                // item.Actual_Quantity
+                //   ? Math.floor(Number(item.Actual_Quantity))
+                //   : "",
+                item.Actual_Item_Qty ? Math.floor(Number(item.Actual_Item_Qty)) : ""
               ]);
             });
             // $("#picklistItemTable").DataTable().clear().destroy();

@@ -1,4 +1,4 @@
-<div class="d-flex justify-content-between align-items-start">
+<!-- <div class="d-flex justify-content-between align-items-start">
     <div class="d-flex justify-content-start align-items-start gap-3">
         <h3 class="fw-bold text-primary">Branch Assignment</h3>
     </div>
@@ -10,7 +10,7 @@
             Load Items
         </button>
     </div>
-</div>
+</div> -->
 <ul class="nav nav-tabs nav-tabs-bordered d-flex mt-5" id="borderedTabJustified" role="tablist">
     <li class="nav-item flex-fill" role="presentation">
         <button class="nav-link w-100 active" id="unassigned-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-all" type="button" role="tab" aria-controls="all" aria-selected="true">Unassigned</button>

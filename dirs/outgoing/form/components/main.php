@@ -97,6 +97,7 @@
                         </div>
                     </form>
                 </div>
+            </div>
         </section>
     </div>
 </div>
@@ -116,6 +117,9 @@
         var OWhscode = $("#originCodeForm").val();
         var DWhscode = $("#desCodeForm").val();
         var Remarks = $("#remarksForm").val();
+
+        let submitBtn = $(this).find("#submitFormBtn")
+        submitBtn.prop("disabled", true).html(`<span class="spinner-border spinner-border-sm"></span> Processing`)
 
         // 🔹 Collect items
         var Itemnumber = [];
@@ -142,8 +146,8 @@
             return;
         }
 
-        var btn = $(this).find("button[type='submit']");
-        btn.prop("disabled", true);
+        // var btn = $(this).find("button[type='submit']");
+        // btn.prop("disabled", true);
 
         $.post("dirs/outgoing/form/actions/save_stockrequest.php", {
             PurposeRequest: PurposeRequest,
@@ -171,6 +175,7 @@
                         console.log(`RESPONSE: ${res}`)
                         location.reload();
                     })
+                    submitBtn.prop("disabled", false).html("submit")
                 });
             } else {
                 Swal.fire({
@@ -179,7 +184,8 @@
                     text: data.message,
                 });
             }
-            btn.prop("disabled", false);
+            // btn.prop("disabled", false);
+            submitBtn.prop("disabled", false).html("Submit")
         });
 
     });

@@ -260,13 +260,22 @@ $(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function () {
   const target = this.id;
 
   if (target === "unassigned-tab") {
+     $("#basketTableDashboard tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
     loadDeliveryBasket(
       "#basketTableDashboard",
       "dirs/incoming/dashboard/actions/picklisteditems.php",
     );
     $("#loadDeliveryBtn").prop("disabled", true);
   } else if (target === "assigned-tab") {
-    // $("#main-content").html(spinner);
+     $("#basketTableAssigned tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
     setTimeout(function () {
       loadDeliveryBasket(
         "#basketTableAssigned",
@@ -1567,6 +1576,9 @@ function submitBranchAssignment() {
       }
     }
 
+    // let commitButton = $(this).find("button[type='submit'].commit-btn")
+    // commitButton.prop("disabled", true).html(`<span class="spinner-border spinner-border-sm"></span> Commit`)
+
     Swal.fire({
       icon: "warning",
       title: "Save branch assignment?",
@@ -1578,6 +1590,9 @@ function submitBranchAssignment() {
       if (res.isConfirmed) {
         // PROCEED FOR SUBMISSION
         let items = [];
+
+        // let commitButton = $(this).find("button[type='submit'].commit-btn")
+        commitBtn.prop("disabled", true).html(`<span class="spinner-border spinner-border-sm"></span> Commit`)
 
         let hasUnassigned = false;
 
@@ -1629,6 +1644,7 @@ function submitBranchAssignment() {
             title: "Unassigned Items Found",
             text: "Please assign all items before submitting.",
           });
+          commitButton.prop("disabled", false).html("Commit")
           return;
         }
 
@@ -1639,6 +1655,7 @@ function submitBranchAssignment() {
             title: "No items on summary",
             text: "No item(s) found on the summary",
           });
+          commitButton.prop("disabled", false).html("Commit")
           return;
         }
 
@@ -1715,6 +1732,7 @@ function submitBranchAssignment() {
             });
           },
         });
+        commitButton.prop("disabled", false).html("Commit")
       }
     });
   });
@@ -2937,6 +2955,8 @@ function serialDeliveryInput(Picklists) {
                   let totalActualPerModel =
                     parseInt(res.Data?.[0]?.Total_Actual_Item_Qty) || 0;
 
+                    console.log(`TOTAL ACTUAL PER MODEL : ${totalActualPerModel}`)
+
                   $.ajax({
                     url: "dirs/basket/dashboard/actions/get_dsplaybatch_models.php",
                     type: "POST",
@@ -2949,9 +2969,9 @@ function serialDeliveryInput(Picklists) {
                         data &&
                         data.length > 0
                       ) {
-                        console.log(
-                          `DISPLAY BATCH MODELS DATA : ${JSON.stringify(data)}`,
-                        );
+                        // console.log(
+                        //   `DISPLAY BATCH MODELS DATA : ${JSON.stringify(data)}`,
+                        // );
                         console.log(``);
                         Object.values(groupedItems).forEach(function (item) {
                           let brand = item.ItemBrand;
@@ -3488,6 +3508,14 @@ function submitLoadingBasket(Picklists) {
     .on("submit", function (e) {
       e.preventDefault();
 
+       let commitBtn = $(this).find("button[type='submit'].commit-btn");
+          commitBtn
+            .prop("disabled", true)
+            .html(
+              `<span class="spinner-border spinner-border-sm"></span> Loading`,
+            );
+
+
       const rowsWithItems = $("#loadBasketTable tbody tr").filter(function () {
         // return $(this).attr("data-itemid");
         return $(this).attr("data-itemmapping");
@@ -3499,7 +3527,7 @@ function submitLoadingBasket(Picklists) {
           title: "No items found",
           text: "Please add item(s) to the loading basket first.",
         });
-
+        commitBtn.prop("disabled", false).html("Load");
         return;
       }
 
@@ -3662,12 +3690,12 @@ function submitLoadingBasket(Picklists) {
         cancelButtonText: "Back",
       }).then((result) => {
         if (result.isConfirmed) {
-          let commitBtn = $(this).find("button[type='submit'].commit-btn");
-          commitBtn
-            .prop("disabled", true)
-            .html(
-              `<span class="spinner-border spinner-border-sm"></span> Loading`,
-            );
+          // let commitBtn = $(this).find("button[type='submit'].commit-btn");
+          // commitBtn
+          //   .prop("disabled", true)
+          //   .html(
+          //     `<span class="spinner-border spinner-border-sm"></span> Loading`,
+          //   );
 
           $.ajax({
             url: "dirs/basket/dashboard/actions/save_create_loading_basketv2.php",
@@ -3714,5 +3742,6 @@ function submitLoadingBasket(Picklists) {
           });
         }
       });
+      commitBtn.prop("disabled", false).html("Load");
     });
 }

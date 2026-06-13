@@ -101,7 +101,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button class="clearfix btn btn-primary float-end" type="submit" id="branchAssignmentBtn">Commit</button>
+                                <button class="clearfix btn btn-primary float-end commit-btn" type="submit" id="branchAssignmentBtn">Commit</button>
                             </div>
                         </form>
                     </div>
