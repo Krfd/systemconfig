@@ -13,8 +13,30 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
+  $("#form-content").html(spinner);
   $.post("dirs/outgoing/form/components/main.php", {}, function (data) {
     $("#form-content").html(data);
+    $("#outgoingTable tbody").html(`
+      <tr>
+        <td colspan="6" class="text-center">${spinner}</td>
+      </tr>
+    `);
+  //   $("#outgoingTable tbody").html(`
+  //   <tr>
+  //     <td colspan="6" style="padding:0;">
+  //       <div style="
+  //         height: inherit;
+  //         width: 100%;
+  //         display: flex;
+  //         align-items: center;
+  //         justify-content: center;
+  //       ">
+  //         ${spinner}
+  //       </div>
+  //     </td>
+  //   </tr>
+  // `);
+    console.log(`UPDATED SPINNER`)
     loadImperialBrands();
     get_SRN();
     loadIAPBranches();
@@ -303,14 +325,14 @@ $("#newModel").on("change", function () {
 });
 
 function loadItems() {
+  // $("#form-content").html(spinner);
   $.ajax({
-    url: "dirs/outgoing/form/actions/get_prepitem.php", // your API file
+    url: "dirs/outgoing/form/actions/get_prepitem.php", 
     type: "POST",
     data: {},
     dataType: "json",
     // beforeSend: function () {
     //   let tbody = $("#outgoingTable tbody");
-
     //   tbody.html(`
     //         <tr>
     //             <td colspan="6" class="text-center" style="background:#FFFBDF;">
@@ -320,17 +342,25 @@ function loadItems() {
     //         </tr>
     //     `);
     // },
+    // beforeSend: function () {
+    // $("#outgoingTable tbody").html(`
+    //     <tr>
+    //         <td colspan="6" style="height:240px; background:#FFFBDF;" class="text-center align-middle">
+    //             <span class="spinner-border spinner-border-sm text-secondary me-2"></span>
+    //             Loading items...
+    //         </td>
+    //     </tr>
+    // `);
+    // },
 
-    // ACCUMULATES
     success: function (response) {
       let tbody = $("#outgoingTable tbody");
-      tbody.empty(); // remove yellow placeholder row
+      tbody.empty(); 
 
       if (response.isSuccess === "success" && response.Data.length > 0) {
         let rowCount = response.Data.length;
         let totalQty = 0;
 
-        // Track existing items by ItemCode
         let existingItems = {};
 
         $.each(response.Data, function (index, item) {
@@ -338,32 +368,13 @@ function loadItems() {
           totalQty += quantity;
 
           if (existingItems[item.ItemCode]) {
-            // If row already exists, accumulate quantity
             let $existingRow = existingItems[item.ItemCode];
             let oldQty =
               parseFloat($existingRow.find(".item-quantity").text()) || 0;
             let newQty = oldQty + quantity;
             $existingRow.find(".item-quantity").text(newQty);
           } else {
-            // let row = `<tr class="item-row">
-            //          <td class="ps-2 align-middle d-none" name="temp-itemnum[]">${item.ItemNum}</td>
-            //         <td class="ps-2 align-middle text-center" style="background: #FFFBDF; padding: 3px">${item.DisplayRowNumber}</td>
-            //         <td class="ps-2 align-middle item-brand" style="background: #FFFBDF; padding: 3px">${item.ItemBrand}</td>
-            //         <td class="ps-2 align-middle item-model" style="background: #FFFBDF; padding: 3px">${item.ItemName}</td>
-            //         <td class="ps-2 align-middle item-category" style="background: #FFFBDF; padding: 3px">${item.ItemGroup}</td>
-            //         <td class="ps-2 align-middle item-code" hidden>${item.ItemCode}</td>
-            //         <td class="ps-2 align-middle item-quantity text-center" style="background: #FFFBDF; padding: 3px">${item.Quantity}</td>
-            //         <td class="ps-2 align-middle d-flex gap-1" style="background: #FFFBDF; padding: 3px">
-            //             <button type="button" class="btn btn-sm btn-danger remove-item-button" onclick="reduceItemQty('${item.ItemNum}')">
-            //                 <i class="bi bi-dash"></i>
-            //             </button>
-            //             <button type="button" class="btn btn-sm btn-primary add-item-button"  onclick="addItemQty('${item.ItemNum}')">
-            //                 <i class="bi bi-plus"></i>
-            //             </button>
-            //         </td>
-            //     </tr>`;
-          
-                let row = `<tr class="item-row">
+                let row = `<tr class="item-row" style="height: 40px; max-height: 40px">
                      <td class="ps-2 align-middle d-none" name="temp-itemnum[]">${item.ItemNum}</td>
                     <td class="ps-2 align-middle text-center" style="background: #fcf7d4;">${item.DisplayRowNumber}</td>
                     <td class="ps-2 align-middle text-center item-brand" style="background: #fcf7d4;">${item.ItemBrand}</td>
@@ -371,44 +382,48 @@ function loadItems() {
                     <td class="ps-5 align-middle text-start item-category" style="background: #fcf7d4;">${item.ItemGroup}</td>
                     <td class="ps-2 align-middle item-code" hidden>${item.ItemCode}</td>
                     <td class="ps-2 align-middle item-quantity text-center" style="background: #fcf7d4;">${item.Quantity}</td>
-                    <td class="pe-4 text-end d-flex gap-1 justify-content-end" style="background: #fcf7d4;">
+                    <td class="pe-4 text-end" style="background: #fcf7d4;">
+                      <div class="d-flex gap-1 justify-content-end">
                         <button type="button" class="btn btn-sm btn-danger remove-item-button" onclick="reduceItemQty('${item.ItemNum}')">
                             <i class="bi bi-dash"></i>
                         </button>
                         <button type="button" class="btn btn-sm btn-primary add-item-button"  onclick="addItemQty('${item.ItemNum}')">
                             <i class="bi bi-plus"></i>
                         </button>
+                      </div>
                     </td>
                 </tr>`;
 
+                
+
+                // <td class="pe-4" style="background: #fcf7d4;">
+                //       <div class="d-flex gap-1 justify-content-end">
+                //         <button type="button" class="btn btn-sm border-danger bg-danger-subtle text-danger-emphasis remove-item-button" onclick="reduceItemQty('${item.ItemNum}')">
+                //             <i class="bi bi-dash"></i>
+                //         </button>
+                //         <button type="button" class="btn btn-sm border-primary bg-primary-subtle text-primary-emphasis add-item-button"  onclick="addItemQty('${item.ItemNum}')">
+                //             <i class="bi bi-plus"></i>
+                //         </button>
+                //       </div>
+                //     </td>
+
             let $row = $(row);
             tbody.append($row);
-            existingItems[item.ItemCode] = $row; // track this row
+            existingItems[item.ItemCode] = $row; 
           }
         });
-
         if (rowCount < 6) {
           let emptyRowsNeeded = 6 - rowCount;
 
           for (let i = 0; i < emptyRowsNeeded; i++) {
-            // let emptyRow = `
-            //       <tr class="item-row empty-row" style="height: 40px; max-height: 40px">
-            //         <td style="background: #FFFBDF; padding: 0">&nbsp;</td>
-            //         <td style="background: #FFFBDF; padding: 0"></td>
-            //         <td style="background: #FFFBDF; padding: 0"></td>
-            //         <td style="background: #FFFBDF; padding: 0"></td>
-            //         <td style="background: #FFFBDF; padding: 0"></td>
-            //         <td style="background: #FFFBDF; padding: 0"></td>
-            //       </tr>
-            //     `;
             let emptyRow = `
                   <tr class="item-row empty-row" style="height: 40px; max-height: 40px">
-                    <td style="background: #fcf7d4; padding: 0">&nbsp;</td>
-                    <td style="background: #fcf7d4; padding: 0"></td>
-                    <td style="background: #fcf7d4; padding: 0"></td>
-                    <td style="background: #fcf7d4; padding: 0"></td>
-                    <td style="background: #fcf7d4; padding: 0"></td>
-                    <td style="background: #fcf7d4; padding: 0"></td>
+                    <td style="background: #fcf7d4">&nbsp;</td>
+                    <td style="background: #fcf7d4"></td>
+                    <td style="background: #fcf7d4"></td>
+                    <td style="background: #fcf7d4"></td>
+                    <td style="background: #fcf7d4"></td>
+                    <td style="background: #fcf7d4"></td>
                   </tr>
                 `;
             tbody.append(emptyRow);
@@ -416,22 +431,21 @@ function loadItems() {
         }
         $("#totalQuantity").text(totalQty);
       } 
-      // else {
-
-      //   for (let j = 0; j < 6; j++) {
-      //     let emptyRow = `
-      //       <tr class="item-row empty-row" style="height: 40px; max-height: 40px">
-      //         <td style="background: #fcf7d4; padding: 0">&nbsp;</td>
-      //         <td style="background: #fcf7d4; padding: 0"></td>
-      //         <td style="background: #fcf7d4; padding: 0"></td>
-      //         <td style="background: #fcf7d4; padding: 0"></td>
-      //         <td style="background: #fcf7d4; padding: 0"></td>
-      //         <td style="background: #fcf7d4; padding: 0"></td>
-      //       </tr>
-      //     `
-      //     tbody.append(emptyRow);
-      //   }
-      // }
+      else {
+        for (let j = 0; j < 6; j++) {
+          let emptyRow = `
+            <tr class="item-row empty-row" style="height: 40px; max-height: 40px">
+              <td style="background: #fcf7d4; padding: 0">&nbsp;</td>
+              <td style="background: #fcf7d4; padding: 0"></td>
+              <td style="background: #fcf7d4; padding: 0"></td>
+              <td style="background: #fcf7d4; padding: 0"></td>
+              <td style="background: #fcf7d4; padding: 0"></td>
+              <td style="background: #fcf7d4; padding: 0"></td>
+            </tr>
+          `
+          tbody.append(emptyRow);
+        }
+      }
     },
     error: function (xhr, status, error) {
       console.log(error);

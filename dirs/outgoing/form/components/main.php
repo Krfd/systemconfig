@@ -48,11 +48,11 @@
                             </div>
                         </div>
                         <div class="float-end my-3">
-                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addRequestUnit"><i class="bi bi-plus"></i> Add</button>
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addRequestUnit"> Add</button>
                             <button type="button" class="btn btn-sm btn-danger" onclick="clearTable()">Clear</button>
                         </div>
-                        <div class="table-responsive overflow-auto border border-secondary-subtle" style="max-height: 450px">
-                            <table class="table table-hover mb-0 w-100">
+                        <div class="table-responsive overall-progress border border-secondary-subtle" style="max-height: 450px; overflow-y: auto">
+                            <table class="table table-hover mb-0 w-100" id="outgoingTable">
                                 <thead class="sticky-top">
                                     <tr>
                                         <th class="text-secondary text-center">#</th>
@@ -115,8 +115,6 @@
                                 </tbody>
                             </table>
                         </div>
-                        <!-- <div id="totalRowOutside" class="d-flex border-top fw-bold"
-                            style="background:#FFF7BC;"> -->
                         <div id="totalRowOutside" class="d-flex border border-secondary fw-bold"
                             style="background:#faf0aa;">
                             <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>

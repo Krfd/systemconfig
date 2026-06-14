@@ -11,12 +11,20 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
+  $("#basket_content").html(spinner);
   $.post("dirs/basket/dashboard/components/main.php", {}, function (data) {
-    $("#basket_content").html(data);
-    $("#basketTableDashboard").DataTable({
-      pageLength: 50,
-      order: [0, "desc"],
-    });
+    // $("#basket_content").html(data);
+    $("#main-content").hide().html(data).fadeIn(200);
+    // $("#basketTableDashboard").DataTable({
+    //   pageLength: 50,
+    //   order: [0, "desc"],
+    // });
+    $("#basketTableDashboard tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
+    // console.log(`BRANCH ASSIGNMENT SPINNER : ${spinner}`)
     loadDeliveryBasket(
       "#basketTableDashboard",
       "dirs/incoming/dashboard/actions/picklisteditems.php",
@@ -132,9 +140,9 @@ $(document).on(
     // deliveryNum = del_num;
 
     $("#main-content").html(spinner);
-    setTimeout(function () {
+    // setTimeout(function () {
       loadDeliveryItems(PickLst_Num);
-    }, 200);
+    // }, 200);
   },
 );
 
@@ -144,69 +152,19 @@ $(document).on("click", ".dropdown .open-picklisted", function (e) {
 
   deliveryPicklistNum = Picklist;
 
-  $("#main-content").html(spinner);
-  setTimeout(function () {
+  $("#basket_content").html(spinner);
+  // setTimeout(function () {
+  // $.post("dirs/basket/dashboard/loadDeliveryItems.php", {}, function (data) {
+  //   $("#main-content").html(data);
+    // $("#deliveryItemsTable tbody").html(`
+    //     <tr>
+    //       <td colspan="100%" class="text-center">${spinner}</td>
+    //     </tr>
+    //   `);
     loadDeliveryItems(Picklist);
-  }, 200);
+  // })
+  // }, 200);
 });
-
-// $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
-//   let serial = $(this).data("serial");
-//   let itemCode = $(this).data("itemcode");
-//   let lbNum = $(this).data("lbnum");
-//   let brand = $(this).find("td:nth-child(1)").text().trim();
-//   let model = $(this).find("td:nth-child(2)").text().trim();
-//   let category = $(this).find("td:nth-child(3)").text().trim();
-//   let qty = $(this).find("td:nth-child(4)").text().trim();
-
-//   // ✅ Prevent modal if row is empty
-//   if (!brand && !model && !qty) {
-//     return;
-//   }
-
-//   // OPTIONAL (stronger check): ignore placeholder rows
-//   if ($(this).hasClass("empty-row")) {
-//     return;
-//   }
-
-//   $("#assignBranchModal #serial").val(serial);
-//   $("#assignBranchModal #brand").val(brand);
-//   $("#assignBranchModal #model").val(model);
-//   $("#assignBranchModal #itemCode").val(itemCode);
-//   $("#assignBranchModal #deliveryQty").text(qty);
-//   loadPicklistBranches(lbNum, model, category, function (length) {
-//     console.log(`BRANCHES LENGTH: ${length}`);
-//     if (length > 1) {
-//       $("#assignBranchModal").modal("show");
-//     } else {
-//       console.log("Single branch");
-//     }
-//   });
-// });
-
-// ---------------------------------------------------------------
-
-// $(document).on("click", "#summaryTable tbody tr", function (e) {
-//   e.preventDefault();
-//   let serial = $(this).data("serial");
-
-//   if (!serial) {
-//     return;
-//   }
-
-//   let $serialCell = $("#delivery-serial-table tbody td").first();
-//   let formattedSerial;
-
-//   if (Array.isArray(serial)) {
-//     formattedSerial = serial.join("<br>");
-//   } else if (typeof serial === "string") {
-//     formattedSerial = serial.split(",").join("<br>");
-//   } else {
-//     formattedSerial = serial;
-//   }
-
-//   $serialCell.html(formattedSerial);
-// });
 
 // BRANCH ASSIGNMENT
 $(document).on("click", ".datatables .dropdown .assign-branch", function (e) {
@@ -242,18 +200,23 @@ function loadDeliveryBasketContent() {
   if ($.fn.DataTable.isDataTable("#basketTableDashboard")) {
     $("#basketTableDashboard").DataTable().clear().destroy();
   }
-  let tableId = "#basketTableDashboard";
-  $("#main-content").html(spinner);
-  setTimeout(function () {
+  // let tableId = "#basketTableDashboard";
+  $("#basket_content").html(spinner);
+  // setTimeout(function () {
     $.post("dirs/basket/dashboard/basket.php", {}, function (data) {
       $("#main-content").hide().html(data).fadeIn(200);
+      $("#basketTableDashboard tbody").html(`
+        <tr>
+          <td colspan="100%" class="text-center">${spinner}</td>
+        </tr>
+      `);
       loadDeliveryBasket(
         "#basketTableDashboard",
         "dirs/incoming/dashboard/actions/picklisteditems.php",
       );
       $("#loadDeliveryBtn").prop("disabled", true);
     });
-  }, 200);
+  // }, 200);
 }
 
 $(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function () {
@@ -286,7 +249,6 @@ $(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function () {
   }
 });
 
-// OPEN SRN FROM LOADING ITEMS
 function loadDeliveryBasket(tableId, url) {
   $.ajax({
     url: url,
@@ -395,35 +357,13 @@ function loadDeliveryBasket(tableId, url) {
           // });
         });
 
-        // ${
-        //             item.PickListStatus !== "IT"
-        //               ?
-        //                 `
-        //             <li>
-        //               <a class="dropdown-item ${
-        //                 item.PickListStatus === "ASSIGNED"
-        //                   ? "edit-branch"
-        //                   : "assign-branch"
-        //               }"
-        //                 href="#"
-        //                 data-picklist="${item.PKList_Number}"
-        //                 data-lbNum="${item.DocEntry}"
-        //                 data-branches="${branches}">
-        //                 ${
-        //                   item.PickListStatus === "ASSIGNED"
-        //                     ? "Edit Assignment"
-        //                     : "Set Assignment"
-        //                 }
-        //               </a>
-        //             </li>
-        //             `
-        //               : ""
-
         if (rows.length === 0) {
           for (let i = 0; i < 8; i++) {
             rows.push(["", "", "", "", ""]);
           }
         }
+
+        destroyAllTooltips()
 
         if ($.fn.DataTable.isDataTable(tableId)) {
           $(tableId).DataTable().clear().destroy();
@@ -452,6 +392,7 @@ function loadDeliveryBasket(tableId, url) {
                 .attr("data-rownum", originalItem.DocEntry)
                 .attr("data-picklist", originalItem.PKList_Number)
                 .attr("data-branches", branches)
+                // .attr("data-bs-toggle", "tooltip")
                 .attr(
                   "data-bs-title",
                   `<div class="text-start">Branches: <br>${branchList.join("<br>") || "No Branch"}</div>`,
@@ -466,7 +407,8 @@ function loadDeliveryBasket(tableId, url) {
           order: [[0, "desc"]],
           rowCallback: function (row, data) {
             $("td:not(:first-child)", row).css({
-              background: "#FFFBDF",
+              // background: "#FFFBDF",
+              background: "#fcf7d4",
               padding: "3px",
               height: "40px",
               "min-height": "40px",
@@ -482,7 +424,7 @@ function loadDeliveryBasket(tableId, url) {
                 $(this).css("background", "#FFF4C2");
               },
               function () {
-                $(this).css("background", "#FFFBDF");
+                $(this).css("background", "#fcf7d4");
               },
             );
           },
@@ -494,12 +436,12 @@ function loadDeliveryBasket(tableId, url) {
               let $emptyRow = $(`
                   <tr class="empty-row">
                     <td>&nbsp;</td>
-                    <td colspan="4" style="background: #FFFBDF">&nbsp;</td>
+                    <td colspan="4" style="background: #fcf7d4">&nbsp;</td>
                   </tr>
                 `);
 
               $emptyRow.css({
-                background: "#FFFBDF",
+                background: "#fcf7d4",
                 height: "40px",
                 "min-height": "40px",
               });
@@ -508,7 +450,7 @@ function loadDeliveryBasket(tableId, url) {
                   $(this).css("background", "#FFF4C2");
                 },
                 function () {
-                  $(this).css("background", "#FFFBDF");
+                  $(this).css("background", "#fcf7d4");
                 },
               );
               tableBody.append($emptyRow);
@@ -517,61 +459,64 @@ function loadDeliveryBasket(tableId, url) {
             const selectionMode =
               $("#basketTableAssigned").data("selectionMode") || false;
 
-            // Target dropdown buttons
+            // $(tableId + " [data-bs-toggle='tooltip']").each(function () {
+            //   if (!this._tooltipInitialized) {
+            //     this._tooltipInitialized = true;
+
+            //     new bootstrap.Tooltip(this, {
+            //       placement: "right",
+            //       container: "body",
+            //       html: true,
+            //       trigger: "hover"
+            //     });
+            //   }
+            // });
+
             $(tableId + " tbody tr").each(function () {
-              const dropdownBtn = $(this).find(
-                "button[data-bs-toggle='dropdown']",
-              );
-
-              if (selectionMode) {
-                dropdownBtn.prop("disabled", true).addClass("disabled");
-              } else {
-                dropdownBtn.prop("disabled", false).removeClass("disabled");
-              }
-
               const existingTooltip = bootstrap.Tooltip.getInstance(this);
-              if (existingTooltip) {
-                existingTooltip.hide();
-              }
+                if (existingTooltip) {
+                  existingTooltip.dispose();
+                }
 
-              new bootstrap.Tooltip(this, {
-                placement: "right",
-                trigger: "hover",
-                container: "body",
-                html: true,
-              });
-            });
+                new bootstrap.Tooltip(this, {
+                  placement: "right",
+                  trigger: "hover",
+                  container: "body",
+                  html: true,
+                });
+            })
 
-            // remove tooltip when dropdown opens
             $(tableId + " tbody")
-              .off("show.bs.dropdown")
+            .off("show.bs.dropdown hide.bs.dropdown click.dropdownAction")
               .on("show.bs.dropdown", ".dropdown", function () {
-                const row = $(this).closest("tr")[0];
+                const row = $(this)
+                .closest("tr")[0];
 
                 const tooltipInstance = bootstrap.Tooltip.getInstance(row);
-
                 if (tooltipInstance) {
-                  tooltipInstance.hide();
+                    tooltipInstance.dispose();
                 }
+                document.querySelectorAll(".tooltip").forEach(el => el.remove());
               })
               .on("hide.bs.dropdown", ".dropdown", function () {
                 const row = $(this).closest("tr")[0];
+                const instance = bootstrap.Tooltip.getInstance(row);
 
-                const tooltipInstance = bootstrap.Tooltip.getInstance(row);
-
-                if (tooltipInstance) {
-                  tooltipInstance.hide();
+                if (instance) {
+                    instance.dispose();
                 }
-              }) // REMOVE TOOLTIP WHEN ANY DROPDOWN ITEM IS CLICKED
+              })
               .on("click.dropdownAction", ".dropdown-item", function () {
-                const row = $(this).closest("tr")[0];
+                  const row = $(this).closest("tr")[0];
 
-                const tooltipInstance = bootstrap.Tooltip.getInstance(row);
+                  const tooltipInstance = bootstrap.Tooltip.getInstance(row);
 
-                if (tooltipInstance) {
-                  tooltipInstance.hide();
-                }
-              });
+                  if (tooltipInstance) {
+                    tooltipInstance.dispose();
+                  }
+
+                  document.querySelectorAll(".tooltip").forEach(el => el.remove());
+              })
           },
         });
       } else {
@@ -584,6 +529,36 @@ function loadDeliveryBasket(tableId, url) {
   });
   // });
 }
+
+function destroyAllTooltips() {
+  // document.querySelectorAll('[data-bs-title]')
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((el) => {
+    const instance = bootstrap.Tooltip.getInstance(el);
+
+    if (instance) {
+      instance.hide();
+      instance.dispose(); // completely remove tooltip
+    }
+  });
+
+  // remove any orphaned tooltip elements
+  document.querySelectorAll('.tooltip').forEach((tooltip) => {
+    tooltip.remove();
+  });
+}
+
+$(document).on("click", ".open-picklisted", function () {
+    // document.querySelectorAll('[data-bs-title]')
+    document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    .forEach(el => {
+        const instance = bootstrap.Tooltip.getInstance(el);
+
+        if (instance) {
+            instance.dispose();
+        }
+    });
+    document.querySelectorAll(".tooltip").forEach(el => el.remove());
+});
 
 $(document).on("click", "#deliveryItemsTable tbody .open-srn", function (e) {
   e.preventDefault();
@@ -2032,7 +2007,11 @@ function loadingItems() {
 function loadDeliveryItems(PickLst_Num) {
   $.post("dirs/basket/dashboard/loadDeliveryItems.php", {}, function (data) {
     $("#main-content").html(data);
-
+    $("#deliveryItemsTable tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
     $.ajax({
       // url: "dirs/basket/dashboard/actions/get_loading_breakdown.php",
       url: "dirs/incoming/dashboard/actions/get_picklist_items.php",
@@ -3140,11 +3119,11 @@ function serialDeliveryInput(Picklists) {
                             );
 
                             // refresh tooltip instance
-                            bootstrap.Tooltip.getInstance(
-                              existingItem[0],
-                            )?.dispose();
+                            // bootstrap.Tooltip.getInstance(
+                            //   existingItem[0],
+                            // )?.dispose();
 
-                            new bootstrap.Tooltip(existingItem[0]);
+                            // new bootstrap.Tooltip(existingItem[0]);
 
                             // console.log("UPDATED SERIALS:", serialArray);
 

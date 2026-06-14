@@ -46,7 +46,7 @@ try {
     <link rel="icon" href="assets/image/logo/iap_icon.png">
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed overall-progress">
     <div class="wrapper">
         <nav class="main-header navbar navbar-expand bg-light">
             <ul class="navbar-nav">

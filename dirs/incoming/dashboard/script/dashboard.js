@@ -184,7 +184,8 @@ function loadIncoming() {
                 </tr>
               `);
               $($emptyRow).css({
-                background: "#FFFBDF",
+                // background: "#FFFBDF",
+                background: "#fcf7d4",
                 height: "40px",
                 "min-height": "40px",
               });
@@ -828,45 +829,49 @@ function openIncoming(DocEntry) {
 
 function picklistBasket() {
   $("#incoming_content").html(spinner);
-  $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
-    $("#main-content").html(data);
-  // if ($.fn.DataTable.isDataTable("#basketTable")) {
-  //   $("#basketTable").DataTable().clear().destroy();
-  // }
-  // $("#main-content").html(spinner);
+    $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
+      $("#main-content").html(data);
+    // if ($.fn.DataTable.isDataTable("#basketTable")) {
+    //   $("#basketTable").DataTable().clear().destroy();
+    // }
+    // $("#main-content").html(spinner);
 
-    $("#basketTable tbody").html(`
-      <tr>
-        <td colspan="100%" class="text-center">${spinner}</td>
-      </tr>
-    `);
+      $("#basketTable tbody").html(`
+        <tr>
+          <td colspan="100%" class="text-center">${spinner}</td>
+        </tr>
+      `);
 
-    // console.log(`SHOULD LOAD SPINNER HERE`)
+      // console.log(`SHOULD LOAD SPINNER HERE`)
 
-  // setTimeout(function () {
-  //   $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
-  //     $("#main-content").hide().html(data).fadeIn(200);
-      // loadBasket();
-  //   });
-  // // }, 200);
+    // setTimeout(function () {
+    //   $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
+    //     $("#main-content").hide().html(data).fadeIn(200);
+        // loadBasket();
+    //   });
+    // // }, 200);
 
-  loadBasket(() => {
-    $("#basketTable").DataTable({
-        pageLength: 50,
-        order: [0, "desc"],
-      });
-  }, 200)
-
-})
+    loadBasket(() => {
+      $("#basketTable").DataTable({
+          pageLength: 50,
+          order: [0, "asc"],
+        });
+    }, 200)
+  })
 }
 
 function loadIncomingDashboard() {
-  $("#main-content").html(spinner);
-  setTimeout(function () {
+  $("#incoming_content").html(spinner);
+  // setTimeout(function () {
     $.post("dirs/incoming/dashboard/incoming.php", {}, function (data) {
       $("#main-content").hide().html(data).fadeIn(200);
+      $("#basketTableDashboard tbody").html(`
+        <tr>
+          <td colspan="100%" class="text-center">${spinner}</td>
+        </tr>
+      `);
     });
-  }, 200);
+  // }, 200);
 }
 
 // PICKLIST BASKET TO PICKLIST ITEMS
@@ -883,7 +888,8 @@ $(document).on("dblclick", "#basketTable tbody .open-picklist", function (e) {
   let $row = $(this).closest("tr");
   let picklistNum = $row.attr("data-picklist-num");
 
-  $("#main-content").html(spinner);
+  // $("#main-content").html(spinner);
+  $("#incoming_content").html(spinner);
 
   // setTimeout(function () {
     $("#picklistItemTable tbody").html(`
@@ -891,6 +897,7 @@ $(document).on("dblclick", "#basketTable tbody .open-picklist", function (e) {
         <td colspan="100%" class="text-center">${spinner}</td>
       </tr>
     `);
+    // console.log(`OPENING PICKLIST`)
     openPicklist(picklistNum);
 
 
@@ -916,15 +923,19 @@ $(document).on("click", ".dropdown .open-picklist-items", function (e) {
 
   picklistNumRef = picklistNum;
 
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    $("#basketTable tbody").html(`
+  $("#incoming_content").html(spinner);
+  $.post("dirs/incoming/dashboard/picklistItem.php", 
+    {picklistNum : picklistNum}, 
+    function (data) {
+      $("#main-content").hide().html(data).fadeIn(200);
+      $("#picklistItemTable tbody").html(`
         <tr>
           <td colspan="100%" class="text-center">${spinner}</td>
         </tr>
       `);
+    // console.log(`OPENING PICKLIST`)
     openPicklist(picklistNum);
-  }, 200);
+    })
 });
 
 // ENTER ACTUAL QUANTITY
@@ -985,107 +996,100 @@ $(document).on("click", ".dropdown .single-dr", function (e) {
 });
 
 function openPicklist(picklistNum) {
-  console.log(`OPENING PICKLIST`)
-  $.post(
-    "dirs/incoming/dashboard/picklistItem.php",
-    { picklistNum: picklistNum },
-    function (data) {
-      $("#main-content").hide().html(data).fadeIn(200);
+  $.ajax({
+    url: "dirs/incoming/dashboard/actions/get_picklist_items.php",
+    type: "POST",
+    dataType: "json",
+    data: { PicklistNumber: picklistNum },
+    success: function (response) {
+      $("#picklistNumDisplay").text(picklistNum);
+      let rows = [];
+      let index = 1;
+      if (response.isSuccess === "success") {
+        let sortedData = response.Data.sort(
+          (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
+        );
 
-      $.ajax({
-        url: "dirs/incoming/dashboard/actions/get_picklist_items.php",
-        type: "POST",
-        dataType: "json",
-        data: { PicklistNumber: picklistNum },
-        success: function (response) {
-          $("#picklistNumDisplay").text(picklistNum);
-          let rows = [];
-          let index = 1;
-          if (response.isSuccess === "success") {
-            let sortedData = response.Data.sort(
-              (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
-            );
-
-            sortedData.forEach((item) => {
-              // console.log(`ITEM : ${JSON.stringify(item)}`);
-              rows.push([
-                index++,
-                item.Brand || "",
-                item.Model || "",
-                item.Category || "",
-                item.Quantity ? Math.floor(Number(item.Quantity)) : "",
-                // item.Actual_Quantity
-                //   ? Math.floor(Number(item.Actual_Quantity))
-                //   : "",
-                item.Actual_Item_Qty ? Math.floor(Number(item.Actual_Item_Qty)) : ""
-              ]);
+        sortedData.forEach((item) => {
+          // console.log(`ITEM : ${JSON.stringify(item)}`);
+          rows.push([
+            index++,
+            item.Brand || "",
+            item.Model || "",
+            item.Category || "",
+            item.Quantity ? Math.floor(Number(item.Quantity)) : "",
+            // item.Actual_Quantity
+            //   ? Math.floor(Number(item.Actual_Quantity))
+            //   : "",
+            item.Actual_Item_Qty ? Math.floor(Number(item.Actual_Item_Qty)) : ""
+          ]);
+        });
+        // $("#picklistItemTable").DataTable().clear().destroy();
+        if ($.fn.DataTable.isDataTable("#picklistItemTable")) {
+          $("#picklistItemTable").DataTable().clear().destroy();
+        }
+        $("#picklistItemTable").DataTable({
+          data: rows,
+          columns: [
+            { title: "#", className: "text-start ps-5" },
+            { title: "Brand", className: "text-start ps-5" },
+            { title: "Model", className: "text-start ps-5" },
+            { title: "Category", className: "text-start ps-5" },
+            { title: "Quantity", className: "text-center" },
+            { title: "Actual Qty", className: "text-center" },
+          ],
+          paging: true,
+          searching: true,
+          info: true,
+          processing: false,
+          autoWidth: false,
+          rowCallback: function (row, data) {
+            const isEmpty = !data[0];
+            $("td", row).css({
+              // background: "#F7F7F7",
+              background: "#fcf7d4",
+              padding: "3px",
+              height: "40px",
+              "min-height": "40px",
+              cursor: isEmpty ? "default" : "pointer",
             });
-            // $("#picklistItemTable").DataTable().clear().destroy();
-            if ($.fn.DataTable.isDataTable("#picklistItemTable")) {
-              $("#picklistItemTable").DataTable().clear().destroy();
+            $("td:eq(2)", row).css("text-align", "start");
+            $("td:eq(4)", row).css("text-align", "center");
+            $("td:eq(5)", row).css("text-align", "center");
+          },
+          drawCallback: function () {
+            let tableBody = $("#picklistItemTable tbody");
+            let currentRows = tableBody.find("tr").length;
+
+            for (let i = currentRows; i < 8; i++) {
+              // let $emptyRow = $(`
+              //   <tr class="empty-row" style="background: #f7f7f7">
+              //     <td colspan="5" style="background: #f7f7f7">&nbsp;</td>
+              //   </tr>
+              // `);
+              let $emptyRow = $(`
+                <tr class="empty-row">
+                  <td colspan="6" style="background: #fcf7d4">&nbsp;</td>
+                </tr>
+              `);
+              $emptyRow.css({
+                // background: "#f7f7f7",
+                background: "#fcf7d4",
+                height: "40px",
+                "min-height": "40px",
+              });
+              tableBody.append($emptyRow);
             }
-            $("#picklistItemTable").DataTable({
-              data: rows,
-              columns: [
-                { title: "#", className: "text-start ps-5" },
-                { title: "Brand", className: "text-start ps-5" },
-                { title: "Model", className: "text-start ps-5" },
-                { title: "Category", className: "text-start ps-5" },
-                { title: "Quantity", className: "text-start ps-5" },
-                { title: "Actual Qty", className: "text-start ps-5" },
-              ],
-              paging: true,
-              searching: true,
-              info: true,
-              processing: false,
-              autoWidth: false,
-              rowCallback: function (row, data) {
-                const isEmpty = !data[0];
-                $("td", row).css({
-                  // background: "#F7F7F7",
-                  background: "#FFFBDF",
-                  padding: "3px",
-                  height: "40px",
-                  "min-height": "40px",
-                  cursor: isEmpty ? "default" : "pointer",
-                });
-                $("td:eq(2)", row).css("text-align", "start");
-              },
-              drawCallback: function () {
-                let tableBody = $("#picklistItemTable tbody");
-                let currentRows = tableBody.find("tr").length;
-
-                for (let i = currentRows; i < 8; i++) {
-                  // let $emptyRow = $(`
-                  //   <tr class="empty-row" style="background: #f7f7f7">
-                  //     <td colspan="5" style="background: #f7f7f7">&nbsp;</td>
-                  //   </tr>
-                  // `);
-                  let $emptyRow = $(`
-                    <tr class="empty-row" style="background: #FFFBDF">
-                      <td colspan="6" style="background: #FFFBDF">&nbsp;</td>
-                    </tr>
-                  `);
-                  $emptyRow.css({
-                    // background: "#f7f7f7",
-                    background: "#FFFBDF",
-                    height: "40px",
-                    "min-height": "40px",
-                  });
-                  tableBody.append($emptyRow);
-                }
-              },
-            });
-          } else {
-            console.error(response.Data);
-          }
-        },
-        error: function (xhr, status, error) {
-          console.error("Error loading outgoing data: ", error);
-        },
-      });
+          },
+        });
+      } else {
+        console.error(response.Data);
+      }
     },
-  );
+    error: function (xhr, status, error) {
+      console.error("Error loading outgoing data: ", error);
+    },
+  });
 }
 
 // DISPLAY PICKLIST
@@ -1098,6 +1102,8 @@ function loadPicklistItems() {
   //   </tr>
   // `);
 
+  // console.log(`OPENING PICKLIST`)
+
   // setTimeout(function () {
 
     $.post(
@@ -1105,7 +1111,6 @@ function loadPicklistItems() {
       { picklistNum: picklistNumRef },
       function (data) {
         $("#main-content").html(data);
-
         $("#picklistItemTable tbody").html(`
           <tr>
             <td colspan="100%" class="text-center">${spinner}</td>
@@ -1151,7 +1156,6 @@ function loadBasketContent() {
   // setTimeout(function () {
     $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
       $("#main-content").hide().html(data).fadeIn(200);
-
       $("#basketTable tbody").html(`
         <tr>
           <td colspan="100%" class="text-center">${spinner}</td>
@@ -1253,9 +1257,15 @@ function openPicklistedForm(SR_Number) {
 
 // DISPLAY BASKET
 function loadBasket() {
-  // $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
-  //   $("#main-content").html(data);
+    // remove every bootstrap tooltip currently alive
+    document.querySelectorAll(".tooltip").forEach(el => el.remove());
 
+    document.querySelectorAll("#basketTable tbody tr").forEach(el => {
+      const instance = bootstrap.Tooltip.getInstance(el);
+      if (instance) {
+        instance.dispose();
+      }
+    });
     $.ajax({
       url: "dirs/incoming/dashboard/actions/picklisteditems.php",
       type: "POST",
@@ -1378,6 +1388,8 @@ function loadBasket() {
             }
           }
 
+          destroyAllTooltips()
+
           if ($.fn.DataTable.isDataTable("#basketTable")) {
             $("#basketTable").DataTable().clear().destroy();
           }
@@ -1414,7 +1426,8 @@ function loadBasket() {
             info: true,
             processing: false,
             autoWidth: false,
-            order: [[0, "desc"]],
+            // order: [[0, "desc"]],
+            order: [[0, "asc"]],
             rowCallback: function (row, data) {
               const isEmptyRow = !data[0];
 
@@ -1460,8 +1473,8 @@ function loadBasket() {
                 $emptyRow.css({
                   // background: "#FFFBDF",
                   background: "#fcf7d4",
-                  height: "50px",
-                  "min-height": "50px",
+                  height: "40px",
+                  "min-height": "40px",
                 });
                 $emptyRow.hover(
                   function () {
@@ -1476,9 +1489,21 @@ function loadBasket() {
               }
 
               $("#basketTable tbody tr").each(function () {
+                // const existingTooltip = bootstrap.Tooltip.getInstance(this);
+                // if (existingTooltip) {
+                //   existingTooltip.hide();
+                // }
+
+                // new bootstrap.Tooltip(this, {
+                //   placement: "right",
+                //   trigger: "hover",
+                //   container: "body",
+                //   html: true,
+                // });
+
                 const existingTooltip = bootstrap.Tooltip.getInstance(this);
                 if (existingTooltip) {
-                  existingTooltip.hide();
+                  existingTooltip.dispose();
                 }
 
                 new bootstrap.Tooltip(this, {
@@ -1491,38 +1516,36 @@ function loadBasket() {
 
               $("#basketTable tbody")
                 .off("show.bs.dropdown hide.bs.dropdown click.dropdownAction")
-
-                // REMOVE TOOLTIP WHEN DROPDOWN OPENS
                 .on("show.bs.dropdown", ".dropdown", function () {
                   const row = $(this).closest("tr")[0];
 
                   const tooltipInstance = bootstrap.Tooltip.getInstance(row);
 
                   if (tooltipInstance) {
-                    tooltipInstance.hide();
+                      tooltipInstance.dispose();
                   }
-                })
 
-                // REMOVE TOOLTIP WHEN DROPDOWN CLOSES
+                  document.querySelectorAll(".tooltip").forEach(el => el.remove());
+                })
                 .on("hide.bs.dropdown", ".dropdown", function () {
                   const row = $(this).closest("tr")[0];
 
-                  const tooltipInstance = bootstrap.Tooltip.getInstance(row);
+                  const instance = bootstrap.Tooltip.getInstance(row);
 
-                  if (tooltipInstance) {
-                    tooltipInstance.hide();
+                  if (instance) {
+                      instance.dispose();
                   }
                 })
-
-                // REMOVE TOOLTIP WHEN ANY DROPDOWN ITEM IS CLICKED
                 .on("click.dropdownAction", ".dropdown-item", function () {
                   const row = $(this).closest("tr")[0];
 
                   const tooltipInstance = bootstrap.Tooltip.getInstance(row);
 
                   if (tooltipInstance) {
-                    tooltipInstance.hide();
+                    tooltipInstance.dispose();
                   }
+
+                  document.querySelectorAll(".tooltip").forEach(el => el.remove());
                 });
             },
           });
@@ -1593,6 +1616,22 @@ function loadBasket() {
       },
     });
   // });
+}
+
+function destroyAllTooltips() {
+  document.querySelectorAll('[data-bs-title]').forEach((el) => {
+    const instance = bootstrap.Tooltip.getInstance(el);
+
+    if (instance) {
+      instance.hide();
+      instance.dispose(); // completely remove tooltip
+    }
+  });
+
+  // remove any orphaned tooltip elements
+  document.querySelectorAll('.tooltip').forEach((tooltip) => {
+    tooltip.remove();
+  });
 }
 
 function formattedDate() {
@@ -1715,7 +1754,7 @@ function encodeQty(picklistNum) {
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemName}</td>
                   <td class="align-middle ps-3 text-start" style="background: #F7F7F7;">${item.Req_ItemCategory}</td>
                   <td class="align-middle text-center" style="background: #F7F7F7;">${item.totalQty}</td>
-                  <td class="align-middle ps-3 editable-cell" style="background: #FFFBDF" contenteditable="true" onfocus="handleFocus(this)" oninput="validateNumber(this)" onkeydown="preventEnter(event)" style="width: 100px; max-width: 100px"></td>
+                  <td class="align-middle ps-3 editable-cell text-center" style="background: #FFFBDF" contenteditable="true" onfocus="handleFocus(this)" oninput="validateNumber(this)" onkeydown="preventEnter(event)" style="width: 100px; max-width: 100px"></td>
                 </tr>
               `;
             });

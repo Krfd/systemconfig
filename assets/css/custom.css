@@ -1,3 +1,16 @@
+.overall-progress::-webkit-scrollbar {
+    width: 3px;
+}
+
+.overall-progress::-webkit-scrollbar-track {
+    background: #CECECE;
+    border-radius: 50px;
+}
+
+.overall-progress::-webkit-scrollbar-thumb {
+    background: #33A1F1;
+    border-radius: 50px;
+}
 .custom-switch {
     position: relative;
     width: 130px;
@@ -73,17 +86,6 @@
 .custom-switch input:checked+label .right {
     color: #fff;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 /* CREATE DELIVERY */
