@@ -1,0 +1,19 @@
+=== GROUPED ITEM SUMMARY ===
+Generated: 2026-06-15 11:21:41
+
+Item ID    : 10
+Total Qty  : 19
+Branch     : STA. BARBARA
+Picklists  : PL10003
+Serials    : 100011224000036762
+------------------------------------------------------------
+Item ID    : 11
+Total Qty  : 11
+Branch     : STA. BARBARA
+Picklists  : PL10003
+Serials    : 31213598
+------------------------------------------------------------
+
+=== GROUPED ITEM SUMMARY ===
+Item ID: 10 | Total Qty: 19 | Branch: STA. BARBARA | Picklists: PL10003 | Serials: 100011224000036762
+Item ID: 11 | Total Qty: 11 | Branch: STA. BARBARA | Picklists: PL10003 | Serials: 31213598

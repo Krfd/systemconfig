@@ -889,6 +889,7 @@ $(document).on("click", ".dropdown .enter-actual-qty", function (e) {
         <td colspan="100%" class="text-center">${spinner}</td>
       </tr>
     `);
+    console.log(`ENCODE QTY HERE`);
     encodeQty(picklistNum, rowNum);
   }, 200);
 });
@@ -1565,7 +1566,7 @@ function encodeQty(picklistNum) {
     { picklistNum: picklistNum },
     function (data) {
       $("#main-content").hide().html(data).fadeIn(200);
-
+      console.log(`ENCODE QTY HERE`);
       $("#pklist").val(picklistNum);
 
       $.ajax({

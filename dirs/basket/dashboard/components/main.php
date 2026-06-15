@@ -27,7 +27,7 @@
                     <tr>
                         <th></th>
                         <th class="text-secondary">Picklist No.</th>
-                        <th class="text-secondary">Quantity</th>
+                        <th class="text-secondary text-center">Quantity</th>
                         <th class="text-secondary">Status</th>
                         <th class="text-secondary"></th>
                     </tr>

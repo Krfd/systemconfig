@@ -51,7 +51,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive d-flex gap-1 overflow-auto mt-3" style="max-height: 450px">
+                            <div class="table-responsive d-flex gap-1 overflow-auto mt-3 overall-progress mb-0" style="max-height: 450px">
                                 <table class="table table-hover col" id="editSummaryTable">
                                     <thead class="sticky-top">
                                     </thead>

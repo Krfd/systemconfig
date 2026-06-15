@@ -52,7 +52,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive d-flex gap-1 overflow-auto mt-5" style="max-height: 450px">
+                            <div class="table-responsive d-flex gap-1 overflow-auto mt-5 overall-progress mb-0" style="max-height: 450px">
                                 <table class="table table-hover col" id="summaryTable">
                                     <thead class="sticky-top">
                                     </thead>
@@ -61,7 +61,7 @@
                                 </table>
                             </div>
                             <div id="totalRowOutside"
-                                class="d-flex border-top fw-bold align-items-center w-100"
+                                class="d-flex border border-secondary-subtle fw-bold align-items-center w-100"
                                 style="background: #f2f2f2">
                                 <!-- ✅ LEFT SIDE (Balance) -->
                                 <div class="d-flex">
