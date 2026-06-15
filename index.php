@@ -148,8 +148,8 @@ try {
                 </div>
             </div>
         </div>
-        <section class="content">
-            <div class="container-fluid" id="main-content"></div>
+        <section class="content overall-progress">
+            <div class="container-fluid overall-progress" id="main-content"></div>
         </section>
     </div>
     <footer class="main-footer">

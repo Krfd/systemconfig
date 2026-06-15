@@ -98,7 +98,7 @@
              <div class="container p-3">
                  <div class="card">
                      <div class="card-body">
-                         <div class="table-responsive overflow-auto" style="max-height: 300px">
+                         <div class="table-responsive overall-progress overflow-auto" style="max-height: 300px">
                              <table class="table datatable" id="basket-serial-table">
                                  <thead>
                                      <tr>

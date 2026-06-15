@@ -14,7 +14,7 @@ function loadDashboard() {
   $("#basket_content").html(spinner);
   $.post("dirs/basket/dashboard/components/main.php", {}, function (data) {
     // $("#basket_content").html(data);
-    $("#main-content").hide().html(data).fadeIn(200);
+    $("#basket_content").hide().html(data).fadeIn(200);
     // $("#basketTableDashboard").DataTable({
     //   pageLength: 50,
     //   order: [0, "desc"],
@@ -293,6 +293,8 @@ function loadDeliveryBasket(tableId, url) {
 
       if (response.isSuccess === "success") {
         Object.values(grouped).forEach((item) => {
+          // console.log(`ITEM : ${JSON.stringify(item)}`)
+          // console.log(`QUANTITY: ${item.RequestItemQty}`)
           let branches = Array.from(item.Req_Branch).join(", ");
 
           const hasInvalidQty = item.items.some((row) => {
@@ -407,7 +409,6 @@ function loadDeliveryBasket(tableId, url) {
           order: [[0, "desc"]],
           rowCallback: function (row, data) {
             $("td:not(:first-child)", row).css({
-              // background: "#FFFBDF",
               background: "#fcf7d4",
               padding: "3px",
               height: "40px",
@@ -764,13 +765,13 @@ function clearTable() {
       for (let i = 0; i < 8; i++) {
         row = `
           <tr>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
         </tr>
         `;
 
@@ -796,11 +797,11 @@ function clearLoadingTable() {
       for (let i = 0; i < 8; i++) {
         row = `
           <tr>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
         </tr>
         `;
 
@@ -1071,7 +1072,15 @@ $(document).on(
 function assignBranch(picklist, branchees) {
   $.post("dirs/basket/dashboard/branchAssignment.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
-
+    // summaryTable.html(`
+    //   <tr>
+    //     <td colspan="6" class="text-center align-middle" style="height:300px;">
+    //         <div style="height:300px; display:flex; align-items:center; justify-content:center;">
+    //           ${spinner}
+    //         </div>
+    //     </td>
+    //   </tr>
+    // `);
     restrictInput();
     submitBranchAssignment("#summaryTable");
 
@@ -1096,7 +1105,7 @@ function assignBranch(picklist, branchees) {
               <th class="text-secondary">Brand</th>
               <th class="text-secondary">Model</th>
               <th class="text-secondary">Category</th>
-              <th class="text-secondary">Actual Quantity</th>
+              <th class="text-secondary text-center">Actual Quantity</th>
           `;
 
           branches.forEach((branch) => {
@@ -1177,7 +1186,7 @@ function assignBranch(picklist, branchees) {
                 <td class="align-middle ps-3" style="background: ##F7F7F7">${unit.ItemBrand}</td>
                 <td class="align-middle ps-3" style="background: ##F7F7F7">${unit.ItemName}</td>
                 <td class="align-middle ps-3" style="background: ##F7F7F7">${unit.ItemCategory}</td>
-                <td class="align-middle ps-3" style="background: ##F7F7F7">${Math.trunc(Number(unit.Actual_Item_Qty))}</td>
+                <td class="align-middle ps-3 text-center" style="background: ##F7F7F7">${Math.trunc(Number(unit.Actual_Item_Qty))}</td>
               `;
 
             // Count editable branches for this row
@@ -1208,7 +1217,7 @@ function assignBranch(picklist, branchees) {
               row += `
                 <td class="align-middle ps-3 text-center" data-branch="${branch}"
                     ${isEditable ? 'contenteditable="true"' : ""}
-                    style="background: ${isEditable ? "#FFFBDF" : "#F7F7F7"}; cursor: ${isEditable ? "text" : "default"}; outline: none;"
+                    style="background: ${isEditable ? "#fcf7d4" : "#F7F7F7"}; cursor: ${isEditable ? "text" : "default"}; outline: none;"
                     onfocus="this.style.border='1px solid #ffc107'; this.style.outline='none';">
                     ${val}
                 </td>
@@ -1441,7 +1450,7 @@ function editAssignBranch(picklist, branchees) {
               row += `
                 <td class="align-middle ps-3 text-center" data-branch="${branch}"
                     ${isEditable ? 'contenteditable="true"' : ""}
-                    style="background: ${isEditable ? "#FFFBDF" : "#F7F7F7"}; cursor: ${isEditable ? "text" : "default"}; outline: none;"
+                    style="background: ${isEditable ? "#fcf7d4" : "#F7F7F7"}; cursor: ${isEditable ? "text" : "default"}; outline: none;"
                     onfocus="this.style.border='1px solid #ffc107'; this.style.outline='none';">
                     ${rawVal > 0 ? rawVal : ""}
                 </td>
@@ -1944,7 +1953,7 @@ function loadingItems() {
             order: [[0, "desc"]],
             rowCallback: function (row, data) {
               $("td", row).css({
-                background: "#FFFBDF",
+                background: "#fcf7d4",
                 padding: "3px",
                 height: "40px",
                 "min-height": "40px",
@@ -1960,7 +1969,7 @@ function loadingItems() {
                   $(this).css("background", "#FFF4C2");
                 },
                 function () {
-                  $(this).css("background", "#FFFBDF");
+                  $(this).css("background", "#fcf7d4");
                 },
               );
             },
@@ -1970,12 +1979,12 @@ function loadingItems() {
 
               for (let i = currentRows; i < 8; i++) {
                 let $emptyRow = $(`
-              <tr class="empty-row" style="background: #FFFBDF">
-                <td colspan="6" style="background: #FFFBDF">&nbsp;</td>
+              <tr class="empty-row">
+                <td colspan="6" style="background: #fcf7d4">&nbsp;</td>
               </tr>
             `);
                 $emptyRow.css({
-                  background: "#FFFBDF",
+                  background: "#fcf7d4",
                   height: "40px",
                   "min-height": "40px",
                   cursor: "pointer",
@@ -1985,7 +1994,7 @@ function loadingItems() {
                     $(this).css("background", "#FFF4C2");
                   },
                   function () {
-                    $(this).css("background", "#FFFBDF");
+                    $(this).css("background", "#fcf7d4");
                   },
                 );
                 tableBody.append($emptyRow);
@@ -2083,7 +2092,7 @@ function loadDeliveryItems(PickLst_Num) {
             order: [[0, "desc"]],
             rowCallback: function (row, data) {
               $("td", row).css({
-                background: "#FFFBDF",
+                background: "#fcf7d4",
                 padding: "3px",
                 height: "40px",
                 "min-height": "40px",
@@ -2097,7 +2106,7 @@ function loadDeliveryItems(PickLst_Num) {
                   $(this).css("background", "#FFF4C2");
                 },
                 function () {
-                  $(this).css("background", "#FFFBDF");
+                  $(this).css("background", "#fcf7d4");
                 },
               );
             },
@@ -2107,12 +2116,12 @@ function loadDeliveryItems(PickLst_Num) {
 
               for (let i = currentRows; i < 8; i++) {
                 let $emptyRow = $(`
-                  <tr class="empty-row" style="background: #FFFBDF">
-                    <td colspan="4" style="background: #FFFBDF">&nbsp;</td>
+                  <tr class="empty-row">
+                    <td colspan="4" style="background: #fcf7d4">&nbsp;</td>
                   </tr>
                 `);
                 $emptyRow.css({
-                  background: "#FFFBDF",
+                  background: "#fcf7d4",
                   height: "40px",
                   "min-height": "40px",
                   cursor: "pointer",
@@ -2122,7 +2131,7 @@ function loadDeliveryItems(PickLst_Num) {
                     $(this).css("background", "#FFF4C2");
                   },
                   function () {
-                    $(this).css("background", "#FFFBDF");
+                    $(this).css("background", "#fcf7d4");
                   },
                 );
                 tableBody.append($emptyRow);
@@ -2840,11 +2849,11 @@ function loadToBasket(Picklists) {
     for (i = 0; i < 8; i++) {
       let emptyRow = $(`
         <tr style="height: 40px">
-          <td class="ps-3" style="background: #FFFBDF"></td>
-          <td class="ps-3" style="background: #FFFBDF"></td>
-          <td class="ps-3" style="background: #FFFBDF"></td>
-          <td class="ps-3" style="background: #FFFBDF"></td>
-          <td class="ps-3" style="background: #FFFBDF"></td>
+          <td class="ps-3" style="background: #fcf7d4"></td>
+          <td class="ps-3" style="background: #fcf7d4"></td>
+          <td class="ps-3" style="background: #fcf7d4"></td>
+          <td class="ps-3" style="background: #fcf7d4"></td>
+          <td class="ps-3" style="background: #fcf7d4"></td>
         </tr>
       `);
       loadingTable.append(emptyRow);
@@ -2935,7 +2944,7 @@ function serialDeliveryInput(Picklists) {
                   let totalActualPerModel =
                     parseInt(res.Data?.[0]?.Total_Actual_Item_Qty) || 0;
 
-                    console.log(`TOTAL ACTUAL PER MODEL : ${totalActualPerModel}`)
+                    // console.log(`TOTAL ACTUAL PER MODEL : ${totalActualPerModel}`)
 
                   $.ajax({
                     url: "dirs/basket/dashboard/actions/get_dsplaybatch_models.php",
@@ -3047,9 +3056,9 @@ function serialDeliveryInput(Picklists) {
                           if (!serialExisted) {
                             let serialRow = `
                               <tr style="height: 40px; min-height: 40px; cursor: pointer">
-                                  <td class="align-middle ps-3" style="background: #FFFBDF">${model}</td>
-                                  <td class="align-middle ps-3" style="background: #FFFBDF">${itemCode}</td>
-                                  <td class="align-middle ps-3" style="background: #FFFBDF">${Serial}</td>
+                                  <td class="align-middle ps-3" style="background: #fcf7d4">${model}</td>
+                                  <td class="align-middle ps-3" style="background: #fcf7d4">${itemCode}</td>
+                                  <td class="align-middle ps-3" style="background: #fcf7d4">${Serial}</td>
                               </tr>
                             `;
 
@@ -3146,11 +3155,11 @@ function serialDeliveryInput(Picklists) {
                                   data-bs-html="true" 
                                   data-bs-title="${"Serials: " + item.ItemSerial} <br>Requested: ${totalActualPerModel}" 
                                   style="height: 40px; min-height: 40px; cursor: pointer">
-                                  <td class="align-middle ps-3 text-center" style="background: #FFFBDF">${counter}</td>
-                                  <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>
-                                  <td class="align-middle ps-3" style="background:#FFFBDF">${model}</td>
-                                  <td class="align-middle ps-3" style="background:#FFFBDF">${category}</td>
-                                  <td class="align-middle ps-3" style="background:#FFFBDF">${qty}</td>
+                                  <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${counter}</td>
+                                  <td class="align-middle ps-3" style="background:#fcf7d4">${brand}</td>
+                                  <td class="align-middle ps-3" style="background:#fcf7d4">${model}</td>
+                                  <td class="align-middle ps-3" style="background:#fcf7d4">${category}</td>
+                                  <td class="align-middle ps-3" style="background:#fcf7d4">${qty}</td>
                                 </tr>`;
 
                             // data-serials="${item.ItemSerial}"
@@ -3382,11 +3391,11 @@ function addNonSerialize(Picklists) {
                             data-itemcode="${itemCode}" 
                             data-serialbased="false" 
                             style="height: 40px; min-height: 40px; cursor: pointer">
-                              <td class="align-middle ps-3 text-center" style="background: #FFFBDF">${counter}</td>
-                              <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>
-                              <td class="align-middle ps-3" style="background:#FFFBDF">${model}</td>
-                              <td class="align-middle ps-3" style="background:#FFFBDF">${category}</td>
-                              <td class="align-middle ps-3" style="background:#FFFBDF">${quantity}</td>
+                              <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${counter}</td>
+                              <td class="align-middle ps-3" style="background:#fcf7d4">${brand}</td>
+                              <td class="align-middle ps-3" style="background:#fcf7d4">${model}</td>
+                              <td class="align-middle ps-3" style="background:#fcf7d4">${category}</td>
+                              <td class="align-middle ps-3" style="background:#fcf7d4">${quantity}</td>
                             </tr>
                           `;
 
@@ -3474,9 +3483,9 @@ function initializeEmptySerialRows() {
   for (let i = 0; i < 5; i++) {
     tbody.append(`
       <tr class="empty-row" style="height: 40px; min-height: 40px;">
-        <td class="align-middle ps-3 text-muted" style="background: #FFFBDF">&nbsp;</td>
-        <td class="align-middle ps-3 text-muted" style="background: #FFFBDF">&nbsp;</td>
-        <td class="align-middle ps-3 text-muted" style="background: #FFFBDF">&nbsp;</td>
+        <td class="align-middle ps-3 text-muted" style="background: #fcf7d4">&nbsp;</td>
+        <td class="align-middle ps-3 text-muted" style="background: #fcf7d4">&nbsp;</td>
+        <td class="align-middle ps-3 text-muted" style="background: #fcf7d4">&nbsp;</td>
       </tr>
     `);
   }

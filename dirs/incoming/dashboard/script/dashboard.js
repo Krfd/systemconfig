@@ -180,7 +180,7 @@ function loadIncoming() {
               let $emptyRow = $(`
                 <tr class="empty-row">
                   <td></td>
-                  <td colspan="5" style="background:#FFFBDF"></td>
+                  <td colspan="5" style="background:#fcf7d4"></td>
                 </tr>
               `);
               $($emptyRow).css({
@@ -365,36 +365,29 @@ function toggleCheckboxes() {
     cancelButtonText: "Back",
   }).then((result) => {
     if (result.isConfirmed) {
-      // $("#previewTableDisplay tbody").html(`
-      //   <tr>
-      //     <td colspan="100%" class="text-center">${spinner}</td>
-      //   </tr>
-      // `);
-
-      setTimeout(function () {
-        $("#main-content").html(spinner);
-        //   $("#previewTableDisplay tbody").html(`
-        //   <tr>
-        //     <td colspan="100%" class="text-center">${spinner}</td>
-        //   </tr>
-        // `);
-        loadPreview(SRNumbers);
-      }, 200);
+        $("#incoming_content").html(spinner);
+        $.post("dirs/incoming/dashboard/preview.php", function (data) {
+          $("#main-content").hide().html(data).fadeIn(200);
+          $("#previewTableDisplay tbody").html(`
+            <tr>
+              <td colspan="100%" class="text-center">${spinner}</td>
+            </tr>
+          `);
+          // console.log(`UPDATED PREVIEW`)
+          loadPreview(SRNumbers);
+        })
     }
   });
 }
 
 function loadPreview(SRNumbers) {
-  $("#previewTableDisplay tbody").html(`
-    <tr>
-      <td colspan="100%" class="text-center">${spinner}</td>
-    </tr>
-  `);
-
-  console.log(`PREVIEWING BASKET`);
-
-  $.post("dirs/incoming/dashboard/preview.php", function (data) {
-    $("#main-content").hide().html(data).fadeIn(200);
+  // $("#previewTableDisplay tbody").html(`
+  //   <tr>
+  //     <td colspan="100%" class="text-center">${spinner}</td>
+  //   </tr>
+  // `);
+  // $.post("dirs/incoming/dashboard/preview.php", function (data) {
+  //   $("#main-content").hide().html(data).fadeIn(200);
 
     $.ajax({
       url: "dirs/incoming/dashboard/actions/get_sr_items.php",
@@ -472,7 +465,7 @@ function loadPreview(SRNumbers) {
         });
       },
     });
-  });
+  // });
 }
 
 function togglePreview() {
@@ -949,15 +942,19 @@ $(document).on("click", ".dropdown .enter-actual-qty", function (e) {
   picklistNumRef = picklistNum;
 
   $("#main-content").html(spinner);
-
-  setTimeout(function () {
-    $("#encodeQtyTable tbody").html(`
-      <tr>
-        <td colspan="100%" class="text-center">${spinner}</td>
-      </tr>
-    `);
+    // $.post(
+    //   "dirs/incoming/dashboard/encodeQty.php",
+    //   { picklistNum: picklistNum },
+    //   function (data) {
+    //     $("#incoming_content").hide().html(data).fadeIn(200);
+    //     $("#encodeQtyTable tbody").html(`
+    //       <tr>
+    //         <td colspan="100%" class="text-center">${spinner}</td>
+    //       </tr>
+    //     `);
+    // formattedDate();
     encodeQty(picklistNum, rowNum);
-  }, 200);
+    // })
 });
 
 // EDIT ACTUAL QUANTITY
@@ -1325,7 +1322,12 @@ function loadBasket() {
             // console.log(`SRN's : ${item.SR_Numbers}`);
             // console.log(``);
             const date = new Date(item.DocDate);
-            const formatted = date.toISOString().split("T")[0];
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            const yy = String(date.getFullYear()).slice(-2);
+
+            const formatted = `${mm}-${dd}-${yy}`;
+            // const formatted = date.toISOString().split("T")[0];
 
             const printOption = item.allHaveActualQty
               ? `<li>
@@ -1489,17 +1491,6 @@ function loadBasket() {
               }
 
               $("#basketTable tbody tr").each(function () {
-                // const existingTooltip = bootstrap.Tooltip.getInstance(this);
-                // if (existingTooltip) {
-                //   existingTooltip.hide();
-                // }
-
-                // new bootstrap.Tooltip(this, {
-                //   placement: "right",
-                //   trigger: "hover",
-                //   container: "body",
-                //   html: true,
-                // });
 
                 const existingTooltip = bootstrap.Tooltip.getInstance(this);
                 if (existingTooltip) {
@@ -1692,7 +1683,15 @@ function encodeQty(picklistNum) {
     { picklistNum: picklistNum },
     function (data) {
       $("#main-content").hide().html(data).fadeIn(200);
-
+      $("#encodeQtyTable tbody").html(`
+        <tr>
+          <td colspan="6" class="text-center align-middle" style="height:350px;">
+            <div style="height:350px; display:flex; align-items:center; justify-content:center;">
+              ${spinner}
+            </div>
+          </td>
+        </tr>
+      `);
       $("#pklist").val(picklistNum);
 
       $.ajax({
@@ -1754,7 +1753,7 @@ function encodeQty(picklistNum) {
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemName}</td>
                   <td class="align-middle ps-3 text-start" style="background: #F7F7F7;">${item.Req_ItemCategory}</td>
                   <td class="align-middle text-center" style="background: #F7F7F7;">${item.totalQty}</td>
-                  <td class="align-middle ps-3 editable-cell text-center" style="background: #FFFBDF" contenteditable="true" onfocus="handleFocus(this)" oninput="validateNumber(this)" onkeydown="preventEnter(event)" style="width: 100px; max-width: 100px"></td>
+                  <td class="align-middle ps-3 editable-cell text-center" style="background: #fcf7d4" contenteditable="true" onfocus="handleFocus(this)" oninput="validateNumber(this)" onkeydown="preventEnter(event)" style="width: 100px; max-width: 100px"></td>
                 </tr>
               `;
             });
@@ -1774,49 +1773,12 @@ function encodeQty(picklistNum) {
                     <td style="background: #F7F7F7"></td>
                     <td style="background: #F7F7F7"></td>
                     <td style="background: #F7F7F7"></td>
-                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #fcf7d4"></td>
                   </tr>
               `;
                 $("#encodeQtyTable tbody").append(emptyRow);
               }
             }
-
-            $("#encodeQtyTable").DataTable({
-              destroy: true,
-              paging: true,
-              searching: true,
-              info: true,
-              order: [[5, "desc"]],
-
-              createdRow: function (row) {
-                if ($(row).hasClass("empty-row")) {
-                  $(row)
-                    .attr("data-order", "999999") // keeps them at bottom
-                    .addClass("no-sort");
-                }
-              },
-
-              rowCallback: function (row) {
-                if ($(row).hasClass("empty-row")) {
-                  $(row).appendTo("#encodeQtyTable tbody");
-                }
-              },
-
-              columnDefs: [
-                {
-                  targets: "_all",
-                  orderDataType: "dom-text",
-                },
-              ],
-
-              drawCallback: function () {
-                // always move empty rows to bottom after sorting/filtering
-                $("#encodeQtyTable tbody tr.empty-row").appendTo(
-                  "#encodeQtyTable tbody",
-                );
-              },
-            });
-
             submitEncodedQty(picklistEntry, picklistNum, srNumberMap);
           } else {
             alert(response.Data);
@@ -2019,9 +1981,11 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
                 // };
                 // openPrint();
                 // Swal.close();
-                setTimeout(() => {
-                  loadBasketContent();
-                }, 300);
+
+                // ORIGINAL
+                // setTimeout(() => {
+                //   loadBasketContent();
+                // }, 300);
               } else {
                 Swal.fire({
                   icon: "error",
@@ -2039,7 +2003,10 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
               });
             },
             complete: function () {
-              submitBtn.prop("disabled", false).html("Save");
+              setTimeout(() => {
+                loadBasketContent();
+              }, 300);
+              // submitBtn.prop("disabled", false).html("Save");
             },
           });
 

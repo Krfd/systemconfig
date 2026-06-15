@@ -22,7 +22,7 @@
                 <div class="container-fluid">
                     <div class="row">
                         <form method="POST" id="delivery">
-                            <div class="d-flex justify-content-between align-items-start">
+                            <div class="d-flex justify-content-between align-items-start mb-5">
                                 <div class="d-flex flex-column gap-1 col-4">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="pcklstno" class="form-label text-dark-emphasis col-3"><small>Picklist No:</small></label>
@@ -52,8 +52,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive d-flex gap-1 overflow-auto mt-5" style="max-height: 450px">
-                                <table class="table table-hover col" id="summaryTable">
+                            <div class="table-responsive d-flex gap-1 overall-progress overflow-auto" style="max-height: 450px">
+                                <table class="table table-hover col mb-0" id="summaryTable">
                                     <thead class="sticky-top">
                                     </thead>
                                     <tbody>
@@ -61,8 +61,8 @@
                                 </table>
                             </div>
                             <div id="totalRowOutside"
-                                class="d-flex border-top fw-bold align-items-center w-100"
-                                style="background: #f2f2f2">
+                                class="d-flex border border-secondary fw-bold align-items-center w-100"
+                                style="background: #faf0aa">
                                 <!-- ✅ LEFT SIDE (Balance) -->
                                 <div class="d-flex">
                                     <div class="p-2 text-end">Balance:</div>

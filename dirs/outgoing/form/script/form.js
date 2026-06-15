@@ -18,25 +18,13 @@ function loadDashboard() {
     $("#form-content").html(data);
     $("#outgoingTable tbody").html(`
       <tr>
-        <td colspan="6" class="text-center">${spinner}</td>
+        <td colspan="6" class="text-center align-middle" style="height: 300px">
+          <div style="height: 300px; display:flex; align-items:center; justify-content:center;">
+            ${spinner}
+          </div>
+        </td>
       </tr>
     `);
-  //   $("#outgoingTable tbody").html(`
-  //   <tr>
-  //     <td colspan="6" style="padding:0;">
-  //       <div style="
-  //         height: inherit;
-  //         width: 100%;
-  //         display: flex;
-  //         align-items: center;
-  //         justify-content: center;
-  //       ">
-  //         ${spinner}
-  //       </div>
-  //     </td>
-  //   </tr>
-  // `);
-    console.log(`UPDATED SPINNER`)
     loadImperialBrands();
     get_SRN();
     loadIAPBranches();

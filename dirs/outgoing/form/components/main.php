@@ -51,7 +51,7 @@
                             <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addRequestUnit"> Add</button>
                             <button type="button" class="btn btn-sm btn-danger" onclick="clearTable()">Clear</button>
                         </div>
-                        <div class="table-responsive overall-progress border border-secondary-subtle" style="max-height: 450px; overflow-y: auto">
+                        <div class="table-responsive overall-progress border border-secondary-subtle" style="max-height: 450px;">
                             <table class="table table-hover mb-0 w-100" id="outgoingTable">
                                 <thead class="sticky-top">
                                     <tr>
@@ -221,9 +221,10 @@
                         Reference: response.SRNumber
                     }, function(res) {
                         console.log(`RESPONSE: ${res}`)
-                        location.reload();
+                        // location.reload();
                     })
-                    submitBtn.prop("disabled", false).html("submit")
+                    location.reload();
+                    // submitBtn.prop("disabled", false).html("submit")
                 });
             } else {
                 Swal.fire({
