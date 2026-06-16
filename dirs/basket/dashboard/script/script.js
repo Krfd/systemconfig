@@ -1576,8 +1576,8 @@ function submitBranchAssignment() {
         // PROCEED FOR SUBMISSION
         let items = [];
 
-        // let commitButton = $(this).find("button[type='submit'].commit-btn")
-        // commitButton.prop("disabled", true).html(`<span class="spinner-border spinner-border-sm"></span> Commit`)
+        let commitButton = $(this).find("button[type='submit'].commit-btn")
+        commitButton.prop("disabled", true).html(`<span class="spinner-border spinner-border-sm"></span> Processing`)
 
         let hasUnassigned = false;
 
@@ -1629,7 +1629,7 @@ function submitBranchAssignment() {
             title: "Unassigned Items Found",
             text: "Please assign all items before submitting.",
           });
-          // commitButton.prop("disabled", false).html("Commit")
+          commitButton.prop("disabled", false).html("Commit")
           return;
         }
 
@@ -1640,7 +1640,7 @@ function submitBranchAssignment() {
             title: "No items on summary",
             text: "No item(s) found on the summary",
           });
-          // commitButton.prop("disabled", false).html("Commit")
+          commitButton.prop("disabled", false).html("Commit")
           return;
         }
 
@@ -3497,13 +3497,12 @@ function submitLoadingBasket(Picklists) {
     .on("submit", function (e) {
       e.preventDefault();
 
-       let commitBtn = $(this).find("button[type='submit'].commit-btn");
-          commitBtn
-            .prop("disabled", true)
-            .html(
-              `<span class="spinner-border spinner-border-sm"></span> Loading`,
-            );
-
+      //  let loadBtn = $(this).find("button[type='submit'].commit-btn");
+      //     loadBtn
+      //       .prop("disabled", true)
+      //       .html(
+      //         `<span class="spinner-border spinner-border-sm"></span> Loading`,
+      //       );
 
       const rowsWithItems = $("#loadBasketTable tbody tr").filter(function () {
         // return $(this).attr("data-itemid");
@@ -3516,7 +3515,7 @@ function submitLoadingBasket(Picklists) {
           title: "No items found",
           text: "Please add item(s) to the loading basket first.",
         });
-        commitBtn.prop("disabled", false).html("Load");
+        // loadBtn.prop("disabled", false).html("Load");
         return;
       }
 
@@ -3665,6 +3664,8 @@ function submitLoadingBasket(Picklists) {
       //   });
       // });
 
+      let loadBtn = $(this).find("button[type='submit'].load-btn");
+
       $("#loadBasketTable tbody tr[data-itemmapping]").each(function () {
         console.log("ROW:");
         console.log("data-itemmapping:", $(this).attr("data-itemmapping"));
@@ -3679,12 +3680,11 @@ function submitLoadingBasket(Picklists) {
         cancelButtonText: "Back",
       }).then((result) => {
         if (result.isConfirmed) {
-          // let commitBtn = $(this).find("button[type='submit'].commit-btn");
-          // commitBtn
-          //   .prop("disabled", true)
-          //   .html(
-          //     `<span class="spinner-border spinner-border-sm"></span> Loading`,
-          //   );
+          loadBtn
+            .prop("disabled", true)
+            .html(
+              `<span class="spinner-border spinner-border-sm"></span> Loading`,
+            );
 
           $.ajax({
             url: "dirs/basket/dashboard/actions/save_create_loading_basketv2.php",
@@ -3717,20 +3717,20 @@ function submitLoadingBasket(Picklists) {
                   title: "Server error",
                   html: res,
                 });
-                commitBtn.prop("disabled", false).html("Load");
+                loadBtn.prop("disabled", false).html("Load");
               }
             },
             error: function (xhr, status, error) {
               console.log("ERROR");
               console.log(xhr.responseText);
-              commitBtn.prop("disabled", false).html("Load");
+              loadBtn.prop("disabled", false).html("Load");
             },
             complete: function () {
-              commitBtn.prop("disabled", false).html("Load");
+              loadBtn.prop("disabled", false).html("Load");
             },
           });
         }
       });
-      commitBtn.prop("disabled", false).html("Load");
+      loadBtn.prop("disabled", false).html("Load");
     });
 }

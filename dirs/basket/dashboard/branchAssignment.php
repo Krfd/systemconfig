@@ -52,7 +52,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive d-flex gap-1 overall-progress overflow-auto" style="max-height: 450px">
+                            <div class="table-responsive d-flex border border-secondary-subtle gap-1 overall-progress overflow-auto" style="max-height: 450px">
                                 <table class="table table-hover col mb-0" id="summaryTable">
                                     <thead class="sticky-top">
                                     </thead>

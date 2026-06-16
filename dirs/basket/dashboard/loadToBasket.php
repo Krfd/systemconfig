@@ -127,7 +127,7 @@
                                     <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #fcf7d4; height: auto; resize: horizontal"></textarea>
                                 </div>
                                 <div class="ms-auto">
-                                    <button class="btn btn-primary float-end commit-btn" type="submit" id="loadingBasketBtn">Load</button>
+                                    <button class="btn btn-primary float-end load-btn" type="submit" id="loadingBasketBtn">Load</button>
                                 </div>
                             </div>
                         </form>

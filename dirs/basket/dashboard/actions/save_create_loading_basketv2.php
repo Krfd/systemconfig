@@ -54,97 +54,37 @@ try {
     $BatchNumber = $result['BatchNumber'];
 
     $stmtCollect = $conn->prepare("EXEC dbo.CreatePicklist_V2 ?,?,?,?,?,?,?");
+    $stmtSupply = $conn->prepare("INSERT INTO Loading_Basket_Item_Total  (
+        batch,
+        Item_id,
+        TotalLoadedQty,
+        OriginalLoadedQty
+    )
+    VALUES (?, ?, ?, ?)
+    ");
 
     $logLines = [];
-
     $referenceMap = [];
-
     $groupedItems = [];
 
-    // foreach ($Item_Id as $key => $itmid) {
-    //     if (empty($itmid)) {
-    //         continue;
-    //     }
-
-    //     $serial     = $ItemSerial[$key] ?? null;
-    //     $picklist   = $PickListnumber[$key] ?? null;
-    //     // $qty   = $ItemQty[$key] ?? null;
-    //     $qty = (float)($ItemQty[$key] ?? 0);
-
-    //     $branch = getBranch($conn, $itmid, $picklist);
-    //     if ($branch === '') {
-    //         throw new Exception("Branch not found for Item ID {$itmid} and Picklist {$picklist}");
-    //     }
-
-    //     // FOR LOGS
-    //     if (!isset($groupedItems[$itmid])) {
-    //         $groupedItems[$itmid] = [
-    //             'ItemId' => $itmid,
-    //             'TotalQty' => 0,
-    //             'Branch' => $branch,
-    //             'Picklists' => [],
-    //             'Serials' => []
-    //         ];
-    //     }
-
-    //     $groupedItems[$itmid]['TotalQty'] += $qty;
-
-    //     if (!empty($picklist)) {
-    //         $groupedItems[$itmid]['Picklists'][] = $picklist;
-    //     }
-
-    //     if (!empty($serial)) {
-    //         $groupedItems[$itmid]['Serials'][] = $serial;
-    //     }
-
-    //     if (!isset($referenceMap[$branch])) {
-    //         $referenceMap[$branch] = generateReference();
-    //     }
-
-    //     $referenceNumber = $referenceMap[$branch];
-
-    //     $stmtCollect->execute([
-    //         $User,
-    //         $itmid,
-    //         $referenceNumber,
-    //         $BatchNumber,
-    //         $picklist,
-    //         $serial,
-    //         $qty
-    //         // $groupedItems[$itmid]['TotalQty']
-    //     ]);
-    // }
+    $logLines[] = "=== GROUPED ITEM SUMMARY ===";
+    $logLines[] = "Generated: " . date('Y-m-d H:i:s');
+    $logLines[] = "";
 
     foreach ($Item_Id as $key => $itmid) {
 
-        if (empty($itmid)) {
-            continue;
-        }
-
-        $serial   = $ItemSerial[$key] ?? null;
-        $picklist = $PickListnumber[$key] ?? null;
-        $qty      = (float)($ItemQty[$key] ?? 0);
-
-        $branch = getBranch($conn, $itmid, $picklist);
-
-        if ($branch === '') {
-            throw new Exception(
-                "Branch not found for Item ID {$itmid} and Picklist {$picklist}"
-            );
-        }
+        $qty   = $ItemQty[$key] ?? null;
 
         if (!isset($groupedItems[$itmid])) {
-
             $groupedItems[$itmid] = [
-                'ItemId'    => $itmid,
-                'TotalQty'  => 0,
-                'Branch'    => $branch,
+                'ItemId' => $itmid,
+                'TotalQty' => 0,
+                'Branch' => null,
                 'Picklists' => [],
-                'Serials'   => []
+                'Serials' => []
             ];
         }
-
-        $groupedItems[$itmid]['TotalQty'] += $qty;
+        $groupedItems[$itmid]['TotalQty'] += (float)$qty;
 
         if (!empty($picklist)) {
             $groupedItems[$itmid]['Picklists'][] = $picklist;
@@ -155,15 +95,122 @@ try {
         }
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | EXECUTE STORED PROCEDURE ONCE PER GROUPED ITEM
-    |--------------------------------------------------------------------------
-    */
-
     foreach ($groupedItems as $item) {
+        $stmtSupply->execute([
+            $BatchNumber,
+            $item['ItemId'],
+            $item['TotalQty'],
+            $item['TotalQty'],
+        ]);
+    }
 
-        $branch = $item['Branch'];
+    $loadedQtyMap = [];
+    $updatedRecords = [];
+
+    /**
+     * 1. GET TOTAL LOADED QTY ONCE PER ITEM (BEFORE LOOP)
+     */
+    $getTotals = $conn->prepare("SELECT Item_id, TotalLoadedQty
+    FROM Loading_Basket_Item_Total
+    WHERE batch = ?");
+    $getTotals->execute([$BatchNumber]);
+
+    while ($row = $getTotals->fetch(PDO::FETCH_ASSOC)) {
+        $loadedQtyMap[$row['Item_id']] = (float)$row['TotalLoadedQty'];
+    }
+
+    /**
+     * 2. CREATE WORKING COPY (THIS WILL BE DECREMENTED IN LOOP)
+     */
+    // $remainingQtyMap = $loadedQtyMap;
+    // $remainingQtyMap = [];
+    $consumedQtyMap = [];
+    foreach ($loadedQtyMap as $itemId => $qty) {
+        $remainingQtyMap[$itemId] = $qty;
+    }
+
+    foreach ($Item_Id as $key => $itmid) {
+        if (empty($itmid)) {
+            continue;
+        }
+
+        $serial     = $ItemSerial[$key] ?? null;
+        $picklist   = $PickListnumber[$key] ?? null;
+        $qty   = $ItemQty[$key] ?? null;
+
+        $branch = getBranch($conn, $itmid, $picklist);
+        $groupedItems[$itmid]['Branch'] = $branch;
+        // $logLines[] = "PAIR => key={$key} | Item={$itmid} | Picklist=" . ($picklist ?? 'NULL');
+        if ($branch === '') {
+            throw new Exception("Branch not found for Item ID {$itmid} and Picklist {$picklist}");
+        }
+
+        $recordKey = $itmid . '|' . $picklist . '|' . $branch;
+
+        if (isset($updatedRecords[$recordKey])) {
+            continue;
+        }
+
+        $updatedRecords[$recordKey] = true;
+
+        /**
+         * INIT CONSUMPTION TRACKING
+         */
+        if (!isset($consumedQtyMap[$itmid])) {
+            $consumedQtyMap[$itmid] = 0;
+        }
+
+        $totalAvailable = $loadedQtyMap[$itmid] ?? 0;
+        $remainingAvailable = $totalAvailable - $consumedQtyMap[$itmid];
+
+        if ($remainingAvailable <= 0) {
+            continue;
+        }
+
+        /**
+         * GET REQUIRED QTY FROM PICKLIST
+         * (DO NOT CHANGE THIS VALUE IN DB)
+         */
+        $getToDeliverCollection = $conn->prepare("SELECT ToDeliver_Qty
+            FROM Pick_List_Item_Collection
+            WHERE ItemRowNum = ? AND PKList_Number = ? AND Req_Branch = ?
+        ");
+        $getToDeliverCollection->execute([$itmid, $picklist, $branch]);
+
+        $collectionQty = (float)$getToDeliverCollection->fetchColumn();
+
+        /**
+         * FINAL ALLOCATION
+         */
+        $allocatedQty = min($remainingAvailable, $collectionQty);
+
+        /**
+         * UPDATE GLOBAL CONSUMPTION (IMPORTANT FIX)
+         */
+        $consumedQtyMap[$itmid] += $allocatedQty;
+
+        /**
+         * GROUPING (UNCHANGED)
+         */
+        if (!isset($groupedItems[$itmid])) {
+            $groupedItems[$itmid] = [
+                'ItemId' => $itmid,
+                'TotalQty' => 0,
+                'Branch' => $branch,
+                'Picklists' => [],
+                'Serials' => []
+            ];
+        }
+
+        $groupedItems[$itmid]['TotalQty'] += (float)$qty;
+
+        if (!empty($picklist)) {
+            $groupedItems[$itmid]['Picklists'][] = $picklist;
+        }
+
+        if (!empty($serial)) {
+            $groupedItems[$itmid]['Serials'][] = $serial;
+        }
 
         if (!isset($referenceMap[$branch])) {
             $referenceMap[$branch] = generateReference();
@@ -171,16 +218,81 @@ try {
 
         $referenceNumber = $referenceMap[$branch];
 
+        $getToDeliver = $conn->prepare("SELECT TotalLoadedQty 
+        FROM Loading_Basket_Item_Total WHERE batch = ? AND Item_id = ?");
+        $getToDeliver->execute([$BatchNumber, $itmid]);
+
+        $totalLoadedQty = $getToDeliver->fetchColumn();
+
+        $getToDeliverCollection = $conn->prepare("SELECT ToDeliver_Qty 
+        FROM Pick_List_Item_Collection WHERE ItemRowNum = ? AND PKList_Number = ? AND Req_Branch = ?");
+        $getToDeliverCollection->execute([$itmid, $picklist, $branch]);
+
+        $collectionQty = $getToDeliverCollection->fetchColumn();
+
+        if ($totalLoadedQty > $collectionQty) {
+            $qty = $totalLoadedQty - $collectionQty;
+            
+            $updateCollection = $conn->prepare("UPDATE Pick_List_Item_Collection
+            SET ToDeliver_Qty = ? WHERE ItemRowNum = ? AND PKList_Number = ? AND Req_Branch = ?");
+            $updateCollection->execute([$allocatedQty, $itmid, $picklist, $branch]);
+        
+            $updateTotalLoadedQty = $conn->prepare("UPDATE Loading_Basket_Item_Total
+            SET TotalLoadedQty = ? WHERE batch = ? AND Item_id = ?");
+            $updateTotalLoadedQty->execute([$qty, $BatchNumber, $itmid]); 
+        } else {
+            $qty = $collectionQty - $totalLoadedQty;
+
+            $updateCollection = $conn->prepare("UPDATE Pick_List_Item_Collection
+            SET ToDeliver_Qty = ? WHERE ItemRowNum = ? AND PKList_Number = ? AND Req_Branch = ?");
+            $updateCollection->execute([$allocatedQty, $itmid, $picklist, $branch]);
+        
+            $updateTotalLoadedQty = $conn->prepare("UPDATE Loading_Basket_Item_Total
+            SET TotalLoadedQty = ? WHERE batch = ? AND Item_id = ?");
+            $updateTotalLoadedQty->execute([$qty, $BatchNumber, $itmid]);
+        }
+
         $stmtCollect->execute([
             $User,
-            $item['ItemId'],
+            $itmid,
             $referenceNumber,
             $BatchNumber,
-            $item['Picklists'][0] ?? null,
-            $item['Serials'][0] ?? null,
-            $item['TotalQty']
+            $picklist,
+            $serial,
+            // $qty
+            $allocatedQty
+            // $groupedItems[$itmid]['TotalQty']
         ]);
     }
+
+    foreach ($groupedItems as $item) {
+
+        $uniquePicklists = array_unique($item['Picklists']);
+        $uniqueSerials   = array_unique($item['Serials']);
+
+        $logLines[] = "Item ID    : {$item['ItemId']}";
+        $logLines[] = "Total Qty  : {$item['TotalQty']}";
+        $logLines[] = "Branch     : {$item['Branch']}";
+        $logLines[] = "Picklists  : " . (!empty($uniquePicklists)
+            ? implode(', ', $uniquePicklists)
+            : 'NONE');
+
+        $logLines[] = "Serials    : " . (!empty($uniqueSerials)
+            ? implode(', ', $uniqueSerials)
+            : 'NONE');
+
+        $logLines[] = str_repeat("-", 60);
+    }
+
+    $fileName = "grouped_items_" . date('Ymd_His') . ".txt";
+
+    file_put_contents(
+        $fileName,
+        implode(PHP_EOL, $logLines)
+    );
+
+    // $stmtAllocate = $conn->prepare("EXEC dbo.Allocate_LoadingBasket_Qty ?");
+    // $stmtAllocate->execute([$BatchNumber]);
 
     $logLines[] = "\n=== GROUPED ITEM SUMMARY ===";
 
