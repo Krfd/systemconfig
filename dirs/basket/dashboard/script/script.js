@@ -11,12 +11,20 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
+  $("#basket_content").html(spinner);
   $.post("dirs/basket/dashboard/components/main.php", {}, function (data) {
-    $("#basket_content").html(data);
-    $("#basketTableDashboard").DataTable({
-      pageLength: 50,
-      order: [0, "desc"],
-    });
+    // $("#basket_content").html(data);
+    $("#basket_content").hide().html(data).fadeIn(200);
+    // $("#basketTableDashboard").DataTable({
+    //   pageLength: 50,
+    //   order: [0, "desc"],
+    // });
+    $("#basketTableDashboard tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
+    // console.log(`BRANCH ASSIGNMENT SPINNER : ${spinner}`)
     loadDeliveryBasket(
       "#basketTableDashboard",
       "dirs/incoming/dashboard/actions/picklisteditems.php",
@@ -132,9 +140,9 @@ $(document).on(
     // deliveryNum = del_num;
 
     $("#main-content").html(spinner);
-    setTimeout(function () {
-      loadDeliveryItems(PickLst_Num);
-    }, 200);
+    // setTimeout(function () {
+    loadDeliveryItems(PickLst_Num);
+    // }, 200);
   },
 );
 
@@ -144,69 +152,19 @@ $(document).on("click", ".dropdown .open-picklisted", function (e) {
 
   deliveryPicklistNum = Picklist;
 
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    loadDeliveryItems(Picklist);
-  }, 200);
+  $("#basket_content").html(spinner);
+  // setTimeout(function () {
+  // $.post("dirs/basket/dashboard/loadDeliveryItems.php", {}, function (data) {
+  //   $("#main-content").html(data);
+  // $("#deliveryItemsTable tbody").html(`
+  //     <tr>
+  //       <td colspan="100%" class="text-center">${spinner}</td>
+  //     </tr>
+  //   `);
+  loadDeliveryItems(Picklist);
+  // })
+  // }, 200);
 });
-
-// $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
-//   let serial = $(this).data("serial");
-//   let itemCode = $(this).data("itemcode");
-//   let lbNum = $(this).data("lbnum");
-//   let brand = $(this).find("td:nth-child(1)").text().trim();
-//   let model = $(this).find("td:nth-child(2)").text().trim();
-//   let category = $(this).find("td:nth-child(3)").text().trim();
-//   let qty = $(this).find("td:nth-child(4)").text().trim();
-
-//   // ✅ Prevent modal if row is empty
-//   if (!brand && !model && !qty) {
-//     return;
-//   }
-
-//   // OPTIONAL (stronger check): ignore placeholder rows
-//   if ($(this).hasClass("empty-row")) {
-//     return;
-//   }
-
-//   $("#assignBranchModal #serial").val(serial);
-//   $("#assignBranchModal #brand").val(brand);
-//   $("#assignBranchModal #model").val(model);
-//   $("#assignBranchModal #itemCode").val(itemCode);
-//   $("#assignBranchModal #deliveryQty").text(qty);
-//   loadPicklistBranches(lbNum, model, category, function (length) {
-//     console.log(`BRANCHES LENGTH: ${length}`);
-//     if (length > 1) {
-//       $("#assignBranchModal").modal("show");
-//     } else {
-//       console.log("Single branch");
-//     }
-//   });
-// });
-
-// ---------------------------------------------------------------
-
-// $(document).on("click", "#summaryTable tbody tr", function (e) {
-//   e.preventDefault();
-//   let serial = $(this).data("serial");
-
-//   if (!serial) {
-//     return;
-//   }
-
-//   let $serialCell = $("#delivery-serial-table tbody td").first();
-//   let formattedSerial;
-
-//   if (Array.isArray(serial)) {
-//     formattedSerial = serial.join("<br>");
-//   } else if (typeof serial === "string") {
-//     formattedSerial = serial.split(",").join("<br>");
-//   } else {
-//     formattedSerial = serial;
-//   }
-
-//   $serialCell.html(formattedSerial);
-// });
 
 // BRANCH ASSIGNMENT
 $(document).on("click", ".datatables .dropdown .assign-branch", function (e) {
@@ -242,31 +200,45 @@ function loadDeliveryBasketContent() {
   if ($.fn.DataTable.isDataTable("#basketTableDashboard")) {
     $("#basketTableDashboard").DataTable().clear().destroy();
   }
-  let tableId = "#basketTableDashboard";
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    $.post("dirs/basket/dashboard/basket.php", {}, function (data) {
-      $("#main-content").hide().html(data).fadeIn(200);
-      loadDeliveryBasket(
-        "#basketTableDashboard",
-        "dirs/incoming/dashboard/actions/picklisteditems.php",
-      );
-      $("#loadDeliveryBtn").prop("disabled", true);
-    });
-  }, 200);
+  // let tableId = "#basketTableDashboard";
+  $("#basket_content").html(spinner);
+  // setTimeout(function () {
+  $.post("dirs/basket/dashboard/basket.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+    $("#basketTableDashboard tbody").html(`
+        <tr>
+          <td colspan="100%" class="text-center">${spinner}</td>
+        </tr>
+      `);
+    loadDeliveryBasket(
+      "#basketTableDashboard",
+      "dirs/incoming/dashboard/actions/picklisteditems.php",
+    );
+    $("#loadDeliveryBtn").prop("disabled", true);
+  });
+  // }, 200);
 }
 
 $(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function () {
   const target = this.id;
 
   if (target === "unassigned-tab") {
+    $("#basketTableDashboard tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
     loadDeliveryBasket(
       "#basketTableDashboard",
       "dirs/incoming/dashboard/actions/picklisteditems.php",
     );
     $("#loadDeliveryBtn").prop("disabled", true);
   } else if (target === "assigned-tab") {
-    // $("#main-content").html(spinner);
+    $("#basketTableAssigned tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
     setTimeout(function () {
       loadDeliveryBasket(
         "#basketTableAssigned",
@@ -277,7 +249,6 @@ $(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function () {
   }
 });
 
-// OPEN SRN FROM LOADING ITEMS
 function loadDeliveryBasket(tableId, url) {
   $.ajax({
     url: url,
@@ -322,6 +293,8 @@ function loadDeliveryBasket(tableId, url) {
 
       if (response.isSuccess === "success") {
         Object.values(grouped).forEach((item) => {
+          // console.log(`ITEM : ${JSON.stringify(item)}`)
+          // console.log(`QUANTITY: ${item.RequestItemQty}`)
           let branches = Array.from(item.Req_Branch).join(", ");
 
           const hasInvalidQty = item.items.some((row) => {
@@ -386,35 +359,13 @@ function loadDeliveryBasket(tableId, url) {
           // });
         });
 
-        // ${
-        //             item.PickListStatus !== "IT"
-        //               ?
-        //                 `
-        //             <li>
-        //               <a class="dropdown-item ${
-        //                 item.PickListStatus === "ASSIGNED"
-        //                   ? "edit-branch"
-        //                   : "assign-branch"
-        //               }"
-        //                 href="#"
-        //                 data-picklist="${item.PKList_Number}"
-        //                 data-lbNum="${item.DocEntry}"
-        //                 data-branches="${branches}">
-        //                 ${
-        //                   item.PickListStatus === "ASSIGNED"
-        //                     ? "Edit Assignment"
-        //                     : "Set Assignment"
-        //                 }
-        //               </a>
-        //             </li>
-        //             `
-        //               : ""
-
         if (rows.length === 0) {
           for (let i = 0; i < 8; i++) {
             rows.push(["", "", "", "", ""]);
           }
         }
+
+        destroyAllTooltips();
 
         if ($.fn.DataTable.isDataTable(tableId)) {
           $(tableId).DataTable().clear().destroy();
@@ -444,6 +395,7 @@ function loadDeliveryBasket(tableId, url) {
                 .attr("data-rownum", originalItem.DocEntry)
                 .attr("data-picklist", originalItem.PKList_Number)
                 .attr("data-branches", branches)
+                // .attr("data-bs-toggle", "tooltip")
                 .attr(
                   "data-bs-title",
                   `<div class="text-start">Branches: <br>${branchList.join("<br>") || "No Branch"}</div>`,
@@ -458,7 +410,7 @@ function loadDeliveryBasket(tableId, url) {
           order: [[0, "desc"]],
           rowCallback: function (row, data) {
             $("td:not(:first-child)", row).css({
-              background: "#FFFBDF",
+              background: "#fcf7d4",
               padding: "3px",
               height: "40px",
               "min-height": "40px",
@@ -474,7 +426,7 @@ function loadDeliveryBasket(tableId, url) {
                 $(this).css("background", "#FFF4C2");
               },
               function () {
-                $(this).css("background", "#FFFBDF");
+                $(this).css("background", "#fcf7d4");
               },
             );
           },
@@ -486,12 +438,12 @@ function loadDeliveryBasket(tableId, url) {
               let $emptyRow = $(`
                   <tr class="empty-row">
                     <td>&nbsp;</td>
-                    <td colspan="4" style="background: #FFFBDF">&nbsp;</td>
+                    <td colspan="4" style="background: #fcf7d4">&nbsp;</td>
                   </tr>
                 `);
 
               $emptyRow.css({
-                background: "#FFFBDF",
+                background: "#fcf7d4",
                 height: "40px",
                 "min-height": "40px",
               });
@@ -500,7 +452,7 @@ function loadDeliveryBasket(tableId, url) {
                   $(this).css("background", "#FFF4C2");
                 },
                 function () {
-                  $(this).css("background", "#FFFBDF");
+                  $(this).css("background", "#fcf7d4");
                 },
               );
               tableBody.append($emptyRow);
@@ -509,21 +461,23 @@ function loadDeliveryBasket(tableId, url) {
             const selectionMode =
               $("#basketTableAssigned").data("selectionMode") || false;
 
-            // Target dropdown buttons
+            // $(tableId + " [data-bs-toggle='tooltip']").each(function () {
+            //   if (!this._tooltipInitialized) {
+            //     this._tooltipInitialized = true;
+
+            //     new bootstrap.Tooltip(this, {
+            //       placement: "right",
+            //       container: "body",
+            //       html: true,
+            //       trigger: "hover"
+            //     });
+            //   }
+            // });
+
             $(tableId + " tbody tr").each(function () {
-              const dropdownBtn = $(this).find(
-                "button[data-bs-toggle='dropdown']",
-              );
-
-              if (selectionMode) {
-                dropdownBtn.prop("disabled", true).addClass("disabled");
-              } else {
-                dropdownBtn.prop("disabled", false).removeClass("disabled");
-              }
-
               const existingTooltip = bootstrap.Tooltip.getInstance(this);
               if (existingTooltip) {
-                existingTooltip.hide();
+                existingTooltip.dispose();
               }
 
               new bootstrap.Tooltip(this, {
@@ -534,35 +488,39 @@ function loadDeliveryBasket(tableId, url) {
               });
             });
 
-            // remove tooltip when dropdown opens
             $(tableId + " tbody")
-              .off("show.bs.dropdown")
+              .off("show.bs.dropdown hide.bs.dropdown click.dropdownAction")
               .on("show.bs.dropdown", ".dropdown", function () {
                 const row = $(this).closest("tr")[0];
 
                 const tooltipInstance = bootstrap.Tooltip.getInstance(row);
-
                 if (tooltipInstance) {
-                  tooltipInstance.hide();
+                  tooltipInstance.dispose();
                 }
+                document
+                  .querySelectorAll(".tooltip")
+                  .forEach((el) => el.remove());
               })
               .on("hide.bs.dropdown", ".dropdown", function () {
                 const row = $(this).closest("tr")[0];
+                const instance = bootstrap.Tooltip.getInstance(row);
 
-                const tooltipInstance = bootstrap.Tooltip.getInstance(row);
-
-                if (tooltipInstance) {
-                  tooltipInstance.hide();
+                if (instance) {
+                  instance.dispose();
                 }
-              }) // REMOVE TOOLTIP WHEN ANY DROPDOWN ITEM IS CLICKED
+              })
               .on("click.dropdownAction", ".dropdown-item", function () {
                 const row = $(this).closest("tr")[0];
 
                 const tooltipInstance = bootstrap.Tooltip.getInstance(row);
 
                 if (tooltipInstance) {
-                  tooltipInstance.hide();
+                  tooltipInstance.dispose();
                 }
+
+                document
+                  .querySelectorAll(".tooltip")
+                  .forEach((el) => el.remove());
               });
           },
         });
@@ -576,6 +534,35 @@ function loadDeliveryBasket(tableId, url) {
   });
   // });
 }
+
+function destroyAllTooltips() {
+  // document.querySelectorAll('[data-bs-title]')
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((el) => {
+    const instance = bootstrap.Tooltip.getInstance(el);
+
+    if (instance) {
+      instance.hide();
+      instance.dispose(); // completely remove tooltip
+    }
+  });
+
+  // remove any orphaned tooltip elements
+  document.querySelectorAll(".tooltip").forEach((tooltip) => {
+    tooltip.remove();
+  });
+}
+
+$(document).on("click", ".open-picklisted", function () {
+  // document.querySelectorAll('[data-bs-title]')
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((el) => {
+    const instance = bootstrap.Tooltip.getInstance(el);
+
+    if (instance) {
+      instance.dispose();
+    }
+  });
+  document.querySelectorAll(".tooltip").forEach((el) => el.remove());
+});
 
 $(document).on("click", "#deliveryItemsTable tbody .open-srn", function (e) {
   e.preventDefault();
@@ -783,13 +770,13 @@ function clearTable() {
       for (let i = 0; i < 8; i++) {
         row = `
           <tr>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
         </tr>
         `;
 
@@ -827,11 +814,11 @@ function clearLoadingTable() {
       for (let i = 0; i < 8; i++) {
         row = `
           <tr>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
+          <td style="background: #fcf7d4; height: 40px;"></td>
         </tr>
         `;
 
@@ -1102,7 +1089,15 @@ $(document).on(
 function assignBranch(picklist, branchees) {
   $.post("dirs/basket/dashboard/branchAssignment.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
-
+    // summaryTable.html(`
+    //   <tr>
+    //     <td colspan="6" class="text-center align-middle" style="height:300px;">
+    //         <div style="height:300px; display:flex; align-items:center; justify-content:center;">
+    //           ${spinner}
+    //         </div>
+    //     </td>
+    //   </tr>
+    // `);
     restrictInput();
     submitBranchAssignment("#summaryTable");
 
@@ -1127,7 +1122,7 @@ function assignBranch(picklist, branchees) {
               <th class="text-secondary">Brand</th>
               <th class="text-secondary">Model</th>
               <th class="text-secondary">Category</th>
-              <th class="text-secondary">Actual Quantity</th>
+              <th class="text-secondary text-center">Actual Quantity</th>
           `;
 
           branches.forEach((branch) => {
@@ -1208,7 +1203,7 @@ function assignBranch(picklist, branchees) {
                 <td class="align-middle ps-3" style="background: ##F7F7F7">${unit.ItemBrand}</td>
                 <td class="align-middle ps-3" style="background: ##F7F7F7">${unit.ItemName}</td>
                 <td class="align-middle ps-3" style="background: ##F7F7F7">${unit.ItemCategory}</td>
-                <td class="align-middle ps-3" style="background: ##F7F7F7">${Math.trunc(Number(unit.Actual_Item_Qty))}</td>
+                <td class="align-middle ps-3 text-center" style="background: ##F7F7F7">${Math.trunc(Number(unit.Actual_Item_Qty))}</td>
               `;
 
             // Count editable branches for this row
@@ -1239,7 +1234,7 @@ function assignBranch(picklist, branchees) {
               row += `
                 <td class="align-middle ps-3 text-center" data-branch="${branch}"
                     ${isEditable ? 'contenteditable="true"' : ""}
-                    style="background: ${isEditable ? "#FFFBDF" : "#F7F7F7"}; cursor: ${isEditable ? "text" : "default"}; outline: none;"
+                    style="background: ${isEditable ? "#fcf7d4" : "#F7F7F7"}; cursor: ${isEditable ? "text" : "default"}; outline: none;"
                     onfocus="this.style.border='1px solid #ffc107'; this.style.outline='none';">
                     ${val}
                 </td>
@@ -1472,7 +1467,7 @@ function editAssignBranch(picklist, branchees) {
               row += `
                 <td class="align-middle ps-3 text-center" data-branch="${branch}"
                     ${isEditable ? 'contenteditable="true"' : ""}
-                    style="background: ${isEditable ? "#FFFBDF" : "#F7F7F7"}; cursor: ${isEditable ? "text" : "default"}; outline: none;"
+                    style="background: ${isEditable ? "#fcf7d4" : "#F7F7F7"}; cursor: ${isEditable ? "text" : "default"}; outline: none;"
                     onfocus="this.style.border='1px solid #ffc107'; this.style.outline='none';">
                     ${rawVal > 0 ? rawVal : ""}
                 </td>
@@ -1555,6 +1550,7 @@ function editAssignBranch(picklist, branchees) {
 
 // SUBMIT BRANCH ASSIGNMENT
 function submitBranchAssignment() {
+  // let commitBtn = document.getElementById("branchAssignmentBtn");
   let commitBtn = document.getElementById("branchAssignmentBtn");
 
   commitBtn.addEventListener("click", function (e) {
@@ -1582,6 +1578,9 @@ function submitBranchAssignment() {
       }
     }
 
+    // let commitButton = $(this).find("button[type='submit'].commit-btn")
+    // commitButton.prop("disabled", true).html(`<span class="spinner-border spinner-border-sm"></span> Commit`)
+
     Swal.fire({
       icon: "warning",
       title: "Save branch assignment?",
@@ -1593,6 +1592,13 @@ function submitBranchAssignment() {
       if (res.isConfirmed) {
         // PROCEED FOR SUBMISSION
         let items = [];
+
+        let commitButton = $(this).find("button[type='submit'].commit-btn");
+        commitButton
+          .prop("disabled", true)
+          .html(
+            `<span class="spinner-border spinner-border-sm"></span> Processing`,
+          );
 
         let hasUnassigned = false;
 
@@ -1644,6 +1650,7 @@ function submitBranchAssignment() {
             title: "Unassigned Items Found",
             text: "Please assign all items before submitting.",
           });
+          commitButton.prop("disabled", false).html("Commit");
           return;
         }
 
@@ -1654,6 +1661,7 @@ function submitBranchAssignment() {
             title: "No items on summary",
             text: "No item(s) found on the summary",
           });
+          commitButton.prop("disabled", false).html("Commit");
           return;
         }
 
@@ -1730,6 +1738,7 @@ function submitBranchAssignment() {
             });
           },
         });
+        // commitButton.prop("disabled", false).html("Commit")
       }
     });
   });
@@ -1965,7 +1974,7 @@ function loadingItems() {
             order: [[0, "desc"]],
             rowCallback: function (row, data) {
               $("td", row).css({
-                background: "#FFFBDF",
+                background: "#fcf7d4",
                 padding: "3px",
                 height: "40px",
                 "min-height": "40px",
@@ -1981,7 +1990,7 @@ function loadingItems() {
                   $(this).css("background", "#FFF4C2");
                 },
                 function () {
-                  $(this).css("background", "#FFFBDF");
+                  $(this).css("background", "#fcf7d4");
                 },
               );
             },
@@ -1991,12 +2000,12 @@ function loadingItems() {
 
               for (let i = currentRows; i < 8; i++) {
                 let $emptyRow = $(`
-              <tr class="empty-row" style="background: #FFFBDF">
-                <td colspan="6" style="background: #FFFBDF">&nbsp;</td>
+              <tr class="empty-row">
+                <td colspan="6" style="background: #fcf7d4">&nbsp;</td>
               </tr>
             `);
                 $emptyRow.css({
-                  background: "#FFFBDF",
+                  background: "#fcf7d4",
                   height: "40px",
                   "min-height": "40px",
                   cursor: "pointer",
@@ -2006,7 +2015,7 @@ function loadingItems() {
                     $(this).css("background", "#FFF4C2");
                   },
                   function () {
-                    $(this).css("background", "#FFFBDF");
+                    $(this).css("background", "#fcf7d4");
                   },
                 );
                 tableBody.append($emptyRow);
@@ -2028,7 +2037,11 @@ function loadingItems() {
 function loadDeliveryItems(PickLst_Num) {
   $.post("dirs/basket/dashboard/loadDeliveryItems.php", {}, function (data) {
     $("#main-content").html(data);
-
+    $("#deliveryItemsTable tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
     $.ajax({
       // url: "dirs/basket/dashboard/actions/get_loading_breakdown.php",
       url: "dirs/incoming/dashboard/actions/get_picklist_items.php",
@@ -2100,7 +2113,7 @@ function loadDeliveryItems(PickLst_Num) {
             order: [[0, "desc"]],
             rowCallback: function (row, data) {
               $("td", row).css({
-                background: "#FFFBDF",
+                background: "#fcf7d4",
                 padding: "3px",
                 height: "40px",
                 "min-height": "40px",
@@ -2114,7 +2127,7 @@ function loadDeliveryItems(PickLst_Num) {
                   $(this).css("background", "#FFF4C2");
                 },
                 function () {
-                  $(this).css("background", "#FFFBDF");
+                  $(this).css("background", "#fcf7d4");
                 },
               );
             },
@@ -2124,12 +2137,12 @@ function loadDeliveryItems(PickLst_Num) {
 
               for (let i = currentRows; i < 8; i++) {
                 let $emptyRow = $(`
-                  <tr class="empty-row" style="background: #FFFBDF">
-                    <td colspan="4" style="background: #FFFBDF">&nbsp;</td>
+                  <tr class="empty-row">
+                    <td colspan="4" style="background: #fcf7d4">&nbsp;</td>
                   </tr>
                 `);
                 $emptyRow.css({
-                  background: "#FFFBDF",
+                  background: "#fcf7d4",
                   height: "40px",
                   "min-height": "40px",
                   cursor: "pointer",
@@ -2139,7 +2152,7 @@ function loadDeliveryItems(PickLst_Num) {
                     $(this).css("background", "#FFF4C2");
                   },
                   function () {
-                    $(this).css("background", "#FFFBDF");
+                    $(this).css("background", "#fcf7d4");
                   },
                 );
                 tableBody.append($emptyRow);
@@ -2857,11 +2870,11 @@ function loadToBasket(Picklists) {
     for (i = 0; i < 8; i++) {
       let emptyRow = $(`
         <tr style="height: 40px">
-          <td class="ps-3" style="background: #FFFBDF"></td>
-          <td class="ps-3" style="background: #FFFBDF"></td>
-          <td class="ps-3" style="background: #FFFBDF"></td>
-          <td class="ps-3" style="background: #FFFBDF"></td>
-          <td class="ps-3" style="background: #FFFBDF"></td>
+          <td class="ps-3" style="background: #fcf7d4"></td>
+          <td class="ps-3" style="background: #fcf7d4"></td>
+          <td class="ps-3" style="background: #fcf7d4"></td>
+          <td class="ps-3" style="background: #fcf7d4"></td>
+          <td class="ps-3" style="background: #fcf7d4"></td>
         </tr>
       `);
       loadingTable.append(emptyRow);
@@ -2953,6 +2966,8 @@ function serialDeliveryInput(Picklists) {
                   let totalActualPerModel =
                     parseInt(res.Data?.[0]?.Total_Actual_Item_Qty) || 0;
 
+                  // console.log(`TOTAL ACTUAL PER MODEL : ${totalActualPerModel}`)
+
                   $.ajax({
                     url: "dirs/basket/dashboard/actions/get_dsplaybatch_models.php",
                     type: "POST",
@@ -2965,21 +2980,27 @@ function serialDeliveryInput(Picklists) {
                         data &&
                         data.length > 0
                       ) {
-                        console.log(
-                          `DISPLAY BATCH MODELS DATA : ${JSON.stringify(data)}`,
-                        );
+                        // console.log(
+                        //   `DISPLAY BATCH MODELS DATA : ${JSON.stringify(data)}`,
+                        // );
                         console.log(``);
                         // Object.values(groupedItems).forEach(function (item) {
-                        const groupedItems = groupedItems[item.Itemcode];
+                        // const groupedItems = groupedItems[item.Itemcode];
+                        const groupedItem = groupedItems[item.Itemcode];
                         console.log(`NEWLY UPDATED GROUPED ITEMS`);
-                        if (!groupedItems) {
+                        // if (!groupedItems) {
+                        if (!groupedItem) {
                           return;
                         }
 
-                        let brand = groupedItems.ItemBrand;
-                        let model = groupedItems.ItemName;
-                        let category = groupedItems.ItemCategory;
-                        let itemCode = groupedItems.Itemcode;
+                        // let brand = groupedItems.ItemBrand;
+                        // let model = groupedItems.ItemName;
+                        // let category = groupedItems.ItemCategory;
+                        // let itemCode = groupedItems.Itemcode;
+                        let brand = groupedItem.ItemBrand;
+                        let model = groupedItem.ItemName;
+                        let category = groupedItem.ItemCategory;
+                        let itemCode = groupedItem.Itemcode;
 
                         // let brand = item.ItemBrand;
                         // let model = item.ItemName;
@@ -2997,13 +3018,18 @@ function serialDeliveryInput(Picklists) {
                           picklist: row.PKList_Number,
                         }));
 
-                        groupedItems[itemCode].itemMappings = itemMappings;
+                        // groupedItems[itemCode].itemMappings = itemMappings;
+                        groupedItem.itemMappings = itemMappings;
 
-                        if (!groupedItems[itemCode].items) {
-                          groupedItems[itemCode].items = [];
+                        // if (!groupedItems[itemCode].items) {
+                        //   groupedItems[itemCode].items = [];
+                        // }
+                        if (!groupedItem.items) {
+                          groupedItem.items = [];
                         }
 
-                        groupedItems[itemCode].items.push({
+                        // groupedItems[itemCode].items.push({
+                        groupedItem.items.push({
                           item_id: data.map((row) => row.Item_id),
                           picklist: data.map((row) => row.PKList_Number),
                           serial: item.ItemSerial,
@@ -3017,7 +3043,11 @@ function serialDeliveryInput(Picklists) {
                           return;
                         }
 
-                        if (item._scanId !== scanId) {
+                        console.log("item._scanId", groupedItem._scanId);
+                        console.log("scanId", scanId);
+
+                        // if (item._scanId !== scanId) {
+                        if (groupedItem._scanId !== scanId) {
                           return;
                         }
 
@@ -3045,7 +3075,8 @@ function serialDeliveryInput(Picklists) {
 
                         // let maxAllowed = groupedItems[itemCode].allowedQty || 0;
                         let currentLoaded =
-                          groupedItems[itemCode].loadedQty || 0;
+                          // groupedItems[itemCode].loadedQty || 0;
+                          groupedItem.loadedQty || 0;
 
                         // if (currentLoaded >= maxAllowed) {
                         if (currentLoaded >= totalActualPerModel) {
@@ -3054,6 +3085,8 @@ function serialDeliveryInput(Picklists) {
                             title: "Limit reached",
                             text: `This item has already reached its maximum allowed quantity.`,
                           });
+                          console.log(`SERIALIZE BUTTON ENABLED INSIDE LIMIT`);
+                          serializeBtn.prop("disabled", false);
                           return;
                         }
 
@@ -3074,9 +3107,9 @@ function serialDeliveryInput(Picklists) {
                         if (!serialExisted) {
                           let serialRow = `
                               <tr style="height: 40px; min-height: 40px; cursor: pointer">
-                                  <td class="align-middle ps-3" style="background: #FFFBDF">${model}</td>
-                                  <td class="align-middle ps-3" style="background: #FFFBDF">${itemCode}</td>
-                                  <td class="align-middle ps-3" style="background: #FFFBDF">${Serial}</td>
+                                  <td class="align-middle ps-3" style="background: #fcf7d4">${model}</td>
+                                  <td class="align-middle ps-3" style="background: #fcf7d4">${itemCode}</td>
+                                  <td class="align-middle ps-3" style="background: #fcf7d4">${Serial}</td>
                               </tr>
                             `;
 
@@ -3104,7 +3137,11 @@ function serialDeliveryInput(Picklists) {
                         totalQty += qty;
 
                         if (existingItem.length) {
-                          groupedItems[itemCode].loadedQty += 1;
+                          console.log(`SERIALIZE BUTTON ENABLED`);
+                          serializeBtn.prop("disabled", false);
+
+                          // groupedItems[itemCode].loadedQty += 1;
+                          groupedItem.loadedQty += 1;
 
                           let qtyCell = existingItem.find("td:nth-child(5)");
                           let currentQty = parseInt(qtyCell.text()) || 0;
@@ -3157,7 +3194,8 @@ function serialDeliveryInput(Picklists) {
 
                           return;
                         } else {
-                          groupedItems[itemCode].loadedQty += 1;
+                          // groupedItems[itemCode].loadedQty += 1;
+                          groupedItem.loadedQty += 1;
                           let counter =
                             loadingTableBody.find("tr[data-itemcode]").length +
                             1;
@@ -3171,11 +3209,11 @@ function serialDeliveryInput(Picklists) {
                                   data-bs-html="true" 
                                   data-bs-title="${"Serials: " + item.ItemSerial} <br>Requested: ${totalActualPerModel}" 
                                   style="height: 40px; min-height: 40px; cursor: pointer">
-                                  <td class="align-middle ps-3 text-center" style="background: #FFFBDF">${counter}</td>
-                                  <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>
-                                  <td class="align-middle ps-3" style="background:#FFFBDF">${model}</td>
-                                  <td class="align-middle ps-3" style="background:#FFFBDF">${category}</td>
-                                  <td class="align-middle ps-3" style="background:#FFFBDF">${qty}</td>
+                                  <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${counter}</td>
+                                  <td class="align-middle ps-3" style="background:#fcf7d4">${brand}</td>
+                                  <td class="align-middle ps-3" style="background:#fcf7d4">${model}</td>
+                                  <td class="align-middle ps-3" style="background:#fcf7d4">${category}</td>
+                                  <td class="align-middle ps-3" style="background:#fcf7d4">${qty}</td>
                                 </tr>`;
 
                           // data-serials="${item.ItemSerial}"
@@ -3406,11 +3444,11 @@ function addNonSerialize(Picklists) {
                             data-itemcode="${itemCode}" 
                             data-serialbased="false" 
                             style="height: 40px; min-height: 40px; cursor: pointer">
-                              <td class="align-middle ps-3 text-center" style="background: #FFFBDF">${counter}</td>
-                              <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>
-                              <td class="align-middle ps-3" style="background:#FFFBDF">${model}</td>
-                              <td class="align-middle ps-3" style="background:#FFFBDF">${category}</td>
-                              <td class="align-middle ps-3" style="background:#FFFBDF">${quantity}</td>
+                              <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${counter}</td>
+                              <td class="align-middle ps-3" style="background:#fcf7d4">${brand}</td>
+                              <td class="align-middle ps-3" style="background:#fcf7d4">${model}</td>
+                              <td class="align-middle ps-3" style="background:#fcf7d4">${category}</td>
+                              <td class="align-middle ps-3" style="background:#fcf7d4">${quantity}</td>
                             </tr>
                           `;
 
@@ -3498,9 +3536,9 @@ function initializeEmptySerialRows() {
   for (let i = 0; i < 5; i++) {
     tbody.append(`
       <tr class="empty-row" style="height: 40px; min-height: 40px;">
-        <td class="align-middle ps-3 text-muted" style="background: #FFFBDF">&nbsp;</td>
-        <td class="align-middle ps-3 text-muted" style="background: #FFFBDF">&nbsp;</td>
-        <td class="align-middle ps-3 text-muted" style="background: #FFFBDF">&nbsp;</td>
+        <td class="align-middle ps-3 text-muted" style="background: #fcf7d4">&nbsp;</td>
+        <td class="align-middle ps-3 text-muted" style="background: #fcf7d4">&nbsp;</td>
+        <td class="align-middle ps-3 text-muted" style="background: #fcf7d4">&nbsp;</td>
       </tr>
     `);
   }
@@ -3511,6 +3549,13 @@ function submitLoadingBasket(Picklists) {
     .off("submit")
     .on("submit", function (e) {
       e.preventDefault();
+
+      //  let loadBtn = $(this).find("button[type='submit'].commit-btn");
+      //     loadBtn
+      //       .prop("disabled", true)
+      //       .html(
+      //         `<span class="spinner-border spinner-border-sm"></span> Loading`,
+      //       );
 
       const rowsWithItems = $("#loadBasketTable tbody tr").filter(function () {
         // return $(this).attr("data-itemid");
@@ -3523,7 +3568,7 @@ function submitLoadingBasket(Picklists) {
           title: "No items found",
           text: "Please add item(s) to the loading basket first.",
         });
-
+        // loadBtn.prop("disabled", false).html("Load");
         return;
       }
 
@@ -3672,6 +3717,8 @@ function submitLoadingBasket(Picklists) {
       //   });
       // });
 
+      let loadBtn = $(this).find("button[type='submit'].load-btn");
+
       $("#loadBasketTable tbody tr[data-itemmapping]").each(function () {
         console.log("ROW:");
         console.log("data-itemmapping:", $(this).attr("data-itemmapping"));
@@ -3686,8 +3733,7 @@ function submitLoadingBasket(Picklists) {
         cancelButtonText: "Back",
       }).then((result) => {
         if (result.isConfirmed) {
-          let commitBtn = $(this).find("button[type='submit'].commit-btn");
-          commitBtn
+          loadBtn
             .prop("disabled", true)
             .html(
               `<span class="spinner-border spinner-border-sm"></span> Loading`,
@@ -3727,19 +3773,20 @@ function submitLoadingBasket(Picklists) {
                   title: "Server error",
                   html: res,
                 });
-                commitBtn.prop("disabled", false).html("Load");
+                loadBtn.prop("disabled", false).html("Load");
               }
             },
             error: function (xhr, status, error) {
               console.log("ERROR");
               console.log(xhr.responseText);
-              commitBtn.prop("disabled", false).html("Load");
+              loadBtn.prop("disabled", false).html("Load");
             },
             complete: function () {
-              commitBtn.prop("disabled", false).html("Load");
+              loadBtn.prop("disabled", false).html("Load");
             },
           });
         }
       });
+      loadBtn.prop("disabled", false).html("Load");
     });
 }

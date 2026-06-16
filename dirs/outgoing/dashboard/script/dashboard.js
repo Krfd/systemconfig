@@ -26,7 +26,7 @@ function loadDashboard() {
     loadOutgoing(() => {
       $("#outgoingTableDisplay").DataTable({
         pageLength: 50,
-        // order: [0, "asc"],
+        order: [0, "asc"],
       });
     });
   });
@@ -200,7 +200,7 @@ function loadOutgoing() {
         // },
         rowCallback: function (row, data, index) {
           $("td", row).css({
-            background: "#FFFBDF",
+            background: "#fcf7d4",
             padding: "3px",
             height: "40px",
             "min-height": "40px",
@@ -218,7 +218,7 @@ function loadOutgoing() {
               $(this).css("background", "#FFF4C2");
             },
             function () {
-              $(this).css("background", "#FFFBDF");
+              $(this).css("background", "#fcf7d4");
             },
           );
         },
@@ -229,11 +229,11 @@ function loadOutgoing() {
           for (let i = currentRows; i < 8; i++) {
             let $emptyRow = $(`
               <tr class="empty-row">
-                <td colspan="8" style="background: #FFFBDF">&nbsp;</td>
+                <td colspan="8" style="background: #fcf7d4">&nbsp;</td>
               </tr>
             `);
             $emptyRow.css({
-              background: "#FFFBDF",
+              background: "#fcf7d4",
               height: "40px",
               "min-height": "40px",
               cursor: "pointer",
@@ -243,7 +243,7 @@ function loadOutgoing() {
                 $(this).css("background", "#FFF4C2");
               },
               function () {
-                $(this).css("background", "#FFFBDF");
+                $(this).css("background", "#fcf7d4");
               },
             );
             tableBody.append($emptyRow);
@@ -286,21 +286,22 @@ function returnOutgoing() {
   $.post("dirs/outgoing/dashboard/outgoing.php", {}, function (data) {
     $("#main-content").html(data);
   });
-  window.location.reload();
 }
 
 function openOutgoingForm(DocEntry) {
-  $("#main-content").html(spinner);
-  setTimeout(function () {
+  $("#dashboard_content").html(spinner);
+  $.post("dirs/outgoing/dashboard/request.php", function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+    $("#openIncomingTable tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
     openRequest(DocEntry);
-  }, 200);
+  })
 }
 
 function openRequest(DocEntry) {
-  $("#main-content").html(spinner);
-  $.post("dirs/outgoing/dashboard/request.php", function (data) {
-    $("#main-content").html(data);
-
     $.ajax({
       url: "dirs/outgoing/dashboard/actions/get_openrequest.php",
       type: "POST",
@@ -332,11 +333,11 @@ function openRequest(DocEntry) {
             totalQty += quantity;
             rows += `
             <tr>
-              <td style="background:#FFFBDF">${index + 1}</td>
-              <td style="background:#FFFBDF">${item.ItemBrand}</td>
-              <td style="background:#FFFBDF">${item.ItemName}</td>
-              <td style="background:#FFFBDF">${item.ItemCategory}</td>
-              <td style="background:#FFFBDF">${item.Request_Qty}</td>
+              <td class="text-center" style="background: #fcf7d4">${index + 1}</td>
+              <td class="text-start" style="background: #fcf7d4">${item.ItemBrand}</td>
+              <td class="text-start" style="background: #fcf7d4">${item.ItemName}</td>
+              <td class="text-start" style="background: #fcf7d4">${item.ItemCategory}</td>
+              <td class="text-start" style="background: #fcf7d4">${item.Request_Qty}</td>
             </tr>
             `;
           });
@@ -344,17 +345,17 @@ function openRequest(DocEntry) {
           $("#totalReqQuantity").text(totalQty);
           $("#openIncomingTable tbody").html(rows);
 
-          if (rowCount < 8) {
-            let emptyRows = 8 - rowCount;
+          if (rowCount < 6) {
+            let emptyRows = 6 - rowCount;
 
             for (let i = 0; i < emptyRows; i++) {
               let emptyRow = `
-              <tr class="item-row empty-row" style="height: 50px; min-height: 50px;">
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
+              <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+                <td style="background: #fcf7d4"></td>
+                <td style="background: #fcf7d4"></td>
+                <td style="background: #fcf7d4"></td>
+                <td style="background: #fcf7d4"></td>
+                <td style="background: #fcf7d4"></td>
               </tr>
               `;
               $("#openIncomingTable tbody").append(emptyRow);
@@ -369,7 +370,7 @@ function openRequest(DocEntry) {
         console.error(xhr.responseText);
       },
     });
-  });
+  // });
 }
 
 $(document).on("click", ".cancel-outgoing", function (e) {

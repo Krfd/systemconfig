@@ -1,5 +1,5 @@
 <div class="table-responsive-md">
-    <table class="table table-hover datatables col" id="outgoingTableDisplay">
+    <table class="table table-hover datatables col border border-secondary-subtle" id="outgoingTableDisplay">
         <thead class="sticky-top">
             <tr>
                 <th></th>

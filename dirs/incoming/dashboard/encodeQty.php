@@ -27,8 +27,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive-sm mt-5 w-100" style="max-height: 700px">
-                                <table class="table datatables" id="encodeQtyTable">
+                            <div class="table-responsive-sm mt-5" style="max-height: 450px">
+                                <table class="table border border-secondary-subtle" id="encodeQtyTable">
                                     <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary d-none"></th>
@@ -37,7 +37,7 @@
                                             <th class="text-secondary" style="width: 300px; min-width: 300px">Model</th>
                                             <th class="text-secondary text-start">Category</th>
                                             <th class="text-secondary text-center">Quantity</th>
-                                            <th class="text-secondary" style="width: 100px; max-width: 100px">Actual Qty</th>
+                                            <th class="text-secondary text-center">Actual Qty</th>
                                         </tr>
                                     </thead>
                                     <tbody>

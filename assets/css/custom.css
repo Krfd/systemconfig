@@ -1,229 +1,230 @@
+.overall-progress::-webkit-scrollbar {
+  width: 5px;
+}
+
+.overall-progress::-webkit-scrollbar-track {
+  background: #cecece;
+  border-radius: 50px;
+}
+
+.overall-progress::-webkit-scrollbar-thumb {
+  background: #33a1f1;
+  border-radius: 50px;
+}
 .custom-switch {
-    position: relative;
-    width: 130px;
-    height: 20px;
+  position: relative;
+  width: 130px;
+  height: 20px;
 }
 
 .custom-switch input {
-    display: none;
+  display: none;
 }
 
 .custom-switch label {
-    display: block;
-    height: 100%;
-    background: #dee2e6;
-    border-radius: 20px;
-    cursor: pointer;
-    position: relative;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    color: #6c757d;
-    overflow: hidden;
-    /* important: hides text under toggle */
+  display: block;
+  height: 100%;
+  background: #dee2e6;
+  border-radius: 20px;
+  cursor: pointer;
+  position: relative;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: #6c757d;
+  overflow: hidden;
+  /* important: hides text under toggle */
 }
 
 /* Text inside */
 .custom-switch label span {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 50%;
-    text-align: center;
-    z-index: 1;
-    /* BELOW the toggle */
-    pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50%;
+  text-align: center;
+  z-index: 1;
+  /* BELOW the toggle */
+  pointer-events: none;
 }
 
 .custom-switch .left {
-    left: 0;
+  left: 0;
 }
 
 .custom-switch .right {
-    right: 0;
+  right: 0;
 }
 
 /* Sliding toggle */
 .custom-switch label::after {
-    content: "";
-    position: absolute;
-    width: 50%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    border-radius: 20px;
-    background: var(--bs-success);
-    /* Manual default */
-    transition: all 0.25s ease;
-    z-index: 2;
-    /* ABOVE the text */
+  content: "";
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border-radius: 20px;
+  background: var(--bs-success);
+  /* Manual default */
+  transition: all 0.25s ease;
+  z-index: 2;
+  /* ABOVE the text */
 }
 
 /* Checked = Scan */
-.custom-switch input:checked+label::after {
-    left: 50%;
-    background: var(--bs-primary);
+.custom-switch input:checked + label::after {
+  left: 50%;
+  background: var(--bs-primary);
 }
 
 /* Text contrast */
-.custom-switch input:not(:checked)+label .left {
-    color: #fff;
+.custom-switch input:not(:checked) + label .left {
+  color: #fff;
 }
 
-.custom-switch input:checked+label .right {
-    color: #fff;
+.custom-switch input:checked + label .right {
+  color: #fff;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* CREATE DELIVERY */
 .modern-switch {
-    position: relative;
-    width: 125px;
-    height: 30px;
-    cursor: pointer;
-    display: inline-block;
-    font-family: sans-serif;
+  position: relative;
+  width: 125px;
+  height: 30px;
+  cursor: pointer;
+  display: inline-block;
+  font-family: sans-serif;
 }
 
 /* hide checkbox */
 .modern-switch input {
-    display: none;
+  display: none;
 }
 
 /* track */
 .switch-track {
-    position: absolute;
-    inset: 0;
-    /* background: #198754; */
-    background: #0d6efd;
-    /* success */
-    border-radius: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 14px;
-    color: white;
-    font-weight: 600;
-    font-size: 13px;
-    transition: background .35s ease;
+  position: absolute;
+  inset: 0;
+  /* background: #198754; */
+  background: #0d6efd;
+  /* success */
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  color: white;
+  font-weight: 600;
+  font-size: 13px;
+  transition: background 0.35s ease;
 }
 
 /* text positions */
 .switch-text {
-    z-index: 1;
-    transition: opacity .25s ease;
+  z-index: 1;
+  transition: opacity 0.25s ease;
 }
 
 .switch-text.right {
-    text-align: right;
+  text-align: right;
 }
 
 /* knob */
 .switch-knob {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    width: 60px;
-    height: 22px;
-    border-radius: 30px;
-    background: white;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, .25) inset;
-    transition:
-        left .35s cubic-bezier(.4, 0, .2, 1),
-        transform .2s ease;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 60px;
+  height: 22px;
+  border-radius: 30px;
+  background: white;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25) inset;
+  transition:
+    left 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.2s ease;
 }
 
 /* hover */
 .modern-switch:hover .switch-knob {
-    transform: scale(1.05);
+  transform: scale(1.05);
 }
 
 /* checked state */
-.modern-switch input:checked+.switch-track {
-    /* background: #0d6efd; */
-    background: #198754;
-    /* primary */
+.modern-switch input:checked + .switch-track {
+  /* background: #0d6efd; */
+  background: #198754;
+  /* primary */
 }
 
 /* move knob */
-.modern-switch input:checked~.switch-knob {
-    left: 58px;
+.modern-switch input:checked ~ .switch-knob {
+  left: 58px;
 }
 
 /* text fade effect */
-.modern-switch input:checked+.switch-track .left {
-    opacity: .4;
-    transition-delay: .1s;
+.modern-switch input:checked + .switch-track .left {
+  opacity: 0.4;
+  transition-delay: 0.1s;
 }
 
-.modern-switch input:checked+.switch-track .right {
-    opacity: 1;
-    transition-delay: .15s;
+.modern-switch input:checked + .switch-track .right {
+  opacity: 1;
+  transition-delay: 0.15s;
 }
 
-.modern-switch input:not(:checked)+.switch-track .left {
-    opacity: 1;
+.modern-switch input:not(:checked) + .switch-track .left {
+  opacity: 1;
 }
 
-.modern-switch input:not(:checked)+.switch-track .right {
-    opacity: .4;
+.modern-switch input:not(:checked) + .switch-track .right {
+  opacity: 0.4;
 }
 .readonly-cell {
-    background-color: #f0f0f0;
-    cursor: not-allowed;
-    color: #6c757d;
-    /* grey text */
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+  color: #6c757d;
+  /* grey text */
 }
- .checkbox {
-     display: none;
- }
+.checkbox {
+  display: none;
+}
 
 /* RELOGIN */
 .lock-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 
 .lock-box {
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    text-align: center;
-    width: 400px;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  width: 400px;
 }
 
 .lock-box input:not([type="checkbox"]) {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
 }
 
 .lock-box button {
-    margin-top: 10px;
-    width: 100%;
-    padding: 10px;
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
 }
 
 .error {
-    color: red;
-    margin-top: 10px;
+  color: red;
+  margin-top: 10px;
 }

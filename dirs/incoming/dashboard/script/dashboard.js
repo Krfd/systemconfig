@@ -11,12 +11,21 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
+  $("#incoming_content").html(spinner);
   $.post("dirs/incoming/dashboard/components/main.php", {}, function (data) {
     $("#incoming_content").html(data);
-    loadIncoming();
-    $("#incomingTableDisplay").DataTable({
-      pageLength: 50,
-      order: [0, "desc"],
+
+    $("#incomingTableDisplay tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
+
+    loadIncoming(() => {
+      $("#incomingTableDisplay").DataTable({
+        pageLength: 50,
+        order: [0, "desc"],
+      });
     });
   });
   cancelPicklist();
@@ -141,7 +150,8 @@ function loadIncoming() {
           },
           rowCallback: function (row, data, index) {
             $("td:not(:first-child)", row).css({
-              background: "#FFFBDF",
+              // background: "#FFFBDF",
+              background: "#fcf7d4",
               padding: "3px",
               height: "40px",
               "min-height": "40px",
@@ -157,7 +167,8 @@ function loadIncoming() {
                 $(this).css("background", "#FFF4C2");
               },
               function () {
-                $(this).css("background", "#FFFBDF");
+                // $(this).css("background", "#FFFBDF");
+                $(this).css("background", "#fcf7d4");
               },
             );
           },
@@ -169,11 +180,12 @@ function loadIncoming() {
               let $emptyRow = $(`
                 <tr class="empty-row">
                   <td></td>
-                  <td colspan="5" style="background:#FFFBDF"></td>
+                  <td colspan="5" style="background:#fcf7d4"></td>
                 </tr>
               `);
               $($emptyRow).css({
-                background: "#FFFBDF",
+                // background: "#FFFBDF",
+                background: "#fcf7d4",
                 height: "40px",
                 "min-height": "40px",
               });
@@ -182,7 +194,8 @@ function loadIncoming() {
                   $("td:not(:first-child)", this).css("background", "#FFF4C2");
                 },
                 function () {
-                  $("td:not(:first-child)", this).css("background", "#FFFBDF");
+                  // $("td:not(:first-child)", this).css("background", "#FFFBDF");
+                  $("td:not(:first-child)", this).css("background", "#fcf7d4");
                 },
               );
               tableBody.append($emptyRow);
@@ -352,64 +365,57 @@ function toggleCheckboxes() {
     cancelButtonText: "Back",
   }).then((result) => {
     if (result.isConfirmed) {
-      // $("#previewTableDisplay tbody").html(`
-      //   <tr>
-      //     <td colspan="100%" class="text-center">${spinner}</td>
-      //   </tr>
-      // `);
-
-      setTimeout(function () {
-        $("#main-content").html(spinner);
-        //   $("#previewTableDisplay tbody").html(`
-        //   <tr>
-        //     <td colspan="100%" class="text-center">${spinner}</td>
-        //   </tr>
-        // `);
+      $("#incoming_content").html(spinner);
+      $.post("dirs/incoming/dashboard/preview.php", function (data) {
+        $("#main-content").hide().html(data).fadeIn(200);
+        $("#previewTableDisplay tbody").html(`
+            <tr>
+              <td colspan="100%" class="text-center">${spinner}</td>
+            </tr>
+          `);
+        // console.log(`UPDATED PREVIEW`)
         loadPreview(SRNumbers);
-      }, 200);
+      });
     }
   });
 }
 
 function loadPreview(SRNumbers) {
-  $("#previewTableDisplay tbody").html(`
-    <tr>
-      <td colspan="100%" class="text-center">${spinner}</td>
-    </tr>
-  `);
+  // $("#previewTableDisplay tbody").html(`
+  //   <tr>
+  //     <td colspan="100%" class="text-center">${spinner}</td>
+  //   </tr>
+  // `);
+  // $.post("dirs/incoming/dashboard/preview.php", function (data) {
+  //   $("#main-content").hide().html(data).fadeIn(200);
 
-  console.log(`PREVIEWING BASKET`);
+  $.ajax({
+    url: "dirs/incoming/dashboard/actions/get_sr_items.php",
+    type: "POST",
+    data: {
+      SR_Number: SRNumbers,
+    },
+    dataType: "json",
+    success: function (response) {
+      if (response.isSuccess === "success") {
+        let previewData = response.Data;
+        let row = "";
+        $("#previewTableDisplay").data("srnumbers", SRNumbers);
+        let previewBody = $("#previewTableDisplay tbody");
 
-  $.post("dirs/incoming/dashboard/preview.php", function (data) {
-    $("#main-content").hide().html(data).fadeIn(200);
+        // const isDisabled = "";
 
-    $.ajax({
-      url: "dirs/incoming/dashboard/actions/get_sr_items.php",
-      type: "POST",
-      data: {
-        SR_Number: SRNumbers,
-      },
-      dataType: "json",
-      success: function (response) {
-        if (response.isSuccess === "success") {
-          let previewData = response.Data;
-          let row = "";
-          $("#previewTableDisplay").data("srnumbers", SRNumbers);
-          let previewBody = $("#previewTableDisplay tbody");
+        // <td class="ps-5" style="width: 80px; max-width: 80px">
+        //           <input type="checkbox" name="checkbox" id="${item.DocEntry}" data-docentry="${item.DocEntry}"
+        //           class="form-check-input align-self-center mx-auto checkbox border border-primary" ${isDisabled}>
+        //         </td>
 
-          // const isDisabled = "";
+        previewData.forEach((item, index) => {
+          if (item.PickedStatus === "Y") {
+            return;
+          }
 
-          // <td class="ps-5" style="width: 80px; max-width: 80px">
-          //           <input type="checkbox" name="checkbox" id="${item.DocEntry}" data-docentry="${item.DocEntry}"
-          //           class="form-check-input align-self-center mx-auto checkbox border border-primary" ${isDisabled}>
-          //         </td>
-
-          previewData.forEach((item, index) => {
-            if (item.PickedStatus === "Y") {
-              return;
-            }
-
-            row += `
+          row += `
                 <tr style="cursor: pointer" data-docentry="${item.DocEntry}" data-picklisted="${item.PickedStatus}">
                   <td class="ps-5" style="width: 80px; max-width: 80px">
                     <input type="checkbox" name="checkbox" id="${item.DocEntry}" data-docentry="${item.DocEntry}"
@@ -422,15 +428,15 @@ function loadPreview(SRNumbers) {
                   <td class="align-middle ps-3" style="background: #f7f7f7">${item.Request_Qty}</td>
                 </tr>
               `;
-          });
+        });
 
-          previewBody.html(row);
+        previewBody.html(row);
 
-          let tableCount = previewBody;
-          let currentRows = tableCount.find("tr").length;
+        let tableCount = previewBody;
+        let currentRows = tableCount.find("tr").length;
 
-          for (let i = currentRows; i < 8; i++) {
-            let empty = $(`
+        for (let i = currentRows; i < 8; i++) {
+          let empty = $(`
               <tr class="empty-row" style="height: 50px">
                 <td style="width: 80px; max-width: 80px;"></td>
                 <td style="background: #f7f7f7"></td>
@@ -440,26 +446,26 @@ function loadPreview(SRNumbers) {
                 <td style="background: #f7f7f7"></td>
               </tr>
             `);
-            previewBody.append(empty);
-          }
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: response.message,
-            confirmButtonText: "OKAY",
-            confirmButtonColor: "#d33",
-          });
+          previewBody.append(empty);
         }
-      },
-      error: function (xhr) {
+      } else {
         Swal.fire({
           icon: "error",
-          title: "Server Error",
-          text: "Something went wrong while processing the request.",
+          title: response.message,
+          confirmButtonText: "OKAY",
+          confirmButtonColor: "#d33",
         });
-      },
-    });
+      }
+    },
+    error: function (xhr) {
+      Swal.fire({
+        icon: "error",
+        title: "Server Error",
+        text: "Something went wrong while processing the request.",
+      });
+    },
   });
+  // });
 }
 
 function togglePreview() {
@@ -815,25 +821,50 @@ function openIncoming(DocEntry) {
 }
 
 function picklistBasket() {
-  if ($.fn.DataTable.isDataTable("#basketTable")) {
-    $("#basketTable").DataTable().clear().destroy();
-  }
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
-      $("#main-content").hide().html(data).fadeIn(200);
-      loadBasket();
-    });
-  }, 200);
+  $("#incoming_content").html(spinner);
+  $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
+    $("#main-content").html(data);
+    // if ($.fn.DataTable.isDataTable("#basketTable")) {
+    //   $("#basketTable").DataTable().clear().destroy();
+    // }
+    // $("#main-content").html(spinner);
+
+    $("#basketTable tbody").html(`
+        <tr>
+          <td colspan="100%" class="text-center">${spinner}</td>
+        </tr>
+      `);
+
+    // console.log(`SHOULD LOAD SPINNER HERE`)
+
+    // setTimeout(function () {
+    //   $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
+    //     $("#main-content").hide().html(data).fadeIn(200);
+    // loadBasket();
+    //   });
+    // // }, 200);
+
+    loadBasket(() => {
+      $("#basketTable").DataTable({
+        pageLength: 50,
+        order: [0, "asc"],
+      });
+    }, 200);
+  });
 }
 
 function loadIncomingDashboard() {
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    $.post("dirs/incoming/dashboard/incoming.php", {}, function (data) {
-      $("#main-content").hide().html(data).fadeIn(200);
-    });
-  }, 200);
+  $("#incoming_content").html(spinner);
+  // setTimeout(function () {
+  $.post("dirs/incoming/dashboard/incoming.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+    $("#basketTableDashboard tbody").html(`
+        <tr>
+          <td colspan="100%" class="text-center">${spinner}</td>
+        </tr>
+      `);
+  });
+  // }, 200);
 }
 
 // PICKLIST BASKET TO PICKLIST ITEMS
@@ -850,11 +881,30 @@ $(document).on("dblclick", "#basketTable tbody .open-picklist", function (e) {
   let $row = $(this).closest("tr");
   let picklistNum = $row.attr("data-picklist-num");
 
-  $("#main-content").html(spinner);
+  // $("#main-content").html(spinner);
+  $("#incoming_content").html(spinner);
 
-  setTimeout(function () {
-    openPicklist(picklistNum);
-  }, 200);
+  // setTimeout(function () {
+  $("#picklistItemTable tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
+  // console.log(`OPENING PICKLIST`)
+  openPicklist(picklistNum);
+
+  //  $.post(
+  //   "dirs/incoming/dashboard/picklistItem.php",
+  //   { picklistNum: picklistNumRef },
+  //   function (data) {
+  //     $("#main-content").html(data);
+
+  //     $("#picklistItemTable tbody").html(`
+  //       <tr>
+  //         <td colspan="100%" class="text-center">${spinner}</td>
+  //       </tr>
+  //     `);
+  // }, 200);
 });
 
 $(document).on("click", ".dropdown .open-picklist-items", function (e) {
@@ -865,10 +915,21 @@ $(document).on("click", ".dropdown .open-picklist-items", function (e) {
 
   picklistNumRef = picklistNum;
 
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    openPicklist(picklistNum);
-  }, 200);
+  $("#incoming_content").html(spinner);
+  $.post(
+    "dirs/incoming/dashboard/picklistItem.php",
+    { picklistNum: picklistNum },
+    function (data) {
+      $("#main-content").hide().html(data).fadeIn(200);
+      $("#picklistItemTable tbody").html(`
+        <tr>
+          <td colspan="100%" class="text-center">${spinner}</td>
+        </tr>
+      `);
+      // console.log(`OPENING PICKLIST`)
+      openPicklist(picklistNum);
+    },
+  );
 });
 
 // ENTER ACTUAL QUANTITY
@@ -882,16 +943,19 @@ $(document).on("click", ".dropdown .enter-actual-qty", function (e) {
   picklistNumRef = picklistNum;
 
   $("#main-content").html(spinner);
-
-  setTimeout(function () {
-    $("#encodeQtyTable tbody").html(`
-      <tr>
-        <td colspan="100%" class="text-center">${spinner}</td>
-      </tr>
-    `);
-    console.log(`ENCODE QTY HERE`);
-    encodeQty(picklistNum, rowNum);
-  }, 200);
+  // $.post(
+  //   "dirs/incoming/dashboard/encodeQty.php",
+  //   { picklistNum: picklistNum },
+  //   function (data) {
+  //     $("#incoming_content").hide().html(data).fadeIn(200);
+  //     $("#encodeQtyTable tbody").html(`
+  //       <tr>
+  //         <td colspan="100%" class="text-center">${spinner}</td>
+  //       </tr>
+  //     `);
+  // formattedDate();
+  encodeQty(picklistNum, rowNum);
+  // })
 });
 
 // EDIT ACTUAL QUANTITY
@@ -930,119 +994,132 @@ $(document).on("click", ".dropdown .single-dr", function (e) {
 });
 
 function openPicklist(picklistNum) {
-  $.post(
-    "dirs/incoming/dashboard/picklistItem.php",
-    { picklistNum: picklistNum },
-    function (data) {
-      $("#main-content").hide().html(data).fadeIn(200);
+  $.ajax({
+    url: "dirs/incoming/dashboard/actions/get_picklist_items.php",
+    type: "POST",
+    dataType: "json",
+    data: { PicklistNumber: picklistNum },
+    success: function (response) {
+      $("#picklistNumDisplay").text(picklistNum);
+      let rows = [];
+      let index = 1;
+      if (response.isSuccess === "success") {
+        let sortedData = response.Data.sort(
+          (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
+        );
 
-      $.ajax({
-        url: "dirs/incoming/dashboard/actions/get_picklist_items.php",
-        type: "POST",
-        dataType: "json",
-        data: { PicklistNumber: picklistNum },
-        success: function (response) {
-          $("#picklistNumDisplay").text(picklistNum);
-          let rows = [];
-          let index = 1;
-          if (response.isSuccess === "success") {
-            let sortedData = response.Data.sort(
-              (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
-            );
-
-            sortedData.forEach((item) => {
-              console.log(`ITEM : ${JSON.stringify(item)}`);
-              rows.push([
-                index++,
-                item.Brand || "",
-                item.Model || "",
-                item.Category || "",
-                item.Quantity ? Math.floor(Number(item.Quantity)) : "",
-                item.Actual_Quantity
-                  ? Math.floor(Number(item.Actual_Quantity))
-                  : "",
-              ]);
+        sortedData.forEach((item) => {
+          // console.log(`ITEM : ${JSON.stringify(item)}`);
+          rows.push([
+            index++,
+            item.Brand || "",
+            item.Model || "",
+            item.Category || "",
+            item.Quantity ? Math.floor(Number(item.Quantity)) : "",
+            // item.Actual_Quantity
+            //   ? Math.floor(Number(item.Actual_Quantity))
+            //   : "",
+            item.Actual_Item_Qty
+              ? Math.floor(Number(item.Actual_Item_Qty))
+              : "",
+          ]);
+        });
+        // $("#picklistItemTable").DataTable().clear().destroy();
+        if ($.fn.DataTable.isDataTable("#picklistItemTable")) {
+          $("#picklistItemTable").DataTable().clear().destroy();
+        }
+        $("#picklistItemTable").DataTable({
+          data: rows,
+          columns: [
+            { title: "#", className: "text-start ps-5" },
+            { title: "Brand", className: "text-start ps-5" },
+            { title: "Model", className: "text-start ps-5" },
+            { title: "Category", className: "text-start ps-5" },
+            { title: "Quantity", className: "text-center" },
+            { title: "Actual Qty", className: "text-center" },
+          ],
+          paging: true,
+          searching: true,
+          info: true,
+          processing: false,
+          autoWidth: false,
+          rowCallback: function (row, data) {
+            const isEmpty = !data[0];
+            $("td", row).css({
+              // background: "#F7F7F7",
+              background: "#fcf7d4",
+              padding: "3px",
+              height: "40px",
+              "min-height": "40px",
+              cursor: isEmpty ? "default" : "pointer",
             });
-            // $("#picklistItemTable").DataTable().clear().destroy();
-            if ($.fn.DataTable.isDataTable("#picklistItemTable")) {
-              $("#picklistItemTable").DataTable().clear().destroy();
+            $("td:eq(2)", row).css("text-align", "start");
+            $("td:eq(4)", row).css("text-align", "center");
+            $("td:eq(5)", row).css("text-align", "center");
+          },
+          drawCallback: function () {
+            let tableBody = $("#picklistItemTable tbody");
+            let currentRows = tableBody.find("tr").length;
+
+            for (let i = currentRows; i < 8; i++) {
+              // let $emptyRow = $(`
+              //   <tr class="empty-row" style="background: #f7f7f7">
+              //     <td colspan="5" style="background: #f7f7f7">&nbsp;</td>
+              //   </tr>
+              // `);
+              let $emptyRow = $(`
+                <tr class="empty-row">
+                  <td colspan="6" style="background: #fcf7d4">&nbsp;</td>
+                </tr>
+              `);
+              $emptyRow.css({
+                // background: "#f7f7f7",
+                background: "#fcf7d4",
+                height: "40px",
+                "min-height": "40px",
+              });
+              tableBody.append($emptyRow);
             }
-            $("#picklistItemTable").DataTable({
-              data: rows,
-              columns: [
-                { title: "#", className: "text-start ps-5" },
-                { title: "Brand", className: "text-start ps-5" },
-                { title: "Model", className: "text-start ps-5" },
-                { title: "Category", className: "text-start ps-5" },
-                { title: "Quantity", className: "text-start ps-5" },
-                { title: "Actual Qty", className: "text-start ps-5" },
-              ],
-              paging: true,
-              searching: true,
-              info: true,
-              processing: false,
-              autoWidth: false,
-              rowCallback: function (row, data) {
-                const isEmpty = !data[0];
-                $("td", row).css({
-                  // background: "#F7F7F7",
-                  background: "#FFFBDF",
-                  padding: "3px",
-                  height: "40px",
-                  "min-height": "40px",
-                  cursor: isEmpty ? "default" : "pointer",
-                });
-                $("td:eq(2)", row).css("text-align", "start");
-              },
-              drawCallback: function () {
-                let tableBody = $("#picklistItemTable tbody");
-                let currentRows = tableBody.find("tr").length;
-
-                for (let i = currentRows; i < 8; i++) {
-                  // let $emptyRow = $(`
-                  //   <tr class="empty-row" style="background: #f7f7f7">
-                  //     <td colspan="5" style="background: #f7f7f7">&nbsp;</td>
-                  //   </tr>
-                  // `);
-                  let $emptyRow = $(`
-                    <tr class="empty-row" style="background: #FFFBDF">
-                      <td colspan="6" style="background: #FFFBDF">&nbsp;</td>
-                    </tr>
-                  `);
-                  $emptyRow.css({
-                    // background: "#f7f7f7",
-                    background: "#FFFBDF",
-                    height: "40px",
-                    "min-height": "40px",
-                  });
-                  tableBody.append($emptyRow);
-                }
-              },
-            });
-          } else {
-            console.error(response.Data);
-          }
-        },
-        error: function (xhr, status, error) {
-          console.error("Error loading outgoing data: ", error);
-        },
-      });
+          },
+        });
+      } else {
+        console.error(response.Data);
+      }
     },
-  );
+    error: function (xhr, status, error) {
+      console.error("Error loading outgoing data: ", error);
+    },
+  });
 }
 
 // DISPLAY PICKLIST
 function loadPicklistItems() {
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    $.post(
-      "dirs/incoming/dashboard/picklistItem.php",
-      { picklistNum: picklistNumRef },
-      function (data) {
-        openPicklist(picklistNumRef);
-      },
-    );
-  }, 200);
+  $("#incoming_content").html(spinner);
+
+  // $("#picklistItemTable tbody").html(`
+  //   <tr>
+  //     <td colspan="100%" class="text-center">${spinner}</td>
+  //   </tr>
+  // `);
+
+  // console.log(`OPENING PICKLIST`)
+
+  // setTimeout(function () {
+
+  $.post(
+    "dirs/incoming/dashboard/picklistItem.php",
+    { picklistNum: picklistNumRef },
+    function (data) {
+      $("#main-content").html(data);
+      $("#picklistItemTable tbody").html(`
+          <tr>
+            <td colspan="100%" class="text-center">${spinner}</td>
+          </tr>
+        `);
+      openPicklist(picklistNumRef);
+    },
+  );
+  // }, 200);
 }
 
 // CANCEL PICKLIST
@@ -1074,13 +1151,19 @@ function cancelPicklist() {
 
 // PICKLIST ITEMS
 function loadBasketContent() {
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
-      $("#main-content").hide().html(data).fadeIn(200);
-      loadBasket();
-    });
-  }, 200);
+  // $("#main-content").html(spinner);
+  $("#incoming_content").html(spinner);
+  // setTimeout(function () {
+  $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+    $("#basketTable tbody").html(`
+        <tr>
+          <td colspan="100%" class="text-center">${spinner}</td>
+        </tr>
+      `);
+    loadBasket();
+  });
+  // }, 200);
 }
 
 // ALREADY HAS A PICKLIST NUMBER
@@ -1174,72 +1257,82 @@ function openPicklistedForm(SR_Number) {
 
 // DISPLAY BASKET
 function loadBasket() {
-  $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
-    $("#main-content").html(data);
+  // remove every bootstrap tooltip currently alive
+  document.querySelectorAll(".tooltip").forEach((el) => el.remove());
 
-    $.ajax({
-      url: "dirs/incoming/dashboard/actions/picklisteditems.php",
-      type: "POST",
-      dataType: "json",
-      success: function (response) {
-        if (
-          !response ||
-          response.isSuccess !== "success" ||
-          !Array.isArray(response.Data)
-        ) {
-          response = {
-            isSuccess: "success",
-            Data: [],
-          };
-        }
-        let rows = [];
-        if (response.isSuccess === "success") {
-          let sortedData = response.Data.sort(
-            (a, b) =>
-              Number(b.PKList_Number || 0) - Number(a.PKList_Number || 0),
-          );
+  document.querySelectorAll("#basketTable tbody tr").forEach((el) => {
+    const instance = bootstrap.Tooltip.getInstance(el);
+    if (instance) {
+      instance.dispose();
+    }
+  });
+  $.ajax({
+    url: "dirs/incoming/dashboard/actions/picklisteditems.php",
+    type: "POST",
+    dataType: "json",
+    success: function (response) {
+      if (
+        !response ||
+        response.isSuccess !== "success" ||
+        !Array.isArray(response.Data)
+      ) {
+        response = {
+          isSuccess: "success",
+          Data: [],
+        };
+      }
+      let rows = [];
+      if (response.isSuccess === "success") {
+        let sortedData = response.Data.sort(
+          (a, b) => Number(b.PKList_Number || 0) - Number(a.PKList_Number || 0),
+        );
 
-          const grouped = {};
+        const grouped = {};
 
-          sortedData.forEach((item) => {
-            const key = item.PKList_Number;
+        sortedData.forEach((item) => {
+          const key = item.PKList_Number;
 
-            if (!grouped[key]) {
-              grouped[key] = {
-                ...item,
-                totalQty: 0,
-                allHaveActualQty: true,
-                SR_Numbers: new Set(),
-              };
-            }
+          if (!grouped[key]) {
+            grouped[key] = {
+              ...item,
+              totalQty: 0,
+              allHaveActualQty: true,
+              SR_Numbers: new Set(),
+            };
+          }
 
-            grouped[key].totalQty += Number(item.RequestItemQty || 0);
+          grouped[key].totalQty += Number(item.RequestItemQty || 0);
 
-            if (item.SR_Number) {
-              grouped[key].SR_Numbers.add(item.SR_Number);
-            }
+          if (item.SR_Number) {
+            grouped[key].SR_Numbers.add(item.SR_Number);
+          }
 
-            if (item.Actual_Item_Qty == null) {
-              grouped[key].allHaveActualQty = false;
-            }
-          });
+          if (item.Actual_Item_Qty == null) {
+            grouped[key].allHaveActualQty = false;
+          }
+        });
 
-          const groupedArray = Object.values(grouped).map((item) => ({
-            ...item,
-            SR_Numbers: Array.from(item.SR_Numbers),
-          }));
+        const groupedArray = Object.values(grouped).map((item) => ({
+          ...item,
+          SR_Numbers: Array.from(item.SR_Numbers),
+        }));
 
-          groupedArray.forEach((item) => {
-            // console.log(`PICKLIST ITEM : ${JSON.stringify(item)}`);
-            const isSingleSR = item.SR_Numbers.length === 1;
-            const condition = item.allHaveActualQty && isSingleSR;
-            // console.log(`SRN's : ${item.SR_Numbers}`);
-            // console.log(``);
-            const date = new Date(item.DocDate);
-            const formatted = date.toISOString().split("T")[0];
+        groupedArray.forEach((item) => {
+          // console.log(`PICKLIST ITEM : ${JSON.stringify(item)}`);
+          const isSingleSR = item.SR_Numbers.length === 1;
+          const condition = item.allHaveActualQty && isSingleSR;
+          // console.log(`SRN's : ${item.SR_Numbers}`);
+          // console.log(``);
+          const date = new Date(item.DocDate);
+          const mm = String(date.getMonth() + 1).padStart(2, "0");
+          const dd = String(date.getDate()).padStart(2, "0");
+          const yy = String(date.getFullYear()).slice(-2);
 
-            const printOption = item.allHaveActualQty
-              ? `<li>
+          const formatted = `${mm}-${dd}-${yy}`;
+          // const formatted = date.toISOString().split("T")[0];
+
+          const printOption = item.allHaveActualQty
+            ? `<li>
                   <a class="dropdown-item print-picklist" 
                     href="#"
                     data-picklist="${item.PKList_Number}" 
@@ -1247,35 +1340,35 @@ function loadBasket() {
                     Print
                   </a>
                 </li>`
-              : "";
+            : "";
 
-            const actualQtyOption = item.allHaveActualQty
-              ? item.PickListStatus === "PROCESSING"
-                ? ""
-                : `<li>
+          const actualQtyOption = item.allHaveActualQty
+            ? item.PickListStatus === "PROCESSING"
+              ? ""
+              : `<li>
                   <a class="dropdown-item edit-actual-qty" href="#">
                     Edit Actual Quantity
                   </a>
                   </li>`
-              : `<li>
+            : `<li>
                   <a class="dropdown-item enter-actual-qty" href="#">
                     Encode Quantity
                   </a>
                 </li>`;
 
-            const encoded = item.allHaveActualQty
-              ? "<span class='badge bg-success'>Encoded</span>"
-              : "<span class='badge bg-warning text-white'>Pending</span>";
+          const encoded = item.allHaveActualQty
+            ? "<span class='badge bg-success'>Encoded</span>"
+            : "<span class='badge bg-warning text-white'>Pending</span>";
 
-            rows.push([
-              item.PKList_Number || "",
-              item.RequestItemQty || "",
-              encoded,
-              formatted || "",
-              '<div class="dropdown dropstart">' +
-                '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
-                '<i class="bi bi-three-dots"></i></button>' +
-                `<ul class="dropdown-menu">
+          rows.push([
+            item.PKList_Number || "",
+            item.RequestItemQty || "",
+            encoded,
+            formatted || "",
+            '<div class="dropdown dropstart">' +
+              '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
+              '<i class="bi bi-three-dots"></i></button>' +
+              `<ul class="dropdown-menu">
                   <li><a class="dropdown-item open-picklist-items" href="#">Open</a></li>
                   <li>
                   <a class="dropdown-item print-picklist" 
@@ -1288,223 +1381,252 @@ function loadBasket() {
                   ${actualQtyOption}
                 </ul>
               </div>`,
-            ]);
-          });
+          ]);
+        });
 
-          // ${printOption}
+        // ${printOption}
 
-          if (rows.length === 0) {
-            for (let i = 0; i < 8; i++) {
-              rows.push(["", "", "", "", ""]);
-            }
+        if (rows.length === 0) {
+          for (let i = 0; i < 8; i++) {
+            rows.push(["", "", "", "", ""]);
           }
+        }
 
-          if ($.fn.DataTable.isDataTable("#basketTable")) {
-            $("#basketTable").DataTable().clear().destroy();
-          }
+        destroyAllTooltips();
 
-          $("#basketTable").DataTable({
-            data: rows,
-            columns: [
-              {
-                title: "Picklist No.",
-                className: "text-start open-picklist ps-5",
-              },
-              { title: "Quantity", className: "text-center" },
-              { title: "Status" },
-              { title: "Date", className: "text-start ps-5" },
-              { title: "", orderable: false },
-            ],
-            createdRow: function (row, data, dataIndex) {
-              let originalItem = groupedArray[dataIndex];
+        if ($.fn.DataTable.isDataTable("#basketTable")) {
+          $("#basketTable").DataTable().clear().destroy();
+        }
 
-              if (originalItem) {
-                $(row)
-                  .attr("data-rownum", originalItem.PKList_Number)
-                  .attr("data-picklist-num", originalItem.PKList_Number)
-                  .addClass("picklist-row")
-                  .addClass("picklist-row open-picklist")
-                  .attr(
-                    "data-bs-title",
-                    `<div class="text-start">SRN's:<br>${originalItem.SR_Numbers.join("\n") || "No Branch"}</div>`,
-                  );
-              }
+        $("#basketTable").DataTable({
+          data: rows,
+          columns: [
+            {
+              title: "Picklist No.",
+              className: "text-start open-picklist ps-5",
             },
-            paging: true,
-            searching: true,
-            info: true,
-            processing: false,
-            autoWidth: false,
-            order: [[0, "desc"]],
-            rowCallback: function (row, data) {
-              const isEmptyRow = !data[0];
+            { title: "Quantity", className: "text-center" },
+            { title: "Status" },
+            { title: "Date", className: "text-start ps-5" },
+            { title: "", orderable: false },
+          ],
+          createdRow: function (row, data, dataIndex) {
+            let originalItem = groupedArray[dataIndex];
 
-              $("td", row).css({
-                background: "#FFFBDF",
-                padding: "3px",
+            if (originalItem) {
+              $(row)
+                .attr("data-rownum", originalItem.PKList_Number)
+                .attr("data-picklist-num", originalItem.PKList_Number)
+                .addClass("picklist-row")
+                .addClass("picklist-row open-picklist")
+                .attr(
+                  "data-bs-title",
+                  `<div class="text-start">SRN's:<br>${originalItem.SR_Numbers.join("\n") || "No Branch"}</div>`,
+                );
+            }
+          },
+          paging: true,
+          searching: true,
+          info: true,
+          processing: false,
+          autoWidth: false,
+          // order: [[0, "desc"]],
+          order: [[0, "asc"]],
+          rowCallback: function (row, data) {
+            const isEmptyRow = !data[0];
+
+            $("td", row).css({
+              // background: "#FFFBDF",
+              background: "#fcf7d4",
+              padding: "3px",
+              height: "40px",
+              "min-height": "40px",
+            });
+            $("td:eq(0)", row).addClass("text-primary");
+            $("td:eq(1)", row).css("text-align", "start");
+
+            if (!isEmptyRow) {
+              $(row).css("cursor", "pointer");
+            } else {
+              $(row).css("cursor", "default");
+            }
+
+            $(row).hover(
+              function () {
+                $(this).css("background", "#FFF4C2");
+              },
+              function () {
+                // $(this).css("background", "#FFFBDF");
+                $(this).css("background", "#fcf7d4");
+              },
+            );
+          },
+          drawCallback: function () {
+            let tableBody = $("#basketTable tbody");
+            let currentRows = tableBody.find("tr").length;
+
+            for (let i = currentRows; i < 8; i++) {
+              // let $emptyRow = $(`
+              // <tr class="empty-row" style="background: #FFFBDF">
+              //   <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
+              // </tr>`);
+              let $emptyRow = $(`
+                <tr class="empty-row">
+                  <td colspan="5" style="background: #fcf7d4">&nbsp;</td>
+                </tr>`);
+              $emptyRow.css({
+                // background: "#FFFBDF",
+                background: "#fcf7d4",
                 height: "40px",
                 "min-height": "40px",
               });
-              $("td:eq(0)", row).addClass("text-primary");
-              $("td:eq(1)", row).css("text-align", "start");
-
-              if (!isEmptyRow) {
-                $(row).css("cursor", "pointer");
-              } else {
-                $(row).css("cursor", "default");
-              }
-
-              $(row).hover(
+              $emptyRow.hover(
                 function () {
                   $(this).css("background", "#FFF4C2");
                 },
                 function () {
-                  $(this).css("background", "#FFFBDF");
+                  // $(this).css("background", "#FFFBDF");
+                  $(this).css("background", "#fcf7d4");
                 },
               );
-            },
-            drawCallback: function () {
-              let tableBody = $("#basketTable tbody");
-              let currentRows = tableBody.find("tr").length;
+              tableBody.append($emptyRow);
+            }
 
-              for (let i = currentRows; i < 8; i++) {
-                let $emptyRow = $(`
-                <tr class="empty-row" style="background: #FFFBDF">
-                  <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
-                </tr>`);
-                $emptyRow.css({
-                  background: "#FFFBDF",
-                  height: "50px",
-                  "min-height": "50px",
-                });
-                $emptyRow.hover(
-                  function () {
-                    $(this).css("background", "#FFF4C2");
-                  },
-                  function () {
-                    $(this).css("background", "#FFFBDF");
-                  },
-                );
-                tableBody.append($emptyRow);
+            $("#basketTable tbody tr").each(function () {
+              const existingTooltip = bootstrap.Tooltip.getInstance(this);
+              if (existingTooltip) {
+                existingTooltip.dispose();
               }
 
-              $("#basketTable tbody tr").each(function () {
-                const existingTooltip = bootstrap.Tooltip.getInstance(this);
-                if (existingTooltip) {
-                  existingTooltip.hide();
-                }
-
-                new bootstrap.Tooltip(this, {
-                  placement: "right",
-                  trigger: "hover",
-                  container: "body",
-                  html: true,
-                });
-              });
-
-              $("#basketTable tbody")
-                .off("show.bs.dropdown hide.bs.dropdown click.dropdownAction")
-
-                // REMOVE TOOLTIP WHEN DROPDOWN OPENS
-                .on("show.bs.dropdown", ".dropdown", function () {
-                  const row = $(this).closest("tr")[0];
-
-                  const tooltipInstance = bootstrap.Tooltip.getInstance(row);
-
-                  if (tooltipInstance) {
-                    tooltipInstance.hide();
-                  }
-                })
-
-                // REMOVE TOOLTIP WHEN DROPDOWN CLOSES
-                .on("hide.bs.dropdown", ".dropdown", function () {
-                  const row = $(this).closest("tr")[0];
-
-                  const tooltipInstance = bootstrap.Tooltip.getInstance(row);
-
-                  if (tooltipInstance) {
-                    tooltipInstance.hide();
-                  }
-                })
-
-                // REMOVE TOOLTIP WHEN ANY DROPDOWN ITEM IS CLICKED
-                .on("click.dropdownAction", ".dropdown-item", function () {
-                  const row = $(this).closest("tr")[0];
-
-                  const tooltipInstance = bootstrap.Tooltip.getInstance(row);
-
-                  if (tooltipInstance) {
-                    tooltipInstance.hide();
-                  }
-                });
-            },
-          });
-
-          // FOR PRINTING PICKLIST
-          $("#basketTable")
-            .off("click", "#basketTable .print-picklist")
-            .on("click", ".print-picklist", function (e) {
-              e.preventDefault();
-              e.stopPropagation();
-
-              const PKlistNum = $(this).data("picklist");
-              const DocEntry = $(this).data("doc-entry");
-
-              Swal.fire({
-                title: "Print this Picklist?",
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonText: "Print",
-                confirmButtonColor: "#0d6efd",
-                cancelButtonText: "Cancel",
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  // Swal.fire({
-                  //   title: "Executed By",
-                  //   input: "text",
-                  //   inputPlaceholder: "Enter your name",
-                  //   inputAttributes: {
-                  //     autocapitalize: "off",
-                  //   },
-                  //   showCancelButton: true,
-                  //   confirmButtonText: "Continue",
-                  //   cancelButtonText: "Cancel",
-                  //   inputValidator: (value) => {
-                  //     if (!value) {
-                  //       return "Executed By is required!";
-                  //     }
-                  //   },
-                  // }).then((userInput) => {
-                  //   if (!userInput.isConfirmed) return;
-
-                  // let executedBy = userInput.value;
-                  let executedBy = "";
-
-                  // PRINT ONLY
-                  // const groupByCategory = response.isConfirmed;
-                  const groupByCategory = false;
-
-                  const openPrint = () => {
-                    window.open(
-                      `pdf/requests.php?DocEntry=${DocEntry}` +
-                        `&executedBy=${encodeURIComponent(executedBy)}` +
-                        `&groupByCategory=${groupByCategory ? 1 : 0}`,
-                      "_blank",
-                    );
-                  };
-                  openPrint();
-                  // });
-                }
+              new bootstrap.Tooltip(this, {
+                placement: "right",
+                trigger: "hover",
+                container: "body",
+                html: true,
               });
             });
-        } else {
-          console.error(response.Data);
-        }
-      },
-      error: function (xhr, status, error) {
-        console.error("Error loading outgoing data: ", error);
-      },
-    });
+
+            $("#basketTable tbody")
+              .off("show.bs.dropdown hide.bs.dropdown click.dropdownAction")
+              .on("show.bs.dropdown", ".dropdown", function () {
+                const row = $(this).closest("tr")[0];
+
+                const tooltipInstance = bootstrap.Tooltip.getInstance(row);
+
+                if (tooltipInstance) {
+                  tooltipInstance.dispose();
+                }
+
+                document
+                  .querySelectorAll(".tooltip")
+                  .forEach((el) => el.remove());
+              })
+              .on("hide.bs.dropdown", ".dropdown", function () {
+                const row = $(this).closest("tr")[0];
+
+                const instance = bootstrap.Tooltip.getInstance(row);
+
+                if (instance) {
+                  instance.dispose();
+                }
+              })
+              .on("click.dropdownAction", ".dropdown-item", function () {
+                const row = $(this).closest("tr")[0];
+
+                const tooltipInstance = bootstrap.Tooltip.getInstance(row);
+
+                if (tooltipInstance) {
+                  tooltipInstance.dispose();
+                }
+
+                document
+                  .querySelectorAll(".tooltip")
+                  .forEach((el) => el.remove());
+              });
+          },
+        });
+
+        // FOR PRINTING PICKLIST
+        $("#basketTable")
+          .off("click", "#basketTable .print-picklist")
+          .on("click", ".print-picklist", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const PKlistNum = $(this).data("picklist");
+            const DocEntry = $(this).data("doc-entry");
+
+            Swal.fire({
+              title: "Print this Picklist?",
+              icon: "question",
+              showCancelButton: true,
+              confirmButtonText: "Print",
+              confirmButtonColor: "#0d6efd",
+              cancelButtonText: "Cancel",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // Swal.fire({
+                //   title: "Executed By",
+                //   input: "text",
+                //   inputPlaceholder: "Enter your name",
+                //   inputAttributes: {
+                //     autocapitalize: "off",
+                //   },
+                //   showCancelButton: true,
+                //   confirmButtonText: "Continue",
+                //   cancelButtonText: "Cancel",
+                //   inputValidator: (value) => {
+                //     if (!value) {
+                //       return "Executed By is required!";
+                //     }
+                //   },
+                // }).then((userInput) => {
+                //   if (!userInput.isConfirmed) return;
+
+                // let executedBy = userInput.value;
+                let executedBy = "";
+
+                // PRINT ONLY
+                // const groupByCategory = response.isConfirmed;
+                const groupByCategory = false;
+
+                const openPrint = () => {
+                  window.open(
+                    `pdf/requests.php?DocEntry=${DocEntry}` +
+                      `&executedBy=${encodeURIComponent(executedBy)}` +
+                      `&groupByCategory=${groupByCategory ? 1 : 0}`,
+                    "_blank",
+                  );
+                };
+                openPrint();
+                // });
+              }
+            });
+          });
+      } else {
+        console.error(response.Data);
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("Error loading outgoing data: ", error);
+    },
+  });
+  // });
+}
+
+function destroyAllTooltips() {
+  document.querySelectorAll("[data-bs-title]").forEach((el) => {
+    const instance = bootstrap.Tooltip.getInstance(el);
+
+    if (instance) {
+      instance.hide();
+      instance.dispose(); // completely remove tooltip
+    }
+  });
+
+  // remove any orphaned tooltip elements
+  document.querySelectorAll(".tooltip").forEach((tooltip) => {
+    tooltip.remove();
   });
 }
 
@@ -1566,7 +1688,15 @@ function encodeQty(picklistNum) {
     { picklistNum: picklistNum },
     function (data) {
       $("#main-content").hide().html(data).fadeIn(200);
-      console.log(`ENCODE QTY HERE`);
+      $("#encodeQtyTable tbody").html(`
+        <tr>
+          <td colspan="6" class="text-center align-middle" style="height:350px;">
+            <div style="height:350px; display:flex; align-items:center; justify-content:center;">
+              ${spinner}
+            </div>
+          </td>
+        </tr>
+      `);
       $("#pklist").val(picklistNum);
 
       $.ajax({
@@ -1628,7 +1758,7 @@ function encodeQty(picklistNum) {
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemName}</td>
                   <td class="align-middle ps-3 text-start" style="background: #F7F7F7;">${item.Req_ItemCategory}</td>
                   <td class="align-middle text-center" style="background: #F7F7F7;">${item.totalQty}</td>
-                  <td class="align-middle ps-3 editable-cell" style="background: #FFFBDF" contenteditable="true" onfocus="handleFocus(this)" oninput="validateNumber(this)" onkeydown="preventEnter(event)" style="width: 100px; max-width: 100px"></td>
+                  <td class="align-middle ps-3 editable-cell text-center" style="background: #fcf7d4" contenteditable="true" onfocus="handleFocus(this)" oninput="validateNumber(this)" onkeydown="preventEnter(event)" style="width: 100px; max-width: 100px"></td>
                 </tr>
               `;
             });
@@ -1648,49 +1778,12 @@ function encodeQty(picklistNum) {
                     <td style="background: #F7F7F7"></td>
                     <td style="background: #F7F7F7"></td>
                     <td style="background: #F7F7F7"></td>
-                    <td style="background: #FFFBDF"></td>
+                    <td style="background: #fcf7d4"></td>
                   </tr>
               `;
                 $("#encodeQtyTable tbody").append(emptyRow);
               }
             }
-
-            $("#encodeQtyTable").DataTable({
-              destroy: true,
-              paging: true,
-              searching: true,
-              info: true,
-              order: [[5, "desc"]],
-
-              createdRow: function (row) {
-                if ($(row).hasClass("empty-row")) {
-                  $(row)
-                    .attr("data-order", "999999") // keeps them at bottom
-                    .addClass("no-sort");
-                }
-              },
-
-              rowCallback: function (row) {
-                if ($(row).hasClass("empty-row")) {
-                  $(row).appendTo("#encodeQtyTable tbody");
-                }
-              },
-
-              columnDefs: [
-                {
-                  targets: "_all",
-                  orderDataType: "dom-text",
-                },
-              ],
-
-              drawCallback: function () {
-                // always move empty rows to bottom after sorting/filtering
-                $("#encodeQtyTable tbody tr.empty-row").appendTo(
-                  "#encodeQtyTable tbody",
-                );
-              },
-            });
-
             submitEncodedQty(picklistEntry, picklistNum, srNumberMap);
           } else {
             alert(response.Data);
@@ -1893,9 +1986,11 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
                 // };
                 // openPrint();
                 // Swal.close();
-                setTimeout(() => {
-                  loadBasketContent();
-                }, 300);
+
+                // ORIGINAL
+                // setTimeout(() => {
+                //   loadBasketContent();
+                // }, 300);
               } else {
                 Swal.fire({
                   icon: "error",
@@ -1913,7 +2008,10 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
               });
             },
             complete: function () {
-              submitBtn.prop("disabled", false).html("Save");
+              setTimeout(() => {
+                loadBasketContent();
+              }, 300);
+              // submitBtn.prop("disabled", false).html("Save");
             },
           });
 
@@ -2300,7 +2398,21 @@ function submitDelivery(srn) {
                 "_blank",
               );
 
-              loadBasket();
+              $("#incoming_content").html(spinner);
+              $.post(
+                "dirs/incoming/dashboard/picklistBasket.php",
+                {},
+                function (data) {
+                  $("#main-content").hide().html(data).fadeIn(200);
+
+                  $("#basketTable tbody").html(`
+                    <tr>
+                      <td colspan="100%" class="text-center">${spinner}</td>
+                    </tr>
+                  `);
+                  loadBasket();
+                },
+              );
             });
           }
 

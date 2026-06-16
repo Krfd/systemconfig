@@ -49,6 +49,10 @@
         var Category = $("#newCategory").val();
         // var SRN = $("#srnForm").val();
         var Quantity = $("#newQuantity").val();
+
+        let addBtn = $(this).find("#outgoingModalBtn")
+        addBtn.prop("disabled", true).html(`<span class="spinner-border spinner-border-sm"></span> Processing`)
+
         $.post("dirs/outgoing/form/actions/save_orderitm.php", {
             Brand: Brand,
             Model: Model,
@@ -63,6 +67,7 @@
                 $("#frm-add-order")[0].reset();
                 $("#addRequestUnit").modal('hide');
                 loadItems();
+                addBtn.prop("disabled", false).html("Add")
             } else {
                 Swal.fire({
                     icon: "error",
@@ -70,6 +75,7 @@
                     text: data,
                     timer: 2000
                 });
+                addBtn.prop("disabled", false).html("Add")
             }
         });
     });

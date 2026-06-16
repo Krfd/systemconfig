@@ -27,7 +27,7 @@
                                     </div>
                                     <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                         <label for="eta" class="form-label text-dark-emphasis col-5"><small>Expected Arrival:</small></label>
-                                        <input type="date" id="eta" class="form-control form-control-sm col ms-3" style="background: #FFFBDF" required>
+                                        <input type="date" id="eta" class="form-control form-control-sm col ms-3" style="background: #fcf7d4" required>
                                     </div>
                                     <!-- <div class="p-0 d-flex align-items-baseline gap-1 col">
                                         <label for="status" class="form-label text-dark-emphasis col-3"><small>Status:</small></label>
@@ -41,7 +41,7 @@
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="deldate" class="form-label text-dark-emphasis col-4"><small>Delivery Date:</small></label>
-                                        <input type="date" name="deldate" id="deldate" class="form-control form-control-sm col" style="background: #FFFBDF" required>
+                                        <input type="date" name="deldate" id="deldate" class="form-control form-control-sm col" style="background: #fcf7d4" required>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="status" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>
@@ -68,8 +68,8 @@
                                     <button type="button" class="btn btn-sm btn-danger" onclick="clearLoadingTable()">Clear</button>
                                 </div>
                             </div>
-                            <div class="table-responsive d-flex gap-1 overflow-auto mt-3" style="max-height: 450px">
-                                <table class="table table-hover col" id="loadBasketTable">
+                            <div class="table-responsive d-flex gap-1 overall-progress overflow-auto mt-3 border border-secondary-subtle" style="max-height: 450px">
+                                <table class="table table-hover col mb-0" id="loadBasketTable">
                                     <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary text-center">#</th>
@@ -83,7 +83,8 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div id="totalRowOutside" class="d-flex border-top fw-bold justify-content-end w-100" style="background: #FFFBDF">
+                            <div id="totalRowOutside" class="d-flex border border-secondary-subtle fw-bold justify-content-end w-100" 
+                            style="background: #faf0aa">
                                 <!-- <div class="d-flex">
                                     <div class="d-flex">
                                         <div class="p-2 text-end">Balance:</div>
@@ -103,30 +104,30 @@
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="driver" class="form-label text-dark-emphasis col-4"><small>Driver:</small></label>
-                                        <input type="text" name="driver" id="driver" class="form-control form-control-sm col" style="background: #FFFBDF" required>
+                                        <input type="text" name="driver" id="driver" class="form-control form-control-sm col" style="background: #fcf7d4" required>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="truckCat" class="form-label text-dark-emphasis col-4">
                                             <small>Truck Category:</small>
                                         </label>
-                                        <select name="truckCat" id="truckCat" class="form-select form-select-sm col" style="background: #FFFBDF; appearance: auto" required>
+                                        <select name="truckCat" id="truckCat" class="form-select form-select-sm col" style="background: #fcf7d4; appearance: auto" required>
                                         </select>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="plate" class="form-label text-dark-emphasis col-4">
                                             <small>Truck Plate No:</small>
                                         </label>
-                                        <select name="plate" id="plate" class="form-select form-select-sm col" style="background: #FFFBDF; appearance: auto" required>
+                                        <select name="plate" id="plate" class="form-select form-select-sm col" style="background: #fcf7d4; appearance: auto" required>
                                             <option value="">Select Category first</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-2 mb-auto">
                                     <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
-                                    <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #FFFBDF; height: auto; resize: horizontal"></textarea>
+                                    <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="3" style="background: #fcf7d4; height: auto; resize: horizontal"></textarea>
                                 </div>
                                 <div class="ms-auto">
-                                    <button class="btn btn-primary float-end commit-btn" type="submit" id="loadingBasketBtn">Load</button>
+                                    <button class="btn btn-primary float-end load-btn" type="submit" id="loadingBasketBtn">Load</button>
                                 </div>
                             </div>
                         </form>

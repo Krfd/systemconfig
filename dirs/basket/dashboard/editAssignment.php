@@ -51,8 +51,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive d-flex gap-1 overflow-auto mt-3 overall-progress mb-0" style="max-height: 450px">
-                                <table class="table table-hover col" id="editSummaryTable">
+                            <div class="table-responsive d-flex border border-secondary-subtle gap-1 overflow-auto overall-progress" style="max-height: 450px">
+                                <table class="table table-hover col mb-0" id="editSummaryTable">
                                     <thead class="sticky-top">
                                     </thead>
                                     <tbody>
@@ -64,8 +64,8 @@
                                 <div class="p-2" style="width:120px;" id="editSummaryQty">0</div>
                             </div> -->
                             <div id="totalRowOutside"
-                                class="d-flex border-top fw-bold align-items-center w-100"
-                                style="background: #f2f2f2">
+                                class="d-flex border border-secondary-subtle fw-bold align-items-center w-100"
+                                style="background: #faf0aa">
                                 <!-- ✅ LEFT SIDE (Balance) -->
                                 <div class="d-flex">
                                     <div class="p-2 text-end">Balance:</div>
@@ -104,7 +104,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button class="clearfix btn btn-primary float-end" type="submit" id="branchAssignmentBtn">Save</button>
+                                <button class="clearfix btn btn-primary float-end commit-btn" type="submit" id="branchAssignmentBtn">Save</button>
                             </div>
                         </form>
                     </div>

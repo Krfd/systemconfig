@@ -214,7 +214,7 @@ try {
             }
 
             $groupedItems[$key]['Quantity'] += $quantity;
-            $groupedItems[$key]['Actual'] = $actual;
+            $groupedItems[$key]['Actual'] = (int)$actual;
         }
 
         /* ---------- TABLE ROWS ---------- */
