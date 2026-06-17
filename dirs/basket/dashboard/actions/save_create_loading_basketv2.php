@@ -220,14 +220,6 @@ try {
 
         $collectionQty = (float)$getToDeliverCollection->fetchColumn();
 
-        // reduce the running balance
-        // $remainingQtyMap[$itmid] = $available - $collectionQty;
-
-        // prevent negative values if desired
-        // if ($remainingQtyMap[$itmid] < 0) {
-        //     $remainingQtyMap[$itmid] = 0;
-        // }
-
         $consumedQtyMap[$itmid] += $allocatedQty;
 
         /**

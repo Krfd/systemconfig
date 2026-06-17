@@ -51,8 +51,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive mt-5 border border-secondary" style="max-height: 450px">
-                                <table class="table hover mb-0 w-100" id="openIncomingTable">
+                            <div class="table-responsive mt-5 border border-secondary-subtle" style="max-height: 450px">
+                                <table class="table table-hover mb-0 w-100" id="openIncomingTable">
                                     <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary text-center">#</th>
@@ -66,7 +66,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div id="totalRowOutside" class="d-flex border border-secondary fw-bold"
+                            <div id="totalRowOutside" class="d-flex border border-secondary-subtle fw-bold"
                                 style="background:#faf0aa;">
                                 <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>
                                 <div class="p-2" style="width:120px;" id="totalReqQuantity">0</div>

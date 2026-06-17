@@ -61,7 +61,7 @@
                                 </table>
                             </div>
                             <div id="totalRowOutside"
-                                class="d-flex border border-secondary fw-bold align-items-center w-100"
+                                class="d-flex border border-secondary-subtle fw-bold align-items-center w-100"
                                 style="background: #faf0aa">
                                 <!-- ✅ LEFT SIDE (Balance) -->
                                 <div class="d-flex">

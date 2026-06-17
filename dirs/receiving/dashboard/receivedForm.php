@@ -76,75 +76,75 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr style="height: 50px; min-height: 50px">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
+                                        <tr style="height: 40px; min-height: 40px">
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
+                                        <tr style="height: 40px; min-height: 40px">
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
+                                        <tr style="height: 40px; min-height: 40px">
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
+                                        <tr style="height: 40px; min-height: 40px">
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
+                                        <tr style="height: 40px; min-height: 40px">
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
+                                        <tr style="height: 40px; min-height: 40px">
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
+                                        <tr style="height: 40px; min-height: 40px">
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
                                         </tr>
-                                        <tr style="height: 50px; min-height: 50px">
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
-                                            <td style="background: #FFFBDF"></td>
+                                        <tr style="height: 40px; min-height: 40px">
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
+                                            <td style="background: #fcf7d4"></td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <div id="totalRowOutside" class="d-flex border-top fw-bold"
-                                style="background:#FFF7BC;">
+                            <div id="totalRowOutside" class="d-flex border border-secondary-subtle fw-bold"
+                                style="background: #faf0aa;">
                                 <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>
                                 <div class="p-2" style="width:120px;" id="totalReceivingQty">0</div>
                             </div>

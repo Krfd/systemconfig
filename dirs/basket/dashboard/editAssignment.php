@@ -51,7 +51,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive d-flex border border-secondary-subtle gap-1 overflow-auto overall-progress" style="max-height: 450px">
+                            <div class="table-responsive d-flex border border-secondary-subtle mt-5 gap-1 overflow-auto overall-progress" style="max-height: 450px">
                                 <table class="table table-hover col mb-0" id="editSummaryTable">
                                     <thead class="sticky-top">
                                     </thead>
@@ -96,7 +96,7 @@
                                     <div class="d-flex flex-column gap-3">
                                         <div class="col">
                                             <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
-                                            <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="4" style="background: #FFFBDF; height: auto; resize: horizontal" maxlength="100"></textarea>
+                                            <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="4" style="background: #fcf7d4; height: auto; resize: horizontal" maxlength="100"></textarea>
                                         </div>
                                         <div class="d-flex align-items-baseline col">
                                             <label for="prepby" class="form-label text-dark-emphasis col-5"><small>Prepared by:</small></label>
@@ -115,5 +115,5 @@
 </div>
 <?php
 include("deliveryModal.php");
-include("branchModal.php");
+// include("branchModal.php");
 ?>

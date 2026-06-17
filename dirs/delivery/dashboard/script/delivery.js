@@ -228,7 +228,7 @@ function loadDelivery() {
           },
           rowCallback: function (row, data) {
             $("td", row).css({
-              background: "#FFFBDF",
+              background: "#fcf7d4",
               padding: "3px",
               height: "40px",
               "min-height": "40px",
@@ -245,7 +245,7 @@ function loadDelivery() {
                 $(this).css("background", "#FFF4C2");
               },
               function () {
-                $(this).css("background", "#FFFBDF");
+                $(this).css("background", "#fcf7d4");
               },
             );
           },
@@ -256,12 +256,12 @@ function loadDelivery() {
             for (let i = currentRows; i < 8; i++) {
               let $emptyRow = $(`
                 <tr class="empty-row">
-                  <td colspan="8" style="background:#FFFBDF"></td>
+                  <td colspan="8" style="background:#fcf7d4"></td>
                 </tr>
               `);
 
               $($emptyRow).css({
-                background: "#FFFBDF",
+                background: "#fcf7d4",
                 height: "40px",
                 cursor: "pointer",
               });
@@ -271,7 +271,7 @@ function loadDelivery() {
                   $("td:not(:first-child)", this).css("background", "#FFF4C2");
                 },
                 function () {
-                  $("td:not(:first-child)", this).css("background", "#FFFBDF");
+                  $("td:not(:first-child)", this).css("background", "#fcf7d4");
                 },
               );
 
@@ -606,10 +606,10 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                   if (length > 1) {
                     rows += `
                         <tr style="height: 40px; min-height: 40px;" data-serial="${latestInput}">
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${model}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${category}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${qty}</td>
+                          <td class="align-middle ps-3" style="background:#fcf7d4; padding: 3px">${brand}</td>
+                          <td class="align-middle ps-3" style="background:#fcf7d4; padding: 3px">${model}</td>
+                          <td class="align-middle ps-3" style="background:#fcf7d4; padding: 3px">${category}</td>
+                          <td class="align-middle ps-3" style="background:#fcf7d4; padding: 3px">${qty}</td>
                         </tr>`;
                     if ($existingRow.length) {
                       // ✅ Update quantity
@@ -632,11 +632,11 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                       // ✅ CREATE NEW ROW
                       let newRow = `
                         <tr data-itemcode="${itemCode}" data-serialbased="true" data-serial="${latestInput}" data-deliverynum="${DeliveryNumber}" data-picklist="${PicklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
-                          <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
-                          <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
-                          <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">1</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
+                          <td class="align-middle ps-3 summary-row" style="background: #fcf7d4">${brand}</td>
+                          <td class="align-middle ps-3 summary-row" style="background: #fcf7d4">${model}</td>
+                          <td class="align-middle ps-3 summary-row" style="background: #fcf7d4">${category}</td>
+                          <td class="align-middle ps-3" style="background: #fcf7d4">1</td>
+                          <td class="align-middle ps-3" style="background: #fcf7d4">
                             <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">Unassigned</span>
                           </td>
                         </tr>
@@ -653,10 +653,10 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                   } else {
                     rows += `
                         <tr style="height: 40px; min-height: 40px;">
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${brand}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${model}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${category}</td>
-                          <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${qty}</td>
+                          <td class="align-middle ps-3" style="background: #fcf7d4">${brand}</td>
+                          <td class="align-middle ps-3" style="background: #fcf7d4">${model}</td>
+                          <td class="align-middle ps-3" style="background: #fcf7d4">${category}</td>
+                          <td class="align-middle ps-3" style="background: #fcf7d4">${qty}</td>
                         </tr>`;
                     if ($existingRow.length) {
                       // ✅ Update quantity
@@ -679,11 +679,11 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                       // ✅ CREATE NEW ROW
                       let newRow = `
                           <tr data-itemcode="${itemCode}" data-serial="${latestInput}" data-deliverynum="${DeliveryNumber}" data-picklist="${PicklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
-                            <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${brand}</td>
-                            <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${model}</td>
-                            <td class="align-middle ps-3 summary-row" style="background:#FFFBDF; padding: 3px;">${category}</td>
-                            <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">1</td>
-                            <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">
+                            <td class="align-middle ps-3 summary-row" style="background: #fcf7d4">${brand}</td>
+                            <td class="align-middle ps-3 summary-row" style="background: #fcf7d4">${model}</td>
+                            <td class="align-middle ps-3 summary-row" style="background: #fcf7d4">${category}</td>
+                            <td class="align-middle ps-3" style="background: #fcf7d4>1</td>
+                            <td class="align-middle ps-3" style="background: #fcf7d4>
                               <span class="badge bg-success rounded-5 d-inline-block p-1 text-light">Assigned</span>
                             </td>
                           </tr>
@@ -748,14 +748,14 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                         );
                         let newRow = $(`
                               <tr data-itemcode="${itemCode}" style="padding: 3px; height: 40px; min-height: 40px">
-                                <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
-                                <td style="background:#FFFBDF" class="text-primary">${Serial}</td>
-                                <td style="background:#FFFBDF">${branchName}</td>
-                                <td style="background:#FFFBDF">${brand}</td>
-                                <td style="background:#FFFBDF" class="text-start">${model}</td>
-                                <td style="background:#FFFBDF" class="text-start">${category}</td>
-                                <td style="background:#FFFBDF" class="text-center">${qty}</td>
-                                <td style="background:#FFFBDF" class="d-none">${itemCode}</td>
+                                <td style="background: #fcf7d4" class="text-center">${rowCount}</td>
+                                <td style="background: #fcf7d4" class="text-primary">${Serial}</td>
+                                <td style="background: #fcf7d4">${branchName}</td>
+                                <td style="background: #fcf7d4">${brand}</td>
+                                <td style="background: #fcf7d4" class="text-start">${model}</td>
+                                <td style="background: #fcf7d4" class="text-start">${category}</td>
+                                <td style="background: #fcf7d4" class="text-center">${qty}</td>
+                                <td style="background: #fcf7d4" class="d-none">${itemCode}</td>
                               </tr>
                             `);
                         if ($emptyRow.length) {
@@ -768,7 +768,7 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                             $(this).css("background", "#FFF4C2");
                           },
                           function () {
-                            $(this).css("background", "#FFFBDF");
+                            $(this).css("background", "#fcf7d4");
                           },
                         );
                       });
@@ -892,26 +892,26 @@ function branchDelivery() {
 
     let newRow = $(`
       <tr data-itemcode="${itemCode}" data-branch="${branch}" style="padding: 3px; height: 40px; min-height: 40px">
-        <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
-        <td style="background:#FFFBDF" class="text-primary">${Serial}</td>
-        <td style="background:#FFFBDF">${branch}</td>
-        <td style="background:#FFFBDF">${brand}</td>
-        <td style="background:#FFFBDF" class="text-start">${model}</td>
-        <td style="background:#FFFBDF" class="text-start">${category}</td>
-        <td style="background:#FFFBDF" class="text-center">${qty}</td>
-        <td style="background:#FFFBDF" class="d-none">${itemCode}</td>
+        <td style="background: #fcf7d4" class="text-center">${rowCount}</td>
+        <td style="background: #fcf7d4" class="text-primary">${Serial}</td>
+        <td style="background: #fcf7d4">${branch}</td>
+        <td style="background: #fcf7d4">${brand}</td>
+        <td style="background: #fcf7d4" class="text-start">${model}</td>
+        <td style="background: #fcf7d4" class="text-start">${category}</td>
+        <td style="background: #fcf7d4" class="text-center">${qty}</td>
+        <td style="background: #fcf7d4" class="d-none">${itemCode}</td>
       </tr>
     `);
 
     let noSerialRow =
       $(`<tr data-itemcode="${itemCode}" data-branch="${branch}" style="padding: 3px; height: 40px; min-height: 40px">
-      <td style="background:#FFFBDF" class="text-center">${rowCount}</td>
-      <td style="background:#FFFBDF">${branch}</td>
-      <td style="background:#FFFBDF">${brand}</td>
-      <td style="background:#FFFBDF" class="text-start">${model}</td>
-      <td style="background:#FFFBDF" class="text-start">${category}</td>
-      <td style="background:#FFFBDF" class="text-center">${qty}</td>
-      <td style="background:#FFFBDF" class="d-none">${itemCode}</td>
+      <td style="background: #fcf7d4" class="text-center">${rowCount}</td>
+      <td style="background: #fcf7d4">${branch}</td>
+      <td style="background: #fcf7d4">${brand}</td>
+      <td style="background: #fcf7d4" class="text-start">${model}</td>
+      <td style="background: #fcf7d4" class="text-start">${category}</td>
+      <td style="background: #fcf7d4" class="text-center">${qty}</td>
+      <td style="background: #fcf7d4" class="d-none">${itemCode}</td>
       </tr>
     `);
 
@@ -973,7 +973,7 @@ function branchDelivery() {
         $(this).css("background", "#FFF4C2");
       },
       function () {
-        $(this).css("background", "#FFFBDF");
+        $(this).css("background", "#fcf7d4");
       },
     );
 
@@ -982,7 +982,7 @@ function branchDelivery() {
         $(this).css("background", "#FFF4C2");
       },
       function () {
-        $(this).css("background", "#FFFBDF");
+        $(this).css("background", "#fcf7d4");
       },
     );
   });
@@ -1011,14 +1011,14 @@ function clearTable() {
 
       for (let i = 0; i < 8; i++) {
         row = `
-          <tr>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
-          <td style="background: #FFFBDF; height: 40px;"></td>
+          <tr style="height: 40px; min-height: 40px">
+          <td style="background: #fcf7d4"></td>
+          <td style="background: #fcf7d4"></td>
+          <td style="background: #fcf7d4"></td>
+          <td style="background: #fcf7d4"></td>
+          <td style="background: #fcf7d4"></td>
+          <td style="background: #fcf7d4"></td>
+          <td style="background: #fcf7d4"></td>
         </tr>
         `;
 
@@ -1028,7 +1028,7 @@ function clearTable() {
       }
 
       let serialRow = `<tr>
-          <td rowspan="9" colspan="2" style="background: #FFFBDF" contenteditable="true" style="white-space: pre-wrap;">
+          <td rowspan="9" colspan="2" style="background: #fcf7d4" contenteditable="true" style="white-space: pre-wrap;">
           </td>
         </tr>`;
 
@@ -1069,7 +1069,7 @@ function summaryData() {
     },
     rowCallback: function (row, data) {
       $("td", row).css({
-        background: "#FFFBDF",
+        background: "#fcf7d4",
         padding: "3px",
         height: "40px",
         "min-height": "40px",
@@ -1086,7 +1086,7 @@ function summaryData() {
           $(this).css("background", "#FFF4C2");
         },
         function () {
-          $(this).css("background", "#FFFBDF");
+          $(this).css("background", "#fcf7d4");
         },
       );
     },
@@ -1097,12 +1097,12 @@ function summaryData() {
       for (let i = currentRows; i < 8; i++) {
         let emptyRow = $(`
                 <tr class="empty-row">
-                  <td colspan="7" style="background:#FFFBDF"></td>
+                  <td colspan="7" style="background: #fcf7d4"></td>
                 </tr>
               `);
 
         $(emptyRow).css({
-          background: "#FFFBDF",
+          background: "#fcf7d4",
           height: "40px",
         });
 
@@ -1111,7 +1111,7 @@ function summaryData() {
             $("td:not(:first-child)", this).css("background", "#FFF4C2");
           },
           function () {
-            $("td:not(:first-child)", this).css("background", "#FFFBDF");
+            $("td:not(:first-child)", this).css("background", "#fcf7d4");
           },
         );
 
@@ -1157,10 +1157,10 @@ function loadPicklistBranches(
           branches.forEach((branch) => {
             let row = `
             <tr>
-              <td style="background: #FFF7BC">${branch.ReqBranch}</td>
-              <td style="background: #FFF7BC">${model}</td>
-              <td style="background: #FFF7BC">${category}</td>
-              <td style="background: #FFF7BC; outline: none" contenteditable="true" class="border border-3 border-warning"></td>
+              <td style="background: #fcf7d4">${branch.ReqBranch}</td>
+              <td style="background: #fcf7d4">${model}</td>
+              <td style="background: #fcf7d4">${category}</td>
+              <td style="background: #fcf7d4; outline: none" contenteditable="true" class="border border-3 border-warning"></td>
             </tr>
           `;
 
@@ -1228,11 +1228,11 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
             } else {
               let summaryRow = `
             <tr data-itemcode="${item.ItemCode}" data-deliverynum="${DrNumber}" data-picklist="${picklistDr}" style="height: 40px; cursor: pointer">
-              <td style="background:#FFFBDF">${item.Brand}</td>
-              <td style="background:#FFFBDF">${item.Model}</td>
-              <td style="background:#FFFBDF">${item.Category}</td>
-              <td style="background:#FFFBDF" class="ms-3">${quantity}</td>
-              <td style="background:#FFFBDF">
+              <td style="background: #fcf7d4">${item.Brand}</td>
+              <td style="background: #fcf7d4">${item.Model}</td>
+              <td style="background: #fcf7d4">${item.Category}</td>
+              <td style="background: #fcf7d4" class="ms-3">${quantity}</td>
+              <td style="background: #fcf7d4">
                 <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">Unassigned</span>
               </td>
             </tr>
@@ -1757,7 +1757,7 @@ function loadDeliveryBasket() {
             order: [[0, "desc"]],
             rowCallback: function (row, data) {
               $("td", row).css({
-                background: "#FFFBDF",
+                background: "#fcf7d4",
                 padding: "3px",
                 height: "40px",
                 "min-height": "40px",
@@ -1771,7 +1771,7 @@ function loadDeliveryBasket() {
                   $(this).css("background", "#FFF4C2");
                 },
                 function () {
-                  $(this).css("background", "#FFFBDF");
+                  $(this).css("background", "#fcf7d4");
                 },
               );
             },
@@ -1781,12 +1781,12 @@ function loadDeliveryBasket() {
 
               for (let i = currentRows; i < 8; i++) {
                 let $emptyRow = $(`
-                <tr class="empty-row" style="background: #FFFBDF">
-                  <td colspan="6" style="background: #FFFBDF">&nbsp;</td>
+                <tr class="empty-row">
+                  <td colspan="6" style="background: #fcf7d4">&nbsp;</td>
                 </tr>
               `);
                 $emptyRow.css({
-                  background: "#FFFBDF",
+                  background: "#fcf7d4",
                   height: "40px",
                   "min-height": "40px",
                   cursor: "pointer",
@@ -1796,7 +1796,7 @@ function loadDeliveryBasket() {
                     $(this).css("background", "#FFF4C2");
                   },
                   function () {
-                    $(this).css("background", "#FFFBDF");
+                    $(this).css("background", "#fcf7d4");
                   },
                 );
                 tableBody.append($emptyRow);
@@ -2153,10 +2153,10 @@ function openForm(DeliveryNum) {
             totalQty += quantity;
             rows += `
               <tr style="height: 40px; min-height: 40px; cursor: pointer">
-                <td class="align-middle ps-3" style="background:#FFFBDF;">${item.Brand}</td>
-                <td class="align-middle ps-3" style="background:#FFFBDF;">${item.Model}</td>
-                <td class="align-middle ps-3" style="background:#FFFBDF;">${item.Category}</td>
-                <td class="align-middle ps-3" style="background:#FFFBDF;">${item.Deliver_Qty}</td>
+                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Brand}</td>
+                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Model}</td>
+                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Category}</td>
+                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Deliver_Qty}</td>
               </tr>
             `;
           });
@@ -2168,7 +2168,7 @@ function openForm(DeliveryNum) {
           for (let i = currentRows; i < 8; i++) {
             let emptyRow = $(`
                 <tr class="empty-row" style="height: 45px; min-height: 45px">
-                  <td colspan="4" style="background: #FFFBDF"></td>
+                  <td colspan="4" style="background: #fcf7d4"></td>
                 </tr>
               `);
 
@@ -2220,10 +2220,10 @@ function openDeliveryForm(DeliveryNum, PicklistNumber, RowNum, SRN) {
             totalQty += quantity;
             rows += `
               <tr style="height: 40px; min-height: 40px">
-                <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Brand}</td>
-                <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Model}</td>
-                <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Category}</td>
-                <td class="align-middle ps-3" style="background:#FFFBDF; padding: 3px">${item.Quantity}</td>
+                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Brand}</td>
+                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Model}</td>
+                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Category}</td>
+                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Quantity}</td>
               </tr>
             `;
           });

@@ -49,7 +49,6 @@ function get_SRN() {
       if ($.trim(response.isSuccess) === "success") {
         $("#srnForm").val(response.SRNNumber);
         $("#desForm").val(response.BranchName);
-        // console.log(`BRANCH NAME: ${response.BranchName}`);
         loadDestinationWhscodes(response.BranchName);
       } else {
         alert(response.message || "Error occurred");
@@ -75,6 +74,7 @@ function loadDestinationWhscodes(BranchName) {
               value: warehousecode.WhsCode,
               text: warehousecode.WhsCode,
             }),
+            console.log(`WarehouseCode : ${warehousecode.WhsCode}`)
           );
         });
       } else {
@@ -208,6 +208,7 @@ async function loadOriginWhscodes(Branch) {
       Branch: Branch,
     },
     function (data) {
+      console.log(`ORIGIN WAREHOUSE CODE: ${JSON.stringify(data)}`)
       const response = JSON.parse(data);
       if ($.trim(response.isSuccess) === "success") {
         const whscode = response.Data;

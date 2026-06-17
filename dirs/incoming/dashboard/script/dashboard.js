@@ -1436,7 +1436,6 @@ function loadBasket() {
             const isEmptyRow = !data[0];
 
             $("td", row).css({
-              // background: "#FFFBDF",
               background: "#fcf7d4",
               padding: "3px",
               height: "40px",

@@ -26,7 +26,7 @@
                 <thead class="sticky-top">
                     <tr>
                         <th></th>
-                        <th class="text-secondary">Picklist No.</th>
+                        <th class="text-secondary text-center">Picklist No.</th>
                         <th class="text-secondary text-center">Quantity</th>
                         <th class="text-secondary">Status</th>
                         <th class="text-secondary"></th>
@@ -39,7 +39,7 @@
     </div>
     <div class="tab-pane fade" id="bordered-justified-assigned" role="tabpanel" aria-labelledby="assigned-tab">
         <div class="table-responsive-md">
-            <table class="table datatables table-hover" id="basketTableAssigned">
+            <table class="table datatables table-hover border border-secondary-subtle" id="basketTableAssigned">
                 <thead class="sticky-top">
                     <tr>
                         <th></th>

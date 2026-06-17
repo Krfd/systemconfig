@@ -1,5 +1,5 @@
-<div class="table-responsive-lg mt-3">
-    <table class="table datatables table-hover" id="receivingTable">
+<div class="table-responsive mt-3">
+    <table class="table datatables table-hover border border-secondary-subtle" id="receivingTable">
         <thead>
             <tr>
                 <th class="text-secondary">#</th>

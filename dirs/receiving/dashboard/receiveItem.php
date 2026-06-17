@@ -29,7 +29,7 @@
                                             <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
                                         </div>
                                     </div>
-                                    <input type="hidden" name="lbnum" id="lbnum" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
+                                    <input type="hidden" name="lbnum" id="lbnum" class="form-control form-control-sm col" style="background: #fcf7d4" readonly>
                                 </div>
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-items-baseline gap-3">
@@ -92,7 +92,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div id="totalRowOutside" class="d-flex border-top fw-bold justify-content-end w-100" style="background: #FFFBDF">
+                            <div id="totalRowOutside" class="d-flex border-top fw-bold justify-content-end w-100" style="background: #fcf7d4">
                                 <div class=" p-2 text-end">Total Quantity:</div>
                                 <div class="p-2" style="width:120px;" id="summaryQty">0</div>
                             </div>
@@ -101,7 +101,7 @@
                                     <div class="d-flex flex-column gap-3">
                                         <div class="col">
                                             <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
-                                            <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="4" style="background: #FFFBDF; height: auto; resize: horizontal" maxlength="100"></textarea>
+                                            <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="4" style="background: #fcf7d4; height: auto; resize: horizontal" maxlength="100"></textarea>
                                         </div>
                                         <div class="d-flex align-items-baseline col">
                                             <label for="prepby" class="form-label text-dark-emphasis col-5"><small>Prepared by:</small></label>

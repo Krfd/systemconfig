@@ -1,5 +1,5 @@
 <div class="card shadow-sm" id="dashboard-display">
-    <div class="card-body">
+    <div class="card-body overall-progress">
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -115,8 +115,8 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div id="totalRowOutside" class="d-flex border border-secondary fw-bold"
-                            style="background:#faf0aa;">
+                        <div id="totalRowOutside" class="d-flex border border-secondary-subtle fw-bold"
+                            style="background: #faf0aa;">
                             <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>
                             <div class="p-2" style="width:120px;" id="totalQuantity">0</div>
                         </div>

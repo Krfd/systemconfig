@@ -19,7 +19,6 @@ try {
 
     $get_header = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
     $response = array(
         "isSuccess" => "success",
         "Data" => $get_header

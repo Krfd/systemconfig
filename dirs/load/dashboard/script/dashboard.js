@@ -193,7 +193,7 @@ function loadBasket() {
           // order: [[0, "desc"]],
           rowCallback: function (row, data) {
             $("td", row).css({
-              background: "#FFFBDF",
+              background: "#fcf7d4",
               padding: "3px",
               height: "40px",
               "min-height": "40px",
@@ -205,7 +205,7 @@ function loadBasket() {
                 $(this).css("background", "#FFF4C2");
               },
               function () {
-                $(this).css("background", "#FFFBDF");
+                $(this).css("background", "#fcf7d4");
               },
             );
           },
@@ -216,12 +216,13 @@ function loadBasket() {
             for (let i = currentRows; i < 8; i++) {
               let $emptyRow = $(`
                   <tr class="empty-row" data-bs-toggle="false">
-                    <td colspan="6" style="background: #FFFBDF">&nbsp;</td>
+                    <td colspan="6" style="background: #fcf7d4">&nbsp;</td>
                   </tr>
                 `);
 
               $emptyRow.css({
-                background: "#FFFBDF",
+                // background: "#FFFBDF",
+                background: "#fcf7d4",
                 height: "40px",
                 "min-height:": "40px",
               });
@@ -231,7 +232,8 @@ function loadBasket() {
                   $(this).css("background", "#FFF4C2");
                 },
                 function () {
-                  $(this).css("background", "#FFFBDF");
+                  // $(this).css("background", "#FFFBDF");
+                  $(this).css("background", "#fcf7d4");
                 },
               );
               tableBody.append($emptyRow);
@@ -403,19 +405,19 @@ function getBatchItems(batch, tableSelector) {
               style="height: 40px; min-height: 40px; cursor: pointer"
               data-pklist='${JSON.stringify(item.PKList_Numbers)}'
               data-itemid="${item.ItemRowNum}">
-              <td class="align-middle ps-3" style="background: #FFFBDF">
+              <td class="align-middle ps-3" style="background: #fcf7d4">
                 ${counter}
               </td>
-              <td class="align-middle ps-3 text-primary" style="background: #FFFBDF">
+              <td class="align-middle ps-3 text-primary" style="background: #fcf7d4">
                 ${item.Brand}
               </td>
-              <td class="align-middle ps-3" style="background: #FFFBDF">
+              <td class="align-middle ps-3" style="background: #fcf7d4">
                 ${item.Model}
               </td>
-              <td class="align-middle ps-3" style="background: #FFFBDF">
+              <td class="align-middle ps-3" style="background: #fcf7d4">
                 ${item.Category}
               </td>
-              <td class="align-middle ps-3" style="background: #FFFBDF">
+              <td class="align-middle ps-3" style="background: #fcf7d4">
                 ${item.Deliver_Qty}
               </td>
             </tr>
@@ -430,12 +432,12 @@ function getBatchItems(batch, tableSelector) {
         for (let i = Object.keys(groupedItems).length; i < 8; i++) {
           let emptyRow = $(`
             <tr class="empty-row">
-              <td colspan="5" style="background: #FFFBDF"></td>
+              <td colspan="5" style="background: #fcf7d4"></td>
             </tr>
           `);
 
           $(emptyRow).css({
-            background: "#FFFBDF",
+            background: "#fcf7d4",
             height: "50px",
           });
 

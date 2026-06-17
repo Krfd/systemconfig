@@ -10,7 +10,7 @@
         </div>
     </div>
     <div class="table-responsive-md">
-        <table class="table datatables table-hover" id="deliveryItemsTable">
+        <table class="table datatables table-hover border border-secondary-subtle" id="deliveryItemsTable">
             <thead class="sticky-top">
                 <tr>
                     <th class="text-secondary">Brand</th>

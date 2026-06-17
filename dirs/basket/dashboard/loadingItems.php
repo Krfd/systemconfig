@@ -10,7 +10,7 @@
         </div>
     </div>
     <div class="table-responsive-md mt-2">
-        <table class="table datatables table-hover" id="loadingBasketTable">
+        <table class="table datatables table-hover border border-secondary-subtle" id="loadingBasketTable">
             <thead class="sticky-top">
                 <tr>
                     <th class="text-secondary">Picklist No.</th>

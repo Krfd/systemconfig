@@ -100,7 +100,7 @@ function loadReceiving() {
           order: [[0, "desc"]],
           rowCallback: function (row, data) {
             $("td", row).css({
-              background: "#FFFBDF",
+              background: "#fcf7d4",
               padding: "3px",
               height: "40px",
               "min-height": "40px",
@@ -128,7 +128,7 @@ function loadReceiving() {
                 $(this).css("background", "#FFF4C2");
               },
               function () {
-                $(this).css("background", "#FFFBDF");
+                $(this).css("background", "#fcf7d4");
               },
             );
           },
@@ -139,18 +139,18 @@ function loadReceiving() {
             for (let i = currentRows; i < 8; i++) {
               let emptyRow = $(`
                     <tr class="empty-row">
-                      <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
+                      <td colspan="5" style="background: #fcf7d4">&nbsp;</td>
                     </tr>
                   `);
 
               emptyRow.css({
-                background: "#FFFBDF",
+                background: "#fcf7d4",
                 height: "40px",
                 "min-height": "40px",
               });
 
               emptyRow.hover(function () {
-                $(this).css("background", "#FFFBDF");
+                $(this).css("background", "#fcf7d4");
               });
 
               tableBody.append(emptyRow);
@@ -405,12 +405,12 @@ function openReceivedForm(rcvdNumber) {
 
             rows += `
               <tr>
-                <td style="background:#FFFBDF" class="text-center">${index + 1}</td>
-                <td style="background:#FFFBDF">${item.ItemBrand}</td>
-                <td style="background:#FFFBDF">${item.ItemModel}</td>
-                <td style="background:#FFFBDF">${item.ItemCategory}</td>
-                <td style="background:#FFFBDF">${Number(item.Recvd_ItemQty).toFixed(0)}</td>
-                <td style="background:#FFFBDF">${itemType}</td>
+                <td style="background: #fcf7d4" class="text-center">${index + 1}</td>
+                <td style="background: #fcf7d4">${item.ItemBrand}</td>
+                <td style="background: #fcf7d4">${item.ItemModel}</td>
+                <td style="background: #fcf7d4">${item.ItemCategory}</td>
+                <td style="background: #fcf7d4">${Number(item.Recvd_ItemQty).toFixed(0)}</td>
+                <td style="background: #fcf7d4">${itemType}</td>
               </tr>
             `;
           });
@@ -423,13 +423,13 @@ function openReceivedForm(rcvdNumber) {
 
             for (let i = 0; i < emptyRows; i++) {
               let emptyRow = `
-              <tr class="item-row empty-row" style="height: 50px; min-height: 50px;">
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
+              <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+                <td style="background: #fcf7d4"></td>
+                <td style="background: #fcf7d4"></td>
+                <td style="background: #fcf7d4"></td>
+                <td style="background: #fcf7d4"></td>
+                <td style="background: #fcf7d4"></td>
+                <td style="background: #fcf7d4"></td>
               </tr>
               `;
               $("#receiving-form-table tbody").append(emptyRow);
@@ -652,14 +652,14 @@ function clearTable() {
 
       for (let i = 0; i < 8; i++) {
         row = `
-          <tr>
-          <td style="background: #FFFBDF; height: 50px;"></td>
-          <td style="background: #FFFBDF; height: 50px;"></td>
-          <td style="background: #FFFBDF; height: 50px;"></td>
-          <td style="background: #FFFBDF; height: 50px;"></td>
-          <td style="background: #FFFBDF; height: 50px;"></td>
-          <td style="background: #FFFBDF; height: 50px;"></td>
-          <td style="background: #FFFBDF; height: 50px;"></td>
+          <tr style="height: 40px; max-height: 40px">
+          <td style="background: #fcf7d4"></td>
+          <td style="background: #fcf7d4"></td>
+          <td style="background: #fcf7d4"></td>
+          <td style="background: #fcf7d4"></td>
+          <td style="background: #fcf7d4"></td>
+          <td style="background: #fcf7d4"></td>
+          <td style="background: #fcf7d4"></td>
         </tr>
         `;
 
@@ -668,10 +668,10 @@ function clearTable() {
 
       for (let j = 0; j < 5; j++) {
         serialRow = `
-          <tr style="height: 40px">
-            <td style="background: #FFFBDF"></td>
-            <td style="background: #FFFBDF"></td>
-            <td style="background: #FFFBDF"></td>
+          <tr style="height: 40px; max-height: 40px">
+            <td style="background: #fcf7d4"></td>
+            <td style="background: #fcf7d4"></td>
+            <td style="background: #fcf7d4"></td>
           </tr>
         `;
         $("#receiving-serial-table tbody").append(serialRow);
@@ -874,11 +874,11 @@ function addNonSerialize() {
 
                       rows += `
                   <tr data-itemcode="${itemCode}" data-rownum="${itemRowNum}" style="height: 40px; min-height: 40px; cursor: pointer">
-                    <td class="align-middle ps-3 text-center" style="background:#FFFBDF">${counter}</td>
-                    <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>
-                    <td class="align-middle ps-3" style="background:#FFFBDF">${model}</td>
-                    <td class="align-middle ps-3" style="background:#FFFBDF">${category}</td>
-                    <td class="align-middle ps-3" style="background:#FFFBDF">${Quantity}</td>
+                    <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${counter}</td>
+                    <td class="align-middle ps-3" style="background: #fcf7d4">${brand}</td>
+                    <td class="align-middle ps-3" style="background: #fcf7d4">${model}</td>
+                    <td class="align-middle ps-3" style="background: #fcf7d4">${category}</td>
+                    <td class="align-middle ps-3" style="background: #fcf7d4">${Quantity}</td>
                   </tr>`;
                     }
 
@@ -1019,9 +1019,9 @@ function serialDeliveryInput() {
                 if (!serialExisted) {
                   let serialRow = `
                       <tr style="height: 40px; min-height: 40px; cursor: pointer">
-                          <td class="align-middle ps-3" style="background: #FFFBDF">${model}</td>
-                          <td class="align-middle ps-3" style="background: #FFFBDF">${itemCode}</td>
-                          <td class="align-middle ps-3" style="background: #FFFBDF">${serial}</td>
+                          <td class="align-middle ps-3" style="background: #fcf7d4">${model}</td>
+                          <td class="align-middle ps-3" style="background: #fcf7d4">${itemCode}</td>
+                          <td class="align-middle ps-3" style="background: #fcf7d4">${serial}</td>
                       </tr>
                   `;
 
@@ -1057,11 +1057,11 @@ function serialDeliveryInput() {
                     receivingBody.find("tr[data-itemcode]").length + 1;
                   let newRow = `
                     <tr data-itemcode="${itemCode}" data-rownum="${itemRowNum}" data-serialbased="true" style="height: 40px; min-height: 40px; cursor: pointer">
-                      <td class="align-middle ps-3 text-center" style="background: #FFFBDF">${counter}</td>
-                      <td class="align-middle ps-3" style="background:#FFFBDF">${brand}</td>
-                      <td class="align-middle ps-3" style="background:#FFFBDF">${model}</td>
-                      <td class="align-middle ps-3" style="background:#FFFBDF">${category}</td>
-                      <td class="align-middle ps-3" style="background:#FFFBDF">${qty}</td>
+                      <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${counter}</td>
+                      <td class="align-middle ps-3" style="background: #fcf7d4">${brand}</td>
+                      <td class="align-middle ps-3" style="background: #fcf7d4">${model}</td>
+                      <td class="align-middle ps-3" style="background: #fcf7d4">${category}</td>
+                      <td class="align-middle ps-3" style="background: #fcf7d4">${qty}</td>
                     </tr>
                   `;
 
