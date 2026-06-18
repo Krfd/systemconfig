@@ -1,0 +1,51 @@
+=== GROUPED ITEM SUMMARY ===
+Generated: 2026-06-17 11:05:02
+
+Item ID    : 3
+Total Qty  : 10
+Branch     : SHOWROOM
+Picklists  : PL10001
+Serials    : 31213598
+------------------------------------------------------------
+Item ID    : 6
+Total Qty  : 16
+Branch     : VIAC
+Picklists  : PL10001
+Serials    : 31213598, 31214146, 31010792, 31111703
+------------------------------------------------------------
+Item ID    : 9
+Total Qty  : 10
+Branch     : PLAZA
+Picklists  : PL10002
+Serials    : 31213598
+------------------------------------------------------------
+Item ID    : 2
+Total Qty  : 7
+Branch     : SHOWROOM
+Picklists  : PL10001
+Serials    : 110015A42264000040, 110015A42254000272
+------------------------------------------------------------
+Item ID    : 8
+Total Qty  : 5
+Branch     : PLAZA
+Picklists  : PL10002
+Serials    : 110015A42264000040
+------------------------------------------------------------
+Item ID    : 1
+Total Qty  : 9
+Branch     : SHOWROOM
+Picklists  : PL10001
+Serials    : 200624923000081181
+------------------------------------------------------------
+Item ID    : 5
+Total Qty  : 11
+Branch     : VIAC
+Picklists  : PL10001
+Serials    : 200624923000081181, 200624923000081212
+------------------------------------------------------------
+Item ID    : 7
+Total Qty  : 7
+Branch     : GALLERIA
+Picklists  : PL10002
+Serials    : 0KSMPDBX100337
+------------------------------------------------------------

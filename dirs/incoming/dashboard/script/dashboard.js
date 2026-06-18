@@ -421,11 +421,11 @@ function loadPreview(SRNumbers) {
                     <input type="checkbox" name="checkbox" id="${item.DocEntry}" data-docentry="${item.DocEntry}"
                     class="form-check-input align-self-center mx-auto checkbox border border-primary">
                   </td>
-                  <td class="align-middle ps-3" style="background: #f7f7f7">${index + 1}</td>
-                  <td class="align-middle ps-3" style="background: #f7f7f7">${item.ItemBrand}</td>
-                  <td class="align-middle ps-3" style="background: #f7f7f7">${item.ItemName}</td>
-                  <td class="align-middle ps-3" style="background: #f7f7f7">${item.ItemCategory}</td>
-                  <td class="align-middle ps-3" style="background: #f7f7f7">${item.Request_Qty}</td>
+                  <td class="align-middle ps-3" style="background: #fcf7d4">${index + 1}</td>
+                  <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemBrand}</td>
+                  <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemName}</td>
+                  <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemCategory}</td>
+                  <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${item.Request_Qty}</td>
                 </tr>
               `;
         });
@@ -776,11 +776,11 @@ function openIncoming(DocEntry) {
             totalQty += quantity;
             rows += `
                 <tr style="height: 40px; min-height: 40px">
-                  <td class="align-middle ps-3" style="background:#FFFBDF">${index + 1}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF">${item.ItemBrand}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF">${item.ItemName}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF">${item.ItemCategory}</td>
-                  <td class="align-middle ps-3" style="background:#FFFBDF">${item.Request_Qty}</td>
+                  <td class="align-middle ps-3" style="background: #fcf7d4">${index + 1}</td>
+                  <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemBrand}</td>
+                  <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemName}</td>
+                  <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemCategory}</td>
+                  <td class="align-middle ps-3" style="background: #fcf7d4">${item.Request_Qty}</td>
                 </tr>
               `;
           });
@@ -794,11 +794,11 @@ function openIncoming(DocEntry) {
             for (let i = 0; i < emptyRowsNeeded; i++) {
               let emptyRow = `
                   <tr class="item-row empty-row" style="height: 50px; min-height: 50px;">
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
-                    <td style="background: #FFFBDF"></td>
+                    <td style="background:  #fcf7d4"></td>
+                    <td style="background:  #fcf7d4"></td>
+                    <td style="background:  #fcf7d4"></td>
+                    <td style="background:  #fcf7d4"></td>
+                    <td style="background:  #fcf7d4"></td>
                   </tr>
               `;
               $("#openIncomingTable tbody").append(emptyRow);

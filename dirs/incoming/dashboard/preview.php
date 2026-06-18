@@ -22,7 +22,7 @@
                     <th class="text-secondary">Brand</th>
                     <th class="text-secondary">Model</th>
                     <th class="text-secondary">Category</th>
-                    <th class="text-secondary">Quantity</th>
+                    <th class="text-secondary text-center">Quantity</th>
                 </tr>
             </thead>
             <tbody>

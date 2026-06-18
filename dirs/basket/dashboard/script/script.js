@@ -293,8 +293,6 @@ function loadDeliveryBasket(tableId, url) {
 
       if (response.isSuccess === "success") {
         Object.values(grouped).forEach((item) => {
-          // console.log(`ITEM : ${JSON.stringify(item)}`)
-          // console.log(`QUANTITY: ${item.RequestItemQty}`)
           let branches = Array.from(item.Req_Branch).join(", ");
 
           const hasInvalidQty = item.items.some((row) => {
@@ -355,8 +353,6 @@ function loadDeliveryBasket(tableId, url) {
                 </ul>
               </div>`,
           ]);
-          // END OF NEWLY ADDED LOOP
-          // });
         });
 
         if (rows.length === 0) {
@@ -376,7 +372,6 @@ function loadDeliveryBasket(tableId, url) {
           columns: [
             { title: "", className: "text-center" },
             { title: "Picklist No." },
-            // { title: "Quantity", className: "text-start ps-5" },
             { title: "Quantity", className: "text-center" },
             {
               title: "Status",
@@ -395,7 +390,6 @@ function loadDeliveryBasket(tableId, url) {
                 .attr("data-rownum", originalItem.DocEntry)
                 .attr("data-picklist", originalItem.PKList_Number)
                 .attr("data-branches", branches)
-                // .attr("data-bs-toggle", "tooltip")
                 .attr(
                   "data-bs-title",
                   `<div class="text-start">Branches: <br>${branchList.join("<br>") || "No Branch"}</div>`,
@@ -418,8 +412,8 @@ function loadDeliveryBasket(tableId, url) {
             });
             $("td:eq(1)", row).addClass("text-primary ps-2 text-center");
             $("td:eq(1)", row).css("text-align", "start");
-            $("td:eq(2)", row).css("text-align", "start ps-2");
-            $("td:eq(3)", row).css("text-align", "start ps-2");
+            $("td:eq(2)", row).css("text-align", "start");
+            $("td:eq(3)", row).css("text-align", "start");
 
             $(row).hover(
               function () {
@@ -460,19 +454,6 @@ function loadDeliveryBasket(tableId, url) {
 
             const selectionMode =
               $("#basketTableAssigned").data("selectionMode") || false;
-
-            // $(tableId + " [data-bs-toggle='tooltip']").each(function () {
-            //   if (!this._tooltipInitialized) {
-            //     this._tooltipInitialized = true;
-
-            //     new bootstrap.Tooltip(this, {
-            //       placement: "right",
-            //       container: "body",
-            //       html: true,
-            //       trigger: "hover"
-            //     });
-            //   }
-            // });
 
             $(tableId + " tbody tr").each(function () {
               const existingTooltip = bootstrap.Tooltip.getInstance(this);
@@ -1550,355 +1531,357 @@ function editAssignBranch(picklist, branchees) {
 
 // SUBMIT BRANCH ASSIGNMENT
 function submitBranchAssignment() {
-  // let commitBtn = document.getElementById("branchAssignmentBtn");
-  let commitBtn = document.getElementById("branchAssignmentBtn");
+  $(document)
+    .off("click", "#branchAssignmentBtn")
+    .on("click", "#branchAssignmentBtn", function (e) {
+      e.preventDefault();
 
-  commitBtn.addEventListener("click", function (e) {
-    e.preventDefault();
+      let validation = validateSummaryTable();
 
-    let validation = validateSummaryTable();
+      if (!validation.isValid) {
+        if (validation.hasEmpty) {
+          Swal.fire({
+            icon: "warning",
+            title: "Incomplete Assignment",
+            text: "All editable fields must have a value.",
+          });
+          return;
+        }
 
-    if (!validation.isValid) {
-      if (validation.hasEmpty) {
-        Swal.fire({
-          icon: "warning",
-          title: "Incomplete Assignment",
-          text: "All editable fields must have a value.",
-        });
-        return;
+        if (validation.hasError) {
+          Swal.fire({
+            icon: "error",
+            title: "Invalid Quantity",
+            text: "Entered values does not match the actual quantity.",
+          });
+          return;
+        }
       }
 
-      if (validation.hasError) {
-        Swal.fire({
-          icon: "error",
-          title: "Invalid Quantity",
-          text: "Entered values does not match the actual quantity.",
-        });
-        return;
-      }
-    }
+      let commitButton = $("#branchAssignmentBtn");
 
-    // let commitButton = $(this).find("button[type='submit'].commit-btn")
-    // commitButton.prop("disabled", true).html(`<span class="spinner-border spinner-border-sm"></span> Commit`)
+      Swal.fire({
+        icon: "warning",
+        title: "Save branch assignment?",
+        confirmButtonText: "Save",
+        allowOutsideClick: false,
+        showCancelButton: true,
+        cancelButtonText: "Back",
+      }).then((res) => {
+        if (res.isConfirmed) {
+          // PROCEED FOR SUBMISSION
+          let items = [];
 
-    Swal.fire({
-      icon: "warning",
-      title: "Save branch assignment?",
-      confirmButtonText: "Save",
-      allowOutsideClick: false,
-      showCancelButton: true,
-      cancelButtonText: "Back",
-    }).then((res) => {
-      if (res.isConfirmed) {
-        // PROCEED FOR SUBMISSION
-        let items = [];
+          // let commitButton = $(this).find("button[type='submit'].commit-btn");
+          // let commitButton = $("#branchAssignmentBtn");
+          commitButton
+            .prop("disabled", true)
+            .html(
+              `<span class="spinner-border spinner-border-sm"></span> Saving`,
+            );
 
-        let commitButton = $(this).find("button[type='submit'].commit-btn");
-        commitButton
-          .prop("disabled", true)
-          .html(
-            `<span class="spinner-border spinner-border-sm"></span> Processing`,
-          );
+          let hasUnassigned = false;
 
-        let hasUnassigned = false;
+          $("#summaryTable tbody tr.item-row").each(function () {
+            let tds = $(this).find("td");
 
-        $("#summaryTable tbody tr.item-row").each(function () {
-          let tds = $(this).find("td");
+            let ids = tds.eq(0).text().split(",");
+            let brand = tds.eq(1).text().trim();
+            let model = tds.eq(2).text().trim();
+            let category = tds.eq(3).text().trim();
+            let quantity = tds.eq(4).text().trim();
 
-          let ids = tds.eq(0).text().split(",");
-          let brand = tds.eq(1).text().trim();
-          let model = tds.eq(2).text().trim();
-          let category = tds.eq(3).text().trim();
-          let quantity = tds.eq(4).text().trim();
+            if (!brand) return;
 
-          if (!brand) return;
+            let branchData = [];
 
-          let branchData = [];
+            tds.slice(5).each(function () {
+              let branch = $(this).data("branch");
+              let qty = $(this).text().trim() || 0;
 
-          tds.slice(5).each(function () {
-            let branch = $(this).data("branch");
-            let qty = $(this).text().trim() || 0;
+              if (branch) {
+                branchData.push({
+                  branch: branch,
+                  quantity: parseInt(qty) || 0,
+                });
+              }
+            });
 
-            if (branch) {
-              branchData.push({
-                branch: branch,
-                quantity: parseInt(qty) || 0,
+            // if (itemCode !== "" && brand !== "") {
+            if (brand !== "") {
+              items.push({
+                // branch: branch,
+                item_ids: ids,
+                brand,
+                model,
+                category,
+                quantity: parseInt(quantity) || 0,
+                // itemCode: itemCode,
+                branches: branchData,
               });
             }
           });
 
-          // if (itemCode !== "" && brand !== "") {
-          if (brand !== "") {
-            items.push({
-              // branch: branch,
-              item_ids: ids,
-              brand,
-              model,
-              category,
-              quantity: parseInt(quantity) || 0,
-              // itemCode: itemCode,
-              branches: branchData,
-            });
-          }
-        });
-
-        // console.log(`ITEMS TO SUBMIT : ${JSON.stringify(items)}`);
-
-        if (hasUnassigned) {
-          Swal.fire({
-            icon: "error",
-            title: "Unassigned Items Found",
-            text: "Please assign all items before submitting.",
-          });
-          commitButton.prop("disabled", false).html("Commit");
-          return;
-        }
-
-        // if (items.length === 0 && nonSerializeItems.length === 0) {
-        if (items.length === 0) {
-          Swal.fire({
-            icon: "error",
-            title: "No items on summary",
-            text: "No item(s) found on the summary",
-          });
-          commitButton.prop("disabled", false).html("Commit");
-          return;
-        }
-
-        let formData = new FormData();
-
-        // formData.append("BatchNum", $("#lbnum").val());
-        formData.append("PickListNumber", $("#pcklstno").val());
-        formData.append("Branch", $("#origin").val());
-        formData.append("OrginWhscode", $("#whcode").val());
-        formData.append("Remarks", $("#remarks").val());
-
-        // SERIALIZED
-        // items.forEach((item, i) => {
-        //   // formData.append(`Serial[${i}]`, item.serial);
-        //   // formData.append(`BranchFor[${i}]`, item.branch);
-        //   formData.append(`Brand[${i}]`, item.brand);
-        //   formData.append(`Model[${i}]`, item.model);
-        //   // formData.append(`ItemCode[${i}]`, item.itemCode);
-        //   formData.append(`Category[${i}]`, item.category); // add if needed
-        //   formData.append(`Quantity[${i}]`, item.quantity);
-
-        //   item.branches.forEach((b, j) => {
-        //     formData.append(`Branch[${i}][${j}]`, b.branch);
-        //     formData.append(`Qty[${i}][${j}]`, b.quantity);
-        //   });
-        // });
-
-        formData.append("PickListNumber", $("#pcklstno").val());
-
-        items.forEach((item, i) => {
-          item.item_ids.forEach((id, k) => {
-            item.branches.forEach((b, j) => {
-              formData.append(`ItemId[]`, id);
-              // formData.append(`PickListNumber[]`, $("#pcklstno").val()); // adjust if different
-              formData.append(`RequestingBranch[]`, b.branch);
-              formData.append(`DeliveryQty[]`, b.quantity);
-              formData.append(`Remarks[]`, $("#remarks").val());
-            });
-          });
-        });
-
-        // ================= DEBUG =================
-
-        $.ajax({
-          // url: "dirs/basket/dashboard/actions/update_loadingbasket.php",
-          url: "dirs/basket/dashboard/actions/update_setupdeliveryqty.php",
-          type: "POST",
-          data: formData,
-          processData: false,
-          contentType: false,
-          dataType: "json",
-          success: function (response) {
-            if (response.isSuccess === "success") {
-              Swal.fire({
-                icon: "success",
-                title: "Items has been assigned",
-              }).then(() => {
-                loadDeliveryBasketContent();
-              });
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Failed",
-                text: response.message || "Error submitting data",
-              });
-            }
-          },
-          error: function (xhr) {
-            console.error(xhr.responseText);
+          if (hasUnassigned) {
             Swal.fire({
               icon: "error",
-              title: "Server Error",
-              text: "Something went wrong.",
+              title: "Unassigned Items Found",
+              text: "Please assign all items before submitting.",
             });
-          },
-        });
-        // commitButton.prop("disabled", false).html("Commit")
-      }
+            commitButton.prop("disabled", false).html("Commit");
+            return;
+          }
+
+          // if (items.length === 0 && nonSerializeItems.length === 0) {
+          if (items.length === 0) {
+            Swal.fire({
+              icon: "error",
+              title: "No items on summary",
+              text: "No item(s) found on the summary",
+            });
+            commitButton.prop("disabled", false).html("Commit");
+            return;
+          }
+
+          let formData = new FormData();
+
+          // formData.append("BatchNum", $("#lbnum").val());
+          formData.append("PickListNumber", $("#pcklstno").val());
+          formData.append("Branch", $("#origin").val());
+          formData.append("OrginWhscode", $("#whcode").val());
+          formData.append("Remarks", $("#remarks").val());
+
+          formData.append("PickListNumber", $("#pcklstno").val());
+
+          items.forEach((item, i) => {
+            item.item_ids.forEach((id, k) => {
+              item.branches.forEach((b, j) => {
+                formData.append(`ItemId[]`, id);
+                // formData.append(`PickListNumber[]`, $("#pcklstno").val()); // adjust if different
+                formData.append(`RequestingBranch[]`, b.branch);
+                formData.append(`DeliveryQty[]`, b.quantity);
+                formData.append(`Remarks[]`, $("#remarks").val());
+              });
+            });
+          });
+
+          // ================= DEBUG =================
+
+          $.ajax({
+            // url: "dirs/basket/dashboard/actions/update_loadingbasket.php",
+            url: "dirs/basket/dashboard/actions/update_setupdeliveryqty.php",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            success: function (response) {
+              if (response.isSuccess === "success") {
+                commitButton.prop("disabled", false).html(`Commit`);
+                Swal.fire({
+                  icon: "success",
+                  title: "Items has been assigned",
+                }).then(() => {
+                  loadDeliveryBasketContent();
+                });
+              } else {
+                commitButton.disabled = false;
+                commitButton.innerHTML = "Commit";
+                Swal.fire({
+                  icon: "error",
+                  title: "Failed",
+                  text: response.message || "Error submitting data",
+                });
+              }
+            },
+            error: function (xhr) {
+              commitButton.disabled = false;
+              commitButton.innerHTML = "Commit";
+              console.error(xhr.responseText);
+              Swal.fire({
+                icon: "error",
+                title: "Server Error",
+                text: "Something went wrong.",
+              });
+            },
+          });
+        }
+      });
     });
-  });
 }
 
 // EDIT BRANCH ASSIGNMENT
 function saveBranchAssignment() {
-  let commitBtn = document.getElementById("branchAssignmentBtn");
+  // let commitBtn = document.getElementById("editBranchAssignmentBtn");
 
-  commitBtn.addEventListener("click", function (e) {
-    e.preventDefault();
+  // commitBtn.addEventListener("click", function (e) {
+  //   e.preventDefault();
+  $(document)
+    .off("click", "#editBranchAssignmentBtn")
+    .on("click", "#editBranchAssignmentBtn", function (e) {
+      e.preventDefault();
 
-    let validation = validateSummaryTable();
-    if (!validation.isValid) {
-      if (validation.hasEmpty) {
-        Swal.fire({
-          icon: "warning",
-          title: "Incomplete Assignment",
-          text: "All editable fields must have a value.",
-        });
-        return;
-      }
-
-      if (validation.hasError) {
-        Swal.fire({
-          icon: "error",
-          title: "Invalid Quantity",
-          text: "Some values exceed the allowed quantity.",
-        });
-        return;
-      }
-    }
-
-    Swal.fire({
-      icon: "warning",
-      title: "Save branch assignment?",
-      confirmButtonText: "Save",
-      allowOutsideClick: false,
-      showCancelButton: true,
-      cancelButtonText: "Back",
-    }).then((res) => {
-      if (res.isConfirmed) {
-        let items = [];
-
-        let hasUnassigned = false;
-
-        $("#editSummaryTable tbody tr.item-row").each(function () {
-          let tds = $(this).find("td");
-
-          let ids = tds.eq(0).text().split(",");
-          let brand = tds.eq(1).text().trim();
-          let model = tds.eq(2).text().trim();
-          let category = tds.eq(3).text().trim();
-          let quantity = tds.eq(4).text().trim();
-
-          if (!brand) return;
-
-          let branchData = [];
-
-          tds.slice(5).each(function () {
-            let branch = $(this).data("branch");
-            let qty = $(this).text().trim() || 0;
-
-            if (branch) {
-              branchData.push({
-                branch: branch,
-                quantity: parseInt(qty) || 0,
-              });
-            }
-          });
-
-          if (brand !== "") {
-            items.push({
-              item_ids: ids,
-              brand,
-              model,
-              category,
-              quantity: parseInt(quantity) || 0,
-              branches: branchData,
-            });
-          }
-        });
-
-        console.log(`ITEMS TO SUBMIT : ${JSON.stringify(items)}`);
-
-        if (hasUnassigned) {
+      let validation = validateSummaryTable();
+      if (!validation.isValid) {
+        if (validation.hasEmpty) {
           Swal.fire({
-            icon: "error",
-            title: "Unassigned Items Found",
-            text: "Please assign all items before submitting.",
+            icon: "warning",
+            title: "Incomplete Assignment",
+            text: "All editable fields must have a value.",
           });
           return;
         }
 
-        if (items.length === 0) {
+        if (validation.hasError) {
           Swal.fire({
             icon: "error",
-            title: "No items on summary",
-            text: "No item(s) found on the summary",
+            title: "Invalid Quantity",
+            text: "Some values exceed the allowed quantity.",
           });
           return;
         }
+      }
 
-        let formData = new FormData();
+      Swal.fire({
+        icon: "warning",
+        title: "Save branch assignment?",
+        confirmButtonText: "Save",
+        allowOutsideClick: false,
+        showCancelButton: true,
+        cancelButtonText: "Back",
+      }).then((res) => {
+        if (res.isConfirmed) {
+          let items = [];
 
-        formData.append("PickListNumber", $("#pcklstno").val());
-        formData.append("Branch", $("#origin").val());
-        formData.append("OrginWhscode", $("#whcode").val());
-        formData.append("Remarks", $("#remarks").val());
+          let hasUnassigned = false;
 
-        formData.append("PickListNumber", $("#pcklstno").val());
+          $("#editSummaryTable tbody tr.item-row").each(function () {
+            let tds = $(this).find("td");
 
-        items.forEach((item, i) => {
-          item.item_ids.forEach((id, k) => {
-            item.branches.forEach((b, j) => {
-              formData.append(`ItemId[]`, id);
-              formData.append(`RequestingBranch[]`, b.branch);
-              formData.append(`DeliveryQty[]`, b.quantity);
-              formData.append(`Remarks[]`, $("#remarks").val());
+            let ids = tds.eq(0).text().split(",");
+            let brand = tds.eq(1).text().trim();
+            let model = tds.eq(2).text().trim();
+            let category = tds.eq(3).text().trim();
+            let quantity = tds.eq(4).text().trim();
+
+            if (!brand) return;
+
+            let branchData = [];
+
+            tds.slice(5).each(function () {
+              let branch = $(this).data("branch");
+              let qty = $(this).text().trim() || 0;
+
+              if (branch) {
+                branchData.push({
+                  branch: branch,
+                  quantity: parseInt(qty) || 0,
+                });
+              }
             });
-          });
-        });
 
-        // ================= DEBUG =================
-
-        $.ajax({
-          url: "dirs/basket/dashboard/actions/update_setupdeliveryqty.php",
-          type: "POST",
-          data: formData,
-          processData: false,
-          contentType: false,
-          dataType: "json",
-          success: function (response) {
-            if (response.isSuccess === "success") {
-              Swal.fire({
-                icon: "success",
-                title: "Items has been assigned",
-              }).then(() => {
-                loadDeliveryBasketContent();
-              });
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Failed",
-                text: response.message || "Error submitting data",
+            if (brand !== "") {
+              items.push({
+                item_ids: ids,
+                brand,
+                model,
+                category,
+                quantity: parseInt(quantity) || 0,
+                branches: branchData,
               });
             }
-          },
-          error: function (xhr) {
-            console.error(xhr.responseText);
+          });
+
+          // console.log(`ITEMS TO SUBMIT : ${JSON.stringify(items)}`);
+
+          if (hasUnassigned) {
             Swal.fire({
               icon: "error",
-              title: "Server Error",
-              text: "Something went wrong.",
+              title: "Unassigned Items Found",
+              text: "Please assign all items before submitting.",
             });
-          },
-        });
-      }
+
+            return;
+          }
+
+          if (items.length === 0) {
+            Swal.fire({
+              icon: "error",
+              title: "No items on summary",
+              text: "No item(s) found on the summary",
+            });
+            return;
+          }
+
+          let formData = new FormData();
+
+          formData.append("PickListNumber", $("#pcklstno").val());
+          formData.append("Branch", $("#origin").val());
+          formData.append("OrginWhscode", $("#whcode").val());
+          formData.append("Remarks", $("#remarks").val());
+
+          formData.append("PickListNumber", $("#pcklstno").val());
+
+          items.forEach((item, i) => {
+            item.item_ids.forEach((id, k) => {
+              item.branches.forEach((b, j) => {
+                formData.append(`ItemId[]`, id);
+                formData.append(`RequestingBranch[]`, b.branch);
+                formData.append(`DeliveryQty[]`, b.quantity);
+                formData.append(`Remarks[]`, $("#remarks").val());
+              });
+            });
+          });
+
+          // ================= DEBUG =================
+
+          let commitBtn = $("#editBranchAssignmentBtn");
+
+          commitBtn
+            .prop("disabled", true)
+            .html(
+              `<span class="spinner-border spinner-border-sm"></span> Saving`,
+            );
+
+          $.ajax({
+            url: "dirs/basket/dashboard/actions/update_setupdeliveryqty.php",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            success: function (response) {
+              if (response.isSuccess === "success") {
+                Swal.fire({
+                  icon: "success",
+                  title: "Items has been assigned",
+                }).then(() => {
+                  loadDeliveryBasketContent();
+                });
+              } else {
+                commitBtn.disabled = false;
+                commitBtn.innerHTML = "Save";
+                Swal.fire({
+                  icon: "error",
+                  title: "Failed",
+                  text: response.message || "Error submitting data",
+                });
+              }
+            },
+            error: function (xhr) {
+              commitBtn.disabled = false;
+              commitBtn.innerHTML = "Save";
+              console.error(xhr.responseText);
+              Swal.fire({
+                icon: "error",
+                title: "Server Error",
+                text: "Something went wrong.",
+              });
+            },
+          });
+        }
+      });
     });
-  });
 }
 
 function loadingItems() {
@@ -2073,6 +2056,7 @@ function loadDeliveryItems(PickLst_Num) {
                 Model: item.Model || "",
                 Category: item.Category || "",
                 Quantity: 0,
+                ToDeliver_Qty: item.ToDeliver_Qty || 0,
               };
             }
 
@@ -2084,7 +2068,13 @@ function loadDeliveryItems(PickLst_Num) {
           });
 
           Object.values(grouped).forEach((item) => {
-            rows.push([item.Brand, item.Model, item.Category, item.Quantity]);
+            console.log(`OPENING PICKLIST ITEMS : ${JSON.stringify(item)}`);
+            rows.push([
+              item.Brand,
+              item.Model,
+              item.Category,
+              item.ToDeliver_Qty ? item.ToDeliver_Qty : item.Quantity,
+            ]);
           });
 
           if (rows.length === 0) {
@@ -3199,15 +3189,15 @@ function loadToBasket(Picklists) {
 //                           let counter =
 //                             loadingTableBody.find("tr[data-itemcode]").length +
 //                             1;
-//                           let newRow = `<tr data-itemkey="${itemKey}" 
+//                           let newRow = `<tr data-itemkey="${itemKey}"
 //                                   data-rowkey="${rowKey}"
 //                                   data-itemmapping='${JSON.stringify(itemMappings)}'
-//                                   data-itemcode="${itemCode}" 
-//                                   data-serialbased="true" 
-//                                   data-serials="${item.ItemSerial}" 
-//                                   data-bs-toggle="tooltip" 
-//                                   data-bs-html="true" 
-//                                   data-bs-title="${"Serials: " + item.ItemSerial} <br>Requested: ${totalActualPerModel}" 
+//                                   data-itemcode="${itemCode}"
+//                                   data-serialbased="true"
+//                                   data-serials="${item.ItemSerial}"
+//                                   data-bs-toggle="tooltip"
+//                                   data-bs-html="true"
+//                                   data-bs-title="${"Serials: " + item.ItemSerial} <br>Requested: ${totalActualPerModel}"
 //                                   style="height: 40px; min-height: 40px; cursor: pointer">
 //                                   <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${counter}</td>
 //                                   <td class="align-middle ps-3" style="background:#fcf7d4">${brand}</td>
@@ -3353,7 +3343,7 @@ function serialDeliveryInput(Picklists) {
               }).then(() => {
                 serialInput.focus();
               });
-              serializeBtn.prop("disabled", false)
+              serializeBtn.prop("disabled", false);
               return false;
             }
 
@@ -3375,11 +3365,11 @@ function serialDeliveryInput(Picklists) {
 
               groupedItems[item.Itemcode]._scanId = scanId;
 
-              console.log(`ACTUAL ITEM LOGS`)
-              console.log({
-                Picklists,
-                ItemCode: item.Itemcode
-              });
+              // console.log(`ACTUAL ITEM LOGS`);
+              // console.log({
+              //   Picklists,
+              //   ItemCode: item.Itemcode,
+              // });
 
               $.ajax({
                 url: "dirs/basket/dashboard/actions/get_actual_total.php",
@@ -3489,7 +3479,7 @@ function serialDeliveryInput(Picklists) {
                               title: "Limit reached",
                               text: `This item has already reached its maximum allowed quantity.`,
                             });
-                            serializeBtn.prop("disabled", false)
+                            serializeBtn.prop("disabled", false);
                             return;
                           }
 
@@ -3542,7 +3532,7 @@ function serialDeliveryInput(Picklists) {
                           totalQty += qty;
 
                           if (existingItem.length) {
-                            serializeBtn.prop("disabled", false)
+                            serializeBtn.prop("disabled", false);
                             groupedItems[itemCode].loadedQty += 1;
 
                             let qtyCell = existingItem.find("td:nth-child(5)");
@@ -3593,6 +3583,20 @@ function serialDeliveryInput(Picklists) {
 
                             // data-itemid="${itemId}"
                             //       data-picklist="${picklist}"
+
+                            const tooltip = bootstrap.Tooltip.getInstance(
+                              existingItem[0],
+                            );
+
+                            if (tooltip) {
+                              tooltip.setContent({
+                                ".tooltip-inner":
+                                  "Requested: " +
+                                  totalActualPerModel +
+                                  "<br><br>Serials:<br>" +
+                                  serialArray.join("<br>"),
+                              });
+                            }
 
                             return;
                           } else {
@@ -3687,6 +3691,7 @@ function serialDeliveryInput(Picklists) {
               confirmButtonText: "OKAY",
             });
             $("#serializeBtn").prop("disabled", false);
+            return;
           } else {
             Swal.fire({
               icon: "error",
@@ -3694,6 +3699,7 @@ function serialDeliveryInput(Picklists) {
               confirmButtonText: "OKAY",
             });
             $("#serializeBtn").prop("disabled", false);
+            return;
           }
         },
         error: function () {
@@ -3702,6 +3708,7 @@ function serialDeliveryInput(Picklists) {
             title: "Something went wrong",
           });
           $("#serializeBtn").prop("disabled", false);
+          return;
         },
       });
     }
@@ -3709,6 +3716,14 @@ function serialDeliveryInput(Picklists) {
     serialInput.focus();
   });
 }
+
+// function renumberRows() {
+//   $("#receiving-form-table tbody tr[data-itemcode]").each(function (index) {
+//     $(this)
+//       .find("td:first")
+//       .text(index + 1);
+//   });
+// }
 
 function addNonSerialize(Picklists) {
   $("#frm-add-delivery")
@@ -3771,17 +3786,17 @@ function addNonSerialize(Picklists) {
                   Item_id: null,
                   picklist: null,
                   loadedQty: 0,
-                  items: []
+                  items: [],
                 };
               }
 
               // console.log(`PICKLISTS : ${Picklists}`)
               // console.log(`ITEM CODE : ${item.Itemcode}`)
 
-              console.log(`ACTUAL ITEM LOGS`)
+              console.log(`ACTUAL ITEM LOGS`);
               console.log({
                 Picklists,
-                ItemCode: item.Itemcode
+                ItemCode: item.Itemcode,
               });
 
               $.ajax({
@@ -3789,7 +3804,7 @@ function addNonSerialize(Picklists) {
                 type: "POST",
                 data: {
                   Picklists: Picklists,
-                  ItemCode: item.Itemcode
+                  ItemCode: item.Itemcode,
                 },
                 dataType: "json",
                 success: function (res) {
@@ -3799,13 +3814,15 @@ function addNonSerialize(Picklists) {
                     return;
                   }
                   console.log("DATA:", res.Data);
-                 
 
-                  console.log(`RES : ${res}`)
-                  console.log(`NON-SERIALIZE RESPONDSE DATA: ${JSON.stringify(res.Data)}`)
-                  let totalActualPerModel = parseInt(res.Data?.[0]?.Total_Actual_Item_Qty) || 0
+                  console.log(`RES : ${res}`);
+                  console.log(
+                    `NON-SERIALIZE RESPONDSE DATA: ${JSON.stringify(res.Data)}`,
+                  );
+                  let totalActualPerModel =
+                    parseInt(res.Data?.[0]?.Total_Actual_Item_Qty) || 0;
 
-                  console.log(`TOTAL ACTUAL : ${totalActualPerModel}`)
+                  console.log(`TOTAL ACTUAL : ${totalActualPerModel}`);
                   $.ajax({
                     url: "dirs/basket/dashboard/actions/get_dsplaybatch_models.php",
                     type: "POST",
@@ -3836,10 +3853,10 @@ function addNonSerialize(Picklists) {
 
                         let itemMappings = data.map((row) => ({
                           item_id: row.Item_id,
-                          picklist: row.PKList_Number
-                        }))
+                          picklist: row.PKList_Number,
+                        }));
 
-                        groupedItems[itemCode].itemMappings = itemMappings
+                        groupedItems[itemCode].itemMappings = itemMappings;
 
                         let itemId = data[0]?.Item_id || null;
                         // let itemId = data.map((row) => row.Item_id);
@@ -3883,7 +3900,8 @@ function addNonSerialize(Picklists) {
                         //   return
                         // }
 
-                        let currentLoaded = groupedItems[itemCode].loadedQty || 0;
+                        let currentLoaded =
+                          groupedItems[itemCode].loadedQty || 0;
                         let newTotal = currentLoaded + quantity;
 
                         if (newTotal > totalActualPerModel) {
@@ -3896,7 +3914,7 @@ function addNonSerialize(Picklists) {
                         }
 
                         if (existingRow.length) {
-                          groupedItems[itemCode].loadedQty += quantity
+                          groupedItems[itemCode].loadedQty += quantity;
                           // let currentQty =
                           //   parseInt(existingRow.find("td:nth-child(5)").text()) ||
                           //   0;
@@ -3913,9 +3931,10 @@ function addNonSerialize(Picklists) {
 
                           return;
                         } else {
-                          groupedItems[itemCode].loadedQty += quantity
+                          groupedItems[itemCode].loadedQty += quantity;
                           let counter =
-                            loadingTableBody.find("tr[data-itemcode]").length + 1;
+                            loadingTableBody.find("tr[data-itemcode]").length +
+                            1;
                           let newRow = `
                                 <tr
                                 data-rowkey="${rowKey}" 
@@ -3996,8 +4015,8 @@ function addNonSerialize(Picklists) {
                       return;
                     },
                   });
-               }
-              })
+                },
+              });
             });
           } else {
             Swal.fire({

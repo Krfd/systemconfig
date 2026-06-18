@@ -10,13 +10,13 @@
                  <div class="modal-body">
                      <div class="form-input mb-2">
                          <label for="newBrand" id="newBrandLabel" class="form-label text-dark-emphasis"><small>Brand:</small></label>
-                         <select name="newBrand" id="newBrand" class="form-select form-select-sm" style="background: #FFFBDF; appearance: auto" required>
+                         <select name="newBrand" id="newBrand" class="form-select" style="background: #FFFBDF; appearance: auto" required>
                              <option selected value="">--Choose Brand--</option>
                          </select>
                      </div>
                      <div class="form-input mb-2">
                          <label for="newModel" class="form-label text-dark-emphasis"><small>Model:</small></label>
-                         <select name="newModel" id="newModel" class="form-select form-select-sm" style="background: #FFFBDF; appearance: auto" required>
+                         <select name="newModel" id="newModel" class="form-select" style="background: #FFFBDF; appearance: auto" required>
                              <option selected value="">--Choose Model--</option>
                          </select>
                      </div>
@@ -96,22 +96,22 @@
                  </form>
              </div>
              <div class="container p-3">
-                 <div class="card">
-                     <div class="card-body">
-                         <div class="table-responsive overall-progress overflow-auto" style="max-height: 300px">
-                             <table class="table datatable" id="basket-serial-table">
-                                 <thead>
-                                     <tr>
-                                         <th>Model</th>
-                                         <th>Item Code</th>
-                                         <th>Serial</th>
-                                     </tr>
-                                 </thead>
-                                 <tbody>
-                                 </tbody>
-                             </table>
-                         </div>
-                     </div>
+                 <!-- <div class="card">
+                     <div class="card-body"> -->
+                 <div class="table-responsive overall-progress overflow-auto" style="max-height: 300px">
+                     <table class="table border border-secondary-subtle" id="basket-serial-table">
+                         <thead>
+                             <tr>
+                                 <th class="text-secondary-dark">Model</th>
+                                 <th class="text-secondary-dark">Item Code</th>
+                                 <th class="text-secondary-dark">Serial</th>
+                             </tr>
+                         </thead>
+                         <tbody>
+                         </tbody>
+                     </table>
+                     <!-- </div>
+                     </div> -->
                  </div>
              </div>
          </div>

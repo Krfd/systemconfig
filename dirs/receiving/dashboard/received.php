@@ -1,4 +1,4 @@
-<div class="container-fluid px-4">
+<div class="container-fluid px-4 overall-progress">
     <div class="d-flex justify-content-between align-items-start">
         <div class="d-flex justify-content-start align-items-start gap-3">
             <h3 class="fw-bold text-primary">Stock Receiving</h3>

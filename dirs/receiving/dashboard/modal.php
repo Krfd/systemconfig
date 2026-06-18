@@ -65,53 +65,53 @@
                   </form>
               </div>
               <div class="container p-3">
-                  <div class="card">
-                      <div class="card-body">
-                          <div class="table-responsive overflow-auto" style="max-height: 300px">
-                              <table class="table datatable" id="receiving-serial-table">
-                                  <thead>
-                                      <tr>
-                                          <th>Model</th>
-                                          <th>Item Code</th>
-                                          <th>Serial</th>
-                                      </tr>
-                                  </thead>
-                                  <tbody>
-                                      <tr style="height: 40px">
-                                          <td class="" style="background: #FFFBDF"></td>
-                                          <td class="" style="background: #FFFBDF"></td>
-                                          <td class="" style="background: #FFFBDF"></td>
-                                      </tr>
-                                      <tr style="height: 40px">
-                                          <td class="" style="background: #FFFBDF"></td>
-                                          <td class="" style="background: #FFFBDF"></td>
-                                          <td class="" style="background: #FFFBDF"></td>
-                                      </tr>
-                                      <tr style="height: 40px">
-                                          <td class="" style="background: #FFFBDF"></td>
-                                          <td class="" style="background: #FFFBDF"></td>
-                                          <td class="" style="background: #FFFBDF"></td>
-                                      </tr>
-                                      <tr style="height: 40px">
-                                          <td class="" style="background: #FFFBDF"></td>
-                                          <td class="" style="background: #FFFBDF"></td>
-                                          <td class="" style="background: #FFFBDF"></td>
-                                      </tr>
-                                      <tr style="height: 40px">
-                                          <td class="" style="background: #FFFBDF"></td>
-                                          <td class="" style="background: #FFFBDF"></td>
-                                          <td class="" style="background: #FFFBDF"></td>
-                                      </tr>
-                                      <tr style="height: 40px">
-                                          <td class="" style="background: #FFFBDF"></td>
-                                          <td class="" style="background: #FFFBDF"></td>
-                                          <td class="" style="background: #FFFBDF"></td>
-                                      </tr>
-                                  </tbody>
-                              </table>
-                          </div>
-                      </div>
+                  <!-- <div class="card">
+                      <div class="card-body"> -->
+                  <div class="table-responsive overflow-auto overall-progress" style="max-height: 300px">
+                      <table class="table border border-secondary-subtle" id="receiving-serial-table">
+                          <thead>
+                              <tr>
+                                  <th class="text-secondary-dark">Model</th>
+                                  <th class="text-secondary-dark">Item Code</th>
+                                  <th class="text-secondary-dark">Serial</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr style="height: 40px; min-height: 40px">
+                                  <td class="" style="background: #fcf7d4"></td>
+                                  <td class="" style="background: #fcf7d4"></td>
+                                  <td class="" style="background: #fcf7d4"></td>
+                              </tr>
+                              <tr style="height: 40px; min-height: 40px">
+                                  <td class="" style="background: #fcf7d4"></td>
+                                  <td class="" style="background: #fcf7d4"></td>
+                                  <td class="" style="background: #fcf7d4"></td>
+                              </tr>
+                              <tr style="height: 40px; min-height: 40px">
+                                  <td class="" style="background: #fcf7d4"></td>
+                                  <td class="" style="background: #fcf7d4"></td>
+                                  <td class="" style="background: #fcf7d4"></td>
+                              </tr>
+                              <tr style="height: 40px; min-height: 40px">
+                                  <td class="" style="background: #fcf7d4"></td>
+                                  <td class="" style="background: #fcf7d4"></td>
+                                  <td class="" style="background: #fcf7d4"></td>
+                              </tr>
+                              <tr style="height: 40px; min-height: 40px">
+                                  <td class="" style="background: #fcf7d4"></td>
+                                  <td class="" style="background: #fcf7d4"></td>
+                                  <td class="" style="background: #fcf7d4"></td>
+                              </tr>
+                              <tr style="height: 40px; min-height: 40px">
+                                  <td class="" style="background: #fcf7d4"></td>
+                                  <td class="" style="background: #fcf7d4"></td>
+                                  <td class="" style="background: #fcf7d4"></td>
+                              </tr>
+                          </tbody>
+                      </table>
                   </div>
+                  <!-- </div>
+                  </div> -->
               </div>
           </div>
       </div>

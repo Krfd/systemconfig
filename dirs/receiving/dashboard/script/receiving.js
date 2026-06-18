@@ -962,6 +962,10 @@ function serialDeliveryInput() {
         },
         dataType: "json",
         success: function (response) {
+          console.log(`DELIVERY NUMBER : ${DeliveryNumber}`);
+          console.log(`SERIAL : ${Serial}`);
+          // console.log(`DELIVERY NUMBER : ${DeliveryNumber}`);
+          console.log(``);
           if (response.isSuccess === "success") {
             let items = response.Data;
             let rows = [];
@@ -969,14 +973,37 @@ function serialDeliveryInput() {
             let totalQty = existingTotal;
             let receivingBody = $("#receiving-form-table tbody");
 
+            if (!items || items.length === 0) {
+              e.stopPropagation();
+              e.stopImmediatePropagation();
+
+              Swal.fire({
+                icon: "error",
+                title: "No item(s) found",
+                text: "No record for this serial",
+                confirmButtonText: "OKAY",
+                allowEnterKey: true,
+                allowEscapeKey: false,
+              }).then(() => {
+                serialInput.focus();
+              });
+              serializeBtn.prop("disabled", false);
+              return false;
+            }
+
             const scanId = Date.now();
 
             items.forEach((item) => {
               if (!item.ItemCode) return;
+
               if (!receivingGroupedItems[item.ItemCode]) {
                 receivingGroupedItems[item.ItemCode] = {
                   ...item,
                   qty: 0,
+                  Item_id: null,
+                  picklist: null,
+                  loadedQty: 0,
+                  items: [],
                 };
               }
 
@@ -991,50 +1018,84 @@ function serialDeliveryInput() {
                 let itemDeliveryQty = item.Deliver_Qty;
                 let qty = 1;
 
+                // let itemMappings = data.map((row) => ({
+                let itemMappings = items.map((row) => ({
+                  item_id: row.Item_id,
+                  picklist: row.PKList_Number,
+                }));
+
+                receivingGroupedItems[itemCode].itemMappings = itemMappings;
+
+                if (!receivingGroupedItems[itemCode].items) {
+                  receivingGroupedItems[itemCode].items = [];
+                }
+
+                receivingGroupedItems[itemCode].items.push({
+                  // item_id: data.map((row) => row.Item_id),
+                  // item_id: data.map((row) => row.Item_id),
+                  item_id: items.map((row) => row.Item_id),
+                  picklist: items.map((row) => row.PKList_Number),
+                  serial: item.ItemSerial,
+                });
+
+                if (!brand || !model || !category || !itemCode) {
+                  console.warn("Skipped item due to null/empty value:", item);
+                  return;
+                }
+
                 if (item._scanId !== scanId) {
                   return;
                 }
 
                 console.log(`RECEIVING ITEM: ${JSON.stringify(item)}`);
 
-                if (!brand || !model || !category || !itemCode) {
-                  console.warn("Skipped item due to null/empty value:", item);
-                  return;
-                }
-                totalQty += qty;
+                const rowKey = itemCode + "|" + latestInput;
+                const itemKey = itemCode + "|" + model;
+
                 let existingRow = receivingBody.find(
-                  `tr[data-itemcode="${itemCode}"]`,
+                  // `tr[data-itemcode="${itemCode}"]`,
+                  `tr[data-rowkey="${rowKey}"]`,
                 );
 
-                const serial = item.ItemSerial || Serial;
+                let existingItem = receivingBody.find(
+                  `tr[data-itemkey="${itemKey}"]`,
+                );
+
+                // DUPLICATE SERIAL
+                if (existingRow.length) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Serial number has already been scanned",
+                  });
+                  return;
+                }
+
+                const serial = item.ItemSerial;
 
                 const tableElement = document.querySelector(
                   "#receiving-serial-table",
                 );
 
-                const serialExisted = Array.from(
-                  tableElement.querySelectorAll("tbody tr td"),
-                ).some((td) => td.textContent.trim() === serial);
+                const serialExisted = $(
+                  "#receiving-serial-table tbody tr td:nth-child(3)",
+                )
+                  .toArray()
+                  .some((td) => $(td).text().trim() === latestInput);
 
                 if (!serialExisted) {
                   let serialRow = `
-                      <tr style="height: 40px; min-height: 40px; cursor: pointer">
-                          <td class="align-middle ps-3" style="background: #fcf7d4">${model}</td>
-                          <td class="align-middle ps-3" style="background: #fcf7d4">${itemCode}</td>
-                          <td class="align-middle ps-3" style="background: #fcf7d4">${serial}</td>
-                      </tr>
-                  `;
+                    <tr style="height: 40px; min-height: 40px; cursor: pointer">
+                        <td class="align-middle ps-3" style="background: #fcf7d4">${model}</td>
+                        <td class="align-middle ps-3" style="background: #fcf7d4">${itemCode}</td>
+                        <td class="align-middle ps-3" style="background: #fcf7d4">${serial}</td>
+                    </tr>`;
 
                   let receivingSerialTable = $("#receiving-serial-table tbody");
 
-                  // find first empty preset row
-                  // let emptyRow = receivingSerialTable.find("tr").filter(function () {
-                  //     return $(this).find("td").eq(0).text().trim() === "";
-                  // }).first();
                   let emptyRow = receivingSerialTable
                     .find("tr")
                     .filter(function () {
-                      return $(this).text().trim() === "";
+                      return $(this).find("td").eq(0).text().trim() === "";
                     })
                     .first();
 
@@ -1042,10 +1103,12 @@ function serialDeliveryInput() {
                   if (emptyRow.length) {
                     emptyRow.replaceWith(serialRow);
                   } else {
-                    // no empty rows left
                     receivingSerialTable.prepend(serialRow);
                   }
                 }
+
+                totalQty += qty;
+                console.log(`TOTAL QTY: ${totalQty}`);
 
                 if (existingRow.length) {
                   let currentQty =
@@ -1056,7 +1119,16 @@ function serialDeliveryInput() {
                   let counter =
                     receivingBody.find("tr[data-itemcode]").length + 1;
                   let newRow = `
-                    <tr data-itemcode="${itemCode}" data-rownum="${itemRowNum}" data-serialbased="true" style="height: 40px; min-height: 40px; cursor: pointer">
+                    <tr data-itemkey="${itemKey}" 
+                    data-rowkey="${rowKey}" 
+                    data-itemmapping='${JSON.stringify(itemMappings)}' 
+                    data-itemcode="${itemCode}" 
+                    data-serialbased="true" 
+                    data-serials="${item.ItemSerial}"
+                    data-bs-toggle="tooltip"
+                    data-bs-html="true"
+                    data-bs-title="${"Serials: " + item.ItemSerial}"
+                    style="height: 40px; min-height: 40px; cursor: pointer">
                       <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${counter}</td>
                       <td class="align-middle ps-3" style="background: #fcf7d4">${brand}</td>
                       <td class="align-middle ps-3" style="background: #fcf7d4">${model}</td>
@@ -1065,19 +1137,24 @@ function serialDeliveryInput() {
                     </tr>
                   `;
 
+                  // data-rownum="${itemRowNum}"
+
                   // receivingBody.prepend(newRow);
                   // renumberRows();
 
-                  let emptyRow = receivingBody
-                    .find("tr")
-                    .filter(function () {
-                      return (
-                        !$(this).attr("data-itemcode") &&
-                        $(this).text().trim() === ""
-                      );
-                    })
-                    .first();
+                  // let emptyRow = receivingBody
+                  //   .find("tr")
+                  //   .filter(function () {
+                  //     return (
+                  //       !$(this).attr("data-itemcode") &&
+                  //       $(this).text().trim() === ""
+                  //     );
+                  //   })
+                  //   .first();
 
+                  let emptyRow = receivingBody
+                    .find("tr:not([data-itemcode])")
+                    .first();
                   if (emptyRow.length) {
                     emptyRow.replaceWith(newRow);
                   } else {
@@ -1085,6 +1162,15 @@ function serialDeliveryInput() {
                   }
 
                   renumberRows();
+
+                  const tooltipTriggerList = document.querySelectorAll(
+                    '[data-bs-toggle="tooltip"]',
+                  );
+
+                  tooltipTriggerList.forEach((el) => {
+                    bootstrap.Tooltip.getInstance(el)?.dispose();
+                    new bootstrap.Tooltip(el);
+                  });
                 }
 
                 if ($.fn.DataTable.isDataTable("#receiving-form-table")) {
@@ -1102,29 +1188,37 @@ function serialDeliveryInput() {
               });
             });
             $("#serializeBtn").prop("disabled", false);
-            // $("#receiving-form-table tbody").html(rows);
             $("#receivingQty").text(totalQty);
           } else if (response.isSuccess === "Failed") {
             Swal.fire({
               icon: "error",
               title: "Unavailable stock for this model",
               confirmButtonText: "OKAY",
+            }).then(() => {
+              console.log("No response found on this item");
             });
+            $("#serializeBtn").prop("disabled", false);
+            return;
           } else {
+            console.log(`NO RESPONSE`);
             Swal.fire({
               icon: "error",
               title: response.Data,
               confirmButtonText: "OKAY",
             });
             $("#serializeBtn").prop("disabled", false);
+            return;
           }
         },
         error: function () {
           Swal.fire({
             icon: "error",
             title: "Something went wrong",
+          }).then(() => {
+            console.log("No response found on this item");
           });
           $("#serializeBtn").prop("disabled", false);
+          return;
         },
       });
     }
@@ -1189,6 +1283,8 @@ function submitReceiving() {
         return;
       }
 
+      let receivingBtn = $("#submitRecBtn");
+
       Swal.fire({
         title: "Submit Receiving?",
         text: "Please confirm before submitting the receiving form.",
@@ -1206,7 +1302,7 @@ function submitReceiving() {
           },
           dataType: "json",
           beforeSend: function () {
-            $("#submitRecBtn")
+            receivingBtn
               .prop("disabled", true)
               .html(
                 `<span class="spinner-border spinner-border-sm"></span> Processing`,
@@ -1214,6 +1310,7 @@ function submitReceiving() {
           },
           success: function (response) {
             if (response.isSuccess === "success") {
+              receivingBtn.prop("disabled", false).html(`Receive`);
               Swal.fire({
                 icon: "success",
                 title: "Items has been received",
@@ -1225,18 +1322,8 @@ function submitReceiving() {
                 `pdf/receiving.php?batch=${formData.DeliveryNumber}`,
                 "_blank",
               );
-
-              // Swal.fire({
-              //   icon: "success",
-              //   title: "Items has been received",
-              //   // text: `Receiving #: ${response.ReceivingNumber || ""}`,
-              // });
-              // .then(() => {
-              //   loadDashboard();
-              // });
-              // returnReceiving();
-              console.log(`RECEIVED!`);
             } else {
+              receivingBtn.prop("disabled", false).html(`Receive`);
               Swal.fire({
                 icon: "error",
                 title: response.message || "Submission failed",
@@ -1244,13 +1331,14 @@ function submitReceiving() {
             }
           },
           error: function () {
+            receivingBtn.prop("disabled", false).html(`Receive`);
             Swal.fire({
               icon: "error",
               title: "Something went wrong",
             });
           },
           complete: function () {
-            $("#submitRecBtn").prop("disabled", false).html("Received");
+            $("#submitRecBtn").prop("disabled", false).html("Receive");
           },
         });
       });

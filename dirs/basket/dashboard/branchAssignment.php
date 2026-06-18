@@ -26,17 +26,17 @@
                                 <div class="d-flex flex-column gap-1 col-4">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="pcklstno" class="form-label text-dark-emphasis col-3"><small>Picklist No:</small></label>
-                                        <input type="text" name="pcklstno" id="pcklstno" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
+                                        <input type="text" name="pcklstno" id="pcklstno" class="form-control form-control-sm col" style="background: #f7f7f7" readonly>
                                     </div>
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
-                                            <input type="text" id="origin" class="form-control form-control-sm col ms-3" style="background: #f2f2f2" readonly>
+                                            <input type="text" id="origin" class="form-control form-control-sm col ms-3" style="background: #f7f7f7" readonly>
                                         </div>
                                         <div class="col p-0 d-flex align-items-baseline col" hidden>
                                             <label for="whcode" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
-                                            <!-- <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f2f2f2" readonly> -->
-                                            <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f2f2f2" value="NEWWHS" readonly>
+                                            <!-- <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f7f7f7" readonly> -->
+                                            <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f7f7f7" value="NEWWHS" readonly>
                                         </div>
                                     </div>
                                     <input type="hidden" name="lbnum" id="lbnum" class="form-control form-control-sm col" style="background: #FFFBDF" readonly>
@@ -44,11 +44,11 @@
                                 <div class="d-flex flex-column gap-1 col-3">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="docdate" class="form-label text-dark-emphasis col-4"><small>Document Date:</small></label>
-                                        <input type="text" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
+                                        <input type="text" name="docdate" id="docdate" class="form-control form-control-sm col" style="background: #f7f7f7" readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="status" class="form-label text-dark-emphasis col-4"><small>Status:</small></label>
-                                        <input type="text" name="status" id="status" class="form-control form-control-sm col" style="background: #f2f2f2" readonly>
+                                        <input type="text" name="status" id="status" class="form-control form-control-sm col" style="background: #f7f7f7" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -93,11 +93,11 @@
                                     <div class="d-flex flex-column gap-1 col">
                                         <div class="d-flex align-items-baseline col">
                                             <label for="prepby" class="form-label text-dark-emphasis col-4"><small>Prepared by:</small></label>
-                                            <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #f2f2f2" readonly required>
+                                            <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #f7f7f7" readonly required>
                                         </div>
                                         <div class="d-flex align-items-baseline col">
                                             <label for="remarks" class="form-label text-dark-emphasis col-4"><small>Remarks:</small></label>
-                                            <textarea name="remarks" id="remarks" class="form-control form-control-sm col" rows="4" style="background: #FFFBDF; height: auto; resize: horizontal" maxlength="100"></textarea>
+                                            <textarea name="remarks" id="remarks" class="form-control form-control-sm col" rows="4" style="background: #fcf7d4; height: auto; resize: horizontal" maxlength="100"></textarea>
                                         </div>
                                     </div>
                                 </div>

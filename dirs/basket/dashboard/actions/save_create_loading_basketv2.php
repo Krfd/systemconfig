@@ -15,17 +15,6 @@ $TruckCat           = $_POST['TruckCat'] ?? '';
 $Plate              = $_POST['Plate'] ?? '';
 $Remarks            = $_POST['Remarks'] ?? '';
 
-// $debugText = "=== Item_Id ===\n";
-// $debugText .= print_r($Item_Id, true);
-
-// $debugText .= "\n=== ItemSerial ===\n";
-// $debugText .= print_r($ItemSerial, true);
-
-// $debugText .= "\n=== PickListnumber ===\n";
-// $debugText .= print_r($PickListnumber, true);
-
-// file_put_contents('post_debug.txt', $debugText);
-
 try {
     $conn->beginTransaction();
 
@@ -68,9 +57,10 @@ try {
     $stmtSupply = $conn->prepare("INSERT INTO Loading_Basket_Item_Total  (
         batch,
         Item_id,
-        TotalLoadedQty
+        TotalLoadedQty,
+        OriginalLoadedQty
     )
-    VALUES (?, ?, ?)
+    VALUES (?, ?, ?, ?)
     ");
 
     $logLines = [];
@@ -109,6 +99,7 @@ try {
         $stmtSupply->execute([
             $BatchNumber,
             $item['ItemId'],
+            $item['TotalQty'],
             $item['TotalQty']
         ]);
     }
@@ -148,12 +139,12 @@ try {
 
         $branch = getBranch($conn, $itmid, $picklist);
         $groupedItems[$itmid]['Branch'] = $branch;
-        // $logLines[] = "PAIR => key={$key} | Item={$itmid} | Picklist=" . ($picklist ?? 'NULL');
         if ($branch === '') {
             throw new Exception("Branch not found for Item ID {$itmid} and Picklist {$picklist}");
         }
 
-        $recordKey = $itmid . '|' . $picklist . '|' . $branch;
+        // $recordKey = $itmid . '|' . $picklist . '|' . $branch;
+        $recordKey = $itmid . '|' . $picklist . '|' . $branch . "|" . $serial;
 
         if (isset($updatedRecords[$recordKey])) {
             continue;
@@ -172,6 +163,12 @@ try {
         $remainingAvailable = $totalAvailable - $consumedQtyMap[$itmid];
 
         if ($remainingAvailable <= 0) {
+
+            $logLines[] =
+                "SKIPPED => " .
+                "Item={$itmid} | " .
+                "Serial={$serial} | " .
+                "Remaining={$remainingAvailable}";
             continue;
         }
 
@@ -212,15 +209,15 @@ try {
 
         $groupedItems[$itmid]['TotalQty'] += (float)$qty;
 
-        $getToDeliverCollection = $conn->prepare("SELECT ToDeliver_Qty
-            FROM Pick_List_Item_Collection
-            WHERE ItemRowNum = ? AND PKList_Number = ?
-        ");
-        $getToDeliverCollection->execute([$itmid, $picklist]);
+        // $getToDeliverCollection = $conn->prepare("SELECT ToDeliver_Qty
+        //     FROM Pick_List_Item_Collection
+        //     WHERE ItemRowNum = ? AND PKList_Number = ?
+        // ");
+        // $getToDeliverCollection->execute([$itmid, $picklist]);
 
-        $collectionQty = (float)$getToDeliverCollection->fetchColumn();
+        // $collectionQty = (float)$getToDeliverCollection->fetchColumn();
 
-        $consumedQtyMap[$itmid] += $allocatedQty;
+        // $consumedQtyMap[$itmid] += $allocatedQty;
 
         /**
          * GROUPING (UNCHANGED)
@@ -263,27 +260,66 @@ try {
 
         $collectionQty = $getToDeliverCollection->fetchColumn();
 
-        if ($totalLoadedQty > $collectionQty) {
-            $qty = $totalLoadedQty - $collectionQty;
+        // if ($totalLoadedQty > $collectionQty) {
+        //     $qty = $totalLoadedQty - $collectionQty;
 
-            $updateCollection = $conn->prepare("UPDATE Pick_List_Item_Collection
-            SET ToDeliver_Qty = ? WHERE ItemRowNum = ? AND PKList_Number = ? AND Req_Branch = ?");
-            $updateCollection->execute([$allocatedQty, $itmid, $picklist, $branch]);
+        //     $updateCollection = $conn->prepare("UPDATE Pick_List_Item_Collection
+        //     SET ToDeliver_Qty = ? WHERE ItemRowNum = ? AND PKList_Number = ? AND Req_Branch = ?");
+        //     $updateCollection->execute([$allocatedQty, $itmid, $picklist, $branch]);
 
-            $updateTotalLoadedQty = $conn->prepare("UPDATE Loading_Basket_Item_Total
-            SET TotalLoadedQty = ? WHERE batch = ? AND Item_id = ?");
-            $updateTotalLoadedQty->execute([$qty, $BatchNumber, $itmid]);
-        } else {
-            $qty = $collectionQty - $totalLoadedQty;
+        //     $updateTotalLoadedQty = $conn->prepare("UPDATE Loading_Basket_Item_Total
+        //     SET TotalLoadedQty = ? WHERE batch = ? AND Item_id = ?");
+        //     $updateTotalLoadedQty->execute([$qty, $BatchNumber, $itmid]);
+        // } else {
+        //     $qty = $collectionQty - $totalLoadedQty;
 
-            $updateCollection = $conn->prepare("UPDATE Pick_List_Item_Collection
-            SET ToDeliver_Qty = ? WHERE ItemRowNum = ? AND PKList_Number = ? AND Req_Branch = ?");
-            $updateCollection->execute([$allocatedQty, $itmid, $picklist, $branch]);
+        //     $updateCollection = $conn->prepare("UPDATE Pick_List_Item_Collection
+        //     SET ToDeliver_Qty = ? WHERE ItemRowNum = ? AND PKList_Number = ? AND Req_Branch = ?");
+        //     $updateCollection->execute([$allocatedQty, $itmid, $picklist, $branch]);
 
-            $updateTotalLoadedQty = $conn->prepare("UPDATE Loading_Basket_Item_Total
-            SET TotalLoadedQty = ? WHERE batch = ? AND Item_id = ?");
-            $updateTotalLoadedQty->execute([$qty, $BatchNumber, $itmid]);
+        //     $updateTotalLoadedQty = $conn->prepare("UPDATE Loading_Basket_Item_Total
+        //     SET TotalLoadedQty = ? WHERE batch = ? AND Item_id = ?");
+        //     $updateTotalLoadedQty->execute([$qty, $BatchNumber, $itmid]);
+        // }
+
+        // UPDATE COLLECTION WITH ALLOCATED QTY
+        $updateCollection = $conn->prepare("UPDATE Pick_List_Item_Collection
+            SET ToDeliver_Qty = ?
+            WHERE ItemRowNum = ?
+            AND PKList_Number = ?
+            AND Req_Branch = ?
+        ");
+
+        $updateCollection->execute([
+            $allocatedQty,
+            $itmid,
+            $picklist,
+            $branch
+        ]);
+
+        // DECREASE BASKET REMAINING QTY
+        $newRemainingQty = $totalLoadedQty - $allocatedQty;
+
+        if ($newRemainingQty < 0) {
+            $newRemainingQty = 0;
         }
+
+        $updateTotalLoadedQty = $conn->prepare("UPDATE Loading_Basket_Item_Total
+            SET TotalLoadedQty = ?
+            WHERE batch = ?
+            AND Item_id = ?
+        ");
+
+        $updateTotalLoadedQty->execute([
+            $newRemainingQty,
+            $BatchNumber,
+            $itmid
+        ]);
+
+        $loadedQtyMap[$itmid] = $newRemainingQty;
+
+        $logLines[] =
+            "EXECUTE => Item={$itmid} | Serial={$serial} | Qty={$allocatedQty}";
 
         $stmtCollect->execute([
             $User,
