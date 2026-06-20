@@ -31,14 +31,14 @@
                             </div>
                         </div>
                         <div class="table-responsive mt-3 overall-progress border border-secondary-subtle" style="max-height: 450px;">
-                            <table class="table table-hover mb-0 w-100 col" id="batchItemTable">
+                            <table class="table table-hover col mb-0" id="batchItemTable">
                                 <thead class="sticky-top">
                                     <tr>
-                                        <th class="text-secondary">#</th>
+                                        <th class="text-secondary text-center">#</th>
                                         <th class="text-secondary">Brand</th>
                                         <th class="text-secondary">Model</th>
                                         <th class="text-secondary">Category</th>
-                                        <th class="text-secondary">Quantity</th>
+                                        <th class="text-secondary text-center">Quantity</th>
                                     </tr>
                                 </thead>
                                 <tbody>

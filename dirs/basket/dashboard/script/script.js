@@ -28,6 +28,7 @@ function loadDashboard() {
     loadDeliveryBasket(
       "#basketTableDashboard",
       "dirs/incoming/dashboard/actions/picklisteditems.php",
+      "UNASSIGNED"
     );
     $("#loadDeliveryBtn").prop("disabled", true);
   });
@@ -200,9 +201,7 @@ function loadDeliveryBasketContent() {
   if ($.fn.DataTable.isDataTable("#basketTableDashboard")) {
     $("#basketTableDashboard").DataTable().clear().destroy();
   }
-  // let tableId = "#basketTableDashboard";
   $("#basket_content").html(spinner);
-  // setTimeout(function () {
   $.post("dirs/basket/dashboard/basket.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
     $("#basketTableDashboard tbody").html(`
@@ -213,10 +212,10 @@ function loadDeliveryBasketContent() {
     loadDeliveryBasket(
       "#basketTableDashboard",
       "dirs/incoming/dashboard/actions/picklisteditems.php",
+      "UNASSIGNED"
     );
     $("#loadDeliveryBtn").prop("disabled", true);
   });
-  // }, 200);
 }
 
 $(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function () {
@@ -231,6 +230,7 @@ $(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function () {
     loadDeliveryBasket(
       "#basketTableDashboard",
       "dirs/incoming/dashboard/actions/picklisteditems.php",
+      "UNASSIGNED"
     );
     $("#loadDeliveryBtn").prop("disabled", true);
   } else if (target === "assigned-tab") {
@@ -239,17 +239,16 @@ $(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function () {
         <td colspan="100%" class="text-center">${spinner}</td>
       </tr>
     `);
-    setTimeout(function () {
       loadDeliveryBasket(
         "#basketTableAssigned",
         "dirs/incoming/dashboard/actions/picklisteditems.php",
+        "ASSIGNED"
       );
       $("#loadDeliveryBtn").prop("disabled", false);
-    }, 200);
   }
 });
 
-function loadDeliveryBasket(tableId, url) {
+function loadDeliveryBasket(tableId, url, statusFilter = null) {
   $.ajax({
     url: url,
     type: "POST",
@@ -266,6 +265,22 @@ function loadDeliveryBasket(tableId, url) {
       let sortedData = response.Data.sort(
         (a, b) => Number(b.DocEntry || 0) - Number(a.DocEntry || 0),
       );
+
+      if (statusFilter) {
+        sortedData = sortedData.filter((item) => {
+          const status = item.PickListStatus;
+
+          if (statusFilter === "UNASSIGNED") {
+            return status === "NEW" || status === "PROCESSING";
+          }
+
+          if (statusFilter === "ASSIGNED") {
+            return status === "ASSIGNED";
+          }
+
+          return true;
+        });
+      }
 
       let rows = [];
       let grouped = {};
@@ -563,7 +578,7 @@ $(document).on("click", "#deliveryItemsTable tbody .open-srn", function (e) {
 function toggleDelivery() {
   const loadDeliveryBtn = document.getElementById("loadDeliveryBtn");
   const selectAllBtn = document.getElementById("selectAllBtn");
-
+  console.log("toggleDelivery called");
   // ✅ Reliable state tracking (instead of :visible)
   let selectionMode = $("#basketTableAssigned").data("selectionMode") || false;
   let batchContainer = [];
@@ -2068,7 +2083,6 @@ function loadDeliveryItems(PickLst_Num) {
           });
 
           Object.values(grouped).forEach((item) => {
-            console.log(`OPENING PICKLIST ITEMS : ${JSON.stringify(item)}`);
             rows.push([
               item.Brand,
               item.Model,
@@ -2702,7 +2716,8 @@ function loadDestinationWhscodes(Branch) {
 function loadToBasket(Picklists) {
   $.post("dirs/basket/dashboard/loadToBasket.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
-
+    
+    console.log(`PICKLISTS: ${Picklists}`)
     $.ajax({
       url: "dirs/basket/dashboard/actions/get_user.php",
       type: "POST",
@@ -2720,6 +2735,8 @@ function loadToBasket(Picklists) {
     addNonSerialize(Picklists);
     submitLoadingBasket(Picklists);
     initializeEmptySerialRows();
+
+    console.log("loadToBasket received:", Picklists);
 
     $("#newBrand").on("change", function () {
       $("#newModel").html('<option value="">Select Model</option>');
@@ -3298,6 +3315,7 @@ function loadToBasket(Picklists) {
 //   });
 // }
 function serialDeliveryInput(Picklists) {
+  $(document).off("submit", "#serial-delivery");
   $(document).on("submit", "#serial-delivery", function (e) {
     e.preventDefault();
 
@@ -3365,12 +3383,6 @@ function serialDeliveryInput(Picklists) {
 
               groupedItems[item.Itemcode]._scanId = scanId;
 
-              // console.log(`ACTUAL ITEM LOGS`);
-              // console.log({
-              //   Picklists,
-              //   ItemCode: item.Itemcode,
-              // });
-
               $.ajax({
                 url: "dirs/basket/dashboard/actions/get_actual_total.php",
                 type: "POST",
@@ -3388,6 +3400,8 @@ function serialDeliveryInput(Picklists) {
 
                   let totalActualPerModel =
                     parseInt(res.Data?.[0]?.Total_Actual_Item_Qty) || 0;
+
+                    console.log(`TOTAL ACTUAL  : ${totalActualPerModel}`)
 
                   $.ajax({
                     url: "dirs/basket/dashboard/actions/get_dsplaybatch_models.php",
@@ -4047,20 +4061,16 @@ function initializeEmptySerialRows() {
 }
 
 function submitLoadingBasket(Picklists) {
+  console.log("SERIAL HANDLER PICKLISTS:", Picklists);
+  console.log("submitLoadingBasket received:", Picklists);
   $("#loadingBasketForm")
     .off("submit")
     .on("submit", function (e) {
       e.preventDefault();
 
-      //  let loadBtn = $(this).find("button[type='submit'].commit-btn");
-      //     loadBtn
-      //       .prop("disabled", true)
-      //       .html(
-      //         `<span class="spinner-border spinner-border-sm"></span> Loading`,
-      //       );
+      console.log(`PICKLISTS : ${Picklists}`)
 
       const rowsWithItems = $("#loadBasketTable tbody tr").filter(function () {
-        // return $(this).attr("data-itemid");
         return $(this).attr("data-itemmapping");
       }).length;
 
@@ -4070,7 +4080,6 @@ function submitLoadingBasket(Picklists) {
           title: "No items found",
           text: "Please add item(s) to the loading basket first.",
         });
-        // loadBtn.prop("disabled", false).html("Load");
         return;
       }
 
@@ -4087,61 +4096,6 @@ function submitLoadingBasket(Picklists) {
       let Remarks = $("#remarks").val();
 
       $("#loadBasketTable tbody tr[data-itemmapping]").each(function (index) {
-        // let item_id = $(this).data("itemid");
-        // let serialBased =
-        //   $(this).data("serialbased") === true ||
-        //   $(this).data("serialbased") === "true";
-        // let serials = $(this).attr("data-serials") || null;
-        // let qty = $(this).find("td:nth-child(5)").text();
-        // let picklist = $(this).data("picklist");
-
-        // if (item_id) {
-        //   if (typeof item_id === "string") {
-        //     try {
-        //       item_id = JSON.parse(item_id);
-        //     } catch {
-        //       item_id = item_id.split(",");
-        //     }
-        //   }
-
-        //   // ensure array
-        //   if (!Array.isArray(item_id)) {
-        //     item_id = [item_id];
-        //   }
-
-        //   serials = serials ? serials.split(",").map((s) => s.trim()) : [];
-
-        //   item_id.forEach((id, idx) => {
-        //     if (typeof id === "string" && id.includes(",")) {
-        //       id.split(",").forEach((singleId) => {
-        //         Item_Id.push(Number(singleId.trim()));
-
-        //         ItemQty.push(qty);
-        //         PickListnumber.push(picklist);
-
-        //         if (serialBased) {
-        //           ItemSerial.push(serials || "");
-        //         } else {
-        //           ItemSerial.push(null);
-        //         }
-        //       });
-        //     } else {
-        //       if (serialBased && serials.length > 0) {
-        //         serials.forEach((serial) => {
-        //           Item_Id.push(Number(id));
-        //           ItemSerial.push(serial);
-        //           PickListnumber.push(picklist);
-        //           ItemQty.push(1);
-        //         });
-        //       } else {
-        //         Item_Id.push(Number(id));
-        //         ItemSerial.push(null);
-        //         PickListnumber.push(picklist);
-        //         ItemQty.push(qty);
-        //       }
-        //     }
-        //   });
-        // }
 
         let itemMappings = $(this).attr("data-itemmapping");
 
@@ -4190,42 +4144,7 @@ function submitLoadingBasket(Picklists) {
         });
       });
 
-      // $("#loadBasketTable tbody tr").each(function () {
-      //   console.log({
-      //     itemid: $(this).data("itemid"),
-      //     picklist: $(this).data("picklist"),
-      //     serials: $(this).attr("data-serials"),
-      //   });
-      // });
-      // $("#loadBasketTable tbody tr").each(function () {
-      //   console.log({
-      //     itemmapping: $(this).attr("data-itemmapping"),
-      //     serials: $(this).attr("data-serials"),
-      //   });
-      // });
-
-      // $("#loadBasketTable tbody tr").each(function () {
-      //   let mappings = [];
-
-      //   try {
-      //     mappings = JSON.parse($(this).attr("data-itemmapping") || "[]");
-      //   } catch (e) {
-      //     console.error(e);
-      //   }
-
-      //   console.log({
-      //     mappings,
-      //     serials: $(this).attr("data-serials"),
-      //   });
-      // });
-
       let loadBtn = $(this).find("button[type='submit'].load-btn");
-
-      $("#loadBasketTable tbody tr[data-itemmapping]").each(function () {
-        console.log("ROW:");
-        console.log("data-itemmapping:", $(this).attr("data-itemmapping"));
-        console.log("data-serials:", $(this).attr("data-serials"));
-      });
 
       Swal.fire({
         icon: "question",
@@ -4269,6 +4188,12 @@ function submitLoadingBasket(Picklists) {
                 $("#basket-serial-table tbody").empty();
                 $("#loadingQty").text("0");
                 loadDeliveryBasketContent();
+              }  else if (res.errorType === "timeout") {
+                  Swal.fire({
+                      icon: "warning",
+                      title: "Request Timeout",
+                      text: res.message || "The operation took too long to complete."
+                  });
               } else {
                 Swal.fire({
                   icon: "error",
@@ -4279,8 +4204,25 @@ function submitLoadingBasket(Picklists) {
               }
             },
             error: function (xhr, status, error) {
-              console.log("ERROR");
-              console.log(xhr.responseText);
+              if (status === "timeout") {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Request Timeout",
+                    text: "The server took too long to respond."
+                });
+              } else if (res.errorType === "server") {
+                  Swal.fire({
+                      icon: "error",
+                      title: "Server Error",
+                      text: res.message
+                  });
+              } else {
+                  Swal.fire({
+                      icon: "error",
+                      title: "Unexpected Error",
+                      html: xhr.responseText || error
+                  });
+              }
               loadBtn.prop("disabled", false).html("Load");
             },
             complete: function () {

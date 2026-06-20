@@ -370,7 +370,8 @@ function getBatchItems(batch, tableSelector) {
         let groupedItems = {};
 
         items.forEach((item) => {
-          let itemCode = item.ItemCode;
+          // let itemCode = item.ItemCode;
+          let itemCode = item.Req_ItemCode;
           let pk = item.PKList_Number;
           let qty = parseInt(item.Deliver_Qty) || 0;
 
@@ -405,7 +406,7 @@ function getBatchItems(batch, tableSelector) {
               style="height: 40px; min-height: 40px; cursor: pointer"
               data-pklist='${JSON.stringify(item.PKList_Numbers)}'
               data-itemid="${item.ItemRowNum}">
-              <td class="align-middle ps-3" style="background: #fcf7d4">
+              <td class="align-middle ps-3 text-center" style="background: #fcf7d4">
                 ${counter}
               </td>
               <td class="align-middle ps-3 text-primary" style="background: #fcf7d4">
@@ -417,7 +418,7 @@ function getBatchItems(batch, tableSelector) {
               <td class="align-middle ps-3" style="background: #fcf7d4">
                 ${item.Category}
               </td>
-              <td class="align-middle ps-3" style="background: #fcf7d4">
+              <td class="align-middle ps-3 text-center" style="background: #fcf7d4">
                 ${item.Deliver_Qty}
               </td>
             </tr>

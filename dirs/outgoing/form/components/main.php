@@ -1,5 +1,5 @@
-<div class="card shadow-sm" id="dashboard-display">
-    <div class="card-body overall-progress">
+<div class="card shadow-sm overall-progress" id="dashboard-display">
+    <div class="card-body">
         <section class="content">
             <div class="container-fluid">
                 <div class="row">

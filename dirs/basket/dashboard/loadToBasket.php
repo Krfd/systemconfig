@@ -68,7 +68,7 @@
                                     <button type="button" class="btn btn-sm btn-danger" onclick="clearLoadingTable()">Clear</button>
                                 </div>
                             </div>
-                            <div class="table-responsive d-flex gap-1 overall-progress overflow-auto mt-3 border border-secondary-subtle" style="max-height: 450px">
+                            <div class="table-responsive overall-progress overflow-auto mt-3 border border-secondary-subtle" style="max-height: 450px">
                                 <table class="table table-hover col mb-0" id="loadBasketTable">
                                     <thead class="sticky-top">
                                         <tr>
@@ -85,12 +85,6 @@
                             </div>
                             <div id="totalRowOutside" class="d-flex border border-secondary-subtle fw-bold justify-content-end w-100" 
                             style="background: #faf0aa">
-                                <!-- <div class="d-flex">
-                                    <div class="d-flex">
-                                        <div class="p-2 text-end">Balance:</div>
-                                        <div class="p-2" style="width:120px;" id="balanceQty">0</div>
-                                    </div>
-                                </div> -->
                                 <div class="d-flex">
                                     <div class=" p-2 text-end">Total Quantity:</div>
                                     <div class="p-2" style="width:120px;" id="loadingQty">0</div>

@@ -488,15 +488,15 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
   );
 });
 
-$(document).on("click", "#summaryTable tbody tr", function (e) {
-  e.preventDefault();
-  let serial = $(this).data("serial");
-  console.log(`SERIAL : ${serial}`);
+// $(document).on("click", "#summaryTable tbody tr", function (e) {
+//   e.preventDefault();
+//   let serial = $(this).data("serial");
+//   console.log(`SERIAL : ${serial}`);
 
-  let $serialCell = $("#delivery-serial-table tbody td").first();
-  let formattedSerial = serial.split(",").join("<br>");
-  $serialCell.html(formattedSerial);
-});
+//   let $serialCell = $("#delivery-serial-table tbody td").first();
+//   let formattedSerial = serial.split(",").join("<br>");
+//   $serialCell.html(formattedSerial);
+// });
 
 async function loadIAPBranchlist() {
   $.post("dirs/outgoing/form/actions/get_branchlist.php", {}, function (data) {

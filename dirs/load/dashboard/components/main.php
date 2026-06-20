@@ -1,4 +1,4 @@
-<div class="table-responsive-md mt-3">
+<div class="table-responsive-md mt-3 border border-secondary-subtle overall-progress">
     <table class="table table-hover datatables col" id="loadingBasketTableDisplay">
         <thead class="sticky-top">
             <tr>

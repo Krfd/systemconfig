@@ -71,9 +71,9 @@
                       <table class="table border border-secondary-subtle" id="receiving-serial-table">
                           <thead>
                               <tr>
-                                  <th class="text-secondary-dark">Model</th>
-                                  <th class="text-secondary-dark">Item Code</th>
-                                  <th class="text-secondary-dark">Serial</th>
+                                  <th class="text-secondary">Model</th>
+                                  <th class="text-secondary">Item Code</th>
+                                  <th class="text-secondary">Serial</th>
                               </tr>
                           </thead>
                           <tbody>
