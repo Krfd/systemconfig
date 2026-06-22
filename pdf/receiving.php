@@ -187,27 +187,6 @@ class PDF extends FPDF
 $pdf = new PDF();
 $pdf->AliasNbPages();
 
-// function headerDetails($pdf, $docDate, $branch, $origin, $receivedDate, $receivedTime, $originwhscode, $status, $srNumber)
-// {
-//     $pdf->SetFont('Arial', '', 9);
-
-//     $pageWidth = $pdf->GetPageWidth() - 24;
-
-//     $leftWidth = $pageWidth / 2;
-//     $rightWidth = $pageWidth / 2;
-
-//     $pdf->Cell($leftWidth, 6, sprintf('%-19s %s', 'Receiving Branch:', $branch), 0, 0, 'L');
-//     $pdf->Cell($rightWidth, 6, sprintf('%-15s %s', 'Status:', $status), 0, 1, 'R');
-
-//     $pdf->Cell($leftWidth, 6, sprintf('%-21s %s', 'SR Number:', $srNumber), 0, 0, 'L');
-//     $pdf->Cell($rightWidth, 6, sprintf('%-18s %s', 'Delivery Date:', $receivedDate), 0, 1, 'R');
-//     $pdf->Cell($leftWidth, 6, sprintf('%-22s %s', 'Origin Branch:', $origin), 0, 0, 'L');
-
-//     $pdf->SetX($pdf->GetPageWidth() - 55);
-//     $pdf->Cell(41, 6, sprintf('%-18s %s', 'Document Date:', $docDate), 0, 1, 'R');
-
-//     $pdf->Ln(2);
-// }
 function headerDetails($pdf, $docDate, $branch, $origin, $receivedDate, $receivedTime, $originwhscode, $status, $srNumber)
 {
     $pdf->SetFont('Arial', '', 9);
@@ -362,64 +341,6 @@ function renderItemsTable($pdf, $itemData)
     $pdf->Cell($totalWidth, 6, 'Total Quantity:', 1, 0, 'R');
     $pdf->Cell($headers['Quantity'], 6, $totalQty, 1, 1, 'C');
 }
-
-// function footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks)
-// {
-//     date_default_timezone_set('Asia/Manila');
-
-//     $pdf->Ln(5);
-//     // $pdf->SetFont('Arial', '', 10);
-
-//     // Section title
-//     $pdf->SetFont('Arial', 'B', 10);
-//     $pdf->Cell(0, 6, 'Delivery Details:', 0, 1, 'L');
-
-//     $pdf->SetFont('Arial', '', 9);
-
-//     $labelWidth = 30;
-//     $valueWidth = 120;
-
-//     // DRIVER
-//     $pdf->Cell($labelWidth, 6, 'Driver:', 0, 0, 'L');
-//     $pdf->Cell($valueWidth, 6, $driver, 0, 1, 'L');
-
-//     // TRUCK CATEGORY
-//     $pdf->Cell($labelWidth, 6, 'Truck Category:', 0, 0, 'L');
-//     $pdf->Cell($valueWidth, 6, $truckCat, 0, 1, 'L');
-
-//     // PLATE NO
-//     $pdf->Cell($labelWidth, 6, 'Plate No:', 0, 0, 'L');
-//     $pdf->Cell($valueWidth, 6, $plate, 0, 1, 'L');
-
-//     // PREPARED BY
-//     $pdf->Cell($labelWidth, 6, 'Prepared By:', 0, 0, 'L');
-//     $pdf->Cell($valueWidth, 6, $prepby, 0, 1, 'L');
-
-//     // REMARKS
-//     $pdf->Cell($labelWidth, 6, 'Remarks:', 0, 0, 'L');
-//     $pdf->Cell($valueWidth, 6, $remarks, 0, 1, 'L');
-
-//     $pdf->SetY(-15);
-
-//     // Disable auto page break temporarily
-//     $pdf->SetAutoPageBreak(false);
-
-//     // Position near bottom
-//     $pdf->SetY(-20);
-//     $pdf->SetFont('Arial', '', 8);
-
-//     $pdf->Cell(
-//         0,
-//         6,
-//         'Printed: ' . date('M d, Y h:i A'),
-//         0,
-//         1,
-//         'R'
-//     );
-
-//     // Restore auto page break
-//     $pdf->SetAutoPageBreak(true, 15);
-// }
 
 function footerDetails($pdf, $driver, $truckCat, $plate, $prepby, $remarks)
 {

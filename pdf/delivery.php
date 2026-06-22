@@ -332,6 +332,10 @@ function renderItemsTable($pdf, $itemData)
         $categoryRaw = $row['ItemCategory'] ?? '';
         $quantity = (int)($row['AllocatedQty'] ?? 0);
 
+        if ($quantity === 0) {
+            continue;
+        }
+
         $key = $modelRaw . '|' . $brandRaw . '|' . $categoryRaw;
 
         if (!isset($groupedItems[$key])) {

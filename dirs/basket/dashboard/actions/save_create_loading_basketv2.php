@@ -93,6 +93,8 @@ try {
 
     $referenceMap = [];
     $groupedItems = [];
+    $updatedRecords = [];
+    // $executedOnce = false;
 
     foreach ($Item_Id as $key => $itmid) {
 
@@ -108,7 +110,6 @@ try {
             ];
         }
         $groupedItems[$itmid]['TotalQty'] += (float)$qty;
-
     }
 
     foreach ($groupedItems as $item) {
@@ -129,16 +130,17 @@ try {
         $picklist   = $PickListnumber[$key] ?? null;
         $qty   = $ItemQty[$key] ?? null;
 
-        $branch = getBranch($conn, $itmid, $picklist);
+        // $branch = getBranch($conn, $itmid, $picklist);
+        $branch = trim(getBranch($conn, $itmid, $picklist));
         $groupedItems[$itmid]['Branch'] = $branch;
         if ($branch === '') {
             throw new Exception("Branch not found for Item ID {$itmid} and Picklist {$picklist}");
         }
 
         $inTransitItems->execute([
-            $BatchNumber, 
-            $picklist, 
-            $serial, 
+            $BatchNumber,
+            $picklist,
+            $serial,
             $itmid,
             $qty
         ]);
@@ -189,6 +191,14 @@ try {
 
         $totalQty = $groupedItems[$itmid]['TotalQty'];
 
+        $recordKey = trim($itmid) . '|' . trim($picklist) . '|' . trim($branch);
+
+        if (isset($updatedRecords[$recordKey])) {
+            continue;
+        }
+
+        $updatedRecords[$recordKey] = true;
+
         $stmtCollect->execute([
             $User,
             $itmid,
@@ -199,6 +209,20 @@ try {
             $allocatedQty,
             $totalQty
         ]);
+        // if (!$executedOnce) {
+        //     $stmtCollect->execute([
+        //         $User,
+        //         $itmid,
+        //         $referenceNumber,
+        //         $BatchNumber,
+        //         $picklist,
+        //         $serial,
+        //         $allocatedQty,
+        //         $totalQty
+        //     ]);
+
+        //     $executedOnce = true;
+        // }
     }
 
     $remainingQtyMap = [];
@@ -275,57 +299,6 @@ try {
 
         $rows = $getCollectionRows->fetchAll(PDO::FETCH_ASSOC);
 
-        // foreach ($rows as $row) {
-
-        //     $toDeliver = (float)$row['ToDeliver_Qty'];
-
-        //     if ($remainingLoaded >= $toDeliver) {
-        //         $remainingLoaded -= $toDeliver;
-
-        //         $update = $conn->prepare("UPDATE Pick_List_Item_Collection
-        //             SET TotalLoadedQty = ?
-        //             WHERE ItemRowNum = ?
-        //             AND PKList_Number = ?
-        //         ");
-
-
-        //         $update->execute([
-        //             $remainingLoaded,
-        //             $row['ItemRowNum'],
-        //             $row['PKList_Number']
-        //         ]);
-        //     } else if ($remainingLoaded < $toDeliver) {
-        //         $update = $conn->prepare("UPDATE Pick_List_Item_Collection
-        //             SET ToDeliver_Qty = ?
-        //             WHERE ItemRowNum = ?
-        //             AND PKList_Number = ?
-        //         ");
-
-        //         $update->execute([
-        //             $remainingLoaded,
-        //             $row['ItemRowNum'],
-        //             $row['PKList_Number']
-        //         ]);
-
-        //         $remainingLoaded = 0;
-        //     } else {
-        //         $remainingLoaded = 0;
-
-        //         $update = $conn->prepare("UPDATE Pick_List_Item_Collection
-        //             SET TotalLoadedQty = ?
-        //             WHERE ItemRowNum = ?
-        //             AND PKList_Number = ?
-        //         ");
-
-
-        //         $update->execute([
-        //             $remainingLoaded,
-        //             $row['ItemRowNum'],
-        //             $row['PKList_Number']
-        //         ]);
-        //     }
-        // }
-
         foreach ($rows as $row) {
             $toDeliver = (float)$row['ToDeliver_Qty'];
 
@@ -335,7 +308,6 @@ try {
 
                 $column = 'TotalLoadedQty';
                 $value  = $remainingLoaded;
-
             } else {
 
                 $column = 'ToDeliver_Qty';
@@ -378,13 +350,8 @@ try {
     echo json_encode([
         "isSuccess" => "success"
     ]);
-// } catch (Exception $e) {
+    // } catch (Exception $e) {
 } catch (Throwable $e) {
-    // errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
-    // $conn->rollback();
-    // echo "<b>Warning. Please Contact System Developer.</b><br>";
-    // echo $e->getMessage();
-
     errorHandler(
         E_WARNING,
         $e->getMessage(),

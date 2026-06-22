@@ -12,6 +12,8 @@ try {
     $get_receivedForm->execute([$User, $RcvdNumber]);
     $get_receivedHeader = $get_receivedForm->fetch(PDO::FETCH_ASSOC);
     $get_receivedForm->nextRowset();
+    $get_reference = $get_receivedForm->fetch(PDO::FETCH_ASSOC);
+    $get_receivedForm->nextRowset();
     $get_receivedItems = $get_receivedForm->fetchAll(PDO::FETCH_ASSOC);
 
     $conn->commit();
@@ -19,6 +21,7 @@ try {
     $response = array(
         "isSuccess" => "success",
         "Header" => $get_receivedHeader,
+        "Reference" => $get_reference,
         "Items" => $get_receivedItems
     );
     echo json_encode($response);

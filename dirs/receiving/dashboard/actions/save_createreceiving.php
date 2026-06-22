@@ -29,7 +29,7 @@ $User = $_SESSION['Uid'] ?? null;
 /* =========================================================
        POST VALUES
     ========================================================= */
-$DeliveryNumber    = $data['DeliveryNumber'] ?? '';
+$DeliveryNumber     = $data['DeliveryNumber'] ?? '';
 $Deliverydate       = $data['ReceivingDate'] ?? '';
 $PostingDate        = $data['PostingDate'] ?? '';
 $Driver             = $data['Driver'] ?? '';
@@ -47,44 +47,6 @@ foreach ($items as $item) {
     $inTransitRowNum = $item['InTransitRowNum'];
     $qty = $item['qty'];
 }
-
-// $itemsLog = "";
-
-// foreach ($items as $index => $item) {
-
-//     $itemCode = $item['itemCode'] ?? '';
-//     $inTransitRowNum = $item['InTransitRowNum'] ?? '';
-//     $qty = $item['qty'] ?? 0;
-
-//     $itemsLog .= "
-//         Item #" . ($index + 1) . "
-//         --------------------------------
-//         ItemCode         : {$itemCode}
-//         InTransitRowNum  : {$inTransitRowNum}
-//         Qty              : {$qty}
-
-//         ";
-// }
-
-// $logData = "
-// DeliveryNumber : {$DeliveryNumber}
-// Deliverydate    : {$Deliverydate}
-// PostingDate     : {$PostingDate}
-// Driver          : {$Driver}
-// TruckCategory   : {$TruckCategory}
-// TruckPlate      : {$TruckPlate}
-// Remarks         : {$Remarks}
-// Branchorigin    : {$Branchorigin}
-// BranchWhscode   : {$BranchWhscode}
-
-// Items :
-// {$itemsLog}
-
-// ======================================================
-// ";
-
-// $filePath = "receiving_log.txt";
-// file_put_contents($filePath, $logData, FILE_APPEND);
 
 try {
 
@@ -114,11 +76,6 @@ try {
     {
         do {
             $ReceivedCode = generateAppCode($length);
-            // $stmt = $conn->prepare("
-            //         SELECT TOP 1 1
-            //         FROM ReceivedOrder_H
-            //         WHERE ReceivedCode = ?
-            //     ");
 
             $stmt = $conn->prepare("EXEC dbo.Generate_Unique_Appcode ?");
             $stmt->execute([$ReceivedCode]);
@@ -131,10 +88,8 @@ try {
     /* =========================================================
            INSERT RECEIVING HEADER
         ========================================================= */
-    $stmtHeader = $conn->prepare("
-            EXEC dbo.ReceivingDelivered_items
-                ?,?,?,?,?,?,?,?,?,?,?,?
-        ");
+    $stmtHeader = $conn->prepare("EXEC dbo.ReceivingDelivered_items
+                ?,?,?,?,?,?,?,?,?,?,?,?");
     $stmtHeader->execute([
         $User,
         $DeliveryNumber,
@@ -151,9 +106,9 @@ try {
     ]);
 
     /* =========================================================
-           COLLECT RECEIVING ITEMS
-        ========================================================= */
-    $stmtCollect = $conn->prepare("EXEC dbo.ReceivingItems_orders ?,?,?,?,?");
+        COLLECT RECEIVING ITEMS
+    ========================================================= */
+    $stmtCollect = $conn->prepare("EXEC dbo.ReceivingItems_orders ?, ?, ?, ?, ?, ?");
 
     /* =========================================================
        GET DESIRED QTY
@@ -179,10 +134,6 @@ try {
             $rownum
         ]);
         $validationData = $qtyValidation->fetch(PDO::FETCH_ASSOC);
-
-        // if ($rownum === null || $rownum === '') {
-        //     continue;
-        // }
 
         $desiredQty = $validationData['Deliver_Qty'] ?? 0;
 
@@ -225,31 +176,11 @@ try {
             $BatchNumberReceived,
             $DeliveryNumber,
             $qty,
-            $rownum
+            $rownum,
+            $item['serial'] ?? null
         ]);
     }
 
-    // /* =========================================================
-    //        INSERT RECEIVING HEADER
-    //     ========================================================= */
-    // $stmtHeader = $conn->prepare("
-    //         EXEC dbo.ReceivingDelivered_items
-    //             ?,?,?,?,?,?,?,?,?,?,?,?
-    //     ");
-    // $stmtHeader->execute([
-    //     $User,
-    //     $DeliveryNumber,
-    //     $BatchNumberReceived,
-    //     $ReceivedCode,
-    //     $Deliverydate,
-    //     $PostingDate,
-    //     $Driver,
-    //     $TruckCategory,
-    //     $TruckPlate,
-    //     $Remarks,
-    //     $Branchorigin,
-    //     $BranchWhscode
-    // ]);
     $conn->commit();
 
     echo json_encode([

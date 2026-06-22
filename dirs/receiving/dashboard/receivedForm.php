@@ -27,15 +27,15 @@
                                 <div class="d-flex flex-column gap-1 col-4">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="drNoRecForm" class="form-label text-dark-emphasis col-3"><small>DR No:</small></label>
-                                        <input type="text" name="drNoRecForm" id="drNoRecForm" class="form-control form-control-sm col search-order-field" data-field="deliveryNumber" style="background: #f7f7f7" oninput="this.value = this.value.toUpperCase()">
+                                        <input type="text" name="drNoRecForm" id="drNoRecForm" class="form-control form-control-sm col search-order-field" data-field="deliveryNumber" style="background: #f7f7f7" readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="refNoRecForm" class="form-label text-dark-emphasis col-3"><small>Reference No:</small></label>
-                                        <input type="text" name="refNoRecForm" id="refNoRecForm" class="form-control form-control-sm col search-order-field" data-field="referenceNumber" style="background: #f7f7f7" oninput="this.value = this.value.toUpperCase()">
+                                        <input type="text" name="refNoRecForm" id="refNoRecForm" class="form-control form-control-sm col search-order-field" data-field="referenceNumber" style="background: #f7f7f7" readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="stockReqNoRecForm" class="form-label text-dark-emphasis col-3"><small>Stock Request No:</small></label>
-                                        <input type="text" name="stockReqNoRecForm" id="stockReqNoRecForm" class="form-control form-control-sm col search-order-field" data-field="stockReqNumber" style="background: #f7f7f7" oninput="this.value = this.value.toUpperCase()">
+                                        <input type="text" name="stockReqNoRecForm" id="stockReqNoRecForm" class="form-control form-control-sm col search-order-field" data-field="stockReqNumber" style="background: #f7f7f7" readonly>
                                     </div>
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
@@ -71,7 +71,7 @@
                                             <th class="text-secondary">Brand</th>
                                             <th class="text-secondary">Model</th>
                                             <th class="text-secondary">Category</th>
-                                            <th class="text-secondary">Quantity</th>
+                                            <th class="text-secondary text-center">Quantity</th>
                                             <th class="text-secondary">Type</th>
                                         </tr>
                                     </thead>

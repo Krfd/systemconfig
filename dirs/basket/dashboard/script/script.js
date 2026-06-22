@@ -13,22 +13,16 @@ $(document).ready(function () {
 function loadDashboard() {
   $("#basket_content").html(spinner);
   $.post("dirs/basket/dashboard/components/main.php", {}, function (data) {
-    // $("#basket_content").html(data);
     $("#basket_content").hide().html(data).fadeIn(200);
-    // $("#basketTableDashboard").DataTable({
-    //   pageLength: 50,
-    //   order: [0, "desc"],
-    // });
     $("#basketTableDashboard tbody").html(`
       <tr>
         <td colspan="100%" class="text-center">${spinner}</td>
       </tr>
     `);
-    // console.log(`BRANCH ASSIGNMENT SPINNER : ${spinner}`)
     loadDeliveryBasket(
       "#basketTableDashboard",
       "dirs/incoming/dashboard/actions/picklisteditems.php",
-      "UNASSIGNED"
+      "UNASSIGNED",
     );
     $("#loadDeliveryBtn").prop("disabled", true);
   });
@@ -154,17 +148,7 @@ $(document).on("click", ".dropdown .open-picklisted", function (e) {
   deliveryPicklistNum = Picklist;
 
   $("#basket_content").html(spinner);
-  // setTimeout(function () {
-  // $.post("dirs/basket/dashboard/loadDeliveryItems.php", {}, function (data) {
-  //   $("#main-content").html(data);
-  // $("#deliveryItemsTable tbody").html(`
-  //     <tr>
-  //       <td colspan="100%" class="text-center">${spinner}</td>
-  //     </tr>
-  //   `);
   loadDeliveryItems(Picklist);
-  // })
-  // }, 200);
 });
 
 // BRANCH ASSIGNMENT
@@ -212,7 +196,7 @@ function loadDeliveryBasketContent() {
     loadDeliveryBasket(
       "#basketTableDashboard",
       "dirs/incoming/dashboard/actions/picklisteditems.php",
-      "UNASSIGNED"
+      "UNASSIGNED",
     );
     $("#loadDeliveryBtn").prop("disabled", true);
   });
@@ -230,7 +214,7 @@ $(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function () {
     loadDeliveryBasket(
       "#basketTableDashboard",
       "dirs/incoming/dashboard/actions/picklisteditems.php",
-      "UNASSIGNED"
+      "UNASSIGNED",
     );
     $("#loadDeliveryBtn").prop("disabled", true);
   } else if (target === "assigned-tab") {
@@ -239,12 +223,12 @@ $(document).on("shown.bs.tab", 'button[data-bs-toggle="tab"]', function () {
         <td colspan="100%" class="text-center">${spinner}</td>
       </tr>
     `);
-      loadDeliveryBasket(
-        "#basketTableAssigned",
-        "dirs/incoming/dashboard/actions/picklisteditems.php",
-        "ASSIGNED"
-      );
-      $("#loadDeliveryBtn").prop("disabled", false);
+    loadDeliveryBasket(
+      "#basketTableAssigned",
+      "dirs/incoming/dashboard/actions/picklisteditems.php",
+      "ASSIGNED",
+    );
+    $("#loadDeliveryBtn").prop("disabled", false);
   }
 });
 
@@ -2716,8 +2700,8 @@ function loadDestinationWhscodes(Branch) {
 function loadToBasket(Picklists) {
   $.post("dirs/basket/dashboard/loadToBasket.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
-    
-    console.log(`PICKLISTS: ${Picklists}`)
+
+    console.log(`PICKLISTS: ${Picklists}`);
     $.ajax({
       url: "dirs/basket/dashboard/actions/get_user.php",
       type: "POST",
@@ -3401,7 +3385,7 @@ function serialDeliveryInput(Picklists) {
                   let totalActualPerModel =
                     parseInt(res.Data?.[0]?.Total_Actual_Item_Qty) || 0;
 
-                    console.log(`TOTAL ACTUAL  : ${totalActualPerModel}`)
+                  console.log(`TOTAL ACTUAL  : ${totalActualPerModel}`);
 
                   $.ajax({
                     url: "dirs/basket/dashboard/actions/get_dsplaybatch_models.php",
@@ -3634,8 +3618,6 @@ function serialDeliveryInput(Picklists) {
                                   <td class="align-middle ps-3" style="background: #fcf7d4">${category}</td>
                                   <td class="align-middle ps-3" style="background: #fcf7d4">${qty}</td>
                                 </tr>`;
-
-                            // data-serials="${item.ItemSerial}"
 
                             let emptyRow = loadingTableBody
                               .find("tr:not([data-itemcode])")
@@ -4061,14 +4043,14 @@ function initializeEmptySerialRows() {
 }
 
 function submitLoadingBasket(Picklists) {
-  console.log("SERIAL HANDLER PICKLISTS:", Picklists);
-  console.log("submitLoadingBasket received:", Picklists);
+  // console.log("SERIAL HANDLER PICKLISTS:", Picklists);
+  // console.log("submitLoadingBasket received:", Picklists);
   $("#loadingBasketForm")
     .off("submit")
     .on("submit", function (e) {
       e.preventDefault();
 
-      console.log(`PICKLISTS : ${Picklists}`)
+      // console.log(`PICKLISTS : ${Picklists}`);
 
       const rowsWithItems = $("#loadBasketTable tbody tr").filter(function () {
         return $(this).attr("data-itemmapping");
@@ -4096,7 +4078,6 @@ function submitLoadingBasket(Picklists) {
       let Remarks = $("#remarks").val();
 
       $("#loadBasketTable tbody tr[data-itemmapping]").each(function (index) {
-
         let itemMappings = $(this).attr("data-itemmapping");
 
         let serialBased =
@@ -4188,12 +4169,13 @@ function submitLoadingBasket(Picklists) {
                 $("#basket-serial-table tbody").empty();
                 $("#loadingQty").text("0");
                 loadDeliveryBasketContent();
-              }  else if (res.errorType === "timeout") {
-                  Swal.fire({
-                      icon: "warning",
-                      title: "Request Timeout",
-                      text: res.message || "The operation took too long to complete."
-                  });
+              } else if (res.errorType === "timeout") {
+                Swal.fire({
+                  icon: "warning",
+                  title: "Request Timeout",
+                  text:
+                    res.message || "The operation took too long to complete.",
+                });
               } else {
                 Swal.fire({
                   icon: "error",
@@ -4206,22 +4188,22 @@ function submitLoadingBasket(Picklists) {
             error: function (xhr, status, error) {
               if (status === "timeout") {
                 Swal.fire({
-                    icon: "warning",
-                    title: "Request Timeout",
-                    text: "The server took too long to respond."
+                  icon: "warning",
+                  title: "Request Timeout",
+                  text: "The server took too long to respond.",
                 });
               } else if (res.errorType === "server") {
-                  Swal.fire({
-                      icon: "error",
-                      title: "Server Error",
-                      text: res.message
-                  });
+                Swal.fire({
+                  icon: "error",
+                  title: "Server Error",
+                  text: res.message,
+                });
               } else {
-                  Swal.fire({
-                      icon: "error",
-                      title: "Unexpected Error",
-                      html: xhr.responseText || error
-                  });
+                Swal.fire({
+                  icon: "error",
+                  title: "Unexpected Error",
+                  html: xhr.responseText || error,
+                });
               }
               loadBtn.prop("disabled", false).html("Load");
             },

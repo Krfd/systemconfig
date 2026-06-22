@@ -178,147 +178,147 @@ function loadReceiving() {
 
 function receivingForm() {
   $("#main-content").html(spinner);
-    $.post("dirs/receiving/dashboard/receivingForm.php", {}, function (data) {
-      $("#main-content").hide().html(data).fadeIn(200);
+  $.post("dirs/receiving/dashboard/receivingForm.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
 
-      userDetails();
-      toggleReceivingButtons(false);
-      fetchOrderDetails();
-      // receiveItem();
-      formattedDate();
-      loadImperialBrands();
-      addNonSerialize();
-      serialDeliveryInput();
+    userDetails();
+    toggleReceivingButtons(false);
+    fetchOrderDetails();
+    // receiveItem();
+    formattedDate();
+    loadImperialBrands();
+    addNonSerialize();
+    serialDeliveryInput();
 
-      $("#newBrand").on("change", function () {
-        $("#newModel").html('<option value="">Select Model</option>');
-        $("#newCategory").val("");
-        $("#itemcode").val("");
-        loadImperialModel();
-      });
-
-      $("#newModel").on("change", function () {
-        const selected = $(this).find(":selected");
-        $("#newCategory").val(selected.data("category") || "");
-        $("#itemcode").val(selected.data("itemcode") || "");
-      });
-
-      function toggler() {
-        const toggler = document.getElementById("serialToggler");
-        const knob = document.querySelector(".switch-knob");
-        const manual = document.querySelector(".switch-track .manual");
-        const scan = document.querySelector(".switch-track .scan");
-        const serialInput = document.getElementById("newSerial");
-
-        function preventTyping(e) {
-          const allowedKeys = [
-            "Enter",
-            "Tab",
-            "Backspace",
-            "Delete",
-            "ArrowLeft",
-            "ArrowRight",
-          ];
-
-          if (!allowedKeys.includes(e.key)) {
-            e.preventDefault();
-          }
-        }
-
-        function updateKnob() {
-          scan.style.transition = "opacity 0.3s ease";
-          manual.style.transition = "opacity 0.3s ease";
-
-          if (toggler.checked) {
-            // SCAN MODE
-            toggler.dataset.value = "Scan";
-
-            knob.style.width = "55px";
-            knob.style.transform = "translateX(8px)";
-
-            scan.style.opacity = "1";
-            manual.style.opacity = "0";
-
-            scan.style.pointerEvents = "auto";
-            manual.style.pointerEvents = "none";
-
-            // console.log("SCAN");
-
-            serialInput.value = "";
-            serialInput.focus();
-
-            // Prevent manual typing
-            serialInput.addEventListener("keydown", preventTyping);
-          } else {
-            // MANUAL MODE
-            toggler.dataset.value = "Manual";
-
-            knob.style.width = "60px";
-            knob.style.transform = "translateX(0px)";
-
-            manual.style.opacity = "1";
-            scan.style.opacity = "0";
-
-            manual.style.pointerEvents = "auto";
-            scan.style.pointerEvents = "none";
-
-            // console.log("MANUAL");
-
-            serialInput.value = "";
-            serialInput.focus();
-
-            // Allow manual typing
-            serialInput.removeEventListener("keydown", preventTyping);
-          }
-        }
-
-        updateKnob();
-
-        toggler.addEventListener("change", updateKnob);
-      }
-
-      const addBtn = document.getElementById("addDeliveryModalBtn");
-      const newItemModal = new bootstrap.Modal(
-        document.getElementById("addDeliveryModal"),
-      );
-
-      let allowNonserialize = false;
-
-      addBtn.addEventListener("click", function () {
-        if (allowNonserialize) {
-          newItemModal.show();
-          return;
-        }
-
-        Swal.fire({
-          title: "Enter non-serialize items?",
-          text: "Please confirm before proceeding.",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonText: "Allow",
-          cancelButtonText: "Cancel",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            allowNonserialize = true;
-            newItemModal.show();
-          }
-        });
-      });
-
-      function adjustTotalWidth() {
-        const summaryTable = document.getElementById("receiving-form-table");
-        const totalRow = document.getElementById("totalRowOutside");
-
-        if (summaryTable && totalRow) {
-          totalRow.style.width = summaryTable.offsetWidth + "px";
-        }
-      }
-
-      toggler();
-      adjustTotalWidth();
-      window.addEventListener("resize", adjustTotalWidth);
-      submitReceiving();
+    $("#newBrand").on("change", function () {
+      $("#newModel").html('<option value="">Select Model</option>');
+      $("#newCategory").val("");
+      $("#itemcode").val("");
+      loadImperialModel();
     });
+
+    $("#newModel").on("change", function () {
+      const selected = $(this).find(":selected");
+      $("#newCategory").val(selected.data("category") || "");
+      $("#itemcode").val(selected.data("itemcode") || "");
+    });
+
+    function toggler() {
+      const toggler = document.getElementById("serialToggler");
+      const knob = document.querySelector(".switch-knob");
+      const manual = document.querySelector(".switch-track .manual");
+      const scan = document.querySelector(".switch-track .scan");
+      const serialInput = document.getElementById("newSerial");
+
+      function preventTyping(e) {
+        const allowedKeys = [
+          "Enter",
+          "Tab",
+          "Backspace",
+          "Delete",
+          "ArrowLeft",
+          "ArrowRight",
+        ];
+
+        if (!allowedKeys.includes(e.key)) {
+          e.preventDefault();
+        }
+      }
+
+      function updateKnob() {
+        scan.style.transition = "opacity 0.3s ease";
+        manual.style.transition = "opacity 0.3s ease";
+
+        if (toggler.checked) {
+          // SCAN MODE
+          toggler.dataset.value = "Scan";
+
+          knob.style.width = "55px";
+          knob.style.transform = "translateX(8px)";
+
+          scan.style.opacity = "1";
+          manual.style.opacity = "0";
+
+          scan.style.pointerEvents = "auto";
+          manual.style.pointerEvents = "none";
+
+          // console.log("SCAN");
+
+          serialInput.value = "";
+          serialInput.focus();
+
+          // Prevent manual typing
+          serialInput.addEventListener("keydown", preventTyping);
+        } else {
+          // MANUAL MODE
+          toggler.dataset.value = "Manual";
+
+          knob.style.width = "60px";
+          knob.style.transform = "translateX(0px)";
+
+          manual.style.opacity = "1";
+          scan.style.opacity = "0";
+
+          manual.style.pointerEvents = "auto";
+          scan.style.pointerEvents = "none";
+
+          // console.log("MANUAL");
+
+          serialInput.value = "";
+          serialInput.focus();
+
+          // Allow manual typing
+          serialInput.removeEventListener("keydown", preventTyping);
+        }
+      }
+
+      updateKnob();
+
+      toggler.addEventListener("change", updateKnob);
+    }
+
+    const addBtn = document.getElementById("addDeliveryModalBtn");
+    const newItemModal = new bootstrap.Modal(
+      document.getElementById("addDeliveryModal"),
+    );
+
+    let allowNonserialize = false;
+
+    addBtn.addEventListener("click", function () {
+      if (allowNonserialize) {
+        newItemModal.show();
+        return;
+      }
+
+      Swal.fire({
+        title: "Enter non-serialize items?",
+        text: "Please confirm before proceeding.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Allow",
+        cancelButtonText: "Cancel",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          allowNonserialize = true;
+          newItemModal.show();
+        }
+      });
+    });
+
+    function adjustTotalWidth() {
+      const summaryTable = document.getElementById("receiving-form-table");
+      const totalRow = document.getElementById("totalRowOutside");
+
+      if (summaryTable && totalRow) {
+        totalRow.style.width = summaryTable.offsetWidth + "px";
+      }
+    }
+
+    toggler();
+    adjustTotalWidth();
+    window.addEventListener("resize", adjustTotalWidth);
+    submitReceiving();
+  });
 }
 
 function formatDateMMDDYY(dateString) {
@@ -332,6 +332,7 @@ function formatDateMMDDYY(dateString) {
 }
 
 function openReceivedForm(rcvdNumber) {
+  $("#rcvdNumber").html(rcvdNumber);
   $("#main-content").html(spinner);
   $.post("dirs/receiving/dashboard/receivedForm.php", function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
@@ -348,14 +349,15 @@ function openReceivedForm(rcvdNumber) {
       success: function (response) {
         if (response.isSuccess === "success") {
           let header = response.Header;
+          let reference = response.Reference;
           let items = response.Items;
           let rowCount = response.Items.length;
           let totalQty = 0;
 
           $("#rcvdNumber").text(rcvdNumber);
           $("#drNoRecForm").val(header.ReferenceNumber);
-          $("#refNoRecForm").val(items[0].ReferenceNumber);
-          $("#stockReqNoRecForm").val(items[0].SRNumber);
+          $("#refNoRecForm").val(reference.ReferenceNumber);
+          $("#stockReqNoRecForm").val(reference.SRNumber);
           $("#originRecForm").val(header.OriginBranch);
           $("#origRecForm").val(header.OriginWhscode);
 
@@ -381,7 +383,6 @@ function openReceivedForm(rcvdNumber) {
             let qty = parseFloat(item.Recvd_ItemQty) || 0;
             totalQty += qty;
 
-            // console.log(`ITEM TYPE: ${item.ItemType}`);
             let itemType = item.ItemType;
             if (itemType === "S") {
               itemType = '<span class="badge bg-success">Serialize</span>';
@@ -395,7 +396,7 @@ function openReceivedForm(rcvdNumber) {
                 <td style="background: #fcf7d4">${item.ItemBrand}</td>
                 <td style="background: #fcf7d4">${item.ItemModel}</td>
                 <td style="background: #fcf7d4">${item.ItemCategory}</td>
-                <td style="background: #fcf7d4">${Number(item.Recvd_ItemQty).toFixed(0)}</td>
+                <td style="background: #fcf7d4" class="text-center">${Number(item.Recvd_ItemQty).toFixed(0)}</td>
                 <td style="background: #fcf7d4">${itemType}</td>
               </tr>
             `;
@@ -543,9 +544,8 @@ function fetchOrderDetails() {
         success: function (response) {
           let header = response.Header;
           let items = response.Items;
-          // console.log(`RESPONSE : ${JSON.stringify(header)}`);
-          // console.log(``);
-          // console.log(`ITEMS : ${JSON.stringify(items)}`);
+          console.log(`RECEIVING HEADER : ${JSON.stringify(header)}`);
+          console.log(`RECEIVING ITEMS : ${JSON.stringify(items)}`);
 
           if (response.Header?.Status === "failed") {
             Swal.fire({
@@ -830,7 +830,7 @@ function addNonSerialize() {
                     // let itemRowNum = item.ItemRowNum;
                     let itemRowNum = data[0].ItemRowNum;
 
-                    console.log(`NON SERIALIZE ROW NUM: ${itemRowNum}`);
+                    // console.log(`NON SERIALIZE ROW NUM: ${itemRowNum}`);
 
                     console.log(`RECEIVING ITEM : ${JSON.stringify(item)}`);
 
@@ -949,9 +949,6 @@ function serialDeliveryInput() {
         },
         dataType: "json",
         success: function (response) {
-          // console.log(`DELIVERY NUMBER : ${DeliveryNumber}`);
-          // console.log(`SERIAL : ${Serial}`);
-          console.log(``);
           if (response.isSuccess === "success") {
             let items = response.Data;
             let rows = [];
@@ -996,11 +993,13 @@ function serialDeliveryInput() {
               receivingGroupedItems[item.ItemCode]._scanId = scanId;
 
               Object.values(receivingGroupedItems).forEach(function (item) {
+                console.log(`ITEM: ${JSON.stringify(item)}`);
                 let brand = item.ItemBrand;
                 let model = item.ItemName;
                 let category = item.ItemCategory;
                 let itemCode = item.ItemCode;
                 // let itemDeliveryQty = item.Deliver_Qty;
+                let itemRowNum = item.ItemRowNum;
                 let qty = 1;
 
                 // let itemMappings = data.map((row) => ({
@@ -1066,7 +1065,7 @@ function serialDeliveryInput() {
                   .toArray()
                   .some((td) => $(td).text().trim() === latestInput);
 
-                  // console.log(`NEW ITEM : ${model} - ${serial}`)
+                // console.log(`NEW ITEM : ${model} - ${serial}`)
 
                 if (!serialExisted) {
                   let serialRow = `
@@ -1104,8 +1103,7 @@ function serialDeliveryInput() {
                   qtyCell.text(currentQty + 1);
 
                   // get existing serials
-                  let existingSerials =
-                    existingItem.attr("data-serials") || "";
+                  let existingSerials = existingItem.attr("data-serials") || "";
 
                   // convert to array
                   let serialArray = existingSerials
@@ -1121,16 +1119,12 @@ function serialDeliveryInput() {
                   serialArray = [...new Set(serialArray)];
 
                   // update attribute
-                  existingItem.attr(
-                    "data-serials",
-                    serialArray.join(","),
-                  );
+                  existingItem.attr("data-serials", serialArray.join(","));
 
                   // update tooltip
                   existingItem.attr(
                     "data-bs-title",
-                    "Serials:<br>" +
-                      serialArray.join("<br>"),
+                    "Serials:<br>" + serialArray.join("<br>"),
                   );
 
                   const tooltip = bootstrap.Tooltip.getInstance(
@@ -1140,8 +1134,7 @@ function serialDeliveryInput() {
                   if (tooltip) {
                     tooltip.setContent({
                       ".tooltip-inner":
-                        "Serials:<br>" +
-                        serialArray.join("<br>"),
+                        "Serials:<br>" + serialArray.join("<br>"),
                     });
                   }
                   return;
@@ -1151,6 +1144,7 @@ function serialDeliveryInput() {
                   let newRow = `
                     <tr data-itemkey="${itemKey}" 
                     data-rowkey="${rowKey}" 
+                    data-rownum="${itemRowNum}"
                     data-itemmapping='${JSON.stringify(itemMappings)}' 
                     data-itemcode="${itemCode}" 
                     data-serialbased="true" 
@@ -1274,18 +1268,58 @@ function submitReceiving() {
       $("#receiving-form-table tbody tr[data-itemcode]").each(function () {
         let row = $(this);
 
-        let item = {
-          itemCode: row.data("itemcode"),
-          brand: row.find("td:eq(1)").text().trim(),
-          model: row.find("td:eq(2)").text().trim(),
-          category: row.find("td:eq(3)").text().trim(),
-          qty: parseInt(row.find("td:eq(4)").text().trim()) || 0,
-          // totalQty: parseInt(row.find("td:eq(5)").text().trim()) || 0,
-          serialBased: row.data("serialbased") || false,
-          InTransitRowNum: row.data("rownum"),
-        };
+        let serials = row.attr("data-serials") || "";
 
-        formData.items.push(item);
+        serials = serials
+          ? serials
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [];
+
+        // let item = {
+        //   itemCode: row.data("itemcode"),
+        //   brand: row.find("td:eq(1)").text().trim(),
+        //   model: row.find("td:eq(2)").text().trim(),
+        //   category: row.find("td:eq(3)").text().trim(),
+        //   qty: parseInt(row.find("td:eq(4)").text().trim()) || 0,
+        //   serialBased: row.data("serialbased") || false,
+        //   InTransitRowNum: row.data("rownum"),
+        //   serials: serials,
+        // };
+
+        // MODIFIED
+        if (
+          (row.data("serialbased") === true ||
+            row.data("serialbased") === "true") &&
+          serials.length > 0
+        ) {
+          serials.forEach((serial) => {
+            formData.items.push({
+              itemCode: row.data("itemcode"),
+              brand: row.find("td:eq(1)").text().trim(),
+              model: row.find("td:eq(2)").text().trim(),
+              category: row.find("td:eq(3)").text().trim(),
+              qty: 1,
+              serialBased: true,
+              InTransitRowNum: row.data("rownum"),
+              serial: serial,
+            });
+          });
+        } else {
+          formData.items.push({
+            itemCode: row.data("itemcode"),
+            brand: row.find("td:eq(1)").text().trim(),
+            model: row.find("td:eq(2)").text().trim(),
+            category: row.find("td:eq(3)").text().trim(),
+            qty: parseInt(row.find("td:eq(4)").text().trim()) || 0,
+            serialBased: false,
+            InTransitRowNum: row.data("rownum"),
+            serial: null,
+          });
+        }
+
+        // formData.items.push(item);
       });
 
       // VALIDATION
