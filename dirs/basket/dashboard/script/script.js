@@ -205,10 +205,10 @@ function loadDeliveryBasketContent() {
   $.post("dirs/basket/dashboard/basket.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
     $("#basketTableDashboard tbody").html(`
-        <tr>
-          <td colspan="100%" class="text-center">${spinner}</td>
-        </tr>
-      `);
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
     loadDeliveryBasket(
       "#basketTableDashboard",
       "dirs/incoming/dashboard/actions/picklisteditems.php",

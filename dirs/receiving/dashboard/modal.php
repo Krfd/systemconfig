@@ -56,17 +56,14 @@
                               <input type="text" name="newSerial" id="newSerial" class="form-control" style="background: #FFFBDF" inputmode="numeric"
                                   required>
                           </div>
-                          <!-- <div class="modal-footer"> -->
                           <div class="col d-flex align-self-end ms-2 gap-2">
-                              <button class="btn btn-success" type="submit" id="nonSerializeBtn">Add</button>
+                              <button class="btn btn-success" type="submit" id="serializeBtn">Add</button>
                               <button class="btn btn-danger" type="reset">Clear</button>
                           </div>
                       </div>
                   </form>
               </div>
               <div class="container p-3">
-                  <!-- <div class="card">
-                      <div class="card-body"> -->
                   <div class="table-responsive overflow-auto overall-progress" style="max-height: 300px">
                       <table class="table border border-secondary-subtle" id="receiving-serial-table">
                           <thead>
@@ -110,8 +107,6 @@
                           </tbody>
                       </table>
                   </div>
-                  <!-- </div>
-                  </div> -->
               </div>
           </div>
       </div>

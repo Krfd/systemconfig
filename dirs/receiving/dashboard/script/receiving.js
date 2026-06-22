@@ -11,15 +11,22 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
+  $("#receiving_content").html(spinner);
   $.post("dirs/receiving/dashboard/components/main.php", {}, function (data) {
-    $("#receiving_content").html(data);
+    $("#receiving_content").hide().html(data).fadeIn(200);
+    $("#receivingTable tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
     loadReceiving();
   });
 }
 
 function returnReceiving() {
+  $("#receiving_content").html(spinner);
   $.post("dirs/receiving/dashboard/received.php", {}, function (data) {
-    $("#main-content").html(data);
+    $("#main-content").hide().html(data).fadeIn(200);
   });
 }
 
@@ -121,6 +128,7 @@ function loadReceiving() {
             }
             // console.log(`RECEIVED NUMBER: ${receivedNumber}`);
             $(row).data("rcvdnumber", receivedNumber);
+            $("td:eq(0)", row).addClass("text-center");
             $("td:eq(1)", row).addClass("text-primary ps-2");
 
             $(row).hover(
@@ -170,9 +178,8 @@ function loadReceiving() {
 
 function receivingForm() {
   $("#main-content").html(spinner);
-  (setTimeout(function () {
     $.post("dirs/receiving/dashboard/receivingForm.php", {}, function (data) {
-      $("#main-content").html(data);
+      $("#main-content").hide().html(data).fadeIn(200);
 
       userDetails();
       toggleReceivingButtons(false);
@@ -312,8 +319,6 @@ function receivingForm() {
       window.addEventListener("resize", adjustTotalWidth);
       submitReceiving();
     });
-  }),
-    200);
 }
 
 function formatDateMMDDYY(dateString) {
@@ -329,7 +334,12 @@ function formatDateMMDDYY(dateString) {
 function openReceivedForm(rcvdNumber) {
   $("#main-content").html(spinner);
   $.post("dirs/receiving/dashboard/receivedForm.php", function (data) {
-    $("#main-content").html(data);
+    $("#main-content").hide().html(data).fadeIn(200);
+    $("#receiving-form-table tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
     $.ajax({
       url: "dirs/receiving/dashboard/actions/get_receivedForm.php",
       type: "POST",
@@ -358,30 +368,6 @@ function openReceivedForm(rcvdNumber) {
             : "";
 
           $("#postDate").val(postDate);
-          // console.log(`DATES FORMATTED`);
-
-          // const docDate = header.SysTimeStamp
-          //   ? new Date(header.SysTimeStamp)
-          //       .toLocaleDateString("en-US", {
-          //         month: "2-digit",
-          //         day: "2-digit",
-          //         year: "2-digit",
-          //       })
-          //       .replace(/\//g, "-")
-          //   : "";
-
-          // $("#docDateRecForm").val(docDate);
-          // const postDate = header.PostingDate
-          //   ? new Date(header.PostingDate)
-          //       .toLocaleDateString("en-US", {
-          //         month: "2-digit",
-          //         day: "2-digit",
-          //         year: "2-digit",
-          //       })
-          //       .replace(/\//g, "-")
-          //   : "";
-
-          // $("#postDate").val(postDate);
           $("#statusRecForm").val(header.ReceivedStatus);
 
           $("#receiveByRecForm").val(header.ReceivedBy);
@@ -937,6 +923,7 @@ function addNonSerialize() {
 
 // FOR RECEIVING ITEM
 function serialDeliveryInput() {
+  $(document).off("submit", "#serial-delivery");
   $(document).on("submit", "#serial-delivery", function (e) {
     e.preventDefault();
 
@@ -962,9 +949,8 @@ function serialDeliveryInput() {
         },
         dataType: "json",
         success: function (response) {
-          console.log(`DELIVERY NUMBER : ${DeliveryNumber}`);
-          console.log(`SERIAL : ${Serial}`);
           // console.log(`DELIVERY NUMBER : ${DeliveryNumber}`);
+          // console.log(`SERIAL : ${Serial}`);
           console.log(``);
           if (response.isSuccess === "success") {
             let items = response.Data;
@@ -1000,7 +986,7 @@ function serialDeliveryInput() {
                 receivingGroupedItems[item.ItemCode] = {
                   ...item,
                   qty: 0,
-                  Item_id: null,
+                  // Item_id: null,
                   picklist: null,
                   loadedQty: 0,
                   items: [],
@@ -1014,13 +1000,12 @@ function serialDeliveryInput() {
                 let model = item.ItemName;
                 let category = item.ItemCategory;
                 let itemCode = item.ItemCode;
-                let itemRowNum = item.ItemRowNum;
-                let itemDeliveryQty = item.Deliver_Qty;
+                // let itemDeliveryQty = item.Deliver_Qty;
                 let qty = 1;
 
                 // let itemMappings = data.map((row) => ({
                 let itemMappings = items.map((row) => ({
-                  item_id: row.Item_id,
+                  // item_id: row.Item_id,
                   picklist: row.PKList_Number,
                 }));
 
@@ -1031,9 +1016,7 @@ function serialDeliveryInput() {
                 }
 
                 receivingGroupedItems[itemCode].items.push({
-                  // item_id: data.map((row) => row.Item_id),
-                  // item_id: data.map((row) => row.Item_id),
-                  item_id: items.map((row) => row.Item_id),
+                  // item_id: items.map((row) => row.Item_id),
                   picklist: items.map((row) => row.PKList_Number),
                   serial: item.ItemSerial,
                 });
@@ -1047,7 +1030,7 @@ function serialDeliveryInput() {
                   return;
                 }
 
-                console.log(`RECEIVING ITEM: ${JSON.stringify(item)}`);
+                // console.log(`RECEIVING ITEM: ${JSON.stringify(item)}`);
 
                 const rowKey = itemCode + "|" + latestInput;
                 const itemKey = itemCode + "|" + model;
@@ -1061,6 +1044,7 @@ function serialDeliveryInput() {
                   `tr[data-itemkey="${itemKey}"]`,
                 );
 
+                // console.log(`EIXSTING ROW LENGTH : ${existingRow.length}`)
                 // DUPLICATE SERIAL
                 if (existingRow.length) {
                   Swal.fire({
@@ -1082,12 +1066,14 @@ function serialDeliveryInput() {
                   .toArray()
                   .some((td) => $(td).text().trim() === latestInput);
 
+                  // console.log(`NEW ITEM : ${model} - ${serial}`)
+
                 if (!serialExisted) {
                   let serialRow = `
                     <tr style="height: 40px; min-height: 40px; cursor: pointer">
                         <td class="align-middle ps-3" style="background: #fcf7d4">${model}</td>
                         <td class="align-middle ps-3" style="background: #fcf7d4">${itemCode}</td>
-                        <td class="align-middle ps-3" style="background: #fcf7d4">${serial}</td>
+                        <td class="align-middle ps-3" style="background: #fcf7d4">${Serial}</td>
                     </tr>`;
 
                   let receivingSerialTable = $("#receiving-serial-table tbody");
@@ -1108,13 +1094,57 @@ function serialDeliveryInput() {
                 }
 
                 totalQty += qty;
-                console.log(`TOTAL QTY: ${totalQty}`);
+                // console.log(`TOTAL QTY: ${totalQty}`);
 
-                if (existingRow.length) {
-                  let currentQty =
-                    parseInt(existingRow.find("td:nth-child(5)").text()) || 0;
-                  existingRow.find("td:nth-child(5)").text(currentQty + 1);
-                  existingRow.attr("data-itemcode", itemCode);
+                // if (existingRow.length) {
+                if (existingItem.length) {
+                  serializeBtn.prop("disabled", false);
+                  let qtyCell = existingItem.find("td:nth-child(5)");
+                  let currentQty = parseInt(qtyCell.text()) || 0;
+                  qtyCell.text(currentQty + 1);
+
+                  // get existing serials
+                  let existingSerials =
+                    existingItem.attr("data-serials") || "";
+
+                  // convert to array
+                  let serialArray = existingSerials
+                    ? existingSerials.split(",").map((s) => s.trim())
+                    : [];
+
+                  // use normalized scanned serial
+                  if (!serialArray.includes(latestInput)) {
+                    serialArray.push(latestInput);
+                  }
+
+                  // remove duplicates just in case
+                  serialArray = [...new Set(serialArray)];
+
+                  // update attribute
+                  existingItem.attr(
+                    "data-serials",
+                    serialArray.join(","),
+                  );
+
+                  // update tooltip
+                  existingItem.attr(
+                    "data-bs-title",
+                    "Serials:<br>" +
+                      serialArray.join("<br>"),
+                  );
+
+                  const tooltip = bootstrap.Tooltip.getInstance(
+                    existingItem[0],
+                  );
+
+                  if (tooltip) {
+                    tooltip.setContent({
+                      ".tooltip-inner":
+                        "Serials:<br>" +
+                        serialArray.join("<br>"),
+                    });
+                  }
+                  return;
                 } else {
                   let counter =
                     receivingBody.find("tr[data-itemcode]").length + 1;
@@ -1136,21 +1166,6 @@ function serialDeliveryInput() {
                       <td class="align-middle ps-3" style="background: #fcf7d4">${qty}</td>
                     </tr>
                   `;
-
-                  // data-rownum="${itemRowNum}"
-
-                  // receivingBody.prepend(newRow);
-                  // renumberRows();
-
-                  // let emptyRow = receivingBody
-                  //   .find("tr")
-                  //   .filter(function () {
-                  //     return (
-                  //       !$(this).attr("data-itemcode") &&
-                  //       $(this).text().trim() === ""
-                  //     );
-                  //   })
-                  //   .first();
 
                   let emptyRow = receivingBody
                     .find("tr:not([data-itemcode])")

@@ -3,3 +3,5 @@
 [2026-06-16 17:00:49] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\ishiftdemo\dirs\outgoing\dashboard\actions\get_outgoing.php on line 5
 [2026-06-17 13:03:08] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShiftDemo\dirs\outgoing\dashboard\actions\get_outgoing.php on line 5
 [2026-06-17 13:03:45] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShiftDemo\dirs\outgoing\dashboard\actions\get_outgoing.php on line 5
+[2026-06-20 16:53:10] Error: [2] SQLSTATE[08S01]: [Microsoft][ODBC Driver 17 for SQL Server]TCP Provider: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond.
+ in C:\xampp\htdocs\ishiftdemo\dirs\outgoing\dashboard\actions\get_outgoing.php on line 14

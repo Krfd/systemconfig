@@ -4,7 +4,7 @@
             <h3 class="fw-bold text-primary">Loading Basket</h3>
         </div>
     </div>
-    <div id="basket_content overall-progress"></div>
+    <div id="basket_content" class="overall-progress"></div>
 </div>
 <script src="assets/js/load.js"></script>
 <script src="dirs/load/dashboard/script/dashboard.js"></script>

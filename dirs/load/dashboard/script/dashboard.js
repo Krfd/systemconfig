@@ -115,7 +115,6 @@ function loadBasket() {
           const isDisabled = item.DocStatus === "IN TRANSIT" ? "disabled" : "";
 
           const date = new Date(item.DocDate);
-          // const formatted = date.toISOString().split("T")[0];
           const formatted = date
             .toLocaleDateString("en-US", {
               month: "2-digit",
@@ -160,7 +159,6 @@ function loadBasket() {
             rows.push(["", "", "", "", "", ""]);
           }
         }
-
         if ($.fn.DataTable.isDataTable("#loadingBasketTableDisplay")) {
           $("#loadingBasketTableDisplay").DataTable().clear().destroy();
         }
@@ -221,7 +219,6 @@ function loadBasket() {
                 `);
 
               $emptyRow.css({
-                // background: "#FFFBDF",
                 background: "#fcf7d4",
                 height: "40px",
                 "min-height:": "40px",
@@ -232,7 +229,6 @@ function loadBasket() {
                   $(this).css("background", "#FFF4C2");
                 },
                 function () {
-                  // $(this).css("background", "#FFFBDF");
                   $(this).css("background", "#fcf7d4");
                 },
               );
@@ -396,8 +392,14 @@ function getBatchItems(batch, tableSelector) {
         });
 
         Object.values(groupedItems).forEach((item) => {
-          counter += 1;
+          if (item.Deliver_Qty === 0 || 
+            item.Deliver_Qty === null || 
+            item.Deliver_Qty === "") {
+            return; 
+          }
+          // console.log(`UPDATED RENDERING OF DELIVER QTY`)
 
+          counter += 1;
           totalQty += item.Deliver_Qty;
 
           let row = `

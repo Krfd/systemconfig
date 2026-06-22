@@ -65,7 +65,7 @@
                             </div>
                             <div class="table-responsive mt-5 d-flex gap-1 overflow-auto overall-progress" style="max-height: 450px">
                                 <table class="table table-hover col border border-secondary-subtle mb-0" id="receiving-form-table">
-                                    <thead>
+                                    <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary text-center">#</th>
                                             <th class="text-secondary">Brand</th>

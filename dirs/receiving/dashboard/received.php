@@ -5,7 +5,7 @@
         </div>
         <button class="btn btn-primary" type="button" onclick="receivingForm()">New</button>
     </div>
-    <div id="receiving_content"></div>
+    <div id="receiving_content" class="overall-progress"></div>
 </div>
 <script src="assets/js/load.js"></script>
 <script src="dirs/receiving/dashboard/script/receiving.js"></script>
