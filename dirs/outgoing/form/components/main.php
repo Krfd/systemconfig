@@ -8,7 +8,7 @@
                             <div class="d-flex flex-column gap-1 col-4">
                                 <div class="d-flex align-items-baseline gap-3">
                                     <label for="srnForm" class="form-label text-dark-emphasis col-2"><small>SRN:</small></label>
-                                    <input type="text" name="srnForm" id="srnForm" class="form-control form-control-sm col" style="background: #F7F7F7" readonly required>
+                                    <input type="text" name="srnForm" id="srnForm" class="form-control form-control-sm col ms-1" style="background: #F7F7F7" readonly required>
                                 </div>
                                 <div class="input-group col p-0 d-flex gap-1">
                                     <div class="col p-0 d-flex align-items-baseline gap-1 col-7">

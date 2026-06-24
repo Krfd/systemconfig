@@ -15,18 +15,6 @@
                         <form method="POST" id="frm-request-sts">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="d-flex flex-column gap-1 col-4">
-                                    <!-- <div class="input-group col p-0 d-flex gap-1">
-                                        <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
-                                            <label for="desForm" class="form-label text-dark-emphasis col-5"><small>Destination:</small></label>
-                                            <select name="desForm" id="desForm" class="form-select form-select-sm col ms-3" style="background: #FFFBDF">
-                                            </select>
-                                        </div>
-                                        <div class="col p-0 d-flex align-items-baseline">
-                                            <label for="desCodeForm" class="form-label text-dark-emphasis col-5"><small>WHCode:</small></label>
-                                            <select name="desCodeForm" id="desCodeForm" class="form-select form-select-sm col" style="background: #FFFBDF;" readonly required>
-                                            </select>
-                                        </div>
-                                    </div> -->
                                     <div class="input-group col p-0 d-flex align-items-baseline gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                             <label for="user-origin" class="form-label text-dark-emphasis col-5"><small>Origin:</small></label>
@@ -141,7 +129,7 @@
                                 </table>
                             </div>
                             <div id="totalRowOutside" class="d-flex border-top fw-bold"
-                                style="background:#FFF7BC;">
+                                style="background: #faf0aa">
                                 <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>
                                 <div class="p-2" style="width:120px;" id="totalQuantity">0</div>
                             </div>

@@ -775,12 +775,12 @@ function openIncoming(DocEntry) {
             let quantity = parseFloat(item.Request_Qty) || 0;
             totalQty += quantity;
             rows += `
-                <tr style="height: 40px; min-height: 40px">
-                  <td class="align-middle ps-3" style="background: #fcf7d4">${index + 1}</td>
+                <tr style="height: 40px; min-height: 40px; cursor: pointer">
+                  <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${index + 1}</td>
                   <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemBrand}</td>
                   <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemName}</td>
                   <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemCategory}</td>
-                  <td class="align-middle ps-3" style="background: #fcf7d4">${item.Request_Qty}</td>
+                  <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${item.Request_Qty}</td>
                 </tr>
               `;
           });

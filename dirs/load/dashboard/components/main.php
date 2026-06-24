@@ -1,5 +1,5 @@
-<div class="table-responsive-md mt-3 border border-secondary-subtle overall-progress">
-    <table class="table table-hover datatables col" id="loadingBasketTableDisplay">
+<div class="table-responsive-md mt-3 overall-progress">
+    <table class="table table-hover datatables col border border-secondary-subtle" id="loadingBasketTableDisplay">
         <thead class="sticky-top">
             <tr>
                 <th class="text-secondary text-center">#</th>

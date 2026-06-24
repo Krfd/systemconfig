@@ -9,7 +9,7 @@
                 <th class="text-secondary">Plate No.</th>
                 <th class="text-secondary">Delivery Date</th>
                 <th class="text-secondary">Status</th>
-                <th class="text-secondary">Action</th>
+                <th class="text-secondary text-center">Action</th>
             </tr>
         </thead>
         <tbody>

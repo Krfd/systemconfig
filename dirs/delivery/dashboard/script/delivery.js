@@ -13,11 +13,16 @@ $(document).ready(function () {
 function loadDashboard() {
   $.post("dirs/delivery/dashboard/components/main.php", {}, function (data) {
     $("#delivery_content").html(data);
+    $("#deliveryTableDisplay tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
     loadDelivery();
-    $("#deliveryTableDisplay").DataTable({
-      pageLength: 50,
-      order: [0, "desc"],
-    });
+    // $("#deliveryTableDisplay").DataTable({
+    //   pageLength: 50,
+    //   order: [0, "desc"],
+    // });
   });
 }
 
@@ -31,17 +36,17 @@ $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
     });
 };
 
-// DASHBOARD - FORM
-// $(document).on("dblclick", "#deliveryTableDisplay tbody tr", function (e) {
-//   if ($(e.target).closest(".dropdown").length) return;
-
-//   let DeliveryNum = $(this).find("td:nth-child(2)").text().trim();
-
-//   $("#main-content").html(spinner);
-//   setTimeout(function () {
-//     openForm(DeliveryNum);
-//   }, 200);
-// });
+function returnDelivery() {
+  $("#delivery_content").html(spinner);
+  $.post("dirs/delivery/dashboard/delivery.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+    $("#deliveryTableDisplay tbody").html(`
+        <tr>
+          <td colspan="100%" class="text-center">${spinner}</td>
+        </tr>
+      `);
+  });
+}
 
 $(document).on("click", ".print-dr", function () {
   let branches = $(this).data("branches");
@@ -50,9 +55,6 @@ $(document).on("click", ".print-dr", function () {
     decodeURIComponent($(this).attr("data-branches")),
   );
   let batchNumber = $(this).attr("data-batch");
-
-  console.log(`BATCH: ${batchNumber}`);
-  console.log("BRANCH ARRAY:", branchArray);
 
   window.open(
     `pdf/delivery.php?batch=${batchNumber}&branches=${encodeURIComponent(JSON.stringify(branchArray))}`,
@@ -70,8 +72,6 @@ function loadDelivery() {
       let rows = [];
       let header = response.Header;
       let info = response.Info;
-      // console.log(`DELIVERY INFO : ${JSON.stringify(info)}`);
-      // let existingSeries = new Set();
       let index = 1;
 
       if (response.isSuccess === "success") {
@@ -102,19 +102,10 @@ function loadDelivery() {
           };
         });
 
-        // let sortedData = response.Header.sort(
-        //   (a, b) =>
-        //     Number(b.DeliveryNumber || 0) - Number(a.DeliveryNumber || 0),
-        // );
-
-        // sortedData.forEach((item) => {
         header.forEach((item) => {
-          // console.log("AVAILABLE :", Object.keys(batchInfo));
           let branches = batchInfo[item.BatchNumber]?.branches || [];
-          // console.log(`BRANCHES : ${branches}`);
 
           let status = item.DocStatus ? item.DocStatus.toUpperCase() : "";
-          // let status = "IN TRANSIT";
           let statusClass = "";
 
           if (status === "NEW" || status === "IN TRANSIT") {
@@ -137,15 +128,9 @@ function loadDelivery() {
 
           let statusBadge = `<span class="badge ${statusClass}">${status || ""}</span>`;
 
-          // if (existingSeries.has(item.DeliveryNumber)) {
-          //   return;
-          // }
-
-          // existingSeries.add(item.DeliveryNumber);
-
           let dropdownItems = `
             <li>
-              <a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}">
+              <a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}" data-delivery-num="${item.DeliveryNumber}">
                 Open
               </a>
             </li>
@@ -169,7 +154,6 @@ function loadDelivery() {
             item.Driver,
             item.TruckCategory,
             item.TruckPlate,
-            // item.DeliveryDate || "",
             item.DeliveryDate
               ? new Date(item.DeliveryDate)
                   .toLocaleDateString("en-US", {
@@ -179,7 +163,6 @@ function loadDelivery() {
                   })
                   .replace(/\//g, "-")
               : "",
-            // item.DeliveryDate || "",
             statusBadge,
             '<div class="dropdown dropstart">' +
               '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
@@ -190,9 +173,6 @@ function loadDelivery() {
               "</div>",
           ]);
         });
-
-        // <li><a class="dropdown-item open-batch" href="#" data-batch="${item.BatchNumber}">Open</a></li>
-        // <li><a class="dropdown-item print-dr" href="#" data-batch="${item.BatchNumber}" data-branches="${encodeURIComponent(JSON.stringify(branches))}">Print DR</a></li>
 
         if (rows.length === 0) {
           for (let i = 0; i < 8; i++) {
@@ -291,13 +271,9 @@ function loadDelivery() {
 
 function loadDeliveryDashboard() {
   $("#main-content").html(spinner);
-  console.log(`DELIVERIES`);
-  setTimeout(function () {
-    $.post("dirs/delivery/dashboard/delivery.php", {}, function (data) {
-      $("#main-content").hide().html(data).fadeIn(200);
-      // console.log(`OPENING DELIVERIES`);
-    });
-  }, 200);
+  $.post("dirs/delivery/dashboard/delivery.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+  });
 }
 
 /*load Imperial Brands*/
@@ -397,55 +373,6 @@ $("#newModel").on("change", function () {
   $("#itemcode").val(selected.data("itemcode") || "");
 });
 
-// // LOADING BASKET TO LOADING ITEMS
-// $(document).on(
-//   "dblclick",
-//   "#deliveryBasketTable tbody .open-picklist",
-//   function (e) {
-//     e.preventDefault();
-//     let $row = $(this).closest("tr");
-//     let PickLst_Num = $row.attr("data-picklist");
-//     let del_num = $row.attr("data-delivery-num");
-//     deliveryPicklistNum = PickLst_Num;
-//     deliveryNum = del_num;
-
-//     $("#main-content").html(spinner);
-//     setTimeout(function () {
-//       loadDeliveryItems(PickLst_Num, del_num);
-//     }, 200);
-//   },
-// );
-
-// PICKLIST BASKET DROPDOWN TO PICKLIST ITEMS
-$(document).on("click", ".dropdown .open-picklisted", function (e) {
-  // let Picklist = $(this).closest("tr").attr("data-picklist");
-  let del_num = $(this).closest("tr").attr("data-delivery-num");
-
-  // deliveryPicklistNum = Picklist;
-  deliveryNum = del_num;
-
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    // loadDeliveryItems(Picklist, del_num);
-    loadDeliveryItems(del_num);
-  }, 200);
-});
-
-// CREATE DR FOR PICKLIST
-$(document).on("click", ".dropdown .create-dr", function (e) {
-  e.preventDefault();
-  e.stopPropagation();
-
-  let deliveryBasketRow = $(this).closest("tr");
-  let createDeliveryNumber = deliveryBasketRow.attr("data-delivery-num");
-  let picklistDr = deliveryBasketRow.attr("data-picklist");
-
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    createDr(createDeliveryNumber, picklistDr);
-  }, 200);
-});
-
 $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
   let serial = $(this).data("serial");
   let itemCode = $(this).data("itemcode");
@@ -456,12 +383,10 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
   let category = $(this).find("td:nth-child(3)").text().trim();
   let qty = $(this).find("td:nth-child(4)").text().trim();
 
-  // ✅ Prevent modal if row is empty
   if (!brand && !model && !qty) {
     return;
   }
 
-  // OPTIONAL (stronger check): ignore placeholder rows
   if ($(this).hasClass("empty-row")) {
     return;
   }
@@ -481,22 +406,9 @@ $(document).on("dblclick", "#summaryTable tbody tr", function (e) {
       if (length > 1) {
         $("#assignBranchModal").modal("show");
       }
-      //  else {
-      //   console.log("Single branch");
-      // }
     },
   );
 });
-
-// $(document).on("click", "#summaryTable tbody tr", function (e) {
-//   e.preventDefault();
-//   let serial = $(this).data("serial");
-//   console.log(`SERIAL : ${serial}`);
-
-//   let $serialCell = $("#delivery-serial-table tbody td").first();
-//   let formattedSerial = serial.split(",").join("<br>");
-//   $serialCell.html(formattedSerial);
-// });
 
 async function loadIAPBranchlist() {
   $.post("dirs/outgoing/form/actions/get_branchlist.php", {}, function (data) {
@@ -537,10 +449,9 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
     e.preventDefault(); // Prevents creating a new line
     const serialInput = $("#newSerial");
     const Serial = serialInput.val().trim();
-    // Normalize innerText
     let lines = Serial.split(/\r?\n/)
-      .map((s) => s.replace(/[\u200B\s]+/g, "").trim()) // remove zero-width + whitespace
-      .filter(Boolean); // remove empty lines
+      .map((s) => s.replace(/[\u200B\s]+/g, "").trim())
+      .filter(Boolean);
     let latestInput = lines[lines.length - 1] || "";
     let ItemCode = "";
     if (Serial) {
@@ -576,24 +487,17 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
               groupedItems[item.ItemCode].qty += 1;
             });
 
-            // items.forEach(function (item, index) {
             Object.values(groupedItems).forEach(function (item) {
               let brand = item.Brand;
               let model = item.Model;
               let category = item.Category;
               let itemCode = item.ItemCode;
               let qty = item.qty;
-              // 🚫 Skip if any required value is null/empty
               if (!brand || !model || !category || !itemCode) {
                 console.warn("Skipped item due to null/empty value:", item);
-                return; // skip this iteration
+                return;
               }
-              // totalQty += 1;
               totalQty += qty;
-              // Check if row already exists
-              // let $existingRow = $summaryTbody.find(
-              //   `tr[data-itemcode="${itemCode}"][data-branch="${branch}"]`,
-              // );
               let $existingRow = $summaryTbody.find(
                 `tr[data-itemcode="${itemCode}"]`,
               );
@@ -612,24 +516,20 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                           <td class="align-middle ps-3" style="background:#fcf7d4; padding: 3px">${qty}</td>
                         </tr>`;
                     if ($existingRow.length) {
-                      // ✅ Update quantity
                       let currentQty =
                         parseInt($existingRow.find("td:nth-child(4)").text()) ||
                         0;
                       $existingRow.find("td:nth-child(4)").text(currentQty + 1);
 
-                      // ✅ Update badge to Unassigned automatically
                       $existingRow.find("td:nth-child(5)").html(`
                           <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">
                               Unassigned
                           </span>
                       `);
 
-                      // ✅ Update data attributes if needed
                       $existingRow.attr("data-serial", latestInput);
                       $existingRow.attr("data-itemcode", itemCode);
                     } else {
-                      // ✅ CREATE NEW ROW
                       let newRow = `
                         <tr data-itemcode="${itemCode}" data-serialbased="true" data-serial="${latestInput}" data-deliverynum="${DeliveryNumber}" data-picklist="${PicklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
                           <td class="align-middle ps-3 summary-row" style="background: #fcf7d4">${brand}</td>
@@ -659,24 +559,20 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                           <td class="align-middle ps-3" style="background: #fcf7d4">${qty}</td>
                         </tr>`;
                     if ($existingRow.length) {
-                      // ✅ Update quantity
                       let currentQty =
                         parseInt($existingRow.find("td:nth-child(4)").text()) ||
                         0;
                       $existingRow.find("td:nth-child(4)").text(currentQty + 1);
 
-                      // ✅ Update badge to Unassigned automatically
                       $existingRow.find("td:nth-child(5)").html(`
                           <span class="badge bg-warning rounded-5 d-inline-block p-1 text-light">
                               Unassigned
                           </span>
                       `);
 
-                      // ✅ Update data attributes if needed
                       $existingRow.attr("data-serial", latestInput);
                       $existingRow.attr("data-itemcode", itemCode);
                     } else {
-                      // ✅ CREATE NEW ROW
                       let newRow = `
                           <tr data-itemcode="${itemCode}" data-serial="${latestInput}" data-deliverynum="${DeliveryNumber}" data-picklist="${PicklistDr}" style="height: 40px; min-height: 40px; cursor: pointer">
                             <td class="align-middle ps-3 summary-row" style="background: #fcf7d4">${brand}</td>
@@ -688,7 +584,6 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                             </td>
                           </tr>
                         `;
-                      // Replace first empty row if exists
                       let $emptyRow = $summaryTbody
                         .find("tr.empty-row")
                         .first();
@@ -715,10 +610,9 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                         let code = $(this).data("itemcode");
                         if (code == itemCode) {
                           exists = true;
-                          return false; // break loop
+                          return false;
                         }
                       });
-                      // OR SIMPLY DISABLE THE SAVE BUTTON
                       if (exists) {
                         Swal.fire({
                           icon: "error",
@@ -794,9 +688,8 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
         },
       });
     }
-    serialInput.val(""); // clear after submit
+    serialInput.val("");
     serialInput.focus();
-    // }
   });
 }
 
@@ -880,15 +773,11 @@ function branchDelivery() {
     rowCount++;
     serialRowCount++;
 
-    // Check if the row already exists for this branch + itemCode
     let $existingRow = $("#summaryDeliveryTable tbody tr").filter(function () {
       return (
         $(this).data("itemcode") == itemCode && $(this).data("branch") == branch
       );
     });
-
-    // let $emptyRow = $("#summaryDeliveryTable tbody tr.empty-row").first();
-    // let $emptySerialRow = $("#nonSerializeSummary tbody tr.empty-row").first();
 
     let newRow = $(`
       <tr data-itemcode="${itemCode}" data-branch="${branch}" style="padding: 3px; height: 40px; min-height: 40px">
@@ -954,20 +843,6 @@ function branchDelivery() {
         .text(index + 1);
     });
 
-    // if ($emptyRow.length) {
-    //   $emptyRow.replaceWith(newRow);
-    // } else {
-    //   $("#summaryDeliveryTable tbody").append(newRow);
-    // }
-
-    // if (!Serial || Serial.trim() === "") {
-    //   if ($emptySerialRow.length) {
-    //     $emptySerialRow.replaceWith(noSerialRow);
-    //   } else {
-    //     $("#nonSerializeSummary tbody").append(noSerialRow);
-    //   }
-    // }
-
     newRow.hover(
       function () {
         $(this).css("background", "#FFF4C2");
@@ -1005,7 +880,6 @@ function clearTable() {
       let row = [];
 
       $("#delivery-serial-table tbody").empty();
-      // $("#deliveryTable tbody").empty();
       $("#summaryTable tbody").empty();
       $("#summaryDeliveryTable tbody").empty();
 
@@ -1022,7 +896,6 @@ function clearTable() {
         </tr>
         `;
 
-        // $("#deliveryTable tbody").append(row);
         $("#summaryTable tbody").append(row);
         $("#summaryDeliveryTable tbody").append(row);
       }
@@ -1167,7 +1040,6 @@ function loadPicklistBranches(
             tbody.append(row);
           });
         }
-        // console.log(`BRANCHES LENGTH ${branches.length}`);
         if (callback) callback(length, branches[0].ReqBranch);
       }
     },
@@ -1178,7 +1050,6 @@ function loadPicklistBranches(
 }
 
 // NEW ITEM FOR NON-SERIALIZE
-// function addNonSerialize(ItemSerial, DrNumber, itemCode, picklistDr) {
 function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
   $("#frm-add-delivery")
     .off("submit")
@@ -1215,9 +1086,6 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
             let $summaryTbody = $("#summaryTable tbody");
 
             // ----------- SUMMARY TABLE ----------
-            // let $existingRow = $summaryTbody.find(
-            //   `tr[data-itemcode="${item.ItemCode}"][data-branch="${branch}"]`,
-            // );
             let $existingRow = $summaryTbody.find(
               `tr[data-itemcode="${item.ItemCode}"]`,
             );
@@ -1246,7 +1114,6 @@ function addNonSerialize(ItemSerial, DrNumber, picklistDr) {
               }
             }
 
-            // $("#newItemCode").val("");
             $("#newQuantity").val("");
             $("#newBrand").val("");
             $("#newModel").val("");
@@ -1311,161 +1178,6 @@ function submitBranchDelivery() {
     }).then(() => {
       branchDelivery();
       $("#assignBranchModal").modal("hide");
-    });
-  });
-}
-
-// CREATE DELIVERY
-function createDr(createDeliveryNumber, picklistDr, previousSerials = []) {
-  $.post("dirs/delivery/dashboard/createDr.php", {}, function (data) {
-    $("#main-content").hide().html(data).fadeIn(200);
-
-    loadImperialBrands();
-    serialDeliveryInput(createDeliveryNumber, picklistDr, previousSerials);
-    loadIAPBranchlist();
-    summaryData();
-
-    $(document)
-      .off("input", "#branchToDeliverModal td[contenteditable='true']")
-      .on(
-        "input",
-        "#branchToDeliverModal td[contenteditable='true']",
-        function () {
-          validateBranchAssignment();
-        },
-      );
-
-    submitBranchDelivery();
-
-    $("#newBrand").on("change", function () {
-      $("#newModel").html('<option value="">Select Model</option>');
-      $("#newCategory").val("");
-      $("#itemcode").val("");
-      loadImperialModel();
-    });
-
-    $("#newModel").on("change", function () {
-      const selected = $(this).find(":selected");
-      $("#newCategory").val(selected.data("category") || "");
-      $("#itemcode").val(selected.data("itemcode") || "");
-    });
-
-    $.ajax({
-      url: "dirs/delivery/dashboard/actions/get_review_deliveries.php",
-      type: "POST",
-      data: { DeliveryNum: createDeliveryNumber },
-      dataType: "json",
-      success: function (response) {
-        if (response.isSuccess === "success") {
-          let header = response.Data;
-
-          $("#drno").val(createDeliveryNumber);
-          // $("#srn").val(header.BaseNum_SRN);
-          $("#pcklstno").val(picklistDr);
-          $("#docdate").val(header.DocumentDate);
-          $("#origin").val(header.BDestination);
-          $("#whcode").val(header.BWhsDestination);
-          $("#status").val(header.Delivery_Status || "NEW");
-          $("#prepby").val(header.PreparedBy);
-
-          // MANUAL OR SCAN
-          function toggler() {
-            const toggler = document.getElementById("serialToggler");
-            const knob = document.querySelector(".switch-knob");
-            const manual = document.querySelector(".switch-track .manual");
-            const scan = document.querySelector(".switch-track .scan");
-            const serialInput = document.getElementById("newSerial");
-
-            function updateKnob() {
-              scan.style.transition = "opacity 0.3s ease";
-              manual.style.transition = "opacity 0.3s ease";
-
-              if (toggler.checked) {
-                toggler.dataset.value = "Scan";
-                knob.style.width = "55px";
-                knob.style.transform = "translateX(8px)";
-                scan.classList.add("text-white");
-                manual.style.opacity = "0";
-                manual.style.pointerEvents = "none";
-                scan.style.opacity = "1";
-                scan.style.pointerEvents = "auto";
-
-                serialInput.removeEventListener("keydown", preventTyping);
-              } else {
-                toggler.dataset.value = "Manual";
-                knob.style.width = "60px";
-                knob.style.transform = "translateX(0px)";
-                manual.classList.add("text-white");
-                scan.style.opacity = "0";
-                scan.style.pointerEvents = "none";
-                manual.style.opacity = "1";
-                manual.style.pointerEvents = "auto";
-
-                serialInput.removeEventListener("keydown", preventTyping);
-              }
-            }
-
-            function preventTyping(e) {
-              const allowedKeys = ["Enter", "Tab"]; // allow scanner's "Enter" or tab navigation
-              if (!allowedKeys.includes(e.key)) {
-                e.preventDefault();
-              }
-            }
-
-            updateKnob();
-
-            toggler.addEventListener("change", updateKnob);
-          }
-
-          // FOR NON-SERIALIZE ITEMS
-          const addBtn = document.getElementById("addDeliveryModalBtn");
-          const newItemModal = new bootstrap.Modal(
-            document.getElementById("addDeliveryModal"),
-          );
-
-          let allowNonserialize = false;
-
-          addBtn.addEventListener("click", function () {
-            if (allowNonserialize) {
-              newItemModal.show();
-              return;
-            }
-
-            Swal.fire({
-              title: "Enter non-serialize items?",
-              text: "Please confirm before proceeding.",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonText: "Allow",
-              cancelButtonText: "Cancel",
-            }).then((result) => {
-              if (result.isConfirmed) {
-                allowNonserialize = true;
-                newItemModal.show();
-              }
-            });
-          });
-
-          // addNonSerialize("", createDeliveryNumber, itemCode, picklistDr);
-          addNonSerialize("", createDeliveryNumber, picklistDr);
-          //   }
-          // });
-
-          function adjustTotalWidth() {
-            const summaryTable = document.getElementById("summaryTable");
-            const totalRow = document.getElementById("totalRowOutside");
-
-            if (summaryTable && totalRow) {
-              totalRow.style.width = summaryTable.offsetWidth + "px";
-            }
-          }
-
-          toggler();
-          adjustTotalWidth();
-          window.addEventListener("resize", adjustTotalWidth);
-          submitDelivery();
-        }
-      },
     });
   });
 }
@@ -1652,16 +1364,10 @@ function loadDeliveryBasketContent() {
     $("#deliveryBasketTable").DataTable().clear().destroy();
   }
   $("#main-content").html(spinner);
-  setTimeout(function () {
-    $.post(
-      "dirs/delivery/dashboard/loadDeliveryBasket.php",
-      {},
-      function (data) {
-        $("#main-content").hide().html(data).fadeIn(200);
-        loadDeliveryBasket();
-      },
-    );
-  }, 200);
+  $.post("dirs/delivery/dashboard/loadDeliveryBasket.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+    loadDeliveryBasket();
+  });
 }
 
 // DELIVERY BASKET
@@ -1838,7 +1544,6 @@ function removePicklist(picklistNum, rowNum) {
 
   Swal.fire({
     icon: "question",
-    // title: "Remove this picklist?",
     title: "Remove picklist " + picklistNum + "?",
     text: "This action cannot be change.",
     showCancelButton: true,
@@ -1848,7 +1553,6 @@ function removePicklist(picklistNum, rowNum) {
     if (result.isConfirmed) {
       $.post(
         "dirs/delivery/dashboard/actions/update_remove_pklist.php",
-        // { picklist },
         { Itm_RowNum: rowNum },
         function (data) {
           let res;
@@ -1860,7 +1564,6 @@ function removePicklist(picklistNum, rowNum) {
                 title: "Picklist has been removed",
                 confirmButtonText: "OKAY",
               });
-              // CALL LOADING BASKET HERE!
               loadDeliveryBasketContent();
             } else {
               Swla.fire({
@@ -1879,521 +1582,128 @@ function removePicklist(picklistNum, rowNum) {
   });
 }
 
-// OPEN SRN FROM LOADING ITEMS
-$(document).on("click", "#deliveryItemsTable tbody .open-srn", function (e) {
-  e.preventDefault();
+$(document)
+  .off("click", "#deliveryTableDisplay tbody .dropdown .open-batch")
+  .on(
+    "click",
+    "#deliveryTableDisplay tbody .dropdown .open-batch",
+    function (e) {
+      e.preventDefault();
 
-  let picklistedRow = $(this).closest("tr");
-  let SRN = picklistedRow.attr("data-srn-num");
-  let RowNum = "";
-  let DeliveryNum = picklistedRow.attr("data-delivery-num");
-  let PicklistNumber = picklistedRow.attr("data-picklist");
+      let DeliveryNum = $(this).data("delivery-num");
 
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    openDeliveryForm(DeliveryNum, PicklistNumber, RowNum, SRN);
-  }, 200);
-});
+      $("#main-content").html(spinner);
+      $.post("dirs/delivery/dashboard/deliveryForm.php", function (data) {
+        $("#main-content").hide().html(data).fadeIn(200);
+        $("#deliveryTable tbody").html(`
+          <tr>
+            <td colspan="100%" class="text-center">${spinner}</td>
+          </tr>
+        `);
+        openDeliveryForm(DeliveryNum);
+      });
+    },
+  );
 
-// REMOVE SRN
-$(document).on("click", "#deliveryItemsTable tbody .remove-srn", function (e) {
-  e.preventDefault();
-
-  let picklistedRow = $(this).closest("tr");
-  let SRN = picklistedRow.attr("data-srn-num");
-  removeSRN(SRN);
-});
-
-// REMOVE SRN FROM LOADING ITEMS
-function removeSRN(SRN) {
-  if (!SRN) {
-    Swal.fire({
-      icon: "error",
-      title: "Missing SRN",
-      text: "Make sure that the SRN exists!",
-      confirmButtonText: "OKAY",
-    });
-    return;
-  }
-
-  Swal.fire({
-    icon: "question",
-    title: "Remove this request?",
-    text: "This action cannot be change.",
-    showCancelButton: true,
-    confirmButtonText: "Remove",
-    cancelButtonText: "Cancel",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      $.post(
-        "dirs/delivery/dashboard/actions/update_remove_srn.php",
-        { picklist },
-        function (data) {
-          let res;
-          try {
-            res = JSON.parse(data);
-            if (res.isSuccess === "success") {
-              Swal.fire({
-                icon: "success",
-                title: "Request has been removed",
-                confirmButtonText: "OKAY",
-              });
-              // CALL LOADING BASKET HERE!
-              loadDeliveryBasketContent();
-            } else {
-              Swla.fire({
-                icon: "error",
-                title: "Failed to remove request",
-                text: res.message || "Something went wrong",
-                confirmButtonText: "OKAY",
-              });
-            }
-          } catch (err) {
-            console.error(`Error parsing response: `, err);
-          }
-        },
-      );
-    }
-  });
-}
-
-// // LOAD DELIVERY ITEMS
-// function loadDeliveryItems(PickLst_Num, del_num) {
-//   $.post("dirs/delivery/dashboard/loadDeliveryItems.php", {}, function (data) {
-//     $("#main-content").html(data);
-
-//     deliveryNum = del_num;
-
-//     $.ajax({
-//       url: "dirs/delivery/dashboard/actions/get_loading_breakdown.php",
-//       type: "POST",
-//       // data: { PickLst_Num: PickLst_Num },
-//       dataType: "json",
-//       success: function (response) {
-//         $("#picklistDeliveryDisplay").text(PickLst_Num);
-//         if (
-//           !response ||
-//           response.isSuccess !== "success" ||
-//           !Array.isArray(response.Data)
-//         ) {
-//           response = {
-//             isSuccess: "success",
-//             Data: [],
-//           };
-//         }
-//         let rows = [];
-//         if (response.isSuccess === "success") {
-//           let sortedData = response.Data.sort(
-//             (a, b) => Number(b.BaseNum_SRN || 0) - Number(a.RowNum || 0),
-//           );
-
-//           sortedData.forEach((item) => {
-//             rows.push([
-//               item.BaseNum_SRN || "",
-//               item.DocDate || "",
-//               item.ReqBranch || "",
-//               item.TotalQty || "",
-//               '<div class="dropdown dropstart">' +
-//                 '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown"> ' +
-//                 '<i class="bi bi-three-dots"></i></button>' +
-//                 `<ul class="dropdown-menu">
-//                   <li><a class="dropdown-item open-srn" href="#">Open</a></li>
-//                   <li><a class="dropdown-item remove-srn" href="#">Remove</a></li>
-//                 </ul>
-//               </div>`,
-//             ]);
-//           });
-
-//           if (rows.length === 0) {
-//             for (let i = 0; i < 8; i++) {
-//               rows.push(["", "", "", "", ""]);
-//             }
-//           }
-
-//           if ($.fn.DataTable.isDataTable("#deliveryItemsTable")) {
-//             $("#deliveryItemsTable").DataTable().clear().destroy();
-//           }
-
-//           $("#deliveryItemsTable").DataTable({
-//             data: rows,
-//             columns: [
-//               { title: "SRN", className: "text-start ps-5 open-picklist" },
-//               { title: "Date", className: "text-start ps-2" },
-//               { title: "Requesting Branch", className: "text-start ps-2" },
-//               { title: "Quantity", className: "text-start ps-2" },
-//               { title: "", orderable: false },
-//             ],
-//             createdRow: function (row, data, dataIndex) {
-//               let originalItem = sortedData[dataIndex];
-
-//               if (originalItem) {
-//                 $(row)
-//                   .attr("data-srn-num", originalItem.BaseNum_SRN)
-//                   .attr("data-picklist", PickLst_Num)
-//                   .attr("data-delivery-num", del_num);
-//               }
-//             },
-//             paging: true,
-//             searching: true,
-//             info: true,
-//             processing: false,
-//             autoWidth: false,
-//             order: [[0, "desc"]],
-//             rowCallback: function (row, data) {
-//               $("td", row).css({
-//                 background: "#FFFBDF",
-//                 padding: "3px",
-//                 height: "40px",
-//                 "min-height": "40px",
-//                 cursor: "pointer",
-//               });
-//               $("td:eq(0)", row).addClass("text-primary");
-//               $("td:eq(1)", row).css("text-align", "start");
-
-//               $(row).hover(
-//                 function () {
-//                   $(this).css("background", "#FFF4C2");
-//                 },
-//                 function () {
-//                   $(this).css("background", "#FFFBDF");
-//                 },
-//               );
-//             },
-//             drawCallback: function () {
-//               let tableBody = $("#deliveryItemsTable tbody");
-//               let currentRows = tableBody.find("tr").length;
-
-//               for (let i = currentRows; i < 8; i++) {
-//                 let $emptyRow = $(`
-//                 <tr class="empty-row" style="background: #FFFBDF">
-//                   <td colspan="5" style="background: #FFFBDF">&nbsp;</td>
-//                 </tr>
-//               `);
-//                 $emptyRow.css({
-//                   background: "#FFFBDF",
-//                   height: "40px",
-//                   "min-height": "40px",
-//                   cursor: "pointer",
-//                 });
-//                 $emptyRow.hover(
-//                   function () {
-//                     $(this).css("background", "#FFF4C2");
-//                   },
-//                   function () {
-//                     $(this).css("background", "#FFFBDF");
-//                   },
-//                 );
-//                 tableBody.append($emptyRow);
-//               }
-//             },
-//           });
-//         } else {
-//           console.error(response.Data);
-//         }
-//       },
-//       error: function (xhr, status, error) {
-//         console.error("Error loading outgoing data: ", error);
-//       },
-//     });
-//   });
-// }
-
-$(document).on("dblclick", "#deliveryItemsTable tbody tr", function (e) {
-  if ($(e.target).closest(".dropdown").length) return;
-
-  let SRN = $(this).data("srn-num");
-  let PickLst_Num = $(this).data("picklist");
-  let DeliveryNum = $(this).data("delivery-num");
-  let RowNum = "";
-
-  $("#main-content").html(spinner);
-  setTimeout(function () {
-    openDeliveryForm(DeliveryNum, PickLst_Num, RowNum, SRN);
-  }, 200);
-});
-
-// DELIVERY DASHBOARD - FORM
-function openForm(DeliveryNum) {
-  $.post("dirs/delivery/dashboard/form.php", function (data) {
-    $("#main-content").hide().html(data).fadeIn(200);
-    $.ajax({
-      url: "dirs/delivery/dashboard/actions/get_review_deliveries.php",
-      type: "POST",
-      data: { DeliveryNumber: DeliveryNum },
-      dataType: "json",
-      success: function (response) {
-        if (response.isSuccess === "success") {
-          let reviewDeliveries = $("#deliveryTable tbody");
-          let rowCount = response.Orders.length;
-          let totalQty = 0;
-          let header = response.Header;
-          let items = response.Orders;
-
-          const docDate = new Date(header.DocDate);
-          const formattedDocDate = docDate.toISOString().split("T")[0];
-
-          $("#drno").val(DeliveryNum);
-          $("#pcklstno").val(header.PickListNumber);
-          $("#docdate").val(formattedDocDate);
-          $("#origin").val(header.BranchSet);
-          // $("#whcode").val(header.BWhsDestination);
-          $("#deldate").val(header.DeliveryDate);
-
-          // $("#branchName").val(header.Origin);
-          // $("#branchWhCode").val(header.BWhsOrigin);
-          $("#status").val(header.DocStatus);
-          $("#prepby").val(header.PreparedBy) || "N/A";
-          $("#plate").val(header.TruckPlate) || "N/A";
-          $("#driver").val(header.Driver) || "N/A";
-          $("#remarks").val(header.Remarks) || "N/A";
-          let rows = "";
-
-          items.forEach(function (item, index) {
-            let quantity = parseFloat(item.Deliver_Qty) || 0;
-            totalQty += quantity;
-            rows += `
-              <tr style="height: 40px; min-height: 40px; cursor: pointer">
-                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Brand}</td>
-                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Model}</td>
-                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Category}</td>
-                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Deliver_Qty}</td>
-              </tr>
-            `;
-          });
-          $("#totalQuantity").text(totalQty);
-          reviewDeliveries.append(rows);
-
-          let currentRows = reviewDeliveries.find("tr").length;
-
-          for (let i = currentRows; i < 8; i++) {
-            let emptyRow = $(`
-                <tr class="empty-row" style="height: 45px; min-height: 45px">
-                  <td colspan="4" style="background: #fcf7d4"></td>
-                </tr>
-              `);
-
-            reviewDeliveries.append(emptyRow);
-          }
-        }
-      },
-    });
-  });
-}
-
-// OPEN DELIVERY FORM FROM DELIVERY ITEMS
-function openDeliveryForm(DeliveryNum, PicklistNumber, RowNum, SRN) {
-  $.post("dirs/delivery/dashboard/deliveryForm.php", function (data) {
-    $("#main-content").hide().html(data).fadeIn(200);
-
-    $.ajax({
-      url: "dirs/incoming/dashboard/actions/get_openincoming.php",
-      // url: "dirs/delivery/dashboard/actions/get_review_deliveries.php",
-      type: "POST",
-      data: { RowNum: RowNum },
-      // data: { DeliveryNum: DeliveryNum },
-      dataType: "json",
-      success: function (response) {
-        if (response.isSuccess === "success") {
-          $("#deliverySRN").text(SRN);
-          let rowCount = response.Items.length;
-          // let rowCount = response.DevItems.length;
-          let totalQty = 0;
-          let header = response.Data;
-          let items = response.Items;
-          // let items = response.DevItems;
-
-          $("#drno").val(DeliveryNum);
-          $("#pcklstno").val(PicklistNumber);
-          $("#docdate").val(header.DocDate);
-          $("#origin").val(header.Destination);
-          $("#whcode").val(header.DestinationWhs);
-          $("#branchName").val(header.Destination);
-          $("#branchWhCode").val(header.DestinationWhs);
-          $("#status").val(header.RequestStatus);
-          $("#prepby").val(header.PrepBy);
-          $("#plate").val("N/A");
-          $("#driver").val("N/A");
-          $("#remarks").val(header.Remarks) || "N/A";
-          let rows = "";
-          items.forEach(function (item, index) {
-            let quantity = parseFloat(item.Quantity) || 0;
-            totalQty += quantity;
-            rows += `
-              <tr style="height: 40px; min-height: 40px">
-                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Brand}</td>
-                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Model}</td>
-                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Category}</td>
-                <td class="align-middle ps-3" style="background: #fcf7d4">${item.Quantity}</td>
-              </tr>
-            `;
-          });
-          $("#totalQuantity").text(totalQty);
-          // $("#deliveryTable tbody").html(rows);
-          // if (rowCount < 8) {
-          //   let emptyRowsNeeded = 8 - rowCount;
-          //   for (let i = 0; i < emptyRowsNeeded; i++) {
-          //     let emptyRow = `
-          //       <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
-          //         <td style="background: #FFFBDF"></td>
-          //         <td style="background: #FFFBDF"></td>
-          //         <td style="background: #FFFBDF"></td>
-          //         <td style="background: #FFFBDF"></td>
-          //       </tr>
-          //     `;
-          //     $("#deliveryTable tbody").append(emptyRow);
-          //   }
-          //   $("#totalQuantity").text(totalQty);
-          // }
-        }
-      },
-    });
-  });
-}
-
-function loadDeliveryUnits() {
-  let SRN = $("#srnForm").val();
-
+function openDeliveryForm(DeliveryNum) {
+  $("#deliveryNumber").text(DeliveryNum);
   $.ajax({
-    url: "dirs/delivery/dashboard/actions/get_prepitem.php",
+    url: "dirs/delivery/dashboard/actions/get_display_delivered.php",
     type: "POST",
-    data: {
-      SRN: SRN,
-    },
+    data: { DeliverNum: DeliveryNum },
     dataType: "json",
-    beforeSend: function () {
-      // let tbody = $("#deliveryTable tbody");
-      // tbody.html(`
-      //       <tr>
-      //         <td colspan="6" class="text-center" style="background:#FFFBDF;">
-      //             <span class="spinner-border spinner-border-sm text-secondary me-2"></span>
-      //             Loading items...
-      //         </td>
-      //       </tr>
-      //   `);
-    },
     success: function (response) {
-      // let tbody = $("#deliveryTable tbody");
-      // tbody.empty(); // remove yellow placeholder row
-      if (response.isSuccess === "success" && response.Data.length > 0) {
-        let rowCount = response.Data.length;
+      if (response.isSuccess === "success") {
+        let rowCount = response.Items.length;
         let totalQty = 0;
-        console.log(`RESPONSE DATA: ${JSON.stringify(response.Data)}`);
-        // $.each(response.Data, function (index, item) {
-        //   let quantity = parseFloat(item.Quantity) || 0; // ensure number
-        //   totalQty += quantity;
+        let header = response.Header;
+        let items = response.Items;
+        let counter = 1;
 
-        // <td class="ps-2 align-middle" style="background: #FFFBDF; padding: 3px">${item.DisplayRowNumber}</td>
+        $("#drno").val(header.ReferenceNumber);
+        $("#docdate").val(header.DocDate);
+        $("#origin").val(header.OriginBranch);
+        $("#whcode").val(header.OriginWhscode);
+        $("#branchName").val(header.ReceivedBranch);
+        $("#branchWhCode").val(header.ReceivedWhscode) || "";
+        $("#deldate").val(
+          new Date(header.SysTimeStamp)
+            .toLocaleDateString("en-US", {
+              month: "2-digit",
+              day: "2-digit",
+              year: "2-digit",
+            })
+            .replace(/\//g, "-"),
+        );
 
-        //   let row = `<tr class="item-row">
-        //                 <td class="ps-2 align-middle item-brand" style="background: #FFFBDF; padding: 3px">${item.ItemBrand}</td>
-        //                 <td class="ps-2 align-middle item-model" style="background: #FFFBDF; padding: 3px">${item.ItemName}</td>
-        //                 <td class="ps-2 align-middle item-category" style="background: #FFFBDF; padding: 3px">${item.ItemGroup}</td>
-        //                 <td class="ps-2 align-middle item-code" hidden>${item.ItemCode}</td>
-        //                 <td class="ps-2 align-middle item-quantity" style="background: #FFFBDF; padding: 3px">${item.Quantity}</td>
-        //                 <td class="ps-2 align-middle t-action" style="background: #FFFBDF; padding: 3px">
-        //                   <button type="button" class="btn btn-sm btn-danger remove-item-button" id="${item.ItemNum}">
-        //                     <i class="bi bi-dash"></i>
-        //                   </button>
-        //                 </td>
-        //               </tr>
-        //             `;
-        //   tbody.append(row);
-        // });
+        $("#docdate").val(
+          new Date(header.PostingDate)
+            .toLocaleDateString("en-US", {
+              month: "2-digit",
+              day: "2-digit",
+              year: "2-digit",
+            })
+            .replace(/\//g, "-"),
+        );
+        $("#status").val(header.ReceivedStatus);
+        $("#truckCat").val(header.TruckCategory);
+        $("#plate").val(header.TruckPlate);
+        $("#driver").val(header.Driver);
+        $("#remarks").val(header.Remarks);
 
-        // if (rowCount < 8) {
-        //   let emptyRowsNeeded = 8 - rowCount;
+        items.forEach(function (item, index) {
+          let key = `${item.ItemBrand}|${item.ItemModel}`;
+          if (!groupedItems[key]) {
+            groupedItems[key] = {
+              ItemBrand: item.ItemBrand,
+              ItemModel: item.ItemModel,
+              ItemCategory: item.ItemCategory,
+              ReceivedQty: 0,
+              ItemCode: item.ItemCode,
+            };
+          }
+          groupedItems[key].ReceivedQty += parseFloat(item.ReceivedQty) || 0;
+        });
 
-        //   for (let i = 0; i < emptyRowsNeeded; i++) {
-        //     let emptyRow = `
-        //       <tr class="item-row empty-row" style="height: 40px; max-height: 40px">
-        //         <td style="background: #FFFBDF; padding: 0">&nbsp;</td>
-        //         <td style="background: #FFFBDF; padding: 0"></td>
-        //         <td style="background: #FFFBDF; padding: 0"></td>
-        //         <td style="background: #FFFBDF; padding: 0"></td>
-        //         <td style="background: #FFFBDF; padding: 0"></td>
-        //         <td style="background: #FFFBDF; padding: 0"></td>
-        //       </tr>
-        //     `;
-        //     tbody.append(emptyRow);
-        //   }
-        // }
+        let rows = "";
+
+        Object.values(groupedItems).forEach(function (item) {
+          totalQty += item.ReceivedQty;
+          rows += `
+            <tr style="height: 40px; min-height: 40px; cursor: pointer">
+              <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${counter++}</td>
+              <td class="align-middle ps-3 text-primary" style="background: #fcf7d4">${item.ItemBrand}</td>
+              <td class="align-middle ps-1" style="background: #fcf7d4">${item.ItemModel}</td>
+              <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemCategory}</td>
+              <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${parseInt(item.ReceivedQty, 10)}</td>
+            </tr>
+          `;
+        });
         $("#totalQuantity").text(totalQty);
+        $("#deliveryTable tbody").html(rows);
+
+        let deliveredTable = $("#deliveryTable tbody tr").length;
+        if (deliveredTable < 8) {
+          let emptyRowsNeeded = 8 - deliveredTable;
+          for (let i = 0; i < emptyRowsNeeded; i++) {
+            let emptyRow = `
+                  <tr class="item-row empty-row" style="height: 50px; min-height: 50px;">
+                    <td style="background:  #fcf7d4"></td>
+                    <td style="background:  #fcf7d4"></td>
+                    <td style="background:  #fcf7d4"></td>
+                    <td style="background:  #fcf7d4"></td>
+                    <td style="background:  #fcf7d4"></td>
+                  </tr>
+              `;
+            $("#deliveryTable tbody").append(emptyRow);
+          }
+        }
       } else {
-        // If no data, show empty yellow row again
-        // tbody.html(`
-        //             <tr style="height:40px; min-height:40px">
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //             </tr>
-        //             <tr style="height:40px; min-height:40px">
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //             </tr>
-        //             <tr style="height:40px; min-height:40px">
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //             </tr>
-        //             <tr style="height:40px; min-height:40px">
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //             </tr>
-        //             <tr style="height:40px; min-height:40px">
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //             </tr>
-        //             <tr style="height:40px; min-height:40px">
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //             </tr>
-        //             <tr style="height:40px; min-height:40px">
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //             </tr>
-        //             <tr style="height:40px; min-height:40px">
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //               <td style="background:#FFFBDF"></td>
-        //             </tr>
-        //         `);
+        console.error(response.error);
       }
     },
     error: function (xhr, status, error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Failed to load items.",
-      });
+      console.error(xhr.responseText);
     },
   });
 }

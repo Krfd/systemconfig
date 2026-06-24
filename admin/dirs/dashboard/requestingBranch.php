@@ -13,8 +13,8 @@
             <button class="btn btn-sm btn-success"><i class="bi bi-upload"></i> Export CSV</button>
         </div>
     </div>
-    <div class="table-responsive-md mt-3">
-        <table class="table table-hover datatables col" id="branchDetailsTableDisplay">
+    <div class="table-responsive mt-3 overflow-auto overall-progress">
+        <table class="table table-hover col border border-secondary-subtle" id="branchDetailsTableDisplay">
             <thead class="sticky-top">
                 <tr>
                     <th class="text-secondary text-center">#</th>

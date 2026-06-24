@@ -17,7 +17,7 @@
                                 <div class="d-flex flex-column gap-1 col-4">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="srn" class="form-label text-dark-emphasis col-2"><small>SRN:</small></label>
-                                        <input type="text" name="srn" id="srn" class="form-control form-control-sm col" style="background: #f7f7f7" disabled required readonly>
+                                        <input type="text" name="srn" id="srn" class="form-control form-control-sm col ms-1" style="background: #f7f7f7" disabled required readonly>
                                     </div>
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
@@ -51,15 +51,15 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive mt-5 border border-secondary-subtle" style="max-height: 450px">
-                                <table class="table table-hover mb-0 w-100" id="openIncomingTable">
+                            <div class="table-responsive mt-5 overall-progress" style="max-height: 450px">
+                                <table class="table table-hover mb-0 w-100 border border-secondary-subtle" id="openIncomingTable">
                                     <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary text-center">#</th>
                                             <th class="text-secondary">Brand</th>
                                             <th class="text-secondary">Model</th>
                                             <th class="text-secondary">Category</th>
-                                            <th class="text-secondary">Quantity</th>
+                                            <th class="text-secondary text-center">Quantity</th>
                                         </tr>
                                     </thead>
                                     <tbody>

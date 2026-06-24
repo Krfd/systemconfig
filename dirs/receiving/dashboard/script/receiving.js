@@ -353,6 +353,8 @@ function openReceivedForm(rcvdNumber) {
           let items = response.Items;
           let rowCount = response.Items.length;
           let totalQty = 0;
+          let counter = 1;
+          // let receivedTable = $("#receiving-form-table tbody tr").length;
 
           $("#rcvdNumber").text(rcvdNumber);
           $("#drNoRecForm").val(header.ReferenceNumber);
@@ -378,10 +380,26 @@ function openReceivedForm(rcvdNumber) {
           $("#plateRecForm").val(header.TruckPlate);
           $("#remarksRecForm").val(header.Remarks);
 
-          let rows = "";
           items.forEach(function (item, index) {
-            let qty = parseFloat(item.Recvd_ItemQty) || 0;
-            totalQty += qty;
+            let key = `${item.ItemBrand}|${item.ItemModel}`;
+            if (!receivingGroupedItems[key]) {
+              receivingGroupedItems[key] = {
+                ItemBrand: item.ItemBrand,
+                ItemModel: item.ItemModel,
+                ItemCategory: item.ItemCategory,
+                ReceivedQty: 0,
+                ItemCode: item.ItemCode,
+                ItemType: item.ItemType,
+              };
+            }
+            receivingGroupedItems[key].ReceivedQty +=
+              parseFloat(item.Recvd_ItemQty) || 0;
+          });
+
+          let rows = "";
+
+          Object.values(receivingGroupedItems).forEach(function (item, index) {
+            totalQty += item.ReceivedQty;
 
             let itemType = item.ItemType;
             if (itemType === "S") {
@@ -396,32 +414,30 @@ function openReceivedForm(rcvdNumber) {
                 <td style="background: #fcf7d4">${item.ItemBrand}</td>
                 <td style="background: #fcf7d4">${item.ItemModel}</td>
                 <td style="background: #fcf7d4">${item.ItemCategory}</td>
-                <td style="background: #fcf7d4" class="text-center">${Number(item.Recvd_ItemQty).toFixed(0)}</td>
+                <td style="background: #fcf7d4" class="text-center">${Number(item.ReceivedQty).toFixed(0)}</td>
                 <td style="background: #fcf7d4">${itemType}</td>
               </tr>
             `;
           });
-
           $("#totalReceivingQty").text(totalQty);
           $("#receiving-form-table tbody").html(rows);
 
-          if (rowCount < 8) {
-            let emptyRows = 8 - rowCount;
-
+          let receivedTable = $("#receiving-form-table tbody tr").length;
+          if (receivedTable < 8) {
+            let emptyRows = 8 - receivedTable;
             for (let i = 0; i < emptyRows; i++) {
               let emptyRow = `
-              <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
-                <td style="background: #fcf7d4"></td>
-                <td style="background: #fcf7d4"></td>
-                <td style="background: #fcf7d4"></td>
-                <td style="background: #fcf7d4"></td>
-                <td style="background: #fcf7d4"></td>
-                <td style="background: #fcf7d4"></td>
-              </tr>
+                <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+                  <td style="background: #fcf7d4"></td>
+                  <td style="background: #fcf7d4"></td>
+                  <td style="background: #fcf7d4"></td>
+                  <td style="background: #fcf7d4"></td>
+                  <td style="background: #fcf7d4"></td>
+                  <td style="background: #fcf7d4"></td>
+                </tr>
               `;
               $("#receiving-form-table tbody").append(emptyRow);
             }
-            $("#totalReceivingQty").text(totalQty);
           }
         } else {
           console.warn(`NO DATA FOR THIS RECEIVING FORM`);
@@ -1277,18 +1293,6 @@ function submitReceiving() {
               .filter(Boolean)
           : [];
 
-        // let item = {
-        //   itemCode: row.data("itemcode"),
-        //   brand: row.find("td:eq(1)").text().trim(),
-        //   model: row.find("td:eq(2)").text().trim(),
-        //   category: row.find("td:eq(3)").text().trim(),
-        //   qty: parseInt(row.find("td:eq(4)").text().trim()) || 0,
-        //   serialBased: row.data("serialbased") || false,
-        //   InTransitRowNum: row.data("rownum"),
-        //   serials: serials,
-        // };
-
-        // MODIFIED
         if (
           (row.data("serialbased") === true ||
             row.data("serialbased") === "true") &&
@@ -1318,8 +1322,6 @@ function submitReceiving() {
             serial: null,
           });
         }
-
-        // formData.items.push(item);
       });
 
       // VALIDATION

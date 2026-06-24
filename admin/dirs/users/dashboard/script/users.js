@@ -206,7 +206,7 @@ function loadUsers() {
         },
         rowCallback: function (row, data, index) {
           $("td", row).css({
-            background: "#FFFBDF",
+            background: "#fcf7d4",
             padding: "3px",
             height: "40px",
             "min-height": "40px",
@@ -224,7 +224,7 @@ function loadUsers() {
               $(this).css("background", "#FFF4C2");
             },
             function () {
-              $(this).css("background", "#FFFBDF");
+              $(this).css("background", "#fcf7d4");
             },
           );
         },
@@ -235,11 +235,11 @@ function loadUsers() {
           for (let i = currentRows; i < 8; i++) {
             let $emptyRow = $(`
               <tr class="empty-row">
-                <td colspan="9" style="background: #FFFBDF">&nbsp;</td>
+                <td colspan="9" style="background: #fcf7d4">&nbsp;</td>
               </tr>
             `);
             $emptyRow.css({
-              background: "#FFFBDF",
+              background: "#fcf7d4",
               height: "40px",
               "min-height": "40px",
               cursor: "pointer",
@@ -249,7 +249,7 @@ function loadUsers() {
                 $(this).css("background", "#FFF4C2");
               },
               function () {
-                $(this).css("background", "#FFFBDF");
+                $(this).css("background", "#fcf7d4");
               },
             );
             tableBody.append($emptyRow);

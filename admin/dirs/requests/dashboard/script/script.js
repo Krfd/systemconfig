@@ -56,22 +56,20 @@ function loadRequests() {
     success: function (response) {
       let rows = [];
       let items = response.Data;
-      let details = response.DriverDetails
+      let details = response.DriverDetails;
 
       let rowCount = 1;
 
-      console.log(`DETAILS: ${JSON.stringify(details)}`)
+      console.log(`DETAILS: ${JSON.stringify(details)}`);
 
       let detailMap = {};
 
-      details.forEach(detail => {
-          detailMap[detail.BatchNumber] = detail;
+      details.forEach((detail) => {
+        detailMap[detail.BatchNumber] = detail;
       });
 
       if (response.isSuccess === "success" && Array.isArray(response.Data)) {
-
         items.forEach((item, index) => {
-
           let detail = detailMap[item.BatchNumber] || {};
 
           let srn = item.SR_Number;
@@ -83,7 +81,7 @@ function loadRequests() {
           let truckPlate = detail.TruckPlate || "N/A";
           let reqDate = formatDate(item.EncodeDate);
           let recDate = formatDate(item.RecDate);
-          
+
           let status = item.RequestStatus
             ? item.RequestStatus.toUpperCase()
             : "";
@@ -94,12 +92,12 @@ function loadRequests() {
           } else if (status === "PARTIAL") {
             statusClass = "bg-warning";
           } else if (status === "PROCESSING") {
-            statusClass = "bg-info";    
+            statusClass = "bg-info";
           } else if (status === "CANCELLED") {
             statusClass = "bg-warning";
           } else if (status === "DELIVERED" || status === "RECEIVED") {
             statusClass = "bg-success";
-          } 
+          }
 
           let statusBadge = `<span class="badge ${statusClass}">${status || ""}</span>`;
 
@@ -119,49 +117,23 @@ function loadRequests() {
               '<i class="bi bi-three-dots"></i></button>' +
               '<ul class="dropdown-menu">' +
               '<li><a class="dropdown-item open-item" href="#">Open</a></li>' +
-                '<li><a class="dropdown-item cancel-outgoing" data-srn="' +
-                  item.SR_Number +
-                  '" data-entry="' +
-                  item.DocEntry +
-                  '" href="#">Cancel</a></li>' +
-                   '<li><a class="dropdown-item print-pdf" href="#" target="_blank" data-srn="' +
-                item.SR_Number +
-                '">Print</a></li>' +
-                '<li><a class="dropdown-item terminate-item" data-srn="' +
-                  item.SR_Number +
-                  '" data-entry="' +
-                  item.DocEntry +
-                  '" href="#">Terminate</a></li>' +
+              '<li><a class="dropdown-item cancel-outgoing" data-srn="' +
+              item.SR_Number +
+              '" data-entry="' +
+              item.DocEntry +
+              '" href="#">Cancel</a></li>' +
+              '<li><a class="dropdown-item print-pdf" href="#" target="_blank" data-srn="' +
+              item.SR_Number +
+              '">Print</a></li>' +
+              '<li><a class="dropdown-item terminate-item" data-srn="' +
+              item.SR_Number +
+              '" data-entry="' +
+              item.DocEntry +
+              '" href="#">Terminate</a></li>' +
               "</ul></div>",
           ]);
         });
       }
-
-      // '<div class="dropdown">' +
-      //         '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
-      //         '<i class="bi bi-three-dots"></i></button>' +
-      //         '<ul class="dropdown-menu">' +
-      //         '<li><a class="dropdown-item open-item" href="#">Open</a></li>' +
-      //         (item.RequestStatus?.toUpperCase() === "NEW"
-      //           ? '<li><a class="dropdown-item cancel-outgoing" data-srn="' +
-      //             item.SR_Number +
-      //             '" data-entry="' +
-      //             item.DocEntry +
-      //             '" href="#">Cancel</a></li>'
-      //           : "") +
-      //         (item.RequestStatus?.toUpperCase() === "PARTIAL"
-      //           ? '<li><a class="dropdown-item terminate-item" data-srn="' +
-      //             item.SR_Number +
-      //             '" data-entry="' +
-      //             item.DocEntry +
-      //             '" href="#">Terminate</a></li>'
-      //           : "") +
-      //         '<li><a class="dropdown-item print-pdf" href="#" target="_blank" data-srn="' +
-      //         item.SR_Number +
-      //         '">Print</a></li>' +
-      //         "</ul></div>",
-
-      
 
       if (rows.length === 0) {
         for (let i = 0; i < 8; i++) {
@@ -177,7 +149,6 @@ function loadRequests() {
       $("#requestsTableDisplay").DataTable({
         data: rows,
         columns: [
-          // { title: "#", visible: false },
           { title: "#", className: "text-center" },
           { title: "SRN", className: "text-center" },
           { title: "Stock Origin" },
@@ -202,7 +173,7 @@ function loadRequests() {
         },
         rowCallback: function (row, data, index) {
           $("td", row).css({
-            background: "#FFFBDF",
+            background: "#fcf7d4",
             padding: "3px",
             height: "40px",
             "min-height": "40px",
@@ -220,7 +191,7 @@ function loadRequests() {
               $(this).css("background", "#FFF4C2");
             },
             function () {
-              $(this).css("background", "#FFFBDF");
+              $(this).css("background", "#fcf7d4");
             },
           );
         },
@@ -231,11 +202,11 @@ function loadRequests() {
           for (let i = currentRows; i < 8; i++) {
             let $emptyRow = $(`
               <tr class="empty-row">
-                <td colspan="11" style="background: #FFFBDF">&nbsp;</td>
+                <td colspan="11" style="background: #fcf7d4">&nbsp;</td>
               </tr>
             `);
             $emptyRow.css({
-              background: "#FFFBDF",
+              background: "#fcf7d4",
               height: "40px",
               "min-height": "40px",
               cursor: "pointer",
@@ -245,7 +216,7 @@ function loadRequests() {
                 $(this).css("background", "#FFF4C2");
               },
               function () {
-                $(this).css("background", "#FFFBDF");
+                $(this).css("background", "#fcf7d4");
               },
             );
             tableBody.append($emptyRow);
@@ -331,11 +302,11 @@ function openRequest(DocEntry) {
             totalQty += quantity;
             rows += `
             <tr>
-              <td style="background:#FFFBDF">${index + 1}</td>
-              <td style="background:#FFFBDF">${item.ItemBrand}</td>
-              <td style="background:#FFFBDF">${item.ItemName}</td>
-              <td style="background:#FFFBDF">${item.ItemCategory}</td>
-              <td style="background:#FFFBDF">${item.Request_Qty}</td>
+              <td style="background:#fcf7d4">${index + 1}</td>
+              <td style="background:#fcf7d4">${item.ItemBrand}</td>
+              <td style="background:#fcf7d4">${item.ItemName}</td>
+              <td style="background:#fcf7d4">${item.ItemCategory}</td>
+              <td style="background:#fcf7d4">${item.Request_Qty}</td>
             </tr>
             `;
           });
@@ -349,11 +320,11 @@ function openRequest(DocEntry) {
             for (let i = 0; i < emptyRows; i++) {
               let emptyRow = `
               <tr class="item-row empty-row" style="height: 50px; min-height: 50px;">
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
-                <td style="background: #FFFBDF"></td>
+                <td style="background: #fcf7d4"></td>
+                <td style="background: #fcf7d4"></td>
+                <td style="background: #fcf7d4"></td>
+                <td style="background: #fcf7d4"></td>
+                <td style="background: #fcf7d4"></td>
               </tr>
               `;
               $("#openIncomingTable tbody").append(emptyRow);

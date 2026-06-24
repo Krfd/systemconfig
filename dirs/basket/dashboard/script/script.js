@@ -3380,8 +3380,6 @@ function serialDeliveryInput(Picklists) {
                     return;
                   }
 
-                  // console.log(`RES : ${res}`)
-
                   let totalActualPerModel =
                     parseInt(res.Data?.[0]?.Total_Actual_Item_Qty) || 0;
 
@@ -3492,7 +3490,6 @@ function serialDeliveryInput(Picklists) {
                             "#basket-serial-table tbody tr td:nth-child(3)",
                           )
                             .toArray()
-                            // .some((td) => $(td).text().trim() === Serial);
                             .some((td) => $(td).text().trim() === latestInput);
 
                           if (!serialExisted) {
@@ -3569,18 +3566,6 @@ function serialDeliveryInput(Picklists) {
                                 "<br><br>Serials:<br>" +
                                 serialArray.join("<br>"),
                             );
-
-                            // refresh tooltip instance
-                            // bootstrap.Tooltip.getInstance(
-                            //   existingItem[0],
-                            // )?.dispose();
-
-                            // new bootstrap.Tooltip(existingItem[0]);
-
-                            // console.log("UPDATED SERIALS:", serialArray);
-
-                            // data-itemid="${itemId}"
-                            //       data-picklist="${picklist}"
 
                             const tooltip = bootstrap.Tooltip.getInstance(
                               existingItem[0],

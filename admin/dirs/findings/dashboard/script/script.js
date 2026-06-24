@@ -50,10 +50,9 @@ function loadFindings() {
     success: function (response) {
       let rows = [];
       let items = response.Data;
-      let index = 1
+      let index = 1;
 
       if (response.isSuccess === "success" && Array.isArray(response.Data)) {
-
         items.forEach((item) => {
           let reference = item.reference;
           let branch = item.branch;
@@ -71,15 +70,15 @@ function loadFindings() {
 
           let encodeDate = new Date(item.docDate);
 
-let formattedEncodeDate =
-    `${String(encodeDate.getMonth() + 1).padStart(2, "0")}-` +
-    `${String(encodeDate.getDate()).padStart(2, "0")}-` +
-    `${String(encodeDate.getFullYear()).slice(-2)} ` +
-    `${String(encodeDate.getHours()).padStart(2, "0")}:` +
-    `${String(encodeDate.getMinutes()).padStart(2, "0")}:` +
-    `${String(encodeDate.getSeconds()).padStart(2, "0")}`;
+          let formattedEncodeDate =
+            `${String(encodeDate.getMonth() + 1).padStart(2, "0")}-` +
+            `${String(encodeDate.getDate()).padStart(2, "0")}-` +
+            `${String(encodeDate.getFullYear()).slice(-2)} ` +
+            `${String(encodeDate.getHours()).padStart(2, "0")}:` +
+            `${String(encodeDate.getMinutes()).padStart(2, "0")}:` +
+            `${String(encodeDate.getSeconds()).padStart(2, "0")}`;
 
-      let statusClass = "";
+          let statusClass = "";
 
           if (status === "LACKING" || status === "EXCEEDING") {
             statusClass = "bg-danger";
@@ -142,7 +141,7 @@ let formattedEncodeDate =
       $("#findingsTableDisplay").DataTable({
         data: rows,
         columns: [
-          { title: "#"},
+          { title: "#" },
           { title: "Ref. #", className: "text-center" },
           { title: "Branch" },
           { title: "Serial", className: "text-start" },
@@ -168,7 +167,7 @@ let formattedEncodeDate =
         },
         rowCallback: function (row, data, index) {
           $("td", row).css({
-            background: "#FFFBDF",
+            background: "#fcf7d4",
             padding: "3px",
             height: "40px",
             "min-height": "40px",
@@ -186,7 +185,7 @@ let formattedEncodeDate =
               $(this).css("background", "#FFF4C2");
             },
             function () {
-              $(this).css("background", "#FFFBDF");
+              $(this).css("background", "#fcf7d4");
             },
           );
         },
@@ -197,11 +196,11 @@ let formattedEncodeDate =
           for (let i = currentRows; i < 8; i++) {
             let emptyRow = $(`
               <tr class="empty-row">
-                <td colspan="13" style="background: #FFFBDF">&nbsp;</td>
+                <td colspan="13" style="background: #fcf7d4">&nbsp;</td>
               </tr>
             `);
             emptyRow.css({
-              background: "#FFFBDF",
+              background: "#fcf7d4",
               height: "40px",
               "min-height": "40px",
               cursor: "pointer",
@@ -211,7 +210,7 @@ let formattedEncodeDate =
                 $(this).css("background", "#FFF4C2");
               },
               function () {
-                $(this).css("background", "#FFFBDF");
+                $(this).css("background", "#fcf7d4");
               },
             );
             tableBody.append(emptyRow);

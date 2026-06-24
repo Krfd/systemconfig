@@ -10,8 +10,8 @@
         </ul>
     </div>
 </div>
-<div class="table-responsive-md mt-5">
-    <table class="table table-hover datatables col" id="usersTableDisplay">
+<div class="table-responsive mt-5 overall-progress overflow-auto">
+    <table class="table table-hover col border border-secondary-subtle" id="usersTableDisplay">
         <thead class="sticky-top">
             <tr>
                 <th class="text-secondary hidden"></th>

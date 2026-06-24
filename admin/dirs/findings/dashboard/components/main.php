@@ -9,21 +9,21 @@
             <h3 class="fw-semibold mt-2">
                 <i class="bi bi-truck bg-primary-subtle border-primary rounded-5 py-2 px-3"></i> Total In Transit
             </h3>
-        </div>       
+        </div>
         <div class="card shadow-sm col p-3">
             <h3 class="fw-semibold mt-2">
                 <i class="bi bi-truck-front-fill bg-success-subtle border-success rounded-5 py-2 px-3"></i> Total Trucks
             </h3>
-        </div>       
+        </div>
         <div class="card shadow-sm col p-3">
             <h3 class="fw-semibold mt-2">
                 <i class="bi bi-info-square-fill bg-info-subtle border-info rounded-5 py-3 px-3"></i> Top Missing Transactions
             </h3>
-        </div>       
+        </div>
     </div>
 </div>
-<div class="table-responsive-md mt-3">
-    <table class="table table-hover datatables col" id="findingsTableDisplay">
+<div class="table-responsive mt-3 overall-progress overflow-auto">
+    <table class="table table-hover col border border-secondary-subtle" id="findingsTableDisplay">
         <thead class="sticky-top">
             <tr>
                 <th class="text-secondary text-center">#</th>

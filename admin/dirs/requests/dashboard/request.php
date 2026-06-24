@@ -51,8 +51,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive mt-5 overflow-auto" style="max-height: 450px">
-                                <table class="table datatables" id="openIncomingTable">
+                            <div class="table-responsive mt-5 overflow-auto overall-progress" style="max-height: 450px">
+                                <table class="table table-hover border border-secondary-subtle" id="openIncomingTable">
                                     <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary">#</th>
@@ -67,7 +67,7 @@
                                 </table>
                             </div>
                             <div id="totalRowOutside" class="d-flex border-top fw-bold"
-                                style="background:#FFFBDF;">
+                                style="background:#faf0aa">
                                 <div class="p-2 flex-grow-1 text-end">
                                     Total Quantity:
                                 </div>

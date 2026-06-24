@@ -298,58 +298,58 @@ function openOutgoingForm(DocEntry) {
       </tr>
     `);
     openRequest(DocEntry);
-  })
+  });
 }
 
 function openRequest(DocEntry) {
-    $.ajax({
-      url: "dirs/outgoing/dashboard/actions/get_openrequest.php",
-      type: "POST",
-      data: { DocEntry: DocEntry },
-      dataType: "json",
-      success: function (response) {
-        if (response.isSuccess === "success") {
-          let rowCount = response.Items.length;
-          let totalQty = 0;
+  $.ajax({
+    url: "dirs/outgoing/dashboard/actions/get_openrequest.php",
+    type: "POST",
+    data: { DocEntry: DocEntry },
+    dataType: "json",
+    success: function (response) {
+      if (response.isSuccess === "success") {
+        let rowCount = response.Items.length;
+        let totalQty = 0;
 
-          let header = response.Header;
-          let items = response.Items;
+        let header = response.Header;
+        let items = response.Items;
 
-          $("#srn").val(header.SR_Number);
-          $("#destination").val(header.BranchDestination);
-          $("#branchWhCode").val(header.BranchDestination_Whscode);
-          $("#origin").val(header.BranchOrigin);
-          $("#whcode").val(header.BranchOrigin_Whscode);
+        $("#srn").val(header.SR_Number);
+        $("#destination").val(header.BranchDestination);
+        $("#branchWhCode").val(header.BranchDestination_Whscode);
+        $("#origin").val(header.BranchOrigin);
+        $("#whcode").val(header.BranchOrigin_Whscode);
 
-          $("#date").val(header.EncodeDate);
-          $("#status").val(header.RequestStatus);
-          $("#purpose").val(header.PurposeRequest);
-          $("#reqBy").val(header.RequestedBy);
-          $("#remarks").val(header.Remarks);
+        $("#date").val(header.EncodeDate);
+        $("#status").val(header.RequestStatus);
+        $("#purpose").val(header.PurposeRequest);
+        $("#reqBy").val(header.RequestedBy);
+        $("#remarks").val(header.Remarks);
 
-          let rows = "";
-          items.forEach(function (item, index) {
-            let quantity = parseFloat(item.Request_Qty) || 0;
-            totalQty += quantity;
-            rows += `
+        let rows = "";
+        items.forEach(function (item, index) {
+          let quantity = parseFloat(item.Request_Qty) || 0;
+          totalQty += quantity;
+          rows += `
             <tr>
               <td class="text-center" style="background: #fcf7d4">${index + 1}</td>
               <td class="text-start" style="background: #fcf7d4">${item.ItemBrand}</td>
               <td class="text-start" style="background: #fcf7d4">${item.ItemName}</td>
               <td class="text-start" style="background: #fcf7d4">${item.ItemCategory}</td>
-              <td class="text-start" style="background: #fcf7d4">${item.Request_Qty}</td>
+              <td class="text-center" style="background: #fcf7d4">${item.Request_Qty}</td>
             </tr>
             `;
-          });
+        });
 
-          $("#totalReqQuantity").text(totalQty);
-          $("#openIncomingTable tbody").html(rows);
+        $("#totalReqQuantity").text(totalQty);
+        $("#openIncomingTable tbody").html(rows);
 
-          if (rowCount < 6) {
-            let emptyRows = 6 - rowCount;
+        if (rowCount < 6) {
+          let emptyRows = 6 - rowCount;
 
-            for (let i = 0; i < emptyRows; i++) {
-              let emptyRow = `
+          for (let i = 0; i < emptyRows; i++) {
+            let emptyRow = `
               <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
                 <td style="background: #fcf7d4"></td>
                 <td style="background: #fcf7d4"></td>
@@ -358,18 +358,18 @@ function openRequest(DocEntry) {
                 <td style="background: #fcf7d4"></td>
               </tr>
               `;
-              $("#openIncomingTable tbody").append(emptyRow);
-            }
-            $("#totalQuantity").text(totalQty);
+            $("#openIncomingTable tbody").append(emptyRow);
           }
-        } else {
-          console.warn(`NO DATA FROM ROWNUM`);
+          $("#totalQuantity").text(totalQty);
         }
-      },
-      error: function (xhr) {
-        console.error(xhr.responseText);
-      },
-    });
+      } else {
+        console.warn(`NO DATA FROM ROWNUM`);
+      }
+    },
+    error: function (xhr) {
+      console.error(xhr.responseText);
+    },
+  });
   // });
 }
 
