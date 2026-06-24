@@ -31,8 +31,13 @@ function returnReceiving() {
 }
 
 $(document).on("dblclick", "#receivingTable tbody tr", function (e) {
-  if ($(e.target).closest(".dropdown").length) return;
+  // if ($(e.target).closest(".dropdown").length) return;
   let rcvdNumber = $(this).data("rcvdnumber");
+
+  if (!rcvdNumber) {
+    return;
+  }
+
   openReceivedForm(rcvdNumber);
 });
 
@@ -46,6 +51,7 @@ function loadReceiving() {
       let rows = [];
       let counter = 1;
       if (response.isSuccess === "success") {
+        receivingGroupedItems = {};
         data.forEach(function (item) {
           const date = new Date(item.ArrivalDate);
           const arrivalDate = date.toISOString().split("T")[0];
@@ -126,7 +132,6 @@ function loadReceiving() {
             ) {
               receivedNumber = data[1];
             }
-            // console.log(`RECEIVED NUMBER: ${receivedNumber}`);
             $(row).data("rcvdnumber", receivedNumber);
             $("td:eq(0)", row).addClass("text-center");
             $("td:eq(1)", row).addClass("text-primary ps-2");
@@ -184,7 +189,6 @@ function receivingForm() {
     userDetails();
     toggleReceivingButtons(false);
     fetchOrderDetails();
-    // receiveItem();
     formattedDate();
     loadImperialBrands();
     addNonSerialize();
@@ -354,7 +358,6 @@ function openReceivedForm(rcvdNumber) {
           let rowCount = response.Items.length;
           let totalQty = 0;
           let counter = 1;
-          // let receivedTable = $("#receiving-form-table tbody tr").length;
 
           $("#rcvdNumber").text(rcvdNumber);
           $("#drNoRecForm").val(header.ReferenceNumber);
@@ -560,8 +563,6 @@ function fetchOrderDetails() {
         success: function (response) {
           let header = response.Header;
           let items = response.Items;
-          console.log(`RECEIVING HEADER : ${JSON.stringify(header)}`);
-          console.log(`RECEIVING ITEMS : ${JSON.stringify(items)}`);
 
           if (response.Header?.Status === "failed") {
             Swal.fire({
@@ -999,7 +1000,6 @@ function serialDeliveryInput() {
                 receivingGroupedItems[item.ItemCode] = {
                   ...item,
                   qty: 0,
-                  // Item_id: null,
                   picklist: null,
                   loadedQty: 0,
                   items: [],
@@ -1009,18 +1009,14 @@ function serialDeliveryInput() {
               receivingGroupedItems[item.ItemCode]._scanId = scanId;
 
               Object.values(receivingGroupedItems).forEach(function (item) {
-                console.log(`ITEM: ${JSON.stringify(item)}`);
                 let brand = item.ItemBrand;
                 let model = item.ItemName;
                 let category = item.ItemCategory;
                 let itemCode = item.ItemCode;
-                // let itemDeliveryQty = item.Deliver_Qty;
                 let itemRowNum = item.ItemRowNum;
                 let qty = 1;
 
-                // let itemMappings = data.map((row) => ({
                 let itemMappings = items.map((row) => ({
-                  // item_id: row.Item_id,
                   picklist: row.PKList_Number,
                 }));
 
@@ -1031,7 +1027,6 @@ function serialDeliveryInput() {
                 }
 
                 receivingGroupedItems[itemCode].items.push({
-                  // item_id: items.map((row) => row.Item_id),
                   picklist: items.map((row) => row.PKList_Number),
                   serial: item.ItemSerial,
                 });
@@ -1045,13 +1040,10 @@ function serialDeliveryInput() {
                   return;
                 }
 
-                // console.log(`RECEIVING ITEM: ${JSON.stringify(item)}`);
-
                 const rowKey = itemCode + "|" + latestInput;
                 const itemKey = itemCode + "|" + model;
 
                 let existingRow = receivingBody.find(
-                  // `tr[data-itemcode="${itemCode}"]`,
                   `tr[data-rowkey="${rowKey}"]`,
                 );
 
@@ -1059,7 +1051,6 @@ function serialDeliveryInput() {
                   `tr[data-itemkey="${itemKey}"]`,
                 );
 
-                // console.log(`EIXSTING ROW LENGTH : ${existingRow.length}`)
                 // DUPLICATE SERIAL
                 if (existingRow.length) {
                   Swal.fire({
@@ -1080,8 +1071,6 @@ function serialDeliveryInput() {
                 )
                   .toArray()
                   .some((td) => $(td).text().trim() === latestInput);
-
-                // console.log(`NEW ITEM : ${model} - ${serial}`)
 
                 if (!serialExisted) {
                   let serialRow = `
@@ -1109,7 +1098,6 @@ function serialDeliveryInput() {
                 }
 
                 totalQty += qty;
-                // console.log(`TOTAL QTY: ${totalQty}`);
 
                 // if (existingRow.length) {
                 if (existingItem.length) {

@@ -2,8 +2,6 @@
 require_once "../../../../config/connection.php";
 session_start();
 
-// $data = json_decode($_POST['receivingData'], true);
-
 $rawData = $_POST['receivingData'] ?? '';
 
 if (empty($rawData)) {

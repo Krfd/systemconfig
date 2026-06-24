@@ -209,20 +209,6 @@ try {
             $allocatedQty,
             $totalQty
         ]);
-        // if (!$executedOnce) {
-        //     $stmtCollect->execute([
-        //         $User,
-        //         $itmid,
-        //         $referenceNumber,
-        //         $BatchNumber,
-        //         $picklist,
-        //         $serial,
-        //         $allocatedQty,
-        //         $totalQty
-        //     ]);
-
-        //     $executedOnce = true;
-        // }
     }
 
     $remainingQtyMap = [];

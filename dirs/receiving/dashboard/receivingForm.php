@@ -27,15 +27,15 @@
                                 <div class="d-flex flex-column gap-1 col-4">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="drNoRecForm" class="form-label text-dark-emphasis col-3"><small>DR No:</small></label>
-                                        <input type="text" name="drNoRecForm" id="drNoRecForm" class="form-control form-control-sm col search-order-field" data-field="deliveryNumber" style="background: #fcf7d4" oninput="this.value = this.value.toUpperCase()">
+                                        <input type="text" name="drNoRecForm" id="drNoRecForm" class="form-control form-control-sm col search-order-field" data-field="deliveryNumber" style="background: #f7f7f7" oninput="this.value = this.value.toUpperCase()">
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
-                                        <label for="refNoRecForm" class="form-label text-dark-emphasis col-3"><small>Reference No:</small></label>
+                                        <label for="refNoRecForm" class="form-label text-dark-emphasis col-3"><small>Stock Delivery No:</small></label>
                                         <input type="text" name="refNoRecForm" id="refNoRecForm" class="form-control form-control-sm col search-order-field" data-field="referenceNumber" style="background: #fcf7d4" oninput="this.value = this.value.toUpperCase()">
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="stockReqNoRecForm" class="form-label text-dark-emphasis col-3"><small>Stock Request No:</small></label>
-                                        <input type="text" name="stockReqNoRecForm" id="stockReqNoRecForm" class="form-control form-control-sm col search-order-field" data-field="stockReqNumber" style="background: #fcf7d4" oninput="this.value = this.value.toUpperCase()">
+                                        <input type="text" name="stockReqNoRecForm" id="stockReqNoRecForm" class="form-control form-control-sm col search-order-field" data-field="stockReqNumber" style="background: #f7f7f7" oninput="this.value = this.value.toUpperCase()">
                                     </div>
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
@@ -54,7 +54,7 @@
                                         <input type="text" name="docDateRecForm" id="docDateRecForm" class="form-control form-control-sm col" style="background: #f7f7f7" readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
-                                        <label for="postDate" class="form-label text-dark-emphasis col-4"><small>Posting Date:</small></label>
+                                        <label for="postDate" class="form-label text-dark-emphasis col-4"><small>Receiving Date:</small></label>
                                         <input type="text" name="postDate" id="postDate" class="form-control form-control-sm col" style="background: #f7f7f7" readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
@@ -158,7 +158,6 @@
                                 <div class="p-2 flex-grow-1 text-end">Total Quantity:</div>
                                 <div class="p-2" style="width:120px;" id="receivingQty">0</div>
                             </div>
-                            <!-- BOTTOM DATA -->
                             <div class="d-flex justify-content-between align-items-end mt-5">
                                 <div class="d-flex justify-content-start align-items-start gap-1 col-7">
                                     <div class="d-flex flex-column gap-1">
@@ -184,7 +183,10 @@
                                         <textarea name="remarksRecForm" id="remarksRecForm" class="form-control form-control-sm col" rows="5" style="background: #f7f7f7; height: auto;" readonly></textarea>
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-primary" id="submitRecBtn">Receive</button>
+                                <div class="d-flex gap-1">
+                                    <button type="submit" class="btn btn-primary" id="submitDraftRecBtn">Save as Draft</button>
+                                    <button type="submit" class="btn btn-primary" id="submitRecBtn">Submit</button>
+                                </div>
                             </div>
                         </form>
                     </div>

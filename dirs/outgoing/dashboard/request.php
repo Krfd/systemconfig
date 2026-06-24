@@ -17,7 +17,7 @@
                                 <div class="d-flex flex-column gap-1 col-4">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="srn" class="form-label text-dark-emphasis col-2"><small>SRN:</small></label>
-                                        <input type="text" name="srn" id="srn" class="form-control form-control-sm col ms-1" style="background: #f7f7f7" disabled required readonly>
+                                        <input type="text" name="srn" id="srn" class="form-control form-control-sm col ms-2" style="background: #f7f7f7" disabled required readonly>
                                     </div>
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
