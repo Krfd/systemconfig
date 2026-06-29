@@ -187,7 +187,7 @@ function loadBranchDetails(branch) {
           let reqBranch = routes.BranchDestination;
           let rows = [];
 
-          if (status === "NEW") {
+          if (status === "NEW" || status === "IN TRANSIT") {
             statusClass = "bg-primary";
           } else if (status === "CANCEL" || status === "TERMINATE") {
             statusClass = "bg-warning";
@@ -217,53 +217,11 @@ function loadBranchDetails(branch) {
             statusBadge,
             formattedDate,
           ]);
-
-          // rows += `
-          // let newRow = `
-          //   <tr style="height: 40px; min-height: 40px; cursor: pointer">
-          //     <td class="align-middle ps-3" style="background: #FFFBDF">${index + 1}</td>
-          //     <td class="align-middle ps-3" style="background: #FFFBDF">${srn}</td>
-          //     <td class="align-middle ps-3" style="background: #FFFBDF">${origin}</td>
-          //     <td class="align-middle ps-3" style="background: #FFFBDF">${reqBranch}</td>
-          //     <td class="align-middle ps-3" style="background: #FFFBDF">${statusBadge}</td>
-          //     <td class="align-middle ps-3" style="background: #FFFBDF">${formattedDate}</td>
-          //     <td class="align-middle ps-3" style="background: #FFFBDF">
-          //       <div class="dropdown dropstart">
-          //         <button class="btn btn-sm" type="button" data-bs-toggle="dropdown">
-          //           <i class="bi bi-three-dots"></i>
-          //         </button>
-          //         <ul class="dropdown-menu">
-          //           <li>
-          //             <a class="dropdown-item open-srn" href="#">Open</a>
-          //           </li>
-          //           <li>
-          //             <a class="dropdown-item print-srn" href="#">Print</a>
-          //           </li>
-          //         </ul>
-          //       </div>
-          //     </td>
-          //   </tr>
-          // `;
-
-          // let emptyRow = branchTable
-          //   .find("tr")
-          //   .filter(function () {
-          //     return $(this).find("td").eq(0).text().trim() === "";
-          //   })
-          //   .first();
-
-          // if (emptyRow.length) {
-          //   // emptyRow.replaceWith(rows);
-          //   emptyRow.replaceWith(newRow);
-          // } else {
-          //   // branchTable.prepend(rows);
-          //   branchTable.prepend(newRow);
-          // }
         });
 
         if (rows.length === 0) {
           for (let i = 0; i < 8; i++) {
-            rows.push(["", "", "", "", "", "", ""]);
+            rows.push(["", "", "", "", "", "", "", ""]);
           }
         }
 
@@ -282,8 +240,8 @@ function loadBranchDetails(branch) {
             { title: "Branch Code" },
             { title: "User" },
             { title: "Role" },
-            { title: "Position" },
-            { title: "Action" },
+            { title: "Position", className: "text-secondary" },
+            { title: "Action", className: "text-secondary" },
           ],
           pageLength: 8,
           paging: true,

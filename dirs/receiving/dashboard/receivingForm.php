@@ -9,13 +9,14 @@
     </div>
 </div>
 <div class="container-fluid px-4" id="receiving-page">
-    <div class="d-flex justify-content-start align-items-baseline gap-3">
-        <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="returnReceiving()">
-            <i class="bi bi-arrow-left"></i>
-        </button>
-        <div class="d-flex justify-content-start align-items-start gap-3">
+    <div class="d-flex justify-content-between align-items-baseline gap-3">
+        <div class="d-flex justify-content-start gap-3 align-items-center">
+            <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="returnReceiving()">
+                <i class="bi bi-arrow-left"></i>
+            </button>
             <h3 class="fw-bold text-primary">Receiving</h3>
         </div>
+        <button type="button" class="btn btn-primary" onclick="drafts()">Drafts</button>
     </div>
     <div class="card shadow-sm mt-2" id="dashboard-display">
         <div class="card-body">
@@ -91,7 +92,7 @@
                                             <th class="text-secondary">Brand</th>
                                             <th class="text-secondary">Model</th>
                                             <th class="text-secondary">Category</th>
-                                            <th class="text-secondary">Quantity</th>
+                                            <th class="text-secondary text-center">Quantity</th>
                                         </tr>
                                     </thead>
                                     <tbody>

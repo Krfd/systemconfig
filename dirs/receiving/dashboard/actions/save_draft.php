@@ -50,10 +50,24 @@ try {
 
     $conn->beginTransaction();
 
-    $validate = $conn->prepare("SELECT COUNT(*) FROM DraftReceivingHeader WHERE ReferenceNumber = ?");
-    $validate->execute([$DeliveryNumber]);
+    // Draft_Validation -> User and DeliveryNumber
+    // $validate = $conn->prepare("SELECT COUNT(*) FROM DraftReceivingHeader WHERE ReferenceNumber = ?");
+    // $validate->execute([$DeliveryNumber]);
 
-    if ($validate->fetchColumn() > 0) {
+    // if ($validate->fetchColumn() > 0) {
+    //     echo json_encode([
+    //         "isSuccess" => "error",
+    //         "message" => "Record already exists"
+    //     ]);
+    //     exit;
+    // }
+
+    $validate = $conn->prepare("EXEC Draft_Validation ?, ?");
+    $validate->execute([$User, $DeliveryNumber]);
+
+    $result = $validate->fetch(PDO::FETCH_ASSOC);
+
+    if ($result['IsValid']) {
         echo json_encode([
             "isSuccess" => "error",
             "message" => "Record already exists"

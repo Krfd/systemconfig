@@ -107,15 +107,13 @@ function loadIncoming() {
             statusBadge,
             // item.EncodeDate || "",
             item.EncodeDate
-              ? new Date(item.EncodeDate)
-                  .toLocaleDateString("en-US", {
-                    month: "2-digit",
-                    day: "2-digit",
-                    // year: "2-digit",
-                    year: "numeric",
-                  })
-                  .replace(/\//g, "-")
-              : "",
+              ? new Date(item.EncodeDate).toLocaleDateString("en-US", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  year: "numeric",
+                })
+              : // .replace(/\//g, "-")
+                "",
           ]);
         });
 

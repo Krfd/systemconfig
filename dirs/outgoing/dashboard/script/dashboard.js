@@ -124,14 +124,11 @@ function loadOutgoing() {
             item.BranchDestination || "",
             statusBadge,
             item.EncodeDate
-              ? new Date(item.EncodeDate)
-                  .toLocaleDateString("en-US", {
-                    month: "2-digit",
-                    day: "2-digit",
-                    // year: "2-digit",
-                    year: "numeric",
-                  })
-                  .replace(/\//g, "-")
+              ? new Date(item.EncodeDate).toLocaleDateString("en-US", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  year: "numeric",
+                })
               : "",
 
             '<div class="dropdown">' +
@@ -191,7 +188,7 @@ function loadOutgoing() {
         processing: false,
         autoWidth: false,
         language: {
-          emptyTable: "", 
+          emptyTable: "",
         },
         rowCallback: function (row, data, index) {
           $("td", row).css({
@@ -259,8 +256,8 @@ $(document).on("dblclick", "#outgoingTableDisplay tbody tr", function (e) {
 
 // TRIGGER TO OPEN A REQUEST
 $(document).on("click", ".open-item", function (e) {
-  e.preventDefault(); 
-  e.stopPropagation(); 
+  e.preventDefault();
+  e.stopPropagation();
 
   let docEntry = $(this).closest("tr").data("docentry");
   openOutgoingForm(docEntry);
@@ -306,7 +303,7 @@ function openRequest(DocEntry) {
         // let rowCount = response.Items.length;
         let totalQty = 0;
 
-        console.log(`UPDATED OUTGOING`)
+        console.log(`UPDATED OUTGOING`);
 
         let header = response.Header;
         // let items = response.Items;
@@ -318,14 +315,14 @@ function openRequest(DocEntry) {
             if (!acc[key]) {
               acc[key] = {
                 ...item,
-                Request_Qty: parseFloat(item.Request_Qty) || 0
+                Request_Qty: parseFloat(item.Request_Qty) || 0,
               };
             } else {
               acc[key].Request_Qty += parseFloat(item.Request_Qty) || 0;
             }
 
             return acc;
-          }, {})
+          }, {}),
         );
 
         let items = groupedItems;
@@ -368,15 +365,15 @@ function openRequest(DocEntry) {
         let rows = "";
 
         items.forEach(function (item, index) {
-            let quantity = parseFloat(item.Request_Qty) || 0;
-            totalQty += quantity;
+          let quantity = parseFloat(item.Request_Qty) || 0;
+          totalQty += quantity;
 
-            let badge = "";
-            if (item.PickedStatus === null || item.PickedStatus === "null") {
-                badge = `<span class="badge bg-danger">Excess</span>`;
-            }
+          let badge = "";
+          if (item.PickedStatus === null || item.PickedStatus === "null") {
+            badge = `<span class="badge bg-danger">Excess</span>`;
+          }
 
-            rows += `
+          rows += `
                 <tr>
                     <td class="text-center" style="background:#fcf7d4">${index + 1}</td>
                     <td class="text-start" style="background:#fcf7d4">${item.ItemBrand}</td>

@@ -19,18 +19,52 @@ function loadDashboard() {
         <td colspan="100%" class="text-center">${spinner}</td>
       </tr>
     `);
-    TableManager.loadReceiving();
-
-    $('#received-tab').on('shown.bs.tab', function () {
-        TableManager.loadReceiving();
-    });
-
-    $('#drafts-tab').on('shown.bs.tab', function () {
-        TableManager.loadDrafts();
-    });
-    // loadReceiving();
+    loadReceiving();
   });
 }
+
+// function loadDashboard() {
+//   $("#receiving_content").html(spinner);
+
+//   $.post("dirs/receiving/dashboard/components/main.php", {}, function (data) {
+//     $("#receiving_content")
+//       .hide()
+//       .html(data)
+//       .fadeIn(200, function () {
+//         requestAnimationFrame(() => {
+//           TableManager.loadReceiving();
+//         });
+
+//         // $("#receiving_content").html(data);
+//         //
+//         // requestAnimationFrame(() => {
+//         //   requestAnimationFrame(() => {
+//         //     TableManager.loadReceiving();
+//         //   });
+//         // });
+
+//         $("#received-tab")
+//           .off("shown.bs.tab")
+//           .on("shown.bs.tab", function () {
+//             setTimeout(() => {
+//               if ($.fn.DataTable.isDataTable("#receivingTable")) {
+//                 $("#receivingTable").DataTable().columns.adjust().draw();
+//               }
+//             }, 100);
+//           });
+
+//         $("#drafts-tab")
+//           .off("shown.bs.tab")
+//           .on("shown.bs.tab", function () {
+//             setTimeout(() => {
+//               if ($.fn.DataTable.isDataTable("#draftsTable")) {
+//                 $("#draftsTable").DataTable().columns.adjust().draw();
+//               }
+//             }, 100);
+//           });
+//       });
+//   });
+// }
 
 function returnReceiving() {
   $("#receiving_content").html(spinner);
@@ -49,542 +83,394 @@ $(document).on("dblclick", "#receivingTable tbody tr", function (e) {
   openReceivedForm(rcvdNumber);
 });
 
-// function loadReceivingContent() {
-//   if ($.fn.DataTable.isDataTable("#receivingTable")) {
-//     $("#receivingTable").DataTable().clear().destroy();
-//   }
-//   $("#receiving_content").html(spinner);
-//   $.post("dirs/receiving/dashboard/received.php", {}, function (data) {
-//     $("#main-content").hide().html(data).fadeIn(200);
-//     $("#receivingTable tbody").html(`
-//       <tr>
-//         <td colspan="100%" class="text-center">${spinner}</td>
-//       </tr>
-//     `);
-//     loadReceivingBasket(
-//       "#receivingTable",
-//       "dirs/receiving/dashboard/actions/get_received.php",
-//       "received",
-//     );
-//   });
-// }
+// window.TableManager =
+//   window.TableManager ||
+//   (function () {
+//     const loadedTables = {};
 
-// function loadReceivingBasket(tableId, url, statusFilter = null) {
-//   $.ajax({
-//     url: url,
-//     type: "POST",
-//     dataType: "json",
-//     success: function (response) {
-//       if (!response || response.isSuccess !== "success" || !Array.isArray(response.Data)) {
-//         response = {isSuccess: "success", Data: []}
+//     function loadTable({
+//       tableId,
+//       url,
+//       transform,
+//       columns,
+//       rowCallback,
+//       drawCallback,
+//     }) {
+//       // if (!$(tableId).length) {
+//       //   console.warn("Table not found:", tableId);
+//       //   return;
+//       // }
+//       if ($.fn.DataTable.isDataTable(tableId)) {
+//         console.warn("Already initialized:", tableId);
+//         return;
 //       }
-//     }
-//   })
-// }
-const TableManager = (function () {
+//       $.ajax({
+//         url,
+//         type: "POST",
+//         dataType: "json",
 
-    const loadedTables = {};
-
-    // function loadTable({ tableId, url, transform, columns }) {
-function loadTable({
-    tableId,
-    url,
-    transform,
-    columns,
-    rowCallback,
-    drawCallback
-}) {
-
-        $.ajax({
-            url,
-            type: "POST",
-            dataType: "json",
-
-            success(response) {
-
-                if (!response ||
-                    response.isSuccess !== "success" ||
-                    !Array.isArray(response.Data)) {
-                    response = { isSuccess: "success", Data: [] };
-                }
-
-                const rows = transform(response.Data);
-
-                // destroy if exists
-                if ($.fn.DataTable.isDataTable(tableId)) {
-                    $(tableId).DataTable().clear().destroy();
-                }
-
-                $(tableId).DataTable({
-                    data: rows,
-                    columns,
-                    rowCallback,
-                    drawCallback,
-                    paging: true,
-                    searching: true,
-                    info: true,
-                    autoWidth: false,
-                    processing: false,
-
-                    // rowCallback: function (row) {
-                    //     $("td:not(:first-child)", row).css({
-                    //         background: "#fcf7d4",
-                    //         padding: "3px",
-                    //         height: "40px",
-                    //         cursor: "pointer"
-                    //     });
-
-                    //     $(row).hover(
-                    //         function () {
-                    //             $(this).css("background", "#FFF4C2");
-                    //         },
-                    //         function () {
-                    //             $(this).css("background", "#fcf7d4");
-                    //         }
-                    //     );
-                    // }
-                });
-            },
-
-            error(err) {
-                console.error("Table load error:", err);
-            }
-        });
-    }
-
-    return {
-
-        loadReceiving() {
-
-            if (loadedTables.receiving) return;
-
-            loadTable({
-                tableId: "#receivingTable",
-                url: "dirs/receiving/dashboard/actions/get_received.php",
-
-                transform(data) {
-                    return data.map((item, i) => [
-                        i + 1,
-                        item.RRNo,
-                        item.ArrivalDate,
-                        item.StockOrigin,
-                        `<span class="badge bg-${
-                            item.Status === "RECEIVED" ? "success" : "warning"
-                        }">${item.Status}</span>`
-                    ]);
-                },
-
-                columns: [
-                    // { title: "#", className: "text-center" },
-                    { title: "#" },
-                    { title: "RR No." },
-                    { title: "Arrival Date" },
-                    { title: "Stock Origin" },
-                    { title: "Status" }
-                ]
-            });
-
-            loadedTables.receiving = true;
-        },
-
-        loadDrafts() {
-
-            if (loadedTables.drafts) return;
-
-            loadTable({
-                tableId: "#draftsTable",
-                url: "dirs/receiving/dashboard/actions/get_drafts.php",
-
-                transform(data) {
-                    return data.map((item, i) => [
-                        
-                        i + 1,
-                        item.ReferenceNumber,
-                        item.StockOrigin,
-                        item.ReceivedBranch,
-                        `
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-light dropdown-toggle"
-                                    data-bs-toggle="dropdown">
-                                <i class="bi bi-three-dots"></i>
-                            </button>
-
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a class="dropdown-item open-draft"
-                                       data-ref="${item.ReferenceNumber}">
-                                        Open
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        `,
-                    ]);
-                },
-
-                columns: [
-                    // { title: "#", className: "text-center" },
-                    { title: "#" },
-                    { title: "Reference No." },
-                    { title: "Stock Origin" },
-                    { title: "Destination" },
-                    { title: "" }
-                ]
-            });
-
-            loadedTables.drafts = true;
-        },
-
-        reload(tableName) {
-            loadedTables[tableName] = false;
-
-            if (tableName === "receiving") this.loadReceivingTable();
-            if (tableName === "drafts") this.loadDraftsTable();
-        }
-    };
-})();
-
-// ORIGINAL
-// function loadReceiving() {
-//   $.ajax({
-//     url: "dirs/receiving/dashboard/actions/get_received.php",
-//     type: "POST",
-//     dataType: "json",
-//     success: function (response) {
-//       let data = response.Data;
-//       let rows = [];
-//       let counter = 1;
-//       if (response.isSuccess === "success") {
-//         receivingGroupedItems = {};
-//         data.forEach(function (item) {
-//           const date = new Date(item.ArrivalDate);
-//           const arrivalDate = date.toISOString().split("T")[0];
-//           const timestamp = new Date().toLocaleString();
-
-//           const formattedTimestamp =
-//             `${String(new Date(arrivalDate).getMonth() + 1).padStart(2, "0")}-` +
-//             `${String(new Date(arrivalDate).getDate()).padStart(2, "0")}-` +
-//             `${String(new Date(arrivalDate).getFullYear()).slice(-2)} ` +
-//             `${new Date(timestamp).toLocaleTimeString()}`;
-
-//           rows.push([
-//             counter++,
-//             item.ReceivedNumber,
-//             formattedTimestamp,
-//             item.OriginBranch,
-//             (() => {
-//               let status = item.ReceivedStatus;
-//               let bgClass = "";
-//               if (status === "RECEIVED") {
-//                 bgClass = "bg-success";
-//               } else if (status === "PARTIAL") {
-//                 bgClass = "bg-warning";
-//               } else if (status === "TERMINATED") {
-//                 bgClass = "bg-secondary";
-//               }
-//               return `<span class="badge ${bgClass}">${status}</span>`;
-//             })(),
-//           ]);
-//         });
-
-//         if (rows.length < 8) {
-//           for (let i = rows.length; i < 8; i++) {
-//             rows.push(["", "", "", "", ""]);
+//         success(response) {
+//           if (
+//             !response ||
+//             response.isSuccess !== "success" ||
+//             !Array.isArray(response.Data)
+//           ) {
+//             response = { isSuccess: "success", Data: [] };
 //           }
-//         }
 
-//         if ($.fn.DataTable.isDataTable("#receivingTable")) {
-//           $("#receivingTable").DataTable().clear().destroy();
-//         }
+//           const rows = transform(response.Data);
 
-//         $("#receivingTable").DataTable({
-//           data: rows,
+//           // destroy if exists
+//           // if ($.fn.DataTable.isDataTable(tableId)) {
+//           //   $(tableId).DataTable().clear().destroy();
+//           // }
+
+//           // if (!$(tableId).length) {
+//           //   console.warn("Table not found:", tableId);
+//           //   return;
+//           // }
+
+//           // $(tableId).find("tbody").empty();
+
+//           $(tableId).DataTable({
+//             data: rows,
+//             columns,
+//             rowCallback,
+//             drawCallback,
+//             paging: true,
+//             searching: true,
+//             info: true,
+//             autoWidth: false,
+//             processing: false,
+//           });
+
+//           // const $table = $(tableId);
+
+//           // // console.log(`TABLE ID: ${tableId}`);
+
+//           // if (!$table.closest("body").length) {
+//           //   console.warn("Table not attached to DOM yet");
+//           //   return;
+//           // }
+
+//           // const dt = $table.DataTable({
+//           //   data: rows,
+//           //   columns,
+//           //   rowCallback,
+//           //   drawCallback,
+//           //   paging: true,
+//           //   searching: true,
+//           //   info: true,
+//           //   autoWidth: false,
+//           //   destroy: true,
+//           // });
+
+//           // setTimeout(() => {
+//           //   dt.columns.adjust().draw();
+//           // }, 100);
+
+//           // console.log(`UPDATED RECEIVING`);
+
+//           if (tableId === "#receivingTable") {
+//             loadedTables.receiving = true;
+//           }
+
+//           if (tableId === "#draftsTable") {
+//             loadedTables.drafts = true;
+//           }
+//         },
+
+//         error(err) {
+//           console.error("Table load error:", err);
+//         },
+//       });
+//       // loadedTables.receiving = true;
+//     }
+
+//     return {
+//       loadReceiving() {
+//         // if (loadedTables.receiving) return;
+
+//         loadTable({
+//           tableId: "#receivingTable",
+//           url: "dirs/receiving/dashboard/actions/get_received.php",
+//           transform(data) {
+//             console.log(`RECEIVED DATA: ${JSON.stringify(data)}`);
+
+//             return data.map((item, i) => {
+//               const date = new Date(item.ArrivalDate);
+
+//               const formattedTimestamp =
+//                 `${String(date.getMonth() + 1).padStart(2, "0")}-` +
+//                 `${String(date.getDate()).padStart(2, "0")}-` +
+//                 `${String(date.getFullYear()).slice(-2)} ` +
+//                 `${new Date().toLocaleTimeString()}`;
+
+//               return [
+//                 i + 1,
+//                 item.ReceivedNumber,
+//                 formattedTimestamp,
+//                 item.OriginBranch,
+//                 `<span class="badge bg-${
+//                   item.ReceivedStatus === "RECEIVED"
+//                     ? "success"
+//                     : item.ReceivedStatus === "PARTIAL"
+//                       ? "warning"
+//                       : "secondary"
+//                 }">${item.ReceivedStatus}</span>`,
+//               ];
+//             });
+//           },
+
 //           columns: [
 //             { title: "#", className: "text-center" },
 //             { title: "RR No." },
-//             { title: "Arrival Date", className: "text-start ps-3" },
-//             { title: "Stock Origin", className: "ps-3" },
-//             {
-//               title: "Status",
-//               className: "ps-3",
-//             },
+//             { title: "Arrival Date" },
+//             { title: "Stock Origin" },
+//             { title: "Status" },
 //           ],
-//           paging: true,
-//           searching: true,
-//           info: true,
-//           processing: false,
-//           autoWidth: false,
-//           order: [[0, "desc"]],
-//           rowCallback: function (row, data) {
-//             $("td:not(.empty-row)", row).css({
-//               background: "#fcf7d4",
-//               padding: "3px",
-//               height: "40px",
-//               "min-height": "40px",
-//               cursor: "pointer",
-//             });
-//             let receivedNumber = null;
-
-//             if (
-//               data &&
-//               Array.isArray(data) &&
-//               data.length > 0 &&
-//               data[0] !== null &&
-//               data[0] !== undefined &&
-//               data[0] !== ""
-//             ) {
-//               receivedNumber = data[1];
-//             }
-//             $(row).data("rcvdnumber", receivedNumber);
-//             $("td:eq(0)", row).addClass("text-center");
-//             $("td:eq(1)", row).addClass("text-primary ps-2");
-
-//             $(row).hover(
-//               function () {
-//                 $(this).css("background", "#FFF4C2");
-//               },
-//               function () {
-//                 $(this).css("background", "#fcf7d4");
-//               },
-//             );
-//           },
-//           drawCallback: function () {
-//             let tableBody = $("#receivingTable tbody");
-//             let currentRows = tableBody.find("tr").length;
-
-//             for (let i = currentRows; i < 8; i++) {
-//               let emptyRow = $(`
-//                 <tr class="empty-row">
-//                   <td colspan="5" style="background: #fcf7d4">&nbsp;</td>
-//                 </tr>
-//               `);
-
-//               emptyRow.css({
-//                 background: "#fcf7d4",
-//                 height: "40px",
-//                 "min-height": "40px",
-//               });
-
-//               emptyRow.hover(function () {
-//                 $(this).css("background", "#fcf7d4");
-//               });
-
-//               tableBody.append(emptyRow);
-//             }
-//           },
 //         });
-//       }
-//     },
-//     error: function (xhr, status, error) {
-//       console.error("Error loading receiving data: ", error);
-//     },
-//   });
-// }
 
+//         loadedTables.receiving = true;
+//       },
+
+//       loadDrafts() {
+//         if (loadedTables.drafts) return;
+
+//         loadTable({
+//           tableId: "#draftsTable",
+//           url: "dirs/receiving/dashboard/actions/get_drafts.php",
+
+//           transform(data) {
+//             console.log(`RAW: ${JSON.stringify(data)}`);
+//             // return data.map((item, i) => [
+//             //   i + 1,
+//             //   item.ReferenceNumber,
+//             //   item.StockOrigin,
+//             //   item.ReceivedBranch,
+//             //   `<div class="dropdown">
+//             //     <button class="btn btn-sm btn-light"
+//             //             data-bs-toggle="dropdown">
+//             //         <i class="bi bi-three-dots"></i>
+//             //     </button>
+
+//             //     <ul class="dropdown-menu">
+//             //         <li>
+//             //             <a class="dropdown-item open-draft"
+//             //                 data-ref="${item.ReferenceNumber}">
+//             //                 Open
+//             //             </a>
+//             //         </li>
+//             //     </ul>
+//             //   </div>`,
+//             // ]);
+
+//             const rows = data.map((item, i) => [
+//               i + 1,
+//               item.ReferenceNumber,
+//               item.OriginBranch,
+//               item.ReceivedBranch,
+//               `<div class="dropdown">
+//                 <button class="btn btn-sm btn-light"
+//                         data-bs-toggle="dropdown">
+//                     <i class="bi bi-three-dots"></i>
+//                 </button>
+
+//                 <ul class="dropdown-menu">
+//                     <li>
+//                         <a class="dropdown-item open-draft"
+//                             data-ref="${item.ReferenceNumber}">
+//                             Open
+//                         </a>
+//                     </li>
+//                 </ul>
+//               </div>`,
+//             ]);
+
+//             console.log("ROWS", rows);
+
+//             return rows;
+//           },
+
+//           columns: [
+//             // { title: "#", className: "text-center" },
+//             { title: "#" },
+//             { title: "Reference No." },
+//             { title: "Stock Origin" },
+//             { title: "Destination" },
+//             { title: "" },
+//           ],
+//         });
+
+//         // loadedTables.drafts = true;
+//       },
+
+//       // reload(tableName) {
+//       //   loadedTables[tableName] = false;
+
+//       //   if (tableName === "receiving") this.loadReceivingTable();
+//       //   if (tableName === "drafts") this.loadDraftsTable();
+//       // },
+//       reload(tableName) {
+//         loadedTables[tableName] = false;
+
+//         if (tableName === "receiving") this.loadReceiving();
+
+//         if (tableName === "drafts") this.loadDrafts();
+//       },
+//     };
+//   })();
+
+// ORIGINAL
 function loadReceiving() {
+  $.ajax({
+    url: "dirs/receiving/dashboard/actions/get_received.php",
+    type: "POST",
+    dataType: "json",
+    success: function (response) {
+      let data = response.Data;
+      let rows = [];
+      let counter = 1;
+      if (response.isSuccess === "success") {
+        data.forEach(function (item) {
+          const date = new Date(item.ArrivalDate);
+          const arrivalDate = date.toISOString().split("T")[0];
+          const timestamp = new Date().toLocaleString();
 
-    loadTable({
-        tableId: "#receivingTable",
-        url: "dirs/receiving/dashboard/actions/get_received.php",
+          const formattedTimestamp =
+            `${String(new Date(arrivalDate).getMonth() + 1).padStart(2, "0")}-` +
+            `${String(new Date(arrivalDate).getDate()).padStart(2, "0")}-` +
+            `${String(new Date(arrivalDate).getFullYear()).slice(-2)} ` +
+            `${new Date(timestamp).toLocaleTimeString()}`;
 
-        transform(data) {
+          rows.push([
+            counter++,
+            item.ReceivedNumber,
+            formattedTimestamp,
+            item.OriginBranch,
+            (() => {
+              let status = item.ReceivedStatus;
+              let bgClass = "";
+              if (status === "RECEIVED") {
+                bgClass = "bg-success";
+              } else if (status === "PARTIAL") {
+                bgClass = "bg-warning";
+              } else if (status === "TERMINATED") {
+                bgClass = "bg-secondary";
+              }
+              return `<span class="badge ${bgClass}">${status}</span>`;
+            })(),
+          ]);
+        });
 
-            let rows = [];
-            let counter = 1;
+        if (rows.length < 8) {
+          for (let i = rows.length; i < 8; i++) {
+            rows.push(["", "", "", "", ""]);
+          }
+        }
 
-            data.forEach(item => {
+        if ($.fn.DataTable.isDataTable("#receivingTable")) {
+          $("#receivingTable").DataTable().clear().destroy();
+        }
 
-                const date = new Date(item.ArrivalDate);
-                const arrivalDate = date.toISOString().split("T")[0];
-                const timestamp = new Date().toLocaleString();
-
-                const formattedTimestamp =
-                    `${String(new Date(arrivalDate).getMonth() + 1).padStart(2, "0")}-` +
-                    `${String(new Date(arrivalDate).getDate()).padStart(2, "0")}-` +
-                    `${String(new Date(arrivalDate).getFullYear()).slice(-2)} ` +
-                    `${new Date(timestamp).toLocaleTimeString()}`;
-
-                rows.push([
-                    counter++,
-                    item.ReceivedNumber,
-                    formattedTimestamp,
-                    item.OriginBranch,
-
-                    (() => {
-                        let status = item.ReceivedStatus;
-                        let bgClass = "";
-
-                        if (status === "RECEIVED") bgClass = "bg-success";
-                        else if (status === "PARTIAL") bgClass = "bg-warning";
-                        else if (status === "TERMINATED") bgClass = "bg-secondary";
-
-                        return `<span class="badge ${bgClass}">${status}</span>`;
-                    })()
-                ]);
-            });
-
-            // pad empty rows (your original behavior)
-            if (rows.length < 8) {
-                for (let i = rows.length; i < 8; i++) {
-                    rows.push(["", "", "", "", ""]);
-                }
-            }
-
-            return rows;
-        },
-
-        columns: [
+        $("#receivingTable").DataTable({
+          data: rows,
+          columns: [
             { title: "#", className: "text-center" },
             { title: "RR No." },
             { title: "Arrival Date", className: "text-start ps-3" },
             { title: "Stock Origin", className: "ps-3" },
-            { title: "Status", className: "ps-3" }
-        ],
-
-        rowCallback(row, data) {
-
+            {
+              title: "Status",
+              className: "ps-3",
+            },
+          ],
+          paging: true,
+          searching: true,
+          info: true,
+          processing: false,
+          autoWidth: false,
+          order: [[0, "desc"]],
+          rowCallback: function (row, data) {
             $("td:not(.empty-row)", row).css({
-                background: "#fcf7d4",
-                padding: "3px",
-                height: "40px",
-                "min-height": "40px",
-                cursor: "pointer"
+              background: "#fcf7d4",
+              padding: "3px",
+              height: "40px",
+              "min-height": "40px",
+              cursor: "pointer",
             });
-
             let receivedNumber = null;
 
-            if (data && Array.isArray(data) && data[0]) {
-                receivedNumber = data[1];
+            if (
+              data &&
+              Array.isArray(data) &&
+              data.length > 0 &&
+              data[0] !== null &&
+              data[0] !== undefined &&
+              data[0] !== ""
+            ) {
+              receivedNumber = data[1];
             }
-
             $(row).data("rcvdnumber", receivedNumber);
-
             $("td:eq(0)", row).addClass("text-center");
             $("td:eq(1)", row).addClass("text-primary ps-2");
 
             $(row).hover(
-                function () {
-                    $(this).css("background", "#FFF4C2");
-                },
-                function () {
-                    $(this).css("background", "#fcf7d4");
-                }
+              function () {
+                $(this).css("background", "#FFF4C2");
+              },
+              function () {
+                $(this).css("background", "#fcf7d4");
+              },
             );
-        },
-
-        drawCallback() {
-
+          },
+          drawCallback: function () {
             let tableBody = $("#receivingTable tbody");
             let currentRows = tableBody.find("tr").length;
 
             for (let i = currentRows; i < 8; i++) {
+              let emptyRow = $(`
+                <tr class="empty-row">
+                  <td colspan="5" style="background: #fcf7d4">&nbsp;</td>
+                </tr>
+              `);
 
-                let emptyRow = $(`
-                    <tr class="empty-row">
-                        <td colspan="5" style="background:#fcf7d4">&nbsp;</td>
-                    </tr>
-                `);
-
-                emptyRow.css({
-                    background: "#fcf7d4",
-                    height: "40px"
-                });
-
-                tableBody.append(emptyRow);
-            }
-        }
-    });
-}
-
-function loadDrafts() {
-
-    loadTable({
-        tableId: "#draftsTable",
-        url: "dirs/receiving/dashboard/actions/get_drafts.php",
-
-        transform(data) {
-
-            let rows = [];
-            let counter = 1;
-
-            data.forEach(item => {
-
-                rows.push([
-
-                    // ROW NUMBER
-                    counter++,
-
-                    // DATA FIELDS
-                    item.ReferenceNumber || "",
-                    item.StockOrigin || "",
-                    item.ReceivedBranch || "",
-                    // ACTION COLUMN (dropdown)
-                    `
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-light dropdown-toggle"
-                                data-bs-toggle="dropdown">
-                            <i class="bi bi-three-dots"></i>
-                        </button>
-
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a class="dropdown-item open-draft"
-                                   href="#"
-                                   data-ref="${item.ReferenceNumber}">
-                                    Open
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    `,
-                ]);
-            });
-
-            return rows;
-        },
-
-        columns: [
-            { title: "#", className: "text-center" },
-            { title: "Reference No." },
-            { title: "Stock Origin" },
-            { title: "Destination" },
-            { title: "" },
-        ],
-
-        rowCallback(row, data) {
-
-            $("td:not(:first-child)", row).css({
+              emptyRow.css({
                 background: "#fcf7d4",
-                padding: "3px",
                 height: "40px",
-                cursor: "pointer"
-            });
+                "min-height": "40px",
+              });
 
-            $(row).hover(
-                function () {
-                    $(this).css("background", "#FFF4C2");
-                },
-                function () {
-                    $(this).css("background", "#fcf7d4");
-                }
-            );
+              emptyRow.hover(function () {
+                $(this).css("background", "#fcf7d4");
+              });
 
-            // optional: attach metadata
-            $(row).data("ref", data[2]);
-        }
-    });
+              tableBody.append(emptyRow);
+            }
+          },
+        });
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("Error loading receiving data: ", error);
+    },
+  });
 }
 
-function receivingForm() {
-  
+function receivingForm(reference = null) {
   $("#main-content").html(spinner);
-  
+
   $.post("dirs/receiving/dashboard/receivingForm.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
 
     userDetails();
     toggleReceivingButtons(false);
-    fetchOrderDetails();
+    // fetchOrderDetails();
+    if (reference !== null) {
+      fetchOrderDetails(reference);
+    } else {
+      fetchOrderDetails();
+    }
     formattedDate();
     loadImperialBrands();
     addNonSerialize();
@@ -710,6 +596,11 @@ function receivingForm() {
     adjustTotalWidth();
     window.addEventListener("resize", adjustTotalWidth);
     submitReceiving();
+
+    // // Load draft only when a reference is provided
+    // if (reference !== null) {
+    //   loadDraft(reference);
+    // }
   });
 }
 
@@ -718,106 +609,107 @@ function autoSaveDraft() {
   console.log($("#receiving-form-table tbody tr[data-itemcode]").length);
 
   const formData = buildReceivingData();
-  console.log(`FORM DATA : ${JSON.stringify(formData)}`)
+  console.log(`FORM DATA : ${JSON.stringify(formData)}`);
 
-  let draftBtn = $("#submitDraftRecBtn");  
+  let draftBtn = $("#submitDraftRecBtn");
   let submitBtn = $("#submitRecBtn");
 
   return $.ajax({
-      url: "dirs/receiving/dashboard/actions/save_draft.php",
-      type: "POST",
-      data: {
-        receivingData: JSON.stringify(formData),
-      },
-      dataType: "json",
-      beforeSend: function () {
-        draftBtn
-          .prop("disabled", true)
-          .html(`<span class="spinner-border spinner-border-sm"></span> Processing`);
-          submitBtn
-          .prop("disabled", true)
-      },
-      success: function (response) {
-        draftBtn.prop("disabled", false).html("Save as Draft");
-        submitBtn.prop("disabled", false);
-        if (response.isSuccess === "success") {
-          Swal.fire({
-            icon: "success",
-            title: "Items has been saved as draft",
-          })
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: response.message || "Submission failed",
-          });
-        }
-      },
-      error: function () {
-        draftBtn.prop("disabled", false).html("Save as Draft");
-        submitBtn.prop("disabled", false);
+    url: "dirs/receiving/dashboard/actions/save_draft.php",
+    type: "POST",
+    data: {
+      receivingData: JSON.stringify(formData),
+    },
+    dataType: "json",
+    beforeSend: function () {
+      draftBtn
+        .prop("disabled", true)
+        .html(
+          `<span class="spinner-border spinner-border-sm"></span> Processing`,
+        );
+      submitBtn.prop("disabled", true);
+    },
+    success: function (response) {
+      draftBtn.prop("disabled", false).html("Save as Draft");
+      submitBtn.prop("disabled", false);
+      if (response.isSuccess === "success") {
+        Swal.fire({
+          icon: "success",
+          title: "Items has been saved as draft",
+        });
+      } else {
         Swal.fire({
           icon: "error",
-          title: "Something went wrong",
+          title: response.message || "Submission failed",
         });
-      },
+      }
+    },
+    error: function () {
+      draftBtn.prop("disabled", false).html("Save as Draft");
+      submitBtn.prop("disabled", false);
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+      });
+    },
   });
 }
 
 function buildReceivingData() {
-    let formData = {
-        DeliveryNumber: $("#drNoRecForm").val(),
-        Branchorigin: $('input[name="originRecForm"]').val(),
-        BranchWhscode: $('input[name="origRecForm"]').val(),
-        ReceivingDate: $("#docDateRecForm").val(),
-        PostingDate: $("#postDate").val(),
-        Driver: $("#driverRecForm").val(),
-        TruckCategory: $("#truckCat").val(),
-        TruckPlate: $("#plateRecForm").val(),
-        Remarks: $("#remarksRecForm").val(),
-        ReceivedQty: $("#receivingQty").text(),
-        items: [],
-    };
+  let formData = {
+    DeliveryNumber: $("#drNoRecForm").val(),
+    Branchorigin: $('input[name="originRecForm"]').val(),
+    BranchWhscode: $('input[name="origRecForm"]').val(),
+    ReceivingDate: $("#docDateRecForm").val(),
+    PostingDate: $("#postDate").val(),
+    Driver: $("#driverRecForm").val(),
+    TruckCategory: $("#truckCat").val(),
+    TruckPlate: $("#plateRecForm").val(),
+    Remarks: $("#remarksRecForm").val(),
+    ReceivedQty: $("#receivingQty").text(),
+    items: [],
+  };
 
-    $("#receiving-form-table tbody tr[data-itemcode]").each(function () {
-        let row = $(this);
+  $("#receiving-form-table tbody tr[data-itemcode]").each(function () {
+    let row = $(this);
 
-        let serials = (row.attr("data-serials") || "")
-            .split(",")
-            .map(s => s.trim())
-            .filter(Boolean);
+    let serials = (row.attr("data-serials") || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
 
-        if (
-            (row.data("serialbased") === true ||
-                row.data("serialbased") === "true") &&
-            serials.length > 0
-        ) {
-            serials.forEach(serial => {
-                formData.items.push({
-                    itemCode: row.data("itemcode"),
-                    brand: row.find("td:eq(1)").text().trim(),
-                    model: row.find("td:eq(2)").text().trim(),
-                    category: row.find("td:eq(3)").text().trim(),
-                    qty: 1,
-                    serialBased: true,
-                    InTransitRowNum: row.data("rownum"),
-                    serial: serial,
-                });
-            });
-        } else {
-            formData.items.push({
-                itemCode: row.data("itemcode"),
-                brand: row.find("td:eq(1)").text().trim(),
-                model: row.find("td:eq(2)").text().trim(),
-                category: row.find("td:eq(3)").text().trim(),
-                qty: parseInt(row.find("td:eq(4)").text().trim()) || 0,
-                serialBased: false,
-                InTransitRowNum: row.data("rownum"),
-                serial: null,
-            });
-        }
-    });
+    if (
+      (row.data("serialbased") === true ||
+        row.data("serialbased") === "true") &&
+      serials.length > 0
+    ) {
+      serials.forEach((serial) => {
+        formData.items.push({
+          itemCode: row.data("itemcode"),
+          brand: row.find("td:eq(1)").text().trim(),
+          model: row.find("td:eq(2)").text().trim(),
+          category: row.find("td:eq(3)").text().trim(),
+          qty: 1,
+          serialBased: true,
+          InTransitRowNum: row.data("rownum"),
+          serial: serial,
+        });
+      });
+    } else {
+      formData.items.push({
+        itemCode: row.data("itemcode"),
+        brand: row.find("td:eq(1)").text().trim(),
+        model: row.find("td:eq(2)").text().trim(),
+        category: row.find("td:eq(3)").text().trim(),
+        qty: parseInt(row.find("td:eq(4)").text().trim()) || 0,
+        serialBased: false,
+        InTransitRowNum: row.data("rownum"),
+        serial: null,
+      });
+    }
+  });
 
-    return formData;
+  return formData;
 }
 
 function formatDateMMDDYY(dateString) {
@@ -1022,105 +914,340 @@ function userDetails() {
   });
 }
 
-function fetchOrderDetails() {
-  $(".search-order-field").on("keydown", function (e) {
-    if (e.key === "Enter") {
+function fetchOrderDetails(reference = null) {
+  if (reference !== null) {
+    getOrderDetails("referenceNumber", reference);
+    getOrders(reference);
+  }
+
+  // $(".search-order-field").on("keydown", function (e) {
+  //   if (e.key === "Enter") {
+  //     e.preventDefault();
+  //     e.stopPropagation();
+
+  //     let value = $(this).val().trim();
+  //     let field = $(this).data("field");
+
+  //     if (!field) {
+  //       toggleReceivingButtons(false);
+  //       Swal.fire({
+  //         icon: "warning",
+  //         title: "Please enter DR No.",
+  //       });
+  //       return;
+  //     }
+  //     toggleReceivingButtons(false);
+
+  //     $.ajax({
+  //       url: "dirs/receiving/dashboard/actions/get_reviewdeliveryitems.php",
+  //       type: "POST",
+  //       data: {
+  //         searchType: field,
+  //         searchValue: value,
+  //       },
+  //       dataType: "json",
+  //       beforeSend: function () {
+  //         $("#submitRecBtn").prop("disabled", true);
+  //         $("#receivingLoader").removeClass("d-none");
+  //       },
+  //       success: function (response) {
+  //         let header = response.Header;
+  //         let items = response.Items;
+  //         currentOrder.requests = response.Requests;
+
+  //         if (response.Header?.Status === "failed") {
+  //           Swal.fire({
+  //             icon: "error",
+  //             title: "Error fetching delivery details.",
+  //           });
+  //           return;
+  //         }
+
+  //         if (response.isSuccess === "success") {
+  //           if (field !== "deliveryNumber") {
+  //             $("#drNoRecForm").val(header.DeliveryNumber);
+  //           }
+  //           $("#originRecForm").val(items[0].OriginBranch);
+  //           if (field === "deliveryNumber") {
+  //             $("#refNoRecForm").val(items[0].ReferenceNumber);
+  //             $("#stockReqNoRecForm").val(items[0].SR_Number);
+  //           } else {
+  //             $("#refNoRecForm").val(items[0].ReferenceNumber);
+  //             $("#stockReqNoRecForm").val(items[0].SR_Number);
+  //           }
+
+  //           $("#docDateRecForm").val(
+  //             header.DeliveryDate
+  //               ? formatDateMMDDYY(header.DeliveryDate).replace(/-/g, "/")
+  //               : "",
+  //           );
+
+  //           $("#statusRecForm").val(header.DocStatus);
+
+  //           $("#driverRecForm").val(header.Driver || "");
+  //           $("#truckCat").val(header.TruckCategory || "");
+  //           $("#plateRecForm").val(header.TruckPlate || "");
+  //           $("#remarksRecForm").val(header.Remarks || "");
+  //           toggleReceivingButtons(true);
+  //         } else {
+  //           toggleReceivingButtons(false);
+
+  //           let errorMessage = "";
+
+  //           if (response.isSuccess === "received") {
+  //             errorMessage = response.message;
+  //           } else {
+  //             errorMessage = "Invalid reference number";
+  //           }
+
+  //           Swal.fire({
+  //             icon: "error",
+  //             title: errorMessage,
+  //           });
+  //           return;
+  //         }
+  //       },
+  //       error: function () {
+  //         Swal.fire({
+  //           icon: "error",
+  //           title: "Error fetching DR data.",
+  //         });
+  //       },
+  //       complete: function () {
+  //         $("#submitRecBtn").prop("disabled", false);
+  //         $("#receivingLoader").addClass("d-none");
+  //       },
+  //     });
+  //     return false;
+  //   }
+  // });
+
+  $(".search-order-field")
+    .off("keydown.fetchOrder")
+    .on("keydown.fetchOrder", function (e) {
+      if (e.key !== "Enter") return;
+
       e.preventDefault();
       e.stopPropagation();
 
-      let value = $(this).val().trim();
-      let field = $(this).data("field");
+      const value = $(this).val().trim();
+      const field = $(this).data("field");
 
       if (!field) {
         toggleReceivingButtons(false);
+
         Swal.fire({
           icon: "warning",
           title: "Please enter DR No.",
         });
+
         return;
       }
-      toggleReceivingButtons(false);
 
-      $.ajax({
-        url: "dirs/receiving/dashboard/actions/get_reviewdeliveryitems.php",
-        type: "POST",
-        data: {
-          searchType: field,
-          searchValue: value,
-        },
-        dataType: "json",
-        beforeSend: function () {
-          $("#submitRecBtn").prop("disabled", true);
-          $("#receivingLoader").removeClass("d-none");
-        },
-        success: function (response) {
-          let header = response.Header;
-          let items = response.Items;
-          currentOrder.requests = response.Requests;
+      getOrderDetails(field, value);
+    });
+}
 
-          if (response.Header?.Status === "failed") {
-            Swal.fire({
-              icon: "error",
-              title: "Error fetching delivery details.",
-            });
-            return;
-          }
+function getOrderDetails(field, value) {
+  toggleReceivingButtons(false);
 
-          if (response.isSuccess === "success") {
-            if (field !== "deliveryNumber") {
-              $("#drNoRecForm").val(header.DeliveryNumber);
-            }
-            $("#originRecForm").val(items[0].OriginBranch);
-            if (field === "deliveryNumber") {
-              $("#refNoRecForm").val(items[0].ReferenceNumber);
-              $("#stockReqNoRecForm").val(items[0].SR_Number);
-            } else {
-              $("#refNoRecForm").val(items[0].ReferenceNumber);
-              $("#stockReqNoRecForm").val(items[0].SR_Number);
-            }
+  $.ajax({
+    url: "dirs/receiving/dashboard/actions/get_reviewdeliveryitems.php",
+    type: "POST",
+    data: {
+      searchType: field,
+      searchValue: value,
+    },
+    dataType: "json",
+    beforeSend: function () {
+      $("#submitRecBtn").prop("disabled", true);
+      $("#receivingLoader").removeClass("d-none");
+    },
+    success: function (response) {
+      let header = response.Header;
+      let items = response.Items;
+      currentOrder.requests = response.Requests;
 
-            $("#docDateRecForm").val(
-              header.DeliveryDate ? formatDateMMDDYY(header.DeliveryDate).replace(/-/g, "/") : "",
-            );
+      if (response.Header?.Status === "failed") {
+        Swal.fire({
+          icon: "error",
+          title: "Error fetching delivery details.",
+        });
+        return;
+      }
 
-            $("#statusRecForm").val(header.DocStatus);
+      if (response.isSuccess === "success") {
+        $("#drNoRecForm").val(header.DeliveryNumber);
+        $("#originRecForm").val(items[0].OriginBranch);
+        $("#refNoRecForm").val(items[0].ReferenceNumber);
+        $("#stockReqNoRecForm").val(items[0].SR_Number);
 
-            $("#driverRecForm").val(header.Driver || "");
-            $("#truckCat").val(header.TruckCategory || "");
-            $("#plateRecForm").val(header.TruckPlate || "");
-            $("#remarksRecForm").val(header.Remarks || "");
-            toggleReceivingButtons(true);
-          } else {
-            toggleReceivingButtons(false);
+        $("#docDateRecForm").val(
+          header.DeliveryDate
+            ? formatDateMMDDYY(header.DeliveryDate).replace(/-/g, "/")
+            : "",
+        );
 
-            let errorMessage = "";
+        $("#statusRecForm").val(header.DocStatus);
+        $("#driverRecForm").val(header.Driver || "");
+        $("#truckCat").val(header.TruckCategory || "");
+        $("#plateRecForm").val(header.TruckPlate || "");
+        $("#remarksRecForm").val(header.Remarks || "");
 
-            if (response.isSuccess === "received") {
-              errorMessage = response.message
-            } else {
-              errorMessage = "Invalid reference number";
-            }
+        toggleReceivingButtons(true);
+      } else {
+        toggleReceivingButtons(false);
 
-            Swal.fire({
-              icon: "error",
-              title: errorMessage,
-            });
-            return;
-          }
-        },
-        error: function () {
-          Swal.fire({
-            icon: "error",
-            title: "Error fetching DR data.",
-          });
-        },
-        complete: function () {
-          $("#submitRecBtn").prop("disabled", false);
-          $("#receivingLoader").addClass("d-none");
-        },
+        Swal.fire({
+          icon: "error",
+          title:
+            response.isSuccess === "received"
+              ? response.message
+              : "Invalid reference number",
+        });
+      }
+    },
+    error: function () {
+      Swal.fire({
+        icon: "error",
+        title: "Error fetching DR data.",
       });
-      return false;
-    }
+    },
+    complete: function () {
+      $("#submitRecBtn").prop("disabled", false);
+      $("#receivingLoader").addClass("d-none");
+    },
+  });
+}
+
+function getOrders(reference) {
+  $.ajax({
+    url: "dirs/receiving/dashboard/actions/get_draft_orders.php",
+    type: "POST",
+    dataType: "json",
+    data: {
+      reference: reference,
+    },
+    success: function (response) {
+      if (response.isSuccess !== "success") {
+        console.log("No draft data fetched.");
+        return;
+      }
+      const grouped = {};
+      if (response.isSuccess === "success") {
+        response.Items.forEach((item) => {
+          const key = `${item.ItemBrand}|${item.ItemModel}`;
+
+          if (!grouped[key]) {
+            grouped[key] = {
+              ItemBrand: item.ItemBrand,
+              ItemModel: item.ItemModel,
+              ItemCode: item.ItemCode,
+              ItemCategory: item.ItemCategory,
+              StckTransfr_RowNum: item.StckTransfr_RowNum,
+              Recvd_ItemQty: 0,
+              Serials: [],
+            };
+          }
+
+          grouped[key].Recvd_ItemQty += parseFloat(item.Recvd_ItemQty);
+          if (item.ItemSerial) {
+            grouped[key].Serials.push(item.ItemSerial);
+          }
+
+          let serialRow = `
+            <tr style="height: 40px; min-height: 40px; cursor: pointer">
+                <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemModel}</td>
+                <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemCode}</td>
+                <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemSerial}</td>
+            </tr>`;
+
+          let receivingSerialTable = $("#receiving-serial-table tbody");
+
+          let emptyRow = receivingSerialTable
+            .find("tr")
+            .filter(function () {
+              return $(this).find("td").eq(0).text().trim() === "";
+            })
+            .first();
+
+          if (emptyRow.length) {
+            emptyRow.replaceWith(serialRow);
+          } else {
+            receivingSerialTable.prepend(serialRow);
+          }
+        });
+
+        const items = Object.values(grouped);
+        let totalQty = 0;
+
+        let rows = "";
+
+        let rowCount = items.length;
+        items.forEach((item, index) => {
+          totalQty += item.Recvd_ItemQty;
+
+          let itemCode = item.ItemCode;
+          let itemRowNum = item.StckTransfr_RowNum;
+
+          const itemKey = item.ItemModel.trim().toUpperCase();
+          const serials = [...new Set(item.Serials)];
+
+          console.log(`DRAFT ITEM SERIAL : ${item.Serials}`);
+
+          rows += `
+            <tr data-itemkey="${itemKey}"
+              data-itemcode="${itemCode}"
+              data-serialbased="true"
+              data-rownum="${itemRowNum}"
+              data-serials="${serials.join(",")}"
+              data-bs-toggle="tooltip"
+              data-bs-html="true"
+              data-bs-title="Serials: <br>${serials.join("<br>")}"
+              style="height:40px; min-height:40px;">
+                <td class="text-center" style="background:#fcf7d4">${index + 1}</td>
+                <td style="background:#fcf7d4">${item.ItemBrand}</td>
+                <td style="background:#fcf7d4">${item.ItemModel}</td>
+                <td style="background:#fcf7d4">${item.ItemCategory}</td>
+                <td class="text-center" style="background:#fcf7d4">${item.Recvd_ItemQty.toFixed(0)}</td>
+            </tr>`;
+        });
+
+        $("#receivingQty").text(totalQty.toFixed(0));
+        $("#receiving-form-table tbody").html(rows);
+
+        const tooltipTriggerList = document.querySelectorAll(
+          '#receiving-form-table [data-bs-toggle="tooltip"]',
+        );
+
+        tooltipTriggerList.forEach((el) => {
+          bootstrap.Tooltip.getInstance(el)?.dispose();
+          new bootstrap.Tooltip(el);
+        });
+
+        if (rowCount < 8) {
+          let emptyRowsNeeded = 8 - rowCount;
+
+          for (let i = 0; i < emptyRowsNeeded; i++) {
+            let emptyRow = `
+                  <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+                    <td style="background:  #fcf7d4"></td>
+                    <td style="background:  #fcf7d4"></td>
+                    <td style="background:  #fcf7d4"></td>
+                    <td style="background:  #fcf7d4"></td>
+                    <td style="background:  #fcf7d4"></td>
+                  </tr>
+              `;
+            $("#receiving-form-table tbody").append(emptyRow);
+          }
+          $("#receivingQty").text(totalQty);
+        }
+      } else {
+        console.log(response.isSuccess);
+        console.log(response.Items);
+        console.log(`NO DRAFT DATA HAS BEEN FETCHED`);
+      }
+    },
   });
 }
 
@@ -1207,7 +1334,7 @@ function loadImperialBrands() {
           );
         });
       } else {
-        console.log(response.Data);
+        // console.log(response.Data);
       }
     },
   );
@@ -1273,7 +1400,10 @@ function addNonSerialize() {
   $(document).on("submit", "#frm-add-delivery", function (e) {
     e.preventDefault();
 
-    console.log(`CURRENT REQUESTS INSIDE NON-SERIALIZED ITEMS`, JSON.stringify(currentOrder.requests));
+    console.log(
+      `CURRENT REQUESTS INSIDE NON-SERIALIZED ITEMS`,
+      JSON.stringify(currentOrder.requests),
+    );
 
     let Brand = $("#newBrand").val();
     let Model = $("#newModel").val();
@@ -1548,11 +1678,10 @@ function serialDeliveryInput() {
                 const duplicateSerial = receivingBody
                   .find("tr[data-serials]")
                   .toArray()
-                  .some(row => {
-                    const serials =
-                      ($(row).attr("data-serials") || "")
-                        .split(",")
-                        .map(s => s.trim().toUpperCase());
+                  .some((row) => {
+                    const serials = ($(row).attr("data-serials") || "")
+                      .split(",")
+                      .map((s) => s.trim().toUpperCase());
 
                     return serials.includes(serialKey);
                   });
@@ -1596,7 +1725,6 @@ function serialDeliveryInput() {
                     })
                     .first();
 
-                  // replace empty row one by one
                   if (emptyRow.length) {
                     emptyRow.replaceWith(serialRow);
                   } else {
@@ -1664,6 +1792,7 @@ function serialDeliveryInput() {
                       <td class="align-middle ps-3" style="background: #fcf7d4">${qty}</td>
                     </tr>
                   `;
+                  console.log(`ITEM SERIAL: ${item.ItemSerial}`);
 
                   let emptyRow = receivingBody
                     .find("tr:not([data-itemcode])")
@@ -1690,12 +1819,14 @@ function serialDeliveryInput() {
                   $("#receiving-form-table").DataTable().destroy();
                 }
 
+                console.log(`UPDATED SERIAL INPUT FUNCTION`);
+
                 let exists = false;
                 $("#receiving-form-table tbody tr").each(function () {
                   let code = $(this).data("itemcode");
                   if (code == itemCode) {
                     exists = true;
-                    return false; 
+                    return false;
                   }
                 });
               });
@@ -1773,21 +1904,24 @@ function submitReceiving() {
         });
       }
 
-      const unmatchedItems = formData.items.filter(receivedItem => {
-        return !currentOrder.requests.some(requestItem =>
-          requestItem.ItemName.trim().toUpperCase() === receivedItem.model.trim().toUpperCase() &&
-          requestItem.ItemBrand.trim().toUpperCase() === receivedItem.brand.trim().toUpperCase()
+      const unmatchedItems = formData.items.filter((receivedItem) => {
+        return !currentOrder.requests.some(
+          (requestItem) =>
+            requestItem.ItemName.trim().toUpperCase() ===
+              receivedItem.model.trim().toUpperCase() &&
+            requestItem.ItemBrand.trim().toUpperCase() ===
+              receivedItem.brand.trim().toUpperCase(),
         );
       });
 
       // CHECK UNMATCHED ITEMS
       const uniqueUnmatched = Array.from(
         new Map(
-          unmatchedItems.map(item => {
+          unmatchedItems.map((item) => {
             const key = `${item.brand.trim().toUpperCase()}-${item.model.trim().toUpperCase()}`;
             return [key, item];
-          })
-        ).values()
+          }),
+        ).values(),
       );
 
       const submitAjax = () => {
@@ -1804,8 +1938,10 @@ function submitReceiving() {
           beforeSend: function () {
             receivingBtn
               .prop("disabled", true)
-              .html(`<span class="spinner-border spinner-border-sm"></span> Processing`);
-              draftBtn.prop("disabled", true)
+              .html(
+                `<span class="spinner-border spinner-border-sm"></span> Processing`,
+              );
+            draftBtn.prop("disabled", true);
           },
           success: function (response) {
             receivingBtn.prop("disabled", false).html("Submit");
@@ -1821,7 +1957,7 @@ function submitReceiving() {
 
               window.open(
                 `pdf/receiving.php?batch=${formData.DeliveryNumber}`,
-                "_blank"
+                "_blank",
               );
             } else {
               Swal.fire({
@@ -1838,7 +1974,7 @@ function submitReceiving() {
               icon: "error",
               title: "Something went wrong",
             });
-          }
+          },
         });
       };
 
@@ -1851,7 +1987,7 @@ function submitReceiving() {
             <p>The following item(s) do not exist in the selected request:</p>
             <ul style="text-align:left;">
               ${uniqueUnmatched
-                .map(item => `<li>${item.brand} - ${item.model}</li>`)
+                .map((item) => `<li>${item.brand} - ${item.model}</li>`)
                 .join("")}
             </ul>
             <p class="mt-2"><strong>Do you want to continue anyway?</strong></p>
@@ -1859,7 +1995,7 @@ function submitReceiving() {
           showCancelButton: true,
           confirmButtonText: "Yes, Continue",
           cancelButtonText: "Cancel",
-        }).then(result => {
+        }).then((result) => {
           if (result.isConfirmed) submitAjax();
         });
       }
@@ -1871,40 +2007,187 @@ function submitReceiving() {
         showCancelButton: true,
         confirmButtonText: "Submit",
         cancelButtonText: "Cancel",
-      }).then(result => {
+      }).then((result) => {
         if (result.isConfirmed) submitAjax();
       });
     });
 }
 
 $(document)
-.off("click", "#submitDraftRecBtn")
-.on("click", "#submitDraftRecBtn", async function () {
-
-    let draftBtn = $("#submitDraftRecBtn");  
+  .off("click", "#submitDraftRecBtn")
+  .on("click", "#submitDraftRecBtn", async function () {
+    let draftBtn = $("#submitDraftRecBtn");
     let submitBtn = $("#submitRecBtn");
 
     const result = await Swal.fire({
-        title: "Save the following item(s) as draft?",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: "Save",
-        cancelButtonText: "Cancel",
+      title: "Save the following item(s) as draft?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Save",
+      cancelButtonText: "Cancel",
     });
 
     if (!result.isConfirmed) return;
 
     draftBtn
-        .prop("disabled", true)
-        .html(`<span class="spinner-border spinner-border-sm"></span> Processing`);
+      .prop("disabled", true)
+      .html(
+        `<span class="spinner-border spinner-border-sm"></span> Processing`,
+      );
 
     submitBtn.prop("disabled", true);
 
     try {
-        await autoSaveDraft();
-        returnReceiving();
+      await autoSaveDraft();
+      returnReceiving();
     } catch (err) {
-        draftBtn.prop("disabled", false).html("Save as Draft");
-        submitBtn.prop("disabled", false);
+      draftBtn.prop("disabled", false).html("Save as Draft");
+      submitBtn.prop("disabled", false);
     }
+  });
+
+function drafts() {
+  $("#receiving_content").html(spinner);
+  $.post("dirs/receiving/dashboard/drafts.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+    $("#draftsTable tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
+    loadDrafts();
+  });
+}
+
+$(document).on("click", ".dropdown .open-draft", function (e) {
+  e.preventDefault();
+
+  let reference = $(this).data("ref");
+
+  $("#main-content").html(spinner);
+  receivingForm(reference);
 });
+
+function loadDrafts() {
+  $.ajax({
+    url: "dirs/receiving/dashboard/actions/get_drafts.php",
+    type: "POST",
+    dataType: "json",
+    success: function (response) {
+      let data = response.Data;
+      let rows = [];
+      let counter = 1;
+      if (response.isSuccess === "success") {
+        receivingGroupedItems = {};
+        data.forEach(function (item) {
+          const date = new Date(item.SysTimeStamp);
+          const modified = date.toISOString().split("T")[0];
+          const timestamp = new Date().toLocaleString();
+
+          const formattedModified =
+            `${String(new Date(modified).getMonth() + 1).padStart(2, "0")}-` +
+            `${String(new Date(modified).getDate()).padStart(2, "0")}-` +
+            `${String(new Date(modified).getFullYear()).slice(-2)} ` +
+            `${new Date(timestamp).toLocaleTimeString()}`;
+
+          rows.push([
+            counter++,
+            item.ReferenceNumber,
+            item.OriginBranch,
+            item.ReceivedBranch,
+            formattedModified,
+            `<div class="dropdown">
+                <button class="btn"
+                        data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item open-draft"
+                            data-ref="${item.ReferenceNumber}">
+                            Edit
+                        </a>
+                    </li>
+                </ul>
+              </div>`,
+          ]);
+        });
+
+        if (rows.length < 8) {
+          for (let i = rows.length; i < 8; i++) {
+            rows.push(["", "", "", "", "", ""]);
+          }
+        }
+
+        if ($.fn.DataTable.isDataTable("#draftsTable")) {
+          $("#draftsTable").DataTable().clear().destroy();
+        }
+
+        $("#draftsTable").DataTable({
+          data: rows,
+          columns: [
+            { title: "#", className: "text-center" },
+            { title: "Reference No." },
+            { title: "Stock Origin", className: "text-start ps-3" },
+            { title: "Destination", className: "ps-3" },
+            {
+              title: "Last Modified",
+              className: "ps-3",
+            },
+            { title: "" },
+          ],
+          paging: true,
+          searching: true,
+          info: true,
+          processing: false,
+          autoWidth: false,
+          order: [[0, "desc"]],
+          rowCallback: function (row, data) {
+            $("td:not(.empty-row)", row).css({
+              background: "#fcf7d4",
+              padding: "3px",
+              height: "40px",
+              "min-height": "40px",
+              cursor: "pointer",
+            });
+            $("td:eq(0)", row).addClass("text-center");
+            $("td:eq(1)", row).addClass("text-primary ps-2");
+
+            $(row).hover(
+              function () {
+                $(this).css("background", "#FFF4C2");
+              },
+              function () {
+                $(this).css("background", "#fcf7d4");
+              },
+            );
+          },
+          drawCallback: function () {
+            let tableBody = $("#draftsTable tbody");
+            let currentRows = tableBody.find("tr").length;
+
+            for (let i = currentRows; i < 8; i++) {
+              let emptyRow = $(`
+                <tr class="empty-row">
+                  <td colspan="5" style="background: #fcf7d4">&nbsp;</td>
+                </tr>
+              `);
+
+              emptyRow.css({
+                background: "#fcf7d4",
+                height: "40px",
+                "min-height": "40px",
+              });
+
+              emptyRow.hover(function () {
+                $(this).css("background", "#fcf7d4");
+              });
+
+              tableBody.append(emptyRow);
+            }
+          },
+        });
+      }
+    },
+  });
+}

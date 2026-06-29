@@ -60,8 +60,6 @@ function loadRequests() {
 
       let rowCount = 1;
 
-      console.log(`DETAILS: ${JSON.stringify(details)}`);
-
       let detailMap = {};
 
       details.forEach((detail) => {
@@ -172,6 +170,9 @@ function loadRequests() {
           emptyTable: "",
         },
         rowCallback: function (row, data, index) {
+          if ($(row).hasClass("empty-row")) {
+            return;
+          }
           $("td", row).css({
             background: "#fcf7d4",
             padding: "3px",
