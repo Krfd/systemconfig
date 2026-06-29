@@ -63,8 +63,9 @@
                                     </label>
                                 </div>
                                 <div class="d-flex gap-1">
-                                    <button type="button" class="btn btn-sm btn-primary" id="addSerialModalBtn" data-bs-toggle="modal" data-bs-target="#addSerialModal"><i class="bi bi-plus"></i> Insert</button>
-                                    <button type="button" class="btn btn-sm btn-primary" id="addDeliveryModalBtn"><i class="bi bi-plus"></i> Add</button>
+                                    <!-- <i class="bi bi-plus"></i> -->
+                                    <button type="button" class="btn btn-sm btn-primary" id="addSerialModalBtn" data-bs-toggle="modal" data-bs-target="#addSerialModal" title="Serial"><i class="bi bi-upc d-block d-md-none"></i>Serialized</button>
+                                    <button type="button" class="btn btn-sm btn-primary" id="addDeliveryModalBtn" title="No Serial"><del><i class="bi bi-upc d-block d-md-none"></i></del>Nonserialized</button>
                                     <button type="button" class="btn btn-sm btn-danger" onclick="clearLoadingTable()">Clear</button>
                                 </div>
                             </div>

@@ -6,13 +6,6 @@ $User = $_SESSION['Uid'];
 $searchType = $_POST['searchType'];
 $searchValue = $_POST['searchValue'];
 
-$logData = date('Y-m-d H:i:s') .
-    " | User: " . $User .
-    " | Search Type: " . $searchType .
-    " | Search Value: " . $searchValue . PHP_EOL;
-
-file_put_contents('logging.txt', $logData, FILE_APPEND);
-
 try {
     $conn->beginTransaction();
     // $stmt = $conn->prepare("EXEC dbo.DeliveryComplete_Details ?, ?");
@@ -22,7 +15,16 @@ try {
     if (isset($get_header['Status']) && $get_header['Status'] === 'failed') {
         $response = array(
             "isSuccess" => "failed",
-            "Message" => $get_header['Message']
+            "message" => $get_header['Message']
+        );
+        echo json_encode($response);
+        exit;
+    }
+
+    if (isset($get_header['Status']) && $get_header['Status'] === 'received') {
+        $response = array(
+            "isSuccess" => "received",
+            "message" => $get_header['Message']
         );
         echo json_encode($response);
         exit;
@@ -30,13 +32,16 @@ try {
 
     $stmt->nextRowset();
     $delivery_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->nextRowset();
+    $requested_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $conn->commit();
 
     if ($get_header) {
         $response = array(
             "isSuccess" => "success",
             "Header" => $get_header,
-            "Items" => $delivery_items
+            "Items" => $delivery_items,
+            "Requests" => $requested_items
         );
     } else {
         $response = array(

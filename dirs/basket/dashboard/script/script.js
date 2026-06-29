@@ -562,7 +562,6 @@ $(document).on("click", "#deliveryItemsTable tbody .open-srn", function (e) {
 function toggleDelivery() {
   const loadDeliveryBtn = document.getElementById("loadDeliveryBtn");
   const selectAllBtn = document.getElementById("selectAllBtn");
-  console.log("toggleDelivery called");
   // ✅ Reliable state tracking (instead of :visible)
   let selectionMode = $("#basketTableAssigned").data("selectionMode") || false;
   let batchContainer = [];
@@ -1120,7 +1119,8 @@ function assignBranch(picklist, branchees) {
             "-" +
             String(date.getDate()).padStart(2, "0") +
             "-" +
-            String(date.getFullYear()).slice(-2);
+            // String(date.getFullYear()).slice(-2);
+            date.getFullYear();
 
           $("#pcklstno").val(header.PKList_Number);
           // $("#docdate").val(header.DocDate.substring(0, 10));
@@ -1334,8 +1334,17 @@ function editAssignBranch(picklist, branchees) {
 
           $("#editSummaryTable thead").html(headerRow);
 
+          const date = new Date(header.DocDate);
+
+          const formattedDate =
+            String(date.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(date.getDate()).padStart(2, "0") +
+            "-" +
+            date.getFullYear();
+
           $("#pcklstno").val(header.PKList_Number);
-          $("#docdate").val(header.DocDate.substring(0, 10));
+          $("#docdate").val(formattedDate);
           $("#origin").val(header.Picked_Branch || "");
           $("#status").val(header.PickListStatus);
           $("#prepby").val(header.CollectedBy);
@@ -2700,8 +2709,6 @@ function loadDestinationWhscodes(Branch) {
 function loadToBasket(Picklists) {
   $.post("dirs/basket/dashboard/loadToBasket.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
-
-    console.log(`PICKLISTS: ${Picklists}`);
     $.ajax({
       url: "dirs/basket/dashboard/actions/get_user.php",
       type: "POST",
@@ -2719,8 +2726,6 @@ function loadToBasket(Picklists) {
     addNonSerialize(Picklists);
     submitLoadingBasket(Picklists);
     initializeEmptySerialRows();
-
-    console.log("loadToBasket received:", Picklists);
 
     $("#newBrand").on("change", function () {
       $("#newModel").html('<option value="">Select Model</option>');
@@ -2972,10 +2977,6 @@ function serialDeliveryInput(Picklists) {
                         data &&
                         data.length > 0
                       ) {
-                        // console.log(
-                        //   `DISPLAY BATCH MODELS DATA : ${JSON.stringify(data)}`,
-                        // );
-                        // console.log(``);
                         Object.values(groupedItems).forEach(function (item) {
                           let brand = item.ItemBrand;
                           let model = item.ItemName;
@@ -3017,33 +3018,46 @@ function serialDeliveryInput(Picklists) {
                             return;
                           }
 
-                          const rowKey = itemCode + "|" + latestInput;
-                          const itemKey = itemCode + "|" + model;
+                          const modelKey = item.ItemName.trim().toUpperCase();
+                          const serialKey = latestInput.trim().toUpperCase();
 
-                          // check duplicate serial
+                          const rowKey = `${modelKey}|${serialKey}`;
+                          const itemKey = modelKey;
+
                           let existingRow = loadingTableBody.find(
                             `tr[data-rowkey="${rowKey}"]`,
                           );
 
-                          // check existing model/item row
                           let existingItem = loadingTableBody.find(
                             `tr[data-itemkey="${itemKey}"]`,
                           );
 
                           // DUPLICATE SERIAL
-                          if (existingRow.length) {
+                          const duplicateSerial = loadingTableBody
+                            .find("tr[data-serials]")
+                            .toArray()
+                            .some(row => {
+                              const serials =
+                                ($(row).attr("data-serials") || "")
+                                  .split(",")
+                                  .map(s => s.trim().toUpperCase());
+
+                              return serials.includes(serialKey);
+                            });
+
+                          if (duplicateSerial) {
                             Swal.fire({
                               icon: "error",
-                              title: "Serial number has already been scanned",
+                              title: "Serial number already scanned",
                             });
+
+                            serializeBtn.prop("disabled", false);
                             return;
                           }
 
-                          // let maxAllowed = groupedItems[itemCode].allowedQty || 0;
                           let currentLoaded =
                             groupedItems[itemCode].loadedQty || 0;
 
-                          // if (currentLoaded >= maxAllowed) {
                           if (currentLoaded >= totalActualPerModel) {
                             Swal.fire({
                               icon: "error",
@@ -3056,7 +3070,6 @@ function serialDeliveryInput(Picklists) {
 
                           const serial = item.ItemSerial;
 
-                          // get the actual table element
                           const tableElement = document.querySelector(
                             "#basket-serial-table",
                           );
@@ -3168,6 +3181,7 @@ function serialDeliveryInput(Picklists) {
                                   data-itemcode="${itemCode}" 
                                   data-actualqty="${totalActualPerModel}"
                                   data-serialbased="true" 
+                                  data-model="${model}"
                                   data-serials="${item.ItemSerial}" 
                                   data-bs-toggle="tooltip" 
                                   data-bs-html="true" 
@@ -3375,7 +3389,7 @@ function addNonSerialize(Picklists) {
                   let totalActualPerModel =
                     parseInt(res.Data?.[0]?.Total_Actual_Item_Qty) || 0;
 
-                  console.log(`TOTAL ACTUAL : ${totalActualPerModel}`);
+                  // console.log(`TOTAL ACTUAL : ${totalActualPerModel}`);
                   $.ajax({
                     url: "dirs/basket/dashboard/actions/get_dsplaybatch_models.php",
                     type: "POST",
@@ -3484,6 +3498,7 @@ function addNonSerialize(Picklists) {
                                 data-rowkey="${rowKey}" 
                                 data-itemmapping='${JSON.stringify(itemMappings)}'
                                 data-itemid="${itemId}"
+                                data-model="${model}"
                                 data-picklist="${picklist}"
                                 data-itemcode="${itemCode}" 
                                 data-serialbased="false" 
@@ -3613,6 +3628,7 @@ function submitLoadingBasket(Picklists) {
       $("#loadBasketTable tbody tr[data-itemmapping]").each(function () {
         let actualQty = parseInt($(this).attr("data-actualqty")) || 0;
         let loadedQty = parseInt($(this).find("td:nth-child(5)").text()) || 0;
+        let model = $(this).data("model");
 
         if (loadedQty !== actualQty) {
           hasError = true;

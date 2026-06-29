@@ -19,7 +19,16 @@ function loadDashboard() {
         <td colspan="100%" class="text-center">${spinner}</td>
       </tr>
     `);
-    loadReceiving();
+    TableManager.loadReceiving();
+
+    $('#received-tab').on('shown.bs.tab', function () {
+        TableManager.loadReceiving();
+    });
+
+    $('#drafts-tab').on('shown.bs.tab', function () {
+        TableManager.loadDrafts();
+    });
+    // loadReceiving();
   });
 }
 
@@ -31,7 +40,6 @@ function returnReceiving() {
 }
 
 $(document).on("dblclick", "#receivingTable tbody tr", function (e) {
-  // if ($(e.target).closest(".dropdown").length) return;
   let rcvdNumber = $(this).data("rcvdnumber");
 
   if (!rcvdNumber) {
@@ -41,148 +49,536 @@ $(document).on("dblclick", "#receivingTable tbody tr", function (e) {
   openReceivedForm(rcvdNumber);
 });
 
-function loadReceiving() {
-  $.ajax({
-    url: "dirs/receiving/dashboard/actions/get_received.php",
-    type: "POST",
-    dataType: "json",
-    success: function (response) {
-      let data = response.Data;
-      let rows = [];
-      let counter = 1;
-      if (response.isSuccess === "success") {
-        receivingGroupedItems = {};
-        data.forEach(function (item) {
-          const date = new Date(item.ArrivalDate);
-          const arrivalDate = date.toISOString().split("T")[0];
-          const timestamp = new Date().toLocaleString();
+// function loadReceivingContent() {
+//   if ($.fn.DataTable.isDataTable("#receivingTable")) {
+//     $("#receivingTable").DataTable().clear().destroy();
+//   }
+//   $("#receiving_content").html(spinner);
+//   $.post("dirs/receiving/dashboard/received.php", {}, function (data) {
+//     $("#main-content").hide().html(data).fadeIn(200);
+//     $("#receivingTable tbody").html(`
+//       <tr>
+//         <td colspan="100%" class="text-center">${spinner}</td>
+//       </tr>
+//     `);
+//     loadReceivingBasket(
+//       "#receivingTable",
+//       "dirs/receiving/dashboard/actions/get_received.php",
+//       "received",
+//     );
+//   });
+// }
 
-          const formattedTimestamp =
-            `${String(new Date(arrivalDate).getMonth() + 1).padStart(2, "0")}-` +
-            `${String(new Date(arrivalDate).getDate()).padStart(2, "0")}-` +
-            `${String(new Date(arrivalDate).getFullYear()).slice(-2)} ` +
-            `${new Date(timestamp).toLocaleTimeString()}`;
+// function loadReceivingBasket(tableId, url, statusFilter = null) {
+//   $.ajax({
+//     url: url,
+//     type: "POST",
+//     dataType: "json",
+//     success: function (response) {
+//       if (!response || response.isSuccess !== "success" || !Array.isArray(response.Data)) {
+//         response = {isSuccess: "success", Data: []}
+//       }
+//     }
+//   })
+// }
+const TableManager = (function () {
 
-          rows.push([
-            counter++,
-            item.ReceivedNumber,
-            formattedTimestamp,
-            item.OriginBranch,
-            (() => {
-              let status = item.ReceivedStatus;
-              let bgClass = "";
-              if (status === "RECEIVED") {
-                bgClass = "bg-success";
-              } else if (status === "PARTIAL") {
-                bgClass = "bg-warning";
-              } else if (status === "TERMINATED") {
-                bgClass = "bg-secondary";
-              }
-              return `<span class="badge ${bgClass}">${status}</span>`;
-            })(),
-          ]);
+    const loadedTables = {};
+
+    // function loadTable({ tableId, url, transform, columns }) {
+function loadTable({
+    tableId,
+    url,
+    transform,
+    columns,
+    rowCallback,
+    drawCallback
+}) {
+
+        $.ajax({
+            url,
+            type: "POST",
+            dataType: "json",
+
+            success(response) {
+
+                if (!response ||
+                    response.isSuccess !== "success" ||
+                    !Array.isArray(response.Data)) {
+                    response = { isSuccess: "success", Data: [] };
+                }
+
+                const rows = transform(response.Data);
+
+                // destroy if exists
+                if ($.fn.DataTable.isDataTable(tableId)) {
+                    $(tableId).DataTable().clear().destroy();
+                }
+
+                $(tableId).DataTable({
+                    data: rows,
+                    columns,
+                    rowCallback,
+                    drawCallback,
+                    paging: true,
+                    searching: true,
+                    info: true,
+                    autoWidth: false,
+                    processing: false,
+
+                    // rowCallback: function (row) {
+                    //     $("td:not(:first-child)", row).css({
+                    //         background: "#fcf7d4",
+                    //         padding: "3px",
+                    //         height: "40px",
+                    //         cursor: "pointer"
+                    //     });
+
+                    //     $(row).hover(
+                    //         function () {
+                    //             $(this).css("background", "#FFF4C2");
+                    //         },
+                    //         function () {
+                    //             $(this).css("background", "#fcf7d4");
+                    //         }
+                    //     );
+                    // }
+                });
+            },
+
+            error(err) {
+                console.error("Table load error:", err);
+            }
         });
+    }
 
-        if (rows.length < 8) {
-          for (let i = rows.length; i < 8; i++) {
-            rows.push(["", "", "", "", ""]);
-          }
+    return {
+
+        loadReceiving() {
+
+            if (loadedTables.receiving) return;
+
+            loadTable({
+                tableId: "#receivingTable",
+                url: "dirs/receiving/dashboard/actions/get_received.php",
+
+                transform(data) {
+                    return data.map((item, i) => [
+                        i + 1,
+                        item.RRNo,
+                        item.ArrivalDate,
+                        item.StockOrigin,
+                        `<span class="badge bg-${
+                            item.Status === "RECEIVED" ? "success" : "warning"
+                        }">${item.Status}</span>`
+                    ]);
+                },
+
+                columns: [
+                    // { title: "#", className: "text-center" },
+                    { title: "#" },
+                    { title: "RR No." },
+                    { title: "Arrival Date" },
+                    { title: "Stock Origin" },
+                    { title: "Status" }
+                ]
+            });
+
+            loadedTables.receiving = true;
+        },
+
+        loadDrafts() {
+
+            if (loadedTables.drafts) return;
+
+            loadTable({
+                tableId: "#draftsTable",
+                url: "dirs/receiving/dashboard/actions/get_drafts.php",
+
+                transform(data) {
+                    return data.map((item, i) => [
+                        
+                        i + 1,
+                        item.ReferenceNumber,
+                        item.StockOrigin,
+                        item.ReceivedBranch,
+                        `
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light dropdown-toggle"
+                                    data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots"></i>
+                            </button>
+
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item open-draft"
+                                       data-ref="${item.ReferenceNumber}">
+                                        Open
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        `,
+                    ]);
+                },
+
+                columns: [
+                    // { title: "#", className: "text-center" },
+                    { title: "#" },
+                    { title: "Reference No." },
+                    { title: "Stock Origin" },
+                    { title: "Destination" },
+                    { title: "" }
+                ]
+            });
+
+            loadedTables.drafts = true;
+        },
+
+        reload(tableName) {
+            loadedTables[tableName] = false;
+
+            if (tableName === "receiving") this.loadReceivingTable();
+            if (tableName === "drafts") this.loadDraftsTable();
         }
+    };
+})();
 
-        if ($.fn.DataTable.isDataTable("#receivingTable")) {
-          $("#receivingTable").DataTable().clear().destroy();
-        }
+// ORIGINAL
+// function loadReceiving() {
+//   $.ajax({
+//     url: "dirs/receiving/dashboard/actions/get_received.php",
+//     type: "POST",
+//     dataType: "json",
+//     success: function (response) {
+//       let data = response.Data;
+//       let rows = [];
+//       let counter = 1;
+//       if (response.isSuccess === "success") {
+//         receivingGroupedItems = {};
+//         data.forEach(function (item) {
+//           const date = new Date(item.ArrivalDate);
+//           const arrivalDate = date.toISOString().split("T")[0];
+//           const timestamp = new Date().toLocaleString();
 
-        $("#receivingTable").DataTable({
-          data: rows,
-          columns: [
+//           const formattedTimestamp =
+//             `${String(new Date(arrivalDate).getMonth() + 1).padStart(2, "0")}-` +
+//             `${String(new Date(arrivalDate).getDate()).padStart(2, "0")}-` +
+//             `${String(new Date(arrivalDate).getFullYear()).slice(-2)} ` +
+//             `${new Date(timestamp).toLocaleTimeString()}`;
+
+//           rows.push([
+//             counter++,
+//             item.ReceivedNumber,
+//             formattedTimestamp,
+//             item.OriginBranch,
+//             (() => {
+//               let status = item.ReceivedStatus;
+//               let bgClass = "";
+//               if (status === "RECEIVED") {
+//                 bgClass = "bg-success";
+//               } else if (status === "PARTIAL") {
+//                 bgClass = "bg-warning";
+//               } else if (status === "TERMINATED") {
+//                 bgClass = "bg-secondary";
+//               }
+//               return `<span class="badge ${bgClass}">${status}</span>`;
+//             })(),
+//           ]);
+//         });
+
+//         if (rows.length < 8) {
+//           for (let i = rows.length; i < 8; i++) {
+//             rows.push(["", "", "", "", ""]);
+//           }
+//         }
+
+//         if ($.fn.DataTable.isDataTable("#receivingTable")) {
+//           $("#receivingTable").DataTable().clear().destroy();
+//         }
+
+//         $("#receivingTable").DataTable({
+//           data: rows,
+//           columns: [
+//             { title: "#", className: "text-center" },
+//             { title: "RR No." },
+//             { title: "Arrival Date", className: "text-start ps-3" },
+//             { title: "Stock Origin", className: "ps-3" },
+//             {
+//               title: "Status",
+//               className: "ps-3",
+//             },
+//           ],
+//           paging: true,
+//           searching: true,
+//           info: true,
+//           processing: false,
+//           autoWidth: false,
+//           order: [[0, "desc"]],
+//           rowCallback: function (row, data) {
+//             $("td:not(.empty-row)", row).css({
+//               background: "#fcf7d4",
+//               padding: "3px",
+//               height: "40px",
+//               "min-height": "40px",
+//               cursor: "pointer",
+//             });
+//             let receivedNumber = null;
+
+//             if (
+//               data &&
+//               Array.isArray(data) &&
+//               data.length > 0 &&
+//               data[0] !== null &&
+//               data[0] !== undefined &&
+//               data[0] !== ""
+//             ) {
+//               receivedNumber = data[1];
+//             }
+//             $(row).data("rcvdnumber", receivedNumber);
+//             $("td:eq(0)", row).addClass("text-center");
+//             $("td:eq(1)", row).addClass("text-primary ps-2");
+
+//             $(row).hover(
+//               function () {
+//                 $(this).css("background", "#FFF4C2");
+//               },
+//               function () {
+//                 $(this).css("background", "#fcf7d4");
+//               },
+//             );
+//           },
+//           drawCallback: function () {
+//             let tableBody = $("#receivingTable tbody");
+//             let currentRows = tableBody.find("tr").length;
+
+//             for (let i = currentRows; i < 8; i++) {
+//               let emptyRow = $(`
+//                 <tr class="empty-row">
+//                   <td colspan="5" style="background: #fcf7d4">&nbsp;</td>
+//                 </tr>
+//               `);
+
+//               emptyRow.css({
+//                 background: "#fcf7d4",
+//                 height: "40px",
+//                 "min-height": "40px",
+//               });
+
+//               emptyRow.hover(function () {
+//                 $(this).css("background", "#fcf7d4");
+//               });
+
+//               tableBody.append(emptyRow);
+//             }
+//           },
+//         });
+//       }
+//     },
+//     error: function (xhr, status, error) {
+//       console.error("Error loading receiving data: ", error);
+//     },
+//   });
+// }
+
+function loadReceiving() {
+
+    loadTable({
+        tableId: "#receivingTable",
+        url: "dirs/receiving/dashboard/actions/get_received.php",
+
+        transform(data) {
+
+            let rows = [];
+            let counter = 1;
+
+            data.forEach(item => {
+
+                const date = new Date(item.ArrivalDate);
+                const arrivalDate = date.toISOString().split("T")[0];
+                const timestamp = new Date().toLocaleString();
+
+                const formattedTimestamp =
+                    `${String(new Date(arrivalDate).getMonth() + 1).padStart(2, "0")}-` +
+                    `${String(new Date(arrivalDate).getDate()).padStart(2, "0")}-` +
+                    `${String(new Date(arrivalDate).getFullYear()).slice(-2)} ` +
+                    `${new Date(timestamp).toLocaleTimeString()}`;
+
+                rows.push([
+                    counter++,
+                    item.ReceivedNumber,
+                    formattedTimestamp,
+                    item.OriginBranch,
+
+                    (() => {
+                        let status = item.ReceivedStatus;
+                        let bgClass = "";
+
+                        if (status === "RECEIVED") bgClass = "bg-success";
+                        else if (status === "PARTIAL") bgClass = "bg-warning";
+                        else if (status === "TERMINATED") bgClass = "bg-secondary";
+
+                        return `<span class="badge ${bgClass}">${status}</span>`;
+                    })()
+                ]);
+            });
+
+            // pad empty rows (your original behavior)
+            if (rows.length < 8) {
+                for (let i = rows.length; i < 8; i++) {
+                    rows.push(["", "", "", "", ""]);
+                }
+            }
+
+            return rows;
+        },
+
+        columns: [
             { title: "#", className: "text-center" },
             { title: "RR No." },
             { title: "Arrival Date", className: "text-start ps-3" },
             { title: "Stock Origin", className: "ps-3" },
-            {
-              title: "Status",
-              className: "ps-3",
-            },
-          ],
-          paging: true,
-          searching: true,
-          info: true,
-          processing: false,
-          autoWidth: false,
-          order: [[0, "desc"]],
-          rowCallback: function (row, data) {
-            $("td", row).css({
-              background: "#fcf7d4",
-              padding: "3px",
-              height: "40px",
-              "min-height": "40px",
-              cursor: "pointer",
+            { title: "Status", className: "ps-3" }
+        ],
+
+        rowCallback(row, data) {
+
+            $("td:not(.empty-row)", row).css({
+                background: "#fcf7d4",
+                padding: "3px",
+                height: "40px",
+                "min-height": "40px",
+                cursor: "pointer"
             });
-            // let receivedNumber = data[0];
+
             let receivedNumber = null;
 
-            if (
-              data &&
-              Array.isArray(data) &&
-              data.length > 0 &&
-              data[0] !== null &&
-              data[0] !== undefined &&
-              data[0] !== ""
-            ) {
-              receivedNumber = data[1];
+            if (data && Array.isArray(data) && data[0]) {
+                receivedNumber = data[1];
             }
+
             $(row).data("rcvdnumber", receivedNumber);
+
             $("td:eq(0)", row).addClass("text-center");
             $("td:eq(1)", row).addClass("text-primary ps-2");
 
             $(row).hover(
-              function () {
-                $(this).css("background", "#FFF4C2");
-              },
-              function () {
-                $(this).css("background", "#fcf7d4");
-              },
+                function () {
+                    $(this).css("background", "#FFF4C2");
+                },
+                function () {
+                    $(this).css("background", "#fcf7d4");
+                }
             );
-          },
-          drawCallback: function () {
+        },
+
+        drawCallback() {
+
             let tableBody = $("#receivingTable tbody");
             let currentRows = tableBody.find("tr").length;
 
             for (let i = currentRows; i < 8; i++) {
-              let emptyRow = $(`
+
+                let emptyRow = $(`
                     <tr class="empty-row">
-                      <td colspan="5" style="background: #fcf7d4">&nbsp;</td>
+                        <td colspan="5" style="background:#fcf7d4">&nbsp;</td>
                     </tr>
-                  `);
+                `);
 
-              emptyRow.css({
-                background: "#fcf7d4",
-                height: "40px",
-                "min-height": "40px",
-              });
+                emptyRow.css({
+                    background: "#fcf7d4",
+                    height: "40px"
+                });
 
-              emptyRow.hover(function () {
-                $(this).css("background", "#fcf7d4");
-              });
-
-              tableBody.append(emptyRow);
+                tableBody.append(emptyRow);
             }
-          },
-        });
-      }
-      //  else {
-      //   console.error(response.Data);
-      // }
-    },
-    error: function (xhr, status, error) {
-      console.error("Error loading receiving data: ", error);
-    },
-  });
+        }
+    });
+}
+
+function loadDrafts() {
+
+    loadTable({
+        tableId: "#draftsTable",
+        url: "dirs/receiving/dashboard/actions/get_drafts.php",
+
+        transform(data) {
+
+            let rows = [];
+            let counter = 1;
+
+            data.forEach(item => {
+
+                rows.push([
+
+                    // ROW NUMBER
+                    counter++,
+
+                    // DATA FIELDS
+                    item.ReferenceNumber || "",
+                    item.StockOrigin || "",
+                    item.ReceivedBranch || "",
+                    // ACTION COLUMN (dropdown)
+                    `
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light dropdown-toggle"
+                                data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item open-draft"
+                                   href="#"
+                                   data-ref="${item.ReferenceNumber}">
+                                    Open
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    `,
+                ]);
+            });
+
+            return rows;
+        },
+
+        columns: [
+            { title: "#", className: "text-center" },
+            { title: "Reference No." },
+            { title: "Stock Origin" },
+            { title: "Destination" },
+            { title: "" },
+        ],
+
+        rowCallback(row, data) {
+
+            $("td:not(:first-child)", row).css({
+                background: "#fcf7d4",
+                padding: "3px",
+                height: "40px",
+                cursor: "pointer"
+            });
+
+            $(row).hover(
+                function () {
+                    $(this).css("background", "#FFF4C2");
+                },
+                function () {
+                    $(this).css("background", "#fcf7d4");
+                }
+            );
+
+            // optional: attach metadata
+            $(row).data("ref", data[2]);
+        }
+    });
 }
 
 function receivingForm() {
+  
   $("#main-content").html(spinner);
+  
   $.post("dirs/receiving/dashboard/receivingForm.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
 
@@ -246,15 +642,11 @@ function receivingForm() {
           scan.style.pointerEvents = "auto";
           manual.style.pointerEvents = "none";
 
-          // console.log("SCAN");
-
           serialInput.value = "";
           serialInput.focus();
 
-          // Prevent manual typing
           serialInput.addEventListener("keydown", preventTyping);
         } else {
-          // MANUAL MODE
           toggler.dataset.value = "Manual";
 
           knob.style.width = "60px";
@@ -266,12 +658,8 @@ function receivingForm() {
           manual.style.pointerEvents = "auto";
           scan.style.pointerEvents = "none";
 
-          // console.log("MANUAL");
-
           serialInput.value = "";
           serialInput.focus();
-
-          // Allow manual typing
           serialInput.removeEventListener("keydown", preventTyping);
         }
       }
@@ -325,14 +713,121 @@ function receivingForm() {
   });
 }
 
+function autoSaveDraft() {
+  console.log("RECEIVING HAS BEEN SAVED AS DRAFT");
+  console.log($("#receiving-form-table tbody tr[data-itemcode]").length);
+
+  const formData = buildReceivingData();
+  console.log(`FORM DATA : ${JSON.stringify(formData)}`)
+
+  let draftBtn = $("#submitDraftRecBtn");  
+  let submitBtn = $("#submitRecBtn");
+
+  return $.ajax({
+      url: "dirs/receiving/dashboard/actions/save_draft.php",
+      type: "POST",
+      data: {
+        receivingData: JSON.stringify(formData),
+      },
+      dataType: "json",
+      beforeSend: function () {
+        draftBtn
+          .prop("disabled", true)
+          .html(`<span class="spinner-border spinner-border-sm"></span> Processing`);
+          submitBtn
+          .prop("disabled", true)
+      },
+      success: function (response) {
+        draftBtn.prop("disabled", false).html("Save as Draft");
+        submitBtn.prop("disabled", false);
+        if (response.isSuccess === "success") {
+          Swal.fire({
+            icon: "success",
+            title: "Items has been saved as draft",
+          })
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: response.message || "Submission failed",
+          });
+        }
+      },
+      error: function () {
+        draftBtn.prop("disabled", false).html("Save as Draft");
+        submitBtn.prop("disabled", false);
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong",
+        });
+      },
+  });
+}
+
+function buildReceivingData() {
+    let formData = {
+        DeliveryNumber: $("#drNoRecForm").val(),
+        Branchorigin: $('input[name="originRecForm"]').val(),
+        BranchWhscode: $('input[name="origRecForm"]').val(),
+        ReceivingDate: $("#docDateRecForm").val(),
+        PostingDate: $("#postDate").val(),
+        Driver: $("#driverRecForm").val(),
+        TruckCategory: $("#truckCat").val(),
+        TruckPlate: $("#plateRecForm").val(),
+        Remarks: $("#remarksRecForm").val(),
+        ReceivedQty: $("#receivingQty").text(),
+        items: [],
+    };
+
+    $("#receiving-form-table tbody tr[data-itemcode]").each(function () {
+        let row = $(this);
+
+        let serials = (row.attr("data-serials") || "")
+            .split(",")
+            .map(s => s.trim())
+            .filter(Boolean);
+
+        if (
+            (row.data("serialbased") === true ||
+                row.data("serialbased") === "true") &&
+            serials.length > 0
+        ) {
+            serials.forEach(serial => {
+                formData.items.push({
+                    itemCode: row.data("itemcode"),
+                    brand: row.find("td:eq(1)").text().trim(),
+                    model: row.find("td:eq(2)").text().trim(),
+                    category: row.find("td:eq(3)").text().trim(),
+                    qty: 1,
+                    serialBased: true,
+                    InTransitRowNum: row.data("rownum"),
+                    serial: serial,
+                });
+            });
+        } else {
+            formData.items.push({
+                itemCode: row.data("itemcode"),
+                brand: row.find("td:eq(1)").text().trim(),
+                model: row.find("td:eq(2)").text().trim(),
+                category: row.find("td:eq(3)").text().trim(),
+                qty: parseInt(row.find("td:eq(4)").text().trim()) || 0,
+                serialBased: false,
+                InTransitRowNum: row.data("rownum"),
+                serial: null,
+            });
+        }
+    });
+
+    return formData;
+}
+
 function formatDateMMDDYY(dateString) {
   const date = new Date(dateString);
 
   const mm = String(date.getMonth() + 1).padStart(2, "0");
   const dd = String(date.getDate()).padStart(2, "0");
-  const yy = String(date.getFullYear()).slice(-2);
+  const yyyy = date.getFullYear();
 
-  return `${mm}-${dd}-${yy}`;
+  return `${mm}-${dd}-${yyyy}`;
 }
 
 function openReceivedForm(rcvdNumber) {
@@ -367,11 +862,13 @@ function openReceivedForm(rcvdNumber) {
           $("#origRecForm").val(header.OriginWhscode);
 
           const docDate = header.SysTimeStamp
-            ? formatDateMMDDYY(header.SysTimeStamp)
+            ? formatDateMMDDYY(header.SysTimeStamp).replace(/-/g, "/")
             : "";
+
           $("#docDateRecForm").val(docDate);
+
           const postDate = header.PostingDate
-            ? formatDateMMDDYY(header.PostingDate)
+            ? formatDateMMDDYY(header.PostingDate).replace(/-/g, "/")
             : "";
 
           $("#postDate").val(postDate);
@@ -455,17 +952,13 @@ function openReceivedForm(rcvdNumber) {
 
 function validateNumber(el) {
   let value = $(el).text().trim();
-
-  // Remove red border if user starts typing
   if (value !== "") {
     $(el).removeClass("border border-danger");
   }
 
-  // Optional: allow only numbers
   if (!/^\d*$/.test(value)) {
     $(el).text(value.replace(/\D/g, ""));
 
-    // Move cursor to end
     let range = document.createRange();
     let sel = window.getSelection();
     range.selectNodeContents(el);
@@ -563,6 +1056,7 @@ function fetchOrderDetails() {
         success: function (response) {
           let header = response.Header;
           let items = response.Items;
+          currentOrder.requests = response.Requests;
 
           if (response.Header?.Status === "failed") {
             Swal.fire({
@@ -576,10 +1070,8 @@ function fetchOrderDetails() {
             if (field !== "deliveryNumber") {
               $("#drNoRecForm").val(header.DeliveryNumber);
             }
-            // $("#originRecForm").val(header.OriginBranch);
             $("#originRecForm").val(items[0].OriginBranch);
             if (field === "deliveryNumber") {
-              // $("#refNoRecForm").val(header.ReferenceNumber);
               $("#refNoRecForm").val(items[0].ReferenceNumber);
               $("#stockReqNoRecForm").val(items[0].SR_Number);
             } else {
@@ -588,8 +1080,9 @@ function fetchOrderDetails() {
             }
 
             $("#docDateRecForm").val(
-              header.DeliveryDate ? formatDateMMDDYY(header.DeliveryDate) : "",
+              header.DeliveryDate ? formatDateMMDDYY(header.DeliveryDate).replace(/-/g, "/") : "",
             );
+
             $("#statusRecForm").val(header.DocStatus);
 
             $("#driverRecForm").val(header.Driver || "");
@@ -600,19 +1093,17 @@ function fetchOrderDetails() {
           } else {
             toggleReceivingButtons(false);
 
-            let errorMessage = "Invalid input";
+            let errorMessage = "";
 
-            if (field === "deliveryNumber") {
-              errorMessage = "Invalid delivery number";
-            } else if (field === "referenceNumber") {
+            if (response.isSuccess === "received") {
+              errorMessage = response.message
+            } else {
               errorMessage = "Invalid reference number";
-            } else if (field === "stockReqNumber") {
-              errorMessage = "Invalid stock request number";
             }
 
             Swal.fire({
               icon: "error",
-              title: response.message || errorMessage,
+              title: errorMessage,
             });
             return;
           }
@@ -687,15 +1178,13 @@ function clearTable() {
 
 function formattedDate() {
   const today = new Date();
-  const yy = String(today.getFullYear()).slice(-2);
+  const yy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, "0");
   const dd = String(today.getDate()).padStart(2, "0");
 
-  // const formattedDate = `${yyyy}-${mm}-${dd}`;
   const formattedDate = `${mm}-${dd}-${yy}`;
 
-  // document.getElementById("docDateRecForm").value = formattedDate;
-  document.getElementById("postDate").value = formattedDate;
+  document.getElementById("postDate").value = formattedDate.replace(/-/g, "/");
 }
 
 function loadImperialBrands() {
@@ -780,8 +1269,11 @@ async function loadImperialModel() {
 }
 
 function addNonSerialize() {
+  $(document).off("submit", "#frm-add-delivery");
   $(document).on("submit", "#frm-add-delivery", function (e) {
     e.preventDefault();
+
+    console.log(`CURRENT REQUESTS INSIDE NON-SERIALIZED ITEMS`, JSON.stringify(currentOrder.requests));
 
     let Brand = $("#newBrand").val();
     let Model = $("#newModel").val();
@@ -844,10 +1336,7 @@ function addNonSerialize() {
                     let model = item.ItemName;
                     let category = item.ItemCategory;
                     let itemCode = item.Itemcode;
-                    // let itemRowNum = item.ItemRowNum;
                     let itemRowNum = data[0].ItemRowNum;
-
-                    // console.log(`NON SERIALIZE ROW NUM: ${itemRowNum}`);
 
                     console.log(`RECEIVING ITEM : ${JSON.stringify(item)}`);
 
@@ -938,13 +1427,11 @@ function addNonSerialize() {
   });
 }
 
-// FOR RECEIVING ITEM
 function serialDeliveryInput() {
   $(document).off("submit", "#serial-delivery");
   $(document).on("submit", "#serial-delivery", function (e) {
     e.preventDefault();
 
-    // DISABLE ADD BUTTON
     const serializeBtn = $("#serializeBtn");
     serializeBtn.prop("disabled", true);
 
@@ -1040,8 +1527,14 @@ function serialDeliveryInput() {
                   return;
                 }
 
-                const rowKey = itemCode + "|" + latestInput;
-                const itemKey = itemCode + "|" + model;
+                // const rowKey = itemCode + "|" + latestInput;
+                // const itemKey = itemCode + "|" + model;
+
+                const modelKey = item.ItemName.trim().toUpperCase();
+                const serialKey = latestInput.trim().toUpperCase();
+
+                const rowKey = `${modelKey}|${serialKey}`;
+                const itemKey = modelKey;
 
                 let existingRow = receivingBody.find(
                   `tr[data-rowkey="${rowKey}"]`,
@@ -1052,11 +1545,25 @@ function serialDeliveryInput() {
                 );
 
                 // DUPLICATE SERIAL
-                if (existingRow.length) {
+                const duplicateSerial = receivingBody
+                  .find("tr[data-serials]")
+                  .toArray()
+                  .some(row => {
+                    const serials =
+                      ($(row).attr("data-serials") || "")
+                        .split(",")
+                        .map(s => s.trim().toUpperCase());
+
+                    return serials.includes(serialKey);
+                  });
+
+                if (duplicateSerial) {
                   Swal.fire({
                     icon: "error",
-                    title: "Serial number has already been scanned",
+                    title: "Serial number already scanned",
                   });
+
+                  serializeBtn.prop("disabled", false);
                   return;
                 }
 
@@ -1099,33 +1606,26 @@ function serialDeliveryInput() {
 
                 totalQty += qty;
 
-                // if (existingRow.length) {
                 if (existingItem.length) {
                   serializeBtn.prop("disabled", false);
                   let qtyCell = existingItem.find("td:nth-child(5)");
                   let currentQty = parseInt(qtyCell.text()) || 0;
                   qtyCell.text(currentQty + 1);
 
-                  // get existing serials
                   let existingSerials = existingItem.attr("data-serials") || "";
 
-                  // convert to array
                   let serialArray = existingSerials
                     ? existingSerials.split(",").map((s) => s.trim())
                     : [];
 
-                  // use normalized scanned serial
                   if (!serialArray.includes(latestInput)) {
                     serialArray.push(latestInput);
                   }
 
-                  // remove duplicates just in case
                   serialArray = [...new Set(serialArray)];
 
-                  // update attribute
                   existingItem.attr("data-serials", serialArray.join(","));
 
-                  // update tooltip
                   existingItem.attr(
                     "data-bs-title",
                     "Serials:<br>" + serialArray.join("<br>"),
@@ -1195,7 +1695,7 @@ function serialDeliveryInput() {
                   let code = $(this).data("itemcode");
                   if (code == itemCode) {
                     exists = true;
-                    return false; // break loop
+                    return false; 
                   }
                 });
               });
@@ -1254,85 +1754,46 @@ function submitReceiving() {
     .on("submit", "#receivingForm", function (e) {
       e.preventDefault();
 
-      let formData = {
-        DeliveryNumber: $("#drNoRecForm").val(),
-        Branchorigin: $('input[name="originRecForm"]').val(),
-        BranchWhscode: $('input[name="origRecForm"]').val(),
-        ReceivingDate: $("#docDateRecForm").val(),
-        PostingDate: $("#postDate").val(),
-        Driver: $("#driverRecForm").val(),
-        TruckCategory: $("#truckCat").val(),
-        TruckPlate: $("#plateRecForm").val(),
-        Remarks: $("#remarksRecForm").val(),
-        ReceivedQty: $("#receivingQty").text(),
-        items: [],
-      };
+      let formData = buildReceivingData();
 
-      // GET TABLE ROWS
-      $("#receiving-form-table tbody tr[data-itemcode]").each(function () {
-        let row = $(this);
-
-        let serials = row.attr("data-serials") || "";
-
-        serials = serials
-          ? serials
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean)
-          : [];
-
-        if (
-          (row.data("serialbased") === true ||
-            row.data("serialbased") === "true") &&
-          serials.length > 0
-        ) {
-          serials.forEach((serial) => {
-            formData.items.push({
-              itemCode: row.data("itemcode"),
-              brand: row.find("td:eq(1)").text().trim(),
-              model: row.find("td:eq(2)").text().trim(),
-              category: row.find("td:eq(3)").text().trim(),
-              qty: 1,
-              serialBased: true,
-              InTransitRowNum: row.data("rownum"),
-              serial: serial,
-            });
-          });
-        } else {
-          formData.items.push({
-            itemCode: row.data("itemcode"),
-            brand: row.find("td:eq(1)").text().trim(),
-            model: row.find("td:eq(2)").text().trim(),
-            category: row.find("td:eq(3)").text().trim(),
-            qty: parseInt(row.find("td:eq(4)").text().trim()) || 0,
-            serialBased: false,
-            InTransitRowNum: row.data("rownum"),
-            serial: null,
-          });
-        }
-      });
-
-      // VALIDATION
-      if (formData.items.length === 0) {
-        Swal.fire({
+      // VALIDATION 1
+      if (!formData.items.length) {
+        return Swal.fire({
           icon: "warning",
           title: "No items found",
-          text: "Please add at least one item before submitting.",
         });
-        return;
       }
 
-      let receivingBtn = $("#submitRecBtn");
+      // VALIDATION 2
+      if (!currentOrder.requests?.length) {
+        return Swal.fire({
+          icon: "warning",
+          title: "No request data found",
+          text: "Please search a valid delivery first.",
+        });
+      }
 
-      Swal.fire({
-        title: "Submit Receiving?",
-        text: "Please confirm before submitting the receiving form.",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: "Submit",
-        cancelButtonText: "Cancel",
-      }).then((result) => {
-        if (!result.isConfirmed) return;
+      const unmatchedItems = formData.items.filter(receivedItem => {
+        return !currentOrder.requests.some(requestItem =>
+          requestItem.ItemName.trim().toUpperCase() === receivedItem.model.trim().toUpperCase() &&
+          requestItem.ItemBrand.trim().toUpperCase() === receivedItem.brand.trim().toUpperCase()
+        );
+      });
+
+      // CHECK UNMATCHED ITEMS
+      const uniqueUnmatched = Array.from(
+        new Map(
+          unmatchedItems.map(item => {
+            const key = `${item.brand.trim().toUpperCase()}-${item.model.trim().toUpperCase()}`;
+            return [key, item];
+          })
+        ).values()
+      );
+
+      const submitAjax = () => {
+        let receivingBtn = $("#submitRecBtn");
+        let draftBtn = $("submitDraftRecBtn");
+
         $.ajax({
           url: "dirs/receiving/dashboard/actions/save_createreceiving.php",
           type: "POST",
@@ -1343,26 +1804,26 @@ function submitReceiving() {
           beforeSend: function () {
             receivingBtn
               .prop("disabled", true)
-              .html(
-                `<span class="spinner-border spinner-border-sm"></span> Processing`,
-              );
+              .html(`<span class="spinner-border spinner-border-sm"></span> Processing`);
+              draftBtn.prop("disabled", true)
           },
           success: function (response) {
+            receivingBtn.prop("disabled", false).html("Submit");
+            draftBtn.prop("disabled", false);
+
             if (response.isSuccess === "success") {
-              receivingBtn.prop("disabled", false).html(`Receive`);
               Swal.fire({
                 icon: "success",
-                title: "Items has been received",
+                title: "Items have been received",
               }).then(() => {
                 returnReceiving();
               });
-              // OPEN PDF
+
               window.open(
                 `pdf/receiving.php?batch=${formData.DeliveryNumber}`,
-                "_blank",
+                "_blank"
               );
             } else {
-              receivingBtn.prop("disabled", false).html(`Receive`);
               Swal.fire({
                 icon: "error",
                 title: response.message || "Submission failed",
@@ -1370,16 +1831,80 @@ function submitReceiving() {
             }
           },
           error: function () {
-            receivingBtn.prop("disabled", false).html(`Receive`);
+            receivingBtn.prop("disabled", false).html("Submit");
+            draftBtn.prop("disabled", false);
+
             Swal.fire({
               icon: "error",
               title: "Something went wrong",
             });
-          },
-          complete: function () {
-            $("#submitRecBtn").prop("disabled", false).html("Receive");
-          },
+          }
         });
+      };
+
+      // IF UNMATCHED ITEMS EXIST
+      if (uniqueUnmatched.length > 0) {
+        return Swal.fire({
+          icon: "warning",
+          title: "Some items are not in the request",
+          html: `
+            <p>The following item(s) do not exist in the selected request:</p>
+            <ul style="text-align:left;">
+              ${uniqueUnmatched
+                .map(item => `<li>${item.brand} - ${item.model}</li>`)
+                .join("")}
+            </ul>
+            <p class="mt-2"><strong>Do you want to continue anyway?</strong></p>
+          `,
+          showCancelButton: true,
+          confirmButtonText: "Yes, Continue",
+          cancelButtonText: "Cancel",
+        }).then(result => {
+          if (result.isConfirmed) submitAjax();
+        });
+      }
+
+      // NORMAL CONFIRMATION
+      Swal.fire({
+        title: "Submit Receiving?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Submit",
+        cancelButtonText: "Cancel",
+      }).then(result => {
+        if (result.isConfirmed) submitAjax();
       });
     });
 }
+
+$(document)
+.off("click", "#submitDraftRecBtn")
+.on("click", "#submitDraftRecBtn", async function () {
+
+    let draftBtn = $("#submitDraftRecBtn");  
+    let submitBtn = $("#submitRecBtn");
+
+    const result = await Swal.fire({
+        title: "Save the following item(s) as draft?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Save",
+        cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
+
+    draftBtn
+        .prop("disabled", true)
+        .html(`<span class="spinner-border spinner-border-sm"></span> Processing`);
+
+    submitBtn.prop("disabled", true);
+
+    try {
+        await autoSaveDraft();
+        returnReceiving();
+    } catch (err) {
+        draftBtn.prop("disabled", false).html("Save as Draft");
+        submitBtn.prop("disabled", false);
+    }
+});

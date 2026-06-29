@@ -13,7 +13,20 @@ $(document).ready(function () {
 $("#main-menu")
   .find("li.nav-item")
   .find("a.nav-link[name='menu']")
-  .on("click", function () {
+  .on("click", async function () {
+
+    if (
+    $("#receiving-form-table tbody tr[data-itemcode]").length > 0
+) {
+    try {
+        console.log("Before autosave");
+        await autoSaveDraft();
+        console.log("After autosave");
+    } catch (err) {
+        console.error("Failed to save receiving draft:", err);
+    }
+}
+    
     $("#main-menu")
       .find("li.nav-item")
       .find("a.nav-link[name='menu']")
@@ -116,16 +129,27 @@ var tooltipList = [...tooltipTriggerList].map(
 );
 
 function logout() {
-  $.post("actions/save_logs_logout.php", {}, function (res) {
-    if ($.trim(res) == "OK") {
-      console.log(`LOGOUT HAS BEEN LOGGED`);
+  console.log(`LOG OUT FUNCTION HAS BEEN CALLED`)
+  Swal.fire({
+    title: "Are you sure to log out?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Log out",
+    cancelButtonText: "Cancel"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.post("actions/save_logs_logout.php", {}, function (res) {
+        if ($.trim(res) == "OK") {
+          console.log(`LOGOUT HAS BEEN LOGGED`);
+        }
+      });
+      $.post("actions/logout.php", {}, function (data) {
+        if ($.trim(data) == "OK") {
+          window.location.assign("index.php");
+        }
+      });
     }
-  });
-  $.post("actions/logout.php", {}, function (data) {
-    if ($.trim(data) == "OK") {
-      window.location.assign("index.php");
-    }
-  });
+  })
 }
 
 /*Security*/

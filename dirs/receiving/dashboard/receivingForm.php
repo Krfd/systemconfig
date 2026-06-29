@@ -8,7 +8,7 @@
         </div>
     </div>
 </div>
-<div class="container-fluid px-4">
+<div class="container-fluid px-4" id="receiving-page">
     <div class="d-flex justify-content-start align-items-baseline gap-3">
         <button class="btn btn-primary rounded-5" style="height: 45px" type="button" onclick="returnReceiving()">
             <i class="bi bi-arrow-left"></i>
@@ -27,7 +27,7 @@
                                 <div class="d-flex flex-column gap-1 col-4">
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="drNoRecForm" class="form-label text-dark-emphasis col-3"><small>DR No:</small></label>
-                                        <input type="text" name="drNoRecForm" id="drNoRecForm" class="form-control form-control-sm col search-order-field" data-field="deliveryNumber" style="background: #f7f7f7" oninput="this.value = this.value.toUpperCase()">
+                                        <input type="text" name="drNoRecForm" id="drNoRecForm" class="form-control form-control-sm col search-order-field" data-field="deliveryNumber" style="background: #f7f7f7" readonly>
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="refNoRecForm" class="form-label text-dark-emphasis col-3"><small>Stock Delivery No:</small></label>
@@ -35,7 +35,7 @@
                                     </div>
                                     <div class="d-flex align-items-baseline gap-3">
                                         <label for="stockReqNoRecForm" class="form-label text-dark-emphasis col-3"><small>Stock Request No:</small></label>
-                                        <input type="text" name="stockReqNoRecForm" id="stockReqNoRecForm" class="form-control form-control-sm col search-order-field" data-field="stockReqNumber" style="background: #f7f7f7" oninput="this.value = this.value.toUpperCase()">
+                                        <input type="text" name="stockReqNoRecForm" id="stockReqNoRecForm" class="form-control form-control-sm col search-order-field" data-field="stockReqNumber" style="background: #f7f7f7" readonly>
                                     </div>
                                     <div class="input-group col p-0 d-flex gap-1">
                                         <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
@@ -77,8 +77,9 @@
                                     </label>
                                 </div>
                                 <div class="d-flex gap-1">
-                                    <button type="button" class="btn btn-sm btn-primary" id="addSerialModalBtn" data-bs-toggle="modal" data-bs-target="#addSerialModal"><i class="bi bi-plus"></i> Insert</button>
-                                    <button type="button" class="btn btn-sm btn-primary" id="addDeliveryModalBtn"><i class="bi bi-plus"></i> Add</button>
+                                    <!-- <i class="bi bi-plus"></i> -->
+                                    <button type="button" class="btn btn-sm btn-primary" id="addSerialModalBtn" data-bs-toggle="modal" data-bs-target="#addSerialModal" title="Serial"><i class="bi bi-upc d-block d-md-none"></i>Serialize</button>
+                                    <button type="button" class="btn btn-sm btn-primary" id="addDeliveryModalBtn" title="No Serial"><del><i class="bi bi-upc d-block d-md-none"></i></del>Nonserialized</button>
                                     <button type="button" class="btn btn-sm btn-danger" id="clearDeliveryTableBtn" onclick="clearTable()">Clear</button>
                                 </div>
                             </div>
@@ -184,7 +185,7 @@
                                     </div>
                                 </div>
                                 <div class="d-flex gap-1">
-                                    <button type="submit" class="btn btn-primary" id="submitDraftRecBtn">Save as Draft</button>
+                                    <button type="button" class="btn btn-primary" id="submitDraftRecBtn">Save as Draft</button>
                                     <button type="submit" class="btn btn-primary" id="submitRecBtn">Submit</button>
                                 </div>
                             </div>

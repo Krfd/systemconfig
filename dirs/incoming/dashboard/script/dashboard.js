@@ -111,7 +111,8 @@ function loadIncoming() {
                   .toLocaleDateString("en-US", {
                     month: "2-digit",
                     day: "2-digit",
-                    year: "2-digit",
+                    // year: "2-digit",
+                    year: "numeric",
                   })
                   .replace(/\//g, "-")
               : "",
@@ -758,7 +759,8 @@ function openIncoming(DocEntry) {
             "-" +
             String(date.getDate()).padStart(2, "0") +
             "-" +
-            String(date.getFullYear()).slice(-2);
+            // String(date.getFullYear()).slice(-2);
+            date.getFullYear();
 
           // ================= HEADER =================
           $("#srn").val(header.SR_Number);
@@ -824,25 +826,11 @@ function picklistBasket() {
   $("#incoming_content").html(spinner);
   $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
     $("#main-content").html(data);
-    // if ($.fn.DataTable.isDataTable("#basketTable")) {
-    //   $("#basketTable").DataTable().clear().destroy();
-    // }
-    // $("#main-content").html(spinner);
-
     $("#basketTable tbody").html(`
         <tr>
           <td colspan="100%" class="text-center">${spinner}</td>
         </tr>
       `);
-
-    // console.log(`SHOULD LOAD SPINNER HERE`)
-
-    // setTimeout(function () {
-    //   $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
-    //     $("#main-content").hide().html(data).fadeIn(200);
-    // loadBasket();
-    //   });
-    // // }, 200);
 
     loadBasket(() => {
       $("#basketTable").DataTable({
@@ -1151,9 +1139,7 @@ function cancelPicklist() {
 
 // PICKLIST ITEMS
 function loadBasketContent() {
-  // $("#main-content").html(spinner);
   $("#incoming_content").html(spinner);
-  // setTimeout(function () {
   $.post("dirs/incoming/dashboard/picklistBasket.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
     $("#basketTable tbody").html(`
@@ -1163,7 +1149,6 @@ function loadBasketContent() {
       `);
     loadBasket();
   });
-  // }, 200);
 }
 
 // ALREADY HAS A PICKLIST NUMBER
@@ -1198,9 +1183,18 @@ function openPicklistedForm(SR_Number) {
             selectedValue("#origin", header.BranchSetup);
             selectedValue("#whcode", header.BranchOrigin_Whscode);
 
+            const date = new Date(header.DocDate);
+
+            const formattedDate =
+              String(date.getMonth() + 1).padStart(2, "0") +
+              "/" +
+              String(date.getDate()).padStart(2, "0") +
+              "/" +
+              date.getFullYear();
+
             // ================= HEADER =================
             $("#srn").val(header.SR_Number);
-            $("#date").val(header.DocDate);
+            $("#date").val(formattedDate);
             $("#status").val(header.RequestStatus);
             $("#purpose").val(header.PurposeRequest);
             $("#reqBy").val(header.RequestedBy);
@@ -1326,7 +1320,8 @@ function loadBasket() {
           const date = new Date(item.DocDate);
           const mm = String(date.getMonth() + 1).padStart(2, "0");
           const dd = String(date.getDate()).padStart(2, "0");
-          const yy = String(date.getFullYear()).slice(-2);
+          // const yy = String(date.getFullYear()).slice(-2);
+          const yy = date.getFullYear();
 
           const formatted = `${mm}-${dd}-${yy}`;
           // const formatted = date.toISOString().split("T")[0];

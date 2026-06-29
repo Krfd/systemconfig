@@ -118,19 +118,18 @@ function loadOutgoing() {
 
           rows.push([
             item.DocEntry,
-            // item.RowNum !== undefined ? item.RowNum.toString() : "",
             index + 1,
             item.SR_Number || "",
             item.BranchOrigin || "",
             item.BranchDestination || "",
             statusBadge,
-            // item.EncodeDate || "N/A",
             item.EncodeDate
               ? new Date(item.EncodeDate)
                   .toLocaleDateString("en-US", {
                     month: "2-digit",
                     day: "2-digit",
-                    year: "2-digit",
+                    // year: "2-digit",
+                    year: "numeric",
                   })
                   .replace(/\//g, "-")
               : "",
@@ -191,13 +190,9 @@ function loadOutgoing() {
         info: true,
         processing: false,
         autoWidth: false,
-        // order: [[0, "desc"]],
         language: {
-          emptyTable: "", // 🔥 removes "No data available in table"
+          emptyTable: "", 
         },
-        // language: {
-        //   emptyTable: "No records found",
-        // },
         rowCallback: function (row, data, index) {
           $("td", row).css({
             background: "#fcf7d4",
@@ -212,7 +207,6 @@ function loadOutgoing() {
           $("td:eq(1)", row).addClass("text-primary");
           $("td:eq(5)", row).css("text-align", "start");
 
-          // Add hover effect to empty rows too
           $(row).hover(
             function () {
               $(this).css("background", "#FFF4C2");
@@ -265,8 +259,8 @@ $(document).on("dblclick", "#outgoingTableDisplay tbody tr", function (e) {
 
 // TRIGGER TO OPEN A REQUEST
 $(document).on("click", ".open-item", function (e) {
-  e.preventDefault(); // prevent # jump
-  e.stopPropagation(); // stop row click behavior
+  e.preventDefault(); 
+  e.stopPropagation(); 
 
   let docEntry = $(this).closest("tr").data("docentry");
   openOutgoingForm(docEntry);
@@ -309,11 +303,33 @@ function openRequest(DocEntry) {
     dataType: "json",
     success: function (response) {
       if (response.isSuccess === "success") {
-        let rowCount = response.Items.length;
+        // let rowCount = response.Items.length;
         let totalQty = 0;
 
+        console.log(`UPDATED OUTGOING`)
+
         let header = response.Header;
-        let items = response.Items;
+        // let items = response.Items;
+        // Group by Brand + Model
+        let groupedItems = Object.values(
+          response.Items.reduce((acc, item) => {
+            const key = `${item.ItemBrand}|${item.ItemName}`;
+
+            if (!acc[key]) {
+              acc[key] = {
+                ...item,
+                Request_Qty: parseFloat(item.Request_Qty) || 0
+              };
+            } else {
+              acc[key].Request_Qty += parseFloat(item.Request_Qty) || 0;
+            }
+
+            return acc;
+          }, {})
+        );
+
+        let items = groupedItems;
+        let rowCount = items.length;
 
         $("#srn").val(header.SR_Number);
         $("#destination").val(header.BranchDestination);
@@ -327,18 +343,48 @@ function openRequest(DocEntry) {
         $("#reqBy").val(header.RequestedBy);
         $("#remarks").val(header.Remarks);
 
+        // let rows = "";
+        // items.forEach(function (item, index) {
+        //   let quantity = parseFloat(item.Request_Qty) || 0;
+        //   totalQty += quantity;
+
+        //   let badge = '';
+        //   if (item.PickedStatus === null || item.PickedStatus === "null") {
+        //     badge = `<span class="badge bg-danger">Excess</span>`
+        //   }
+
+        //   rows += `
+        //     <tr>
+        //       <td class="text-center" style="background: #fcf7d4">${index + 1}</td>
+        //       <td class="text-start" style="background: #fcf7d4">${item.ItemBrand}</td>
+        //       <td class="text-start" style="background: #fcf7d4">${item.ItemName}</td>
+        //       <td class="text-start" style="background: #fcf7d4">${item.ItemCategory}</td>
+        //       <td class="text-center" style="background: #fcf7d4">${item.Request_Qty}</td>
+        //       <td class="text-center" style="background: #fcf7d4">${badge}</td>
+        //     </tr>
+        //     `;
+        // });
+
         let rows = "";
+
         items.forEach(function (item, index) {
-          let quantity = parseFloat(item.Request_Qty) || 0;
-          totalQty += quantity;
-          rows += `
-            <tr>
-              <td class="text-center" style="background: #fcf7d4">${index + 1}</td>
-              <td class="text-start" style="background: #fcf7d4">${item.ItemBrand}</td>
-              <td class="text-start" style="background: #fcf7d4">${item.ItemName}</td>
-              <td class="text-start" style="background: #fcf7d4">${item.ItemCategory}</td>
-              <td class="text-center" style="background: #fcf7d4">${item.Request_Qty}</td>
-            </tr>
+            let quantity = parseFloat(item.Request_Qty) || 0;
+            totalQty += quantity;
+
+            let badge = "";
+            if (item.PickedStatus === null || item.PickedStatus === "null") {
+                badge = `<span class="badge bg-danger">Excess</span>`;
+            }
+
+            rows += `
+                <tr>
+                    <td class="text-center" style="background:#fcf7d4">${index + 1}</td>
+                    <td class="text-start" style="background:#fcf7d4">${item.ItemBrand}</td>
+                    <td class="text-start" style="background:#fcf7d4">${item.ItemName}</td>
+                    <td class="text-start" style="background:#fcf7d4">${item.ItemCategory}</td>
+                    <td class="text-center" style="background:#fcf7d4">${item.Request_Qty}</td>
+                    <td class="text-center" style="background:#fcf7d4">${badge}</td>
+                </tr>
             `;
         });
 
@@ -351,6 +397,7 @@ function openRequest(DocEntry) {
           for (let i = 0; i < emptyRows; i++) {
             let emptyRow = `
               <tr class="item-row empty-row" style="height: 40px; min-height: 40px;">
+                <td style="background: #fcf7d4"></td>
                 <td style="background: #fcf7d4"></td>
                 <td style="background: #fcf7d4"></td>
                 <td style="background: #fcf7d4"></td>
@@ -370,7 +417,6 @@ function openRequest(DocEntry) {
       console.error(xhr.responseText);
     },
   });
-  // });
 }
 
 $(document).on("click", ".cancel-outgoing", function (e) {
@@ -379,8 +425,6 @@ $(document).on("click", ".cancel-outgoing", function (e) {
 
   let SRN = $(this).data("srn");
   let DocEntry = $(this).data("entry");
-  console.log(`CANCEL SRN : ${SRN}`);
-  console.log(`CANCEL ENTRY : ${DocEntry}`);
   cancelOutgoingForm(DocEntry, SRN);
 });
 
@@ -389,7 +433,7 @@ function cancelOutgoingForm(DocEntry, SRN) {
     Swal.fire({
       icon: "error",
       title: "Missing SRN",
-      text: "Make sure that the SRN exists!",
+      text: "Make sure that the SRN exists",
       confirmButtonText: "OKAY",
     });
     return;
@@ -447,7 +491,6 @@ function terminateOutgoingForm(DocEntry, SRN) {
     Swal.fire({
       icon: "error",
       title: "Missing Information",
-      // text: "Make sure that both SRN and DocEntry exist!",
       confirmButtonText: "OKAY",
     });
     return;

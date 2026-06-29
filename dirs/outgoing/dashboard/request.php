@@ -60,6 +60,7 @@
                                             <th class="text-secondary">Model</th>
                                             <th class="text-secondary">Category</th>
                                             <th class="text-secondary text-center">Quantity</th>
+                                            <th class="text-secondary text-center"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
