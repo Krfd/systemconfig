@@ -24,9 +24,8 @@ $itemData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $firstRow = $header[0] ?? [];
 
-// $docDate  = $firstRow['ArrivalDate'];
 $docDate = isset($firstRow['ArrivalDate'])
-    ? date('M d, Y', strtotime($firstRow['ArrivalDate']))
+    ? date('m/d/Y', strtotime($firstRow['ArrivalDate']))
     : '';
 
 $driver   = $firstRow['Driver'] ?? '';
@@ -39,8 +38,8 @@ $remarks  = $firstRow['Remarks'] ?? 'N/A';
 $origin = $firstRow['OriginBranch'] ?? 'UNKNOWN';
 $originwhscode = $firstRow['OriginWhscode'] ?? 'UNKNOWN';
 $receivedDate = isset($firstRow['SysTimeStamp'])
-    ? date('M d, Y', strtotime($firstRow['SysTimeStamp']))
-    : date('M d, Y');
+    ? date('m/d/Y', strtotime($firstRow['SysTimeStamp']))
+    : date('m/d/Y');
 $receivedTime = isset($firstRow['SysTimeStamp'])
     ? date('h:i A', strtotime($firstRow['SysTimeStamp']))
     : date('h:i A');
@@ -197,18 +196,21 @@ function headerDetails($pdf, $docDate, $branch, $origin, $receivedDate, $receive
     $rightWidth = $pageWidth / 2;
 
     $labelWidth = 25; // fixed width for right-side labels
+    $rightLabelWidth = 20;
 
     // Row 1
     $pdf->Cell($leftWidth, 6, sprintf('%-19s %s', 'Receiving Branch:', $branch), 0, 0, 'L');
 
-    $pdf->Cell($rightWidth - $labelWidth, 6, 'Delivery Date:', 0, 0, 'R');
-    $pdf->Cell($labelWidth, 6, $receivedDate, 0, 1, 'L');
+    $pdf->SetX(145);
+    $pdf->Cell(30, 6, 'Delivery Date:', 0, 0, 'L');
+    $pdf->Cell($rightLabelWidth, 6, $receivedDate, 0, 1, 'R');
 
     // Row 2
     $pdf->Cell($leftWidth, 6, sprintf('%-21s %s', 'SR Number:', $srNumber), 0, 0, 'L');
 
-    $pdf->Cell($rightWidth - $labelWidth, 6, 'Document Date:', 0, 0, 'R');
-    $pdf->Cell($labelWidth, 6, $docDate, 0, 1, 'L');
+    $pdf->SetX(145);
+    $pdf->Cell(30, 6, 'Document Date:', 0, 0, 'L');
+    $pdf->Cell($rightLabelWidth, 6, $docDate, 0, 1, 'R');
 
     // Row 3
     $pdf->Cell($leftWidth, 6, sprintf('%-22s %s', 'Origin Branch:', $origin), 0, 0, 'L');
@@ -332,7 +334,7 @@ function renderItemsTable($pdf, $itemData)
         $counter++;
     }
 
-    $pdf->Ln(2);
+    // $pdf->Ln(2);
     $pdf->SetFont('Arial', 'B', 10);
 
     // Align total to the right side (same as Quantity column)

@@ -198,7 +198,7 @@ try {
             $categoryRaw = $row->Req_ItemCategory ?? '';
             $quantity = (int)($row->Req_Item_Qty ?? 0);
             $actual = isset($row->Actual_Item_Qty) && $row->Actual_Item_Qty !== ''
-                ? (int)$row->Actual_Item_Qty
+                ? $row->Actual_Item_Qty
                 : null;
 
             $key = $modelRaw . '|' . $brandRaw . '|' . $categoryRaw;
@@ -225,7 +225,7 @@ try {
             $modelLines = $pdf->NbLines($headers['Model'], $row['Model']);
             $brandLines = $pdf->NbLines($headers['Brand'], $row['Brand']);
             $qtyLines = $pdf->NbLines($headers['Quantity'], number_format($row['Quantity'] ?? 0, 0));
-            $actualLines = $pdf->NbLines($headers['Actual Qty'], $row['Actual'] !== null ? number_format($row['Actual'], 0) : '');
+            $actualLines = $pdf->NbLines($headers['Actual Qty'], $row['Actual'] !== null ? $row['Actual'] : '');
 
             $maxLines = max($brandLines, $modelLines, $categoryLines, $qtyLines, $actualLines, 1);
             $rowHeight = $lineHeight * $maxLines;
@@ -263,7 +263,14 @@ try {
 
             // Actual Qty
             $pdf->SetXY($x + $headers['#'] + $headers['Category'] + $headers['Model'] + $headers['Brand'] + $headers['Quantity'], $y);
-            $pdf->MultiCell($headers['Actual Qty'], $lineHeight, $row['Actual'] !== null ? number_format($row['Actual'], 0) : '', 0, 'C');
+            // $pdf->MultiCell($headers['Actual Qty'], $lineHeight, $row['Actual'] !== null ? $row['Actual'] : '', 0, 'C');
+            $pdf->MultiCell(
+                $headers['Actual Qty'],
+                $lineHeight,
+                ($row['Actual'] > 0) ? $row['Actual'] : '',
+                0,
+                'C'
+            );
             // Step 4: move Y by full row height
             $pdf->SetY($y + $rowHeight);
 

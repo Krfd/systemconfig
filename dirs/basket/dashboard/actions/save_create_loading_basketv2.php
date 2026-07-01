@@ -94,7 +94,6 @@ try {
     $referenceMap = [];
     $groupedItems = [];
     $updatedRecords = [];
-    // $executedOnce = false;
 
     foreach ($Item_Id as $key => $itmid) {
 

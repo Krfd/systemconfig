@@ -41,6 +41,16 @@ $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
     });
 };
 
+$(document).on("change", "#incomingTableDisplay .checkbox", function () {
+  const docEntry = $(this).data("docentry");
+
+  if ($(this).is(":checked")) {
+    selectedRows.add(docEntry);
+  } else {
+    selectedRows.delete(docEntry);
+  }
+});
+
 function loadIncoming() {
   $.ajax({
     url: "dirs/incoming/dashboard/actions/get_incoming.php",
@@ -105,15 +115,13 @@ function loadIncoming() {
             item.SR_Number || "",
             item.BranchDestination || "",
             statusBadge,
-            // item.EncodeDate || "",
             item.EncodeDate
               ? new Date(item.EncodeDate).toLocaleDateString("en-US", {
                   month: "2-digit",
                   day: "2-digit",
                   year: "numeric",
                 })
-              : // .replace(/\//g, "-")
-                "",
+              : "",
           ]);
         });
 
@@ -148,8 +156,8 @@ function loadIncoming() {
             emptyTable: "",
           },
           rowCallback: function (row, data, index) {
+            // checkbox.prop("checked", selectedRows.has(docEntry));
             $("td:not(:first-child)", row).css({
-              // background: "#FFFBDF",
               background: "#fcf7d4",
               padding: "3px",
               height: "40px",
@@ -160,13 +168,11 @@ function loadIncoming() {
             $("td:eq(2)", row).addClass("text-primary");
             $("td:eq(6)", row).addClass("text-start");
 
-            // Hover effect
             $(row).hover(
               function () {
                 $(this).css("background", "#FFF4C2");
               },
               function () {
-                // $(this).css("background", "#FFFBDF");
                 $(this).css("background", "#fcf7d4");
               },
             );
@@ -183,7 +189,6 @@ function loadIncoming() {
                 </tr>
               `);
               $($emptyRow).css({
-                // background: "#FFFBDF",
                 background: "#fcf7d4",
                 height: "40px",
                 "min-height": "40px",
@@ -380,14 +385,6 @@ function toggleCheckboxes() {
 }
 
 function loadPreview(SRNumbers) {
-  // $("#previewTableDisplay tbody").html(`
-  //   <tr>
-  //     <td colspan="100%" class="text-center">${spinner}</td>
-  //   </tr>
-  // `);
-  // $.post("dirs/incoming/dashboard/preview.php", function (data) {
-  //   $("#main-content").hide().html(data).fadeIn(200);
-
   $.ajax({
     url: "dirs/incoming/dashboard/actions/get_sr_items.php",
     type: "POST",
@@ -401,13 +398,6 @@ function loadPreview(SRNumbers) {
         let row = "";
         $("#previewTableDisplay").data("srnumbers", SRNumbers);
         let previewBody = $("#previewTableDisplay tbody");
-
-        // const isDisabled = "";
-
-        // <td class="ps-5" style="width: 80px; max-width: 80px">
-        //           <input type="checkbox" name="checkbox" id="${item.DocEntry}" data-docentry="${item.DocEntry}"
-        //           class="form-check-input align-self-center mx-auto checkbox border border-primary" ${isDisabled}>
-        //         </td>
 
         previewData.forEach((item, index) => {
           if (item.PickedStatus === "Y") {
@@ -464,7 +454,6 @@ function loadPreview(SRNumbers) {
       });
     },
   });
-  // });
 }
 
 function togglePreview() {
@@ -672,7 +661,6 @@ function checkAll() {
   }
 }
 
-// Optional: Prevent manual checking beyond 5
 $(document).on("change", "#incomingTableDisplay tbody .checkbox", function () {
   const checkedCount = $(
     "#incomingTableDisplay tbody .checkbox:checked",
@@ -695,15 +683,12 @@ function selectAll() {
 
   if (checkboxes.length === 0) return;
 
-  // Check if all valid checkboxes are already checked
   const allChecked = checkboxes.length === checkboxes.filter(":checked").length;
 
   if (allChecked) {
-    // Uncheck all
     checkboxes.prop("checked", false);
     $("#selectAllBtn").text("Select All");
   } else {
-    // Check all valid ones
     checkboxes.prop("checked", true);
     $("#selectAllBtn").text("Deselect All");
   }
@@ -841,7 +826,6 @@ function picklistBasket() {
 
 function loadIncomingDashboard() {
   $("#incoming_content").html(spinner);
-  // setTimeout(function () {
   $.post("dirs/incoming/dashboard/incoming.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
     $("#basketTableDashboard tbody").html(`
@@ -850,7 +834,6 @@ function loadIncomingDashboard() {
         </tr>
       `);
   });
-  // }, 200);
 }
 
 // PICKLIST BASKET TO PICKLIST ITEMS
@@ -1082,16 +1065,6 @@ function openPicklist(picklistNum) {
 function loadPicklistItems() {
   $("#incoming_content").html(spinner);
 
-  // $("#picklistItemTable tbody").html(`
-  //   <tr>
-  //     <td colspan="100%" class="text-center">${spinner}</td>
-  //   </tr>
-  // `);
-
-  // console.log(`OPENING PICKLIST`)
-
-  // setTimeout(function () {
-
   $.post(
     "dirs/incoming/dashboard/picklistItem.php",
     { picklistNum: picklistNumRef },
@@ -1105,7 +1078,6 @@ function loadPicklistItems() {
       openPicklist(picklistNumRef);
     },
   );
-  // }, 200);
 }
 
 // CANCEL PICKLIST
@@ -1249,7 +1221,6 @@ function openPicklistedForm(SR_Number) {
 
 // DISPLAY BASKET
 function loadBasket() {
-  // remove every bootstrap tooltip currently alive
   document.querySelectorAll(".tooltip").forEach((el) => el.remove());
 
   document.querySelectorAll("#basketTable tbody tr").forEach((el) => {
@@ -1318,10 +1289,9 @@ function loadBasket() {
           const date = new Date(item.DocDate);
           const mm = String(date.getMonth() + 1).padStart(2, "0");
           const dd = String(date.getDate()).padStart(2, "0");
-          // const yy = String(date.getFullYear()).slice(-2);
           const yy = date.getFullYear();
 
-          const formatted = `${mm}-${dd}-${yy}`;
+          const formatted = `${mm}/${dd}/${yy}`;
           // const formatted = date.toISOString().split("T")[0];
 
           const printOption = item.allHaveActualQty

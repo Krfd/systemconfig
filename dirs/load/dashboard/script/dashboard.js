@@ -137,6 +137,7 @@ function loadBasket() {
 
               if (status === "IN TRANSIT") badgeClass = "primary";
               else if (status === "PREPARING") badgeClass = "danger";
+              else if (status === "PARTIAL") badgeClass = "warning";
               else if (status === "DELIVERED") badgeClass = "success";
 
               return `<span class="badge bg-${badgeClass}" >${status}</span>`;

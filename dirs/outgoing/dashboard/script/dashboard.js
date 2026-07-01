@@ -334,7 +334,19 @@ function openRequest(DocEntry) {
         $("#origin").val(header.BranchOrigin);
         $("#whcode").val(header.BranchOrigin_Whscode);
 
-        $("#date").val(header.EncodeDate);
+        // $("#date").val(header.EncodeDate);
+
+        const date = new Date(header.EncodeDate);
+
+        const formattedDate =
+          String(date.getMonth() + 1).padStart(2, "0") +
+          "/" +
+          String(date.getDate()).padStart(2, "0") +
+          "/" +
+          date.getFullYear();
+
+        $("#date").val(formattedDate);
+
         $("#status").val(header.RequestStatus);
         $("#purpose").val(header.PurposeRequest);
         $("#reqBy").val(header.RequestedBy);

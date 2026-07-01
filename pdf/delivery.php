@@ -40,7 +40,10 @@ $stmt->nextRowSet();
 $printedStatus = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $firstRow = $header[0] ?? [];
-$deliveryDate  = isset($firstRow['DeliveryDate']) ? date('M d, Y', strtotime($firstRow['DocDate'])) : "N/A";
+// $deliveryDate  = isset($firstRow['DeliveryDate']) ? date('M d, Y', strtotime($firstRow['DocDate'])) : "N/A";
+$deliveryDate = isset($firstRow['DeliveryDate'])
+    ? date('m/d/Y', strtotime($firstRow['DeliveryDate']))
+    : "N/A";
 
 $driver   = $firstRow['Driver'] ?? '';
 $truckCat = $firstRow['TruckCategory'] ?? '';
@@ -50,7 +53,10 @@ $prepby   = $firstRow['ModifyBy'] ?? '';
 $remarks  = $firstRow['Remarks'] ?? 'N/A';
 $origin   = $firstRow['BranchSet'] ?? "N/A";
 $status   = $firstRow['DocStatus'] ?? "N/A";
-$docDate  = isset($firstRow['DocDate']) ? date('M d, Y', strtotime($firstRow['DocDate'])) : "N/A";
+// $docDate  = isset($firstRow['DocDate']) ? date('M d, Y', strtotime($firstRow['DocDate'])) : "N/A";
+$docDate = isset($firstRow['DocDate'])
+    ? date('m/d/Y', strtotime($firstRow['DocDate']))
+    : "N/A";
 
 $printed = (int)($printedStatus['Printed'] ?? 0);
 
@@ -207,15 +213,15 @@ function headerDetails($pdf, $deliveryDate, $branch, $origin, $status, $docDate)
     $leftWidth = $pageWidth / 2;
     $rightWidth = $pageWidth / 2;
 
-    $labelWidth = 22;
-
     $pdf->Cell($leftWidth, 6, sprintf('%-19s %s', 'Requesting Branch: ', $branch), 0, 0, 'L');
-    $pdf->Cell($leftWidth - $labelWidth, 6, 'Delivery Date: ', 0, 0, 'R');
-    $pdf->Cell($labelWidth, 6, $deliveryDate, 0, 1, 'L');
+    $pdf->SetX(148);
+    $pdf->Cell(30, 6, 'Delivery Date:', 0, 0, 'L');
+    $pdf->Cell(25, 6, $deliveryDate, 0, 1, 'L');
 
     $pdf->Cell($rightWidth, 6, sprintf('%-24s %s', 'Origin Branch: ', $origin), 0, 0, 'L');
-    $pdf->Cell($rightWidth - $labelWidth, 6, 'Document Date: ', 0, 0, 'R');
-    $pdf->Cell($labelWidth, 6, $docDate, 0, 1, 'L');
+    $pdf->SetX(148);
+    $pdf->Cell(30, 6, 'Document Date:', 0, 0, 'L');
+    $pdf->Cell(25, 6, $docDate, 0, 1, 'L');
 
     $pdf->Ln(2);
 }
@@ -350,6 +356,24 @@ function renderItemsTable($pdf, $itemData)
         $groupedItems[$key]['quantity'] += $quantity;
     }
 
+    // Sort grouped items
+    uasort($groupedItems, function ($a, $b) {
+
+        $categoryCompare = strcasecmp($a['category'], $b['category']);
+
+        if ($categoryCompare !== 0) {
+            return $categoryCompare;
+        }
+
+        $modelCompare = strcasecmp($a['model'], $b['model']);
+
+        if ($modelCompare !== 0) {
+            return $modelCompare;
+        }
+
+        return strcasecmp($a['brand'], $b['brand']);
+    });
+
     foreach ($groupedItems  as $row) {
 
         $brand = $row['brand'];
@@ -399,7 +423,7 @@ function renderItemsTable($pdf, $itemData)
         $counter++;
     }
 
-    $pdf->Ln(2);
+    // $pdf->Ln(2);
     $pdf->SetFont('Arial', 'B', 10);
 
     // Align total to the right side (same as Quantity column)

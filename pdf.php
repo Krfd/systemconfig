@@ -29,7 +29,7 @@ try {
 
     $status = $srnData->RequestStatus;
     $date = isset($srnData->RequestDate)
-        ? date("m/d/y", strtotime($srnData->RequestDate))
+        ? date("m/d/Y", strtotime($srnData->RequestDate))
         : "N/A";
     $origin = $routeData->BranchOrigin;
     $purpose = $srnData->PurposeRequest;
@@ -139,6 +139,9 @@ try {
         $labelWidth = 15;
         $colonWidth = 3;
         $valueWidth = 60;
+        $rightLabelWidth = 10;
+        $rightColonWidth = 5;
+        $rightValueWidth = 20;
 
         $rightBlockWidth = $labelWidth + $colonWidth + $valueWidth;
 
@@ -154,9 +157,9 @@ try {
         $pdf->SetX($pdf->GetPageWidth() - $rightBlockWidth + 30);
 
         // Status (right)
-        $pdf->Cell($labelWidth, 5, 'Status', 0, 0);
-        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
-        $pdf->Cell($valueWidth, 5, $status, 0, 1);
+        $pdf->Cell($rightLabelWidth, 5, 'Status', 0, 0);
+        $pdf->Cell($rightColonWidth, 5, ':', 0, 0, 'C');
+        $pdf->Cell($rightValueWidth, 5, $status, 0, 1, 'R');
 
         $pdf->SetFont('Arial', '', 9);
 
@@ -170,9 +173,9 @@ try {
         $pdf->SetX($pdf->GetPageWidth() - $rightBlockWidth + 30);
 
         // Date (right)
-        $pdf->Cell($labelWidth, 5, 'Date', 0, 0);
-        $pdf->Cell($colonWidth, 5, ':', 0, 0, 'C');
-        $pdf->Cell($valueWidth, 5, $date, 0, 1);
+        $pdf->Cell($rightLabelWidth, 5, 'Date', 0, 0);
+        $pdf->Cell($rightColonWidth, 5, ':', 0, 0, 'C');
+        $pdf->Cell($rightValueWidth, 5, $date, 0, 1, 'R');
 
         /* ---------- ROW 3 (CATEGORY) ---------- */
         if (!empty($category)) {
@@ -250,6 +253,25 @@ try {
         $lineHeight = 5;
         $i = 1;
         $totalQty = 0;
+
+        usort($itemData, function ($a, $b) {
+            // Sort by Category first
+            $category = strcasecmp(trim($a->ItemCategory), trim($b->ItemCategory));
+
+            if ($category !== 0) {
+                return $category;
+            }
+
+            // Then sort by Model/Item Name
+            $model = strcasecmp(trim($a->ItemName), trim($b->ItemName));
+
+            if ($model !== 0) {
+                return $model;
+            }
+
+            // Finally sort by Brand
+            return strcasecmp(trim($a->ItemBrand), trim($b->ItemBrand));
+        });
 
         foreach ($itemData as $row) {
 

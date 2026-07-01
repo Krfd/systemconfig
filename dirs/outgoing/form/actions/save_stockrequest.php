@@ -56,7 +56,6 @@ try {
 
 
     // 🔹 2. Insert Header
-    // $stmtHeader = $conn->prepare("EXEC dbo.[Create_StockRequest] ?,?,?,?,?,?,?,?");
     $stmtHeader = $conn->prepare("EXEC dbo.[Create_StockRequest] ?,?,?,?,?,?,?");
     $stmtHeader->execute([
         $User,

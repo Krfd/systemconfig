@@ -165,8 +165,8 @@ try {
             <h2>Session Locked</h2>
             <p>Please login again to continue</p>
             <form id="relogin-frm" method="POST">
-                <input type="text" id="newUsername" class="form-control" placeholder="Username" required/>
-                <input type="password" id="newPassword" class="form-control" placeholder="Password" required/>
+                <input type="text" id="newUsername" class="form-control" placeholder="Username" required />
+                <input type="password" id="newPassword" class="form-control" placeholder="Password" required />
                 <div class="col form-check d-flex justify-content-start mt-2 ms-1">
                     <input class="form-check-input" type="checkbox" id="toggle-show-password" onclick="togglePassword()">
                     <label class="form-check-label text-muted ms-2" for="toggle-show-password">
@@ -225,6 +225,7 @@ try {
         let groupedItems = {};
         let receivingGroupedItems = {}
         let receivingObserver = null;
+        const selectedRows = new Set();
 
         function togglePassword() {
             const passwordField = document.getElementById('newPassword');

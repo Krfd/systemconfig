@@ -9,11 +9,7 @@ $Category = $_POST['Category'];
 try {
     $conn->beginTransaction();
 
-    // $fetch_items = $conn->prepare("SELECT ItemSerial, ItemCode, ItemName, ItemBrand, ItemCategory 
-    // FROM DEMO_DATA_WAREHOUSE 
-    // WHERE ItemBrand = ? AND ItemName = ? AND ItemCategory = ?");
     $fetch_items = $conn->prepare("EXEC Get_Nonserialize ?, ?");
-    // $fetch_items->execute([$Brand, $Model, $Category]);
     $fetch_items->execute([$Brand, $Model]);
     $get_items = $fetch_items->fetchAll(PDO::FETCH_ASSOC);
 
@@ -33,7 +29,7 @@ try {
         "Data" => $get_items
     );
     echo json_encode($response);
-} catch(PDOException $e) {
+} catch (PDOException $e) {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollback();
     $response = array(

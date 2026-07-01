@@ -338,9 +338,9 @@ function loadReceiving() {
           const timestamp = new Date().toLocaleString();
 
           const formattedTimestamp =
-            `${String(new Date(arrivalDate).getMonth() + 1).padStart(2, "0")}-` +
-            `${String(new Date(arrivalDate).getDate()).padStart(2, "0")}-` +
-            `${String(new Date(arrivalDate).getFullYear()).slice(-2)} ` +
+            `${String(new Date(arrivalDate).getMonth() + 1).padStart(2, "0")}/` +
+            `${String(new Date(arrivalDate).getDate()).padStart(2, "0")}/` +
+            `${String(new Date(arrivalDate).getFullYear())} ` +
             `${new Date(timestamp).toLocaleTimeString()}`;
 
           rows.push([
@@ -1067,6 +1067,7 @@ function getOrderDetails(field, value) {
       let header = response.Header;
       let items = response.Items;
       currentOrder.requests = response.Requests;
+      console.log(`REQUESTED ITEMS : ${JSON.stringify(currentOrder.requests)}`);
 
       if (response.Header?.Status === "failed") {
         Swal.fire({
@@ -1097,6 +1098,8 @@ function getOrderDetails(field, value) {
         toggleReceivingButtons(true);
       } else {
         toggleReceivingButtons(false);
+
+        console.log(`RESPONSE: ${response.isSuccess}`);
 
         Swal.fire({
           icon: "error",
@@ -1468,7 +1471,7 @@ function addNonSerialize() {
                     let itemCode = item.Itemcode;
                     let itemRowNum = data[0].ItemRowNum;
 
-                    console.log(`RECEIVING ITEM : ${JSON.stringify(item)}`);
+                    // console.log(`RECEIVING ITEM : ${JSON.stringify(item)}`);
 
                     if (!brand || !model || !category || !itemCode) {
                       console.warn(
@@ -1589,6 +1592,8 @@ function serialDeliveryInput() {
             let existingTotal = parseInt($("#receivingQty").text()) || 0;
             let totalQty = existingTotal;
             let receivingBody = $("#receiving-form-table tbody");
+
+            console.log(`RECEIVING ITEM: ${JSON.stringify(items)}`);
 
             if (!items || items.length === 0) {
               e.stopPropagation();
@@ -1789,10 +1794,10 @@ function serialDeliveryInput() {
                       <td class="align-middle ps-3" style="background: #fcf7d4">${brand}</td>
                       <td class="align-middle ps-3" style="background: #fcf7d4">${model}</td>
                       <td class="align-middle ps-3" style="background: #fcf7d4">${category}</td>
-                      <td class="align-middle ps-3" style="background: #fcf7d4">${qty}</td>
+                      <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${qty}</td>
                     </tr>
                   `;
-                  console.log(`ITEM SERIAL: ${item.ItemSerial}`);
+                  // console.log(`ITEM SERIAL: ${item.ItemSerial}`);
 
                   let emptyRow = receivingBody
                     .find("tr:not([data-itemcode])")
@@ -1819,7 +1824,7 @@ function serialDeliveryInput() {
                   $("#receiving-form-table").DataTable().destroy();
                 }
 
-                console.log(`UPDATED SERIAL INPUT FUNCTION`);
+                // console.log(`UPDATED SERIAL INPUT FUNCTION`);
 
                 let exists = false;
                 $("#receiving-form-table tbody tr").each(function () {
@@ -1977,6 +1982,8 @@ function submitReceiving() {
           },
         });
       };
+
+      // console.log(`REQUESTED ITEMS : ${JSON.stringify(currentOrder.requests)}`);
 
       // IF UNMATCHED ITEMS EXIST
       if (uniqueUnmatched.length > 0) {
