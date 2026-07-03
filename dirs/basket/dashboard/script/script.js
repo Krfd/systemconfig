@@ -161,9 +161,22 @@ $(document).on("click", ".datatables .dropdown .assign-branch", function (e) {
   let branches = $(this).data("branches");
 
   $("#main-content").html(spinner);
-  setTimeout(function () {
+  // setTimeout(function () {
+  $.post("dirs/basket/dashboard/branchAssignment.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+    let summaryTable = $("#summaryTable tbody")
+     summaryTable.html(`
+      <tr>
+        <td colspan="6" class="text-center align-middle" style="height:300px;">
+            <div style="height:300px; display:flex; align-items:center; justify-content:center;">
+              ${spinner}
+            </div>
+        </td>
+      </tr>
+    `);
     assignBranch(picklist, branches);
-  }, 200);
+  // }, 200);
+  })
 });
 
 // EDIT ASSIGNMENT
@@ -175,10 +188,22 @@ $(document).on("click", ".edit-branch", function (e) {
   let branches = $(this).data("branches");
 
   $("#main-content").html(spinner);
-
-  setTimeout(function () {
+  $.post("dirs/basket/dashboard/editAssignment.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+  // setTimeout(function () {
+    let summaryTable = $("#editSummaryTable tbody")
+     summaryTable.html(`
+      <tr>
+        <td colspan="6" class="text-center align-middle" style="height:300px;">
+            <div style="height:300px; display:flex; align-items:center; justify-content:center;">
+              ${spinner}
+            </div>
+        </td>
+      </tr>
+    `);
     editAssignBranch(picklist, branches);
-  }, 200);
+  // }, 200);
+  })
 });
 
 function loadDeliveryBasketContent() {
@@ -1066,8 +1091,8 @@ $(document).on(
 );
 
 function assignBranch(picklist, branchees) {
-  $.post("dirs/basket/dashboard/branchAssignment.php", {}, function (data) {
-    $("#main-content").hide().html(data).fadeIn(200);
+  // $.post("dirs/basket/dashboard/branchAssignment.php", {}, function (data) {
+  //   $("#main-content").hide().html(data).fadeIn(200);
     // summaryTable.html(`
     //   <tr>
     //     <td colspan="6" class="text-center align-middle" style="height:300px;">
@@ -1112,13 +1137,15 @@ function assignBranch(picklist, branchees) {
 
           $("#summaryTable thead").html(headerRow);
 
+          console.log(`UPDATED BRANCH ASSIGNMENT FUNCTION `)
+
           const date = new Date(header.DocDate);
 
           const formattedDate =
             String(date.getMonth() + 1).padStart(2, "0") +
-            "-" +
+            "/" +
             String(date.getDate()).padStart(2, "0") +
-            "-" +
+            "/" +
             // String(date.getFullYear()).slice(-2);
             date.getFullYear();
 
@@ -1292,7 +1319,7 @@ function assignBranch(picklist, branchees) {
         }
       },
     });
-  });
+  // });
 }
 
 function editAssignBranch(picklist, branchees) {
@@ -1338,9 +1365,9 @@ function editAssignBranch(picklist, branchees) {
 
           const formattedDate =
             String(date.getMonth() + 1).padStart(2, "0") +
-            "-" +
+            "/" +
             String(date.getDate()).padStart(2, "0") +
-            "-" +
+            "/" +
             date.getFullYear();
 
           $("#pcklstno").val(header.PKList_Number);
@@ -3232,12 +3259,12 @@ function serialDeliveryInput(Picklists) {
                         $("#loadingQty").text(totalQty);
                       } else {
                         console.log(`ITEM NOT FOUND`);
-                        // Swal.fire({
-                        //   icon: "error",
-                        //   title: "Item does not belong to this batch",
-                        //   showConfirmButton: true,
-                        //   confirmButtonText: "OKAY",
-                        // })
+                        Swal.fire({
+                          icon: "error",
+                          title: "Item does not belong to this batch",
+                          showConfirmButton: true,
+                          confirmButtonText: "OKAY",
+                        })
                         $("#serializeBtn").prop("disabled", false);
                       }
                     },

@@ -458,11 +458,12 @@ function loadReceiving() {
 }
 
 function receivingForm(reference = null) {
-  $("#main-content").html(spinner);
-
+  // $("#main-content").html(spinner);
   $.post("dirs/receiving/dashboard/receivingForm.php", {}, function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
 
+    // $("#receiving-serial-table tbody").empty();
+    // console.log(`SERIAL TABLE IS EMPTY`)
     userDetails();
     toggleReceivingButtons(false);
     // fetchOrderDetails();
@@ -605,11 +606,8 @@ function receivingForm(reference = null) {
 }
 
 function autoSaveDraft() {
-  console.log("RECEIVING HAS BEEN SAVED AS DRAFT");
-  console.log($("#receiving-form-table tbody tr[data-itemcode]").length);
-
   const formData = buildReceivingData();
-  console.log(`FORM DATA : ${JSON.stringify(formData)}`);
+  // console.log(`FORM DATA : ${JSON.stringify(formData)}`);
 
   let draftBtn = $("#submitDraftRecBtn");
   let submitBtn = $("#submitRecBtn");
@@ -632,6 +630,8 @@ function autoSaveDraft() {
     success: function (response) {
       draftBtn.prop("disabled", false).html("Save as Draft");
       submitBtn.prop("disabled", false);
+
+      // console.log(`DRAFT VALIDATION: ${response.message}`)
       if (response.isSuccess === "success") {
         Swal.fire({
           icon: "success",
@@ -799,6 +799,8 @@ function openReceivedForm(rcvdNumber) {
             } else {
               itemType = '<span class="badge bg-danger">Non-serialize</span>';
             }
+
+            console.log(`RECEIVED ITEM: ${JSON.stringify(item)}`)
 
             rows += `
               <tr>
@@ -1067,7 +1069,7 @@ function getOrderDetails(field, value) {
       let header = response.Header;
       let items = response.Items;
       currentOrder.requests = response.Requests;
-      console.log(`REQUESTED ITEMS : ${JSON.stringify(currentOrder.requests)}`);
+      // console.log(`REQUESTED ITEMS : ${JSON.stringify(currentOrder.requests)}`);
 
       if (response.Header?.Status === "failed") {
         Swal.fire({
@@ -1196,7 +1198,7 @@ function getOrders(reference) {
           const itemKey = item.ItemModel.trim().toUpperCase();
           const serials = [...new Set(item.Serials)];
 
-          console.log(`DRAFT ITEM SERIAL : ${item.Serials}`);
+          // console.log(`DRAFT ITEM SERIAL : ${item.Serials}`);
 
           rows += `
             <tr data-itemkey="${itemKey}"
@@ -1593,7 +1595,7 @@ function serialDeliveryInput() {
             let totalQty = existingTotal;
             let receivingBody = $("#receiving-form-table tbody");
 
-            console.log(`RECEIVING ITEM: ${JSON.stringify(items)}`);
+            // console.log(`RECEIVING ITEM: ${JSON.stringify(items)}`);
 
             if (!items || items.length === 0) {
               e.stopPropagation();
@@ -1931,7 +1933,7 @@ function submitReceiving() {
 
       const submitAjax = () => {
         let receivingBtn = $("#submitRecBtn");
-        let draftBtn = $("submitDraftRecBtn");
+        let draftBtn = $("#submitDraftRecBtn");
 
         $.ajax({
           url: "dirs/receiving/dashboard/actions/save_createreceiving.php",
@@ -1957,13 +1959,17 @@ function submitReceiving() {
                 icon: "success",
                 title: "Items have been received",
               }).then(() => {
+                window.open(
+                  `pdf/receiving.php?batch=${formData.DeliveryNumber}`,
+                  "_blank",
+                );
                 returnReceiving();
               });
 
-              window.open(
-                `pdf/receiving.php?batch=${formData.DeliveryNumber}`,
-                "_blank",
-              );
+              // window.open(
+              //   `pdf/receiving.php?batch=${formData.DeliveryNumber}`,
+              //   "_blank",
+              // );
             } else {
               Swal.fire({
                 icon: "error",
@@ -2026,6 +2032,16 @@ $(document)
     let draftBtn = $("#submitDraftRecBtn");
     let submitBtn = $("#submitRecBtn");
 
+    let formData = buildReceivingData();
+
+    // VALIDATION 1
+    if (!formData.items.length) {
+      return Swal.fire({
+        icon: "warning",
+        title: "No items found",
+      });
+    }
+
     const result = await Swal.fire({
       title: "Save the following item(s) as draft?",
       icon: "question",
@@ -2046,7 +2062,9 @@ $(document)
 
     try {
       await autoSaveDraft();
-      returnReceiving();
+      // returnReceiving();
+      // loadDrafts();
+      drafts()
     } catch (err) {
       draftBtn.prop("disabled", false).html("Save as Draft");
       submitBtn.prop("disabled", false);
@@ -2072,10 +2090,16 @@ $(document).on("click", ".dropdown .open-draft", function (e) {
   let reference = $(this).data("ref");
 
   $("#main-content").html(spinner);
+  $("#receiving-serial-table tbody").empty();
   receivingForm(reference);
 });
 
 function loadDrafts() {
+  $("#receiving-form-table tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
   $.ajax({
     url: "dirs/receiving/dashboard/actions/get_drafts.php",
     type: "POST",
@@ -2092,9 +2116,9 @@ function loadDrafts() {
           const timestamp = new Date().toLocaleString();
 
           const formattedModified =
-            `${String(new Date(modified).getMonth() + 1).padStart(2, "0")}-` +
-            `${String(new Date(modified).getDate()).padStart(2, "0")}-` +
-            `${String(new Date(modified).getFullYear()).slice(-2)} ` +
+            `${String(new Date(modified).getMonth() + 1).padStart(2, "0")}/` +
+            `${String(new Date(modified).getDate()).padStart(2, "0")}/` +
+            `${String(new Date(modified).getFullYear())} ` +
             `${new Date(timestamp).toLocaleTimeString()}`;
 
           rows.push([

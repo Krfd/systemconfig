@@ -1,3 +1,5 @@
 [2026-06-30 13:14:36] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShiftDemo\dirs\outgoing\dashboard\actions\get_outgoing.php on line 5
 [2026-07-01 08:32:27] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShiftDemo\dirs\outgoing\dashboard\actions\get_outgoing.php on line 5
 [2026-07-01 16:31:18] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\iShiftDemo\dirs\outgoing\dashboard\actions\get_outgoing.php on line 5
+[2026-07-03 21:56:47] Error: [2] SQLSTATE[08S01]: [Microsoft][ODBC Driver 17 for SQL Server]TCP Provider: An established connection was aborted by the software in your host machine.
+ in C:\xampp\htdocs\ishiftdemo\dirs\outgoing\dashboard\actions\get_outgoing.php on line 11

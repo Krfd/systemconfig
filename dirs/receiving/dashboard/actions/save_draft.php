@@ -50,29 +50,38 @@ try {
 
     $conn->beginTransaction();
 
-    // Draft_Validation -> User and DeliveryNumber
-    // $validate = $conn->prepare("SELECT COUNT(*) FROM DraftReceivingHeader WHERE ReferenceNumber = ?");
-    // $validate->execute([$DeliveryNumber]);
+    $stmtBatch = $conn->prepare("EXEC dbo.ReceivingBat_Number ?");
 
-    // if ($validate->fetchColumn() > 0) {
-    //     echo json_encode([
-    //         "isSuccess" => "error",
-    //         "message" => "Record already exists"
-    //     ]);
-    //     exit;
-    // }
+    $stmtBatch->execute([$User]);
+    $result = $stmtBatch->fetch(PDO::FETCH_ASSOC);
+    $BatchNumberReceived = $result['BatchNumberReceived'];
 
-    $validate = $conn->prepare("EXEC Draft_Validation ?, ?");
-    $validate->execute([$User, $DeliveryNumber]);
+    $headerExists = false;
 
-    $result = $validate->fetch(PDO::FETCH_ASSOC);
+    foreach ($items as $item) {
+        $validate = $conn->prepare("EXEC Draft_Validation ?,?,?,?,?,?");
 
-    if ($result['IsValid']) {
-        echo json_encode([
-            "isSuccess" => "error",
-            "message" => "Record already exists"
+        $rownum = $item['InTransitRowNum'] ?? null;
+        $qty = $item['qty'] ?? 0;
+
+        if (empty($rownum)) {
+            continue;
+        }
+
+        $validate->execute([
+            $User,
+            $BatchNumberReceived,
+            $DeliveryNumber,
+            $qty,
+            $rownum,
+            $item['serial'] ?? null
         ]);
-        exit;
+
+        $validationResult = $validate->fetch(PDO::FETCH_ASSOC);
+
+        if (!empty($validationResult['IsValid'])) {
+            $headerExists = true;
+        }
     }
 
     /* =========================================================
@@ -109,53 +118,56 @@ try {
 
     $ReceivedCode = generateUniqueAppCode($conn);
 
+    if (!$headerExists) {
     /* =========================================================
            INSERT RECEIVING HEADER
         ========================================================= */
-    $stmtHeader = $conn->prepare("EXEC dbo.Draft_Receiving_Header
-                ?,?,?,?,?,?,?,?,?,?,?,?");
-    $stmtHeader->execute([
-        $User,
-        $DeliveryNumber,
-        $BatchNumberReceived,
-        $ReceivedCode,
-        $Deliverydate,
-        $PostingDate,
-        $Driver,
-        $TruckCategory,
-        $TruckPlate,
-        $Remarks,
-        $Branchorigin,
-        $BranchWhscode
-    ]);
-
+        $stmtHeader = $conn->prepare("EXEC dbo.Draft_Receiving_Header
+                    ?,?,?,?,?,?,?,?,?,?,?,?");
+        $stmtHeader->execute([
+            $User,
+            $DeliveryNumber,
+            $BatchNumberReceived,
+            $ReceivedCode,
+            $Deliverydate,
+            $PostingDate,
+            $Driver,
+            $TruckCategory,
+            $TruckPlate,
+            $Remarks,
+            $Branchorigin,
+            $BranchWhscode
+        ]);
+        
     /* =========================================================
         COLLECT RECEIVING ITEMS
     ========================================================= */
-    $stmtCollect = $conn->prepare("EXEC dbo.Draft_Receiving_Orders ?, ?, ?, ?, ?, ?");
+        $stmtCollect = $conn->prepare("EXEC dbo.Draft_Receiving_Orders ?, ?, ?, ?, ?, ?");
 
-    foreach ($items as $item) {
-        $rownum = $item['InTransitRowNum'] ?? null;
-        $qty = $item['qty'] ?? 0;
+        foreach ($items as $item) {
+            $rownum = $item['InTransitRowNum'] ?? null;
+            $qty = $item['qty'] ?? 0;
 
-        if (empty($rownum)) {
-            continue;
+            if (empty($rownum)) {
+                continue;
+            }
+
+            $stmtCollect->execute([
+                $User,
+                $BatchNumberReceived,
+                $DeliveryNumber,
+                $qty,
+                $rownum,
+                $item['serial'] ?? null
+            ]);
         }
-
-        $stmtCollect->execute([
-            $User,
-            $BatchNumberReceived,
-            $DeliveryNumber,
-            $qty,
-            $rownum,
-            $item['serial'] ?? null
-        ]);
     }
 
     $conn->commit();
 
     echo json_encode([
         "isSuccess" => 'success',
+        "message" => "Draft saved successfully."
     ]);
 } catch (Exception $e) {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());

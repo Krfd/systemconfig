@@ -35,7 +35,7 @@ try {
     $branchName = $picklistHeader->Req_Branch ?? "N/A";
     $picklistNum = $picklistHeader->PKList_Number ?? "N/A";
     $docDate = isset($picklistHeader->DocDate)
-        ? date("m/d/y", strtotime($picklistHeader->DocDate))
+        ? date("m/d/Y", strtotime($picklistHeader->DocDate))
         : "N/A";
     $timestamp = date("m/d/y h:i A", strtotime($picklistHeader->DocDate));
     $executedby = $executedBy ?? "N/A";
@@ -216,6 +216,23 @@ try {
             $groupedItems[$key]['Quantity'] += $quantity;
             $groupedItems[$key]['Actual'] = (int)$actual;
         }
+
+        uasort($groupedItems, function ($a, $b) {
+
+            $categoryCompare = strcasecmp($a['Category'], $b['Category']);
+
+            if ($categoryCompare !== 0) {
+                return $categoryCompare;
+            }
+
+            $modelCompare = strcasecmp($a['Model'], $b['Model']);
+
+            if ($modelCompare !== 0) {
+                return $modelCompare;
+            }
+
+            return strcasecmp($a['Brand'], $b['Brand']);
+        });
 
         /* ---------- TABLE ROWS ---------- */
         foreach ($groupedItems as $row) {

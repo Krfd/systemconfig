@@ -48,12 +48,17 @@ $(document).on("click", ".dropdown .create-dr", function (e) {
 
 function loadingBasket() {
   $("#main-content").html(spinner);
-  setTimeout(function () {
+  // setTimeout(function () {
     $.post("dirs/load/dashboard/load.php", {}, function (data) {
       $("#main-content").hide().html(data).fadeIn(200);
+      $("#loadingBasketTableDisplay tbody").html(`
+        <tr>
+          <td colspan="100%" class="text-center">${spinner}</td>
+        </tr>
+      `);
       loadBasket();
     });
-  }, 200);
+  // }, 200);
 }
 
 $(document).on("click", ".print-dr", function () {

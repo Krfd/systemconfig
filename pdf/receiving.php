@@ -285,6 +285,23 @@ function renderItemsTable($pdf, $itemData)
         $groupedItems[$key]['quantity'] += $quantity;
     }
 
+    uasort($groupedItems, function ($a, $b) {
+
+        $categoryCompare = strcasecmp($a['category'], $b['category']);
+
+        if ($categoryCompare !== 0) {
+            return $categoryCompare;
+        }
+
+        $modelCompare = strcasecmp($a['model'], $b['model']);
+
+        if ($modelCompare !== 0) {
+            return $modelCompare;
+        }
+
+        return strcasecmp($a['brand'], $b['brand']);
+    });
+
     foreach ($groupedItems  as $row) {
 
         $brand = $row['brand'];
