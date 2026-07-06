@@ -11,6 +11,8 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
+  console.log(`UPDATED DELIVERY`);
+  $("#delivery_content").html(spinner);
   $.post("dirs/delivery/dashboard/components/main.php", {}, function (data) {
     $("#delivery_content").html(data);
     $("#deliveryTableDisplay tbody").html(`
@@ -19,10 +21,6 @@ function loadDashboard() {
       </tr>
     `);
     loadDelivery();
-    // $("#deliveryTableDisplay").DataTable({
-    //   pageLength: 50,
-    //   order: [0, "desc"],
-    // });
   });
 }
 
@@ -136,17 +134,17 @@ function loadDelivery() {
             </li>
           `;
 
-          if (status !== "TERMINATED") {
-            dropdownItems += `
-              <li>
-                <a class="dropdown-item print-dr" href="#"
-                  data-batch="${item.BatchNumber}"
-                  data-branches="${encodeURIComponent(JSON.stringify(branches))}">
-                  Print DR
-                </a>
-              </li>
-            `;
-          }
+          // if (status !== "TERMINATED") {
+          //   dropdownItems += `
+          //     <li>
+          //       <a class="dropdown-item print-dr" href="#"
+          //         data-batch="${item.BatchNumber}"
+          //         data-branches="${encodeURIComponent(JSON.stringify(branches))}">
+          //         Print DR
+          //       </a>
+          //     </li>
+          //   `;
+          // }
 
           rows.push([
             index++,
@@ -155,14 +153,13 @@ function loadDelivery() {
             item.TruckCategory,
             item.TruckPlate,
             item.DeliveryDate
-              ? new Date(item.DeliveryDate)
-                  .toLocaleDateString("en-US", {
-                    month: "2-digit",
-                    day: "2-digit",
-                    year: "2-digit",
-                  })
-                  .replace(/\//g, "-")
-              : "",
+              ? new Date(item.DeliveryDate).toLocaleDateString("en-US", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  year: "numeric",
+                })
+              : // .replace(/\//g, "-")
+                "",
             statusBadge,
             '<div class="dropdown dropstart">' +
               '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
@@ -1600,6 +1597,7 @@ $(document)
             <td colspan="100%" class="text-center">${spinner}</td>
           </tr>
         `);
+        console.log(`DELIVERY NUMBER: ${DeliveryNum}`);
         openDeliveryForm(DeliveryNum);
       });
     },
@@ -1607,6 +1605,7 @@ $(document)
 
 function openDeliveryForm(DeliveryNum) {
   $("#deliveryNumber").text(DeliveryNum);
+  groupedItems = {};
   $.ajax({
     url: "dirs/delivery/dashboard/actions/get_display_delivered.php",
     type: "POST",
@@ -1624,26 +1623,20 @@ function openDeliveryForm(DeliveryNum) {
         $("#docdate").val(header.DocDate);
         $("#origin").val(header.OriginBranch);
         $("#whcode").val(header.OriginWhscode);
-        $("#branchName").val(header.ReceivedBranch);
-        $("#branchWhCode").val(header.ReceivedWhscode) || "";
         $("#deldate").val(
-          new Date(header.SysTimeStamp)
-            .toLocaleDateString("en-US", {
-              month: "2-digit",
-              day: "2-digit",
-              year: "2-digit",
-            })
-            .replace(/\//g, "-"),
+          new Date(header.SysTimeStamp).toLocaleDateString("en-US", {
+            month: "2-digit",
+            day: "2-digit",
+            year: "numeric",
+          }),
         );
 
         $("#docdate").val(
-          new Date(header.PostingDate)
-            .toLocaleDateString("en-US", {
-              month: "2-digit",
-              day: "2-digit",
-              year: "2-digit",
-            })
-            .replace(/\//g, "-"),
+          new Date(header.PostingDate).toLocaleDateString("en-US", {
+            month: "2-digit",
+            day: "2-digit",
+            year: "numeric",
+          }),
         );
         $("#status").val(header.ReceivedStatus);
         $("#truckCat").val(header.TruckCategory);
@@ -1664,6 +1657,7 @@ function openDeliveryForm(DeliveryNum) {
           }
           groupedItems[key].ReceivedQty += parseFloat(item.ReceivedQty) || 0;
         });
+        console.log(groupedItems);
 
         let rows = "";
 
@@ -1680,6 +1674,7 @@ function openDeliveryForm(DeliveryNum) {
           `;
         });
         $("#totalQuantity").text(totalQty);
+        $("#deliveryTable tbody").empty();
         $("#deliveryTable tbody").html(rows);
 
         let deliveredTable = $("#deliveryTable tbody tr").length;

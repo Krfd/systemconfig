@@ -725,6 +725,7 @@ function formatDateMMDDYY(dateString) {
 function openReceivedForm(rcvdNumber) {
   $("#rcvdNumber").html(rcvdNumber);
   $("#main-content").html(spinner);
+  receivingGroupedItems = {};
   $.post("dirs/receiving/dashboard/receivedForm.php", function (data) {
     $("#main-content").hide().html(data).fadeIn(200);
     $("#receiving-form-table tbody").html(`

@@ -28,7 +28,7 @@
                                         <input type="text" id="whcode" class="form-control form-control-sm col" style="background: #f7f7f7" readonly>
                                     </div>
                                 </div>
-                                <div class="input-group col p-0 d-flex align-items-baseline gap-1">
+                                <!-- <div class="input-group col p-0 d-flex align-items-baseline gap-1">
                                     <div class="col p-0 d-flex align-items-baseline gap-1 col-7">
                                         <label for="branchName" class="form-label text-dark-emphasis col-4"><small>Destination:</small></label>
                                         <input type="text" id="branchName" class="form-control form-control-sm col" style="background: #f7f7f7;" readonly>
@@ -37,7 +37,7 @@
                                         <label for="branchWhCode" class="form-label text-dark-emphasis col-4"><small>WHCode:</small></label>
                                         <input type="text" id="branchWhCode" class="form-control form-control-sm col" style="background: #f7f7f7" readonly>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                             <div class="d-flex flex-column gap-1 col-3">
                                 <div class="d-flex align-items-baseline gap-3">

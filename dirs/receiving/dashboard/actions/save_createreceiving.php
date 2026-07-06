@@ -179,6 +179,40 @@ try {
         ]);
     }
 
+    $qtyValidation = $conn->prepare("EXEC QtyValidation ?,?,?,?,?");
+    foreach ($items as $item) {
+        $rownum = $item['InTransitRowNum'] ?? null;
+        $qtyValidation->execute([
+            $User,
+            $rownum,
+            $BatchNumberReceived,
+            $DeliveryNumber,
+            $item['serial'] ?? null
+        ]);
+
+        $result = $qtyValidation->fetch(PDO::FETCH_ASSOC);
+
+        file_put_contents(
+            "debug_result.txt",
+            print_r($result, true) . PHP_EOL,
+            FILE_APPEND
+        );
+
+        $qtyValidation->closeCursor();
+    }
+
+
+    $updateDeliveryStatus = $conn->prepare("EXEC Get_SRN ?");
+    $updateDeliveryStatus->execute([$DeliveryNumber]);
+
+    $getSRN = $updateDeliveryStatus->fetchAll(PDO::FETCH_ASSOC);
+
+    $updateDeliveryStatus = $conn->prepare("EXEC Update_Delivery_Status ?,?");
+
+    foreach ($getSRN as $srn) {
+        $updateDeliveryStatus->execute([$srn['SR_Number'], $DeliveryNumber]);
+    }
+
     $conn->commit();
 
     echo json_encode([
