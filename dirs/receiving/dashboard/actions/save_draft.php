@@ -50,6 +50,40 @@ try {
 
     $conn->beginTransaction();
 
+    $stmtBatch = $conn->prepare("EXEC dbo.ReceivingBat_Number ?");
+
+    $stmtBatch->execute([$User]);
+    $result = $stmtBatch->fetch(PDO::FETCH_ASSOC);
+    $BatchNumberReceived = $result['BatchNumberReceived'];
+
+    $headerExists = false;
+
+    foreach ($items as $item) {
+        $validate = $conn->prepare("EXEC Draft_Validation ?,?,?,?,?,?");
+
+        $rownum = $item['InTransitRowNum'] ?? null;
+        $qty = $item['qty'] ?? 0;
+
+        if (empty($rownum)) {
+            continue;
+        }
+
+        $validate->execute([
+            $User,
+            $BatchNumberReceived,
+            $DeliveryNumber,
+            $qty,
+            $rownum,
+            $item['serial'] ?? null
+        ]);
+
+        $validationResult = $validate->fetch(PDO::FETCH_ASSOC);
+
+        if (!empty($validationResult['IsValid'])) {
+            $headerExists = true;
+        }
+    }
+
     /* =========================================================
            GENERATE RECEIVING BATCH NUMBER
         ========================================================= */
@@ -117,7 +151,7 @@ try {
            INSERT RECEIVING HEADER
         ========================================================= */
         $stmtHeader = $conn->prepare("EXEC dbo.Draft_Receiving_Header
-                ?,?,?,?,?,?,?,?,?,?,?,?");
+                    ?,?,?,?,?,?,?,?,?,?,?,?");
         $stmtHeader->execute([
             $User,
             $DeliveryNumber,
@@ -161,6 +195,7 @@ try {
 
     echo json_encode([
         "isSuccess" => 'success',
+        "message" => "Draft saved successfully."
     ]);
 } catch (Exception $e) {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());

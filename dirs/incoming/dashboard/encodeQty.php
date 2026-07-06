@@ -28,7 +28,7 @@
                                 </div>
                             </div>
                             <div class="table-responsive-sm mt-5" style="max-height: 450px">
-                                <table class="table border border-secondary-subtle" id="encodeQtyTable">
+                                <table class="table border border-secondary-subtle overall-progress" id="encodeQtyTable">
                                     <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary d-none"></th>

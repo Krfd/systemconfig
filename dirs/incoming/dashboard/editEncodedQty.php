@@ -36,8 +36,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive overflow-auto mt-5" style="max-height: 450px">
-                                <table class="table datatables" id="editEncodedQtyTable">
+                            <div class="table-responsive overflow-auto mt-5 overall-progress" style="max-height: 450px">
+                                <table class="table datatables overall-progress border border-secondary-subtle" id="editEncodedQtyTable">
                                     <thead class="sticky-top">
                                         <tr>
                                             <th class="text-secondary d-none"></th>

@@ -87,6 +87,9 @@ function loadOutgoing() {
         );
 
         sortedData.forEach((item, index) => {
+
+          // console.log(`OUTGOING ITEM: ${JSON.stringify(item)}`)
+
           let status = item.RequestStatus
             ? item.RequestStatus.toUpperCase()
             : "";
@@ -153,6 +156,7 @@ function loadOutgoing() {
               '<li><a class="dropdown-item print-pdf" href="#" target="_blank" data-srn="' +
               item.SR_Number +
               '">Print</a></li>' +
+              '<li><a class="dropdown-item" href="#collaborators" role="button" data-bs-toggle="offcanvas" aria-controls="offcanvasScrolling">Collaborators</a></li>' +
               "</ul></div>",
           ]);
         });

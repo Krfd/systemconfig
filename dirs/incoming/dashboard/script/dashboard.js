@@ -1281,18 +1281,15 @@ function loadBasket() {
         }));
 
         groupedArray.forEach((item) => {
-          // console.log(`PICKLIST ITEM : ${JSON.stringify(item)}`);
           const isSingleSR = item.SR_Numbers.length === 1;
           const condition = item.allHaveActualQty && isSingleSR;
           // console.log(`SRN's : ${item.SR_Numbers}`);
-          // console.log(``);
           const date = new Date(item.DocDate);
           const mm = String(date.getMonth() + 1).padStart(2, "0");
           const dd = String(date.getDate()).padStart(2, "0");
           const yy = date.getFullYear();
 
           const formatted = `${mm}/${dd}/${yy}`;
-          // const formatted = date.toISOString().split("T")[0];
 
           const printOption = item.allHaveActualQty
             ? `<li>
@@ -1300,7 +1297,7 @@ function loadBasket() {
                     href="#"
                     data-picklist="${item.PKList_Number}" 
                     data-doc-entry="${item.DocEntry}">
-                    Print
+                    Reprint
                   </a>
                 </li>`
             : "";
@@ -1338,7 +1335,7 @@ function loadBasket() {
                     href="#"
                     data-picklist="${item.PKList_Number}" 
                     data-doc-entry="${item.DocEntry}">
-                    Print
+                    Reprint
                   </a>
                 </li>
                   ${actualQtyOption}
@@ -1527,26 +1524,26 @@ function loadBasket() {
               cancelButtonText: "Cancel",
             }).then((result) => {
               if (result.isConfirmed) {
-                // Swal.fire({
-                //   title: "Executed By",
-                //   input: "text",
-                //   inputPlaceholder: "Enter your name",
-                //   inputAttributes: {
-                //     autocapitalize: "off",
-                //   },
-                //   showCancelButton: true,
-                //   confirmButtonText: "Continue",
-                //   cancelButtonText: "Cancel",
-                //   inputValidator: (value) => {
-                //     if (!value) {
-                //       return "Executed By is required!";
-                //     }
-                //   },
-                // }).then((userInput) => {
-                //   if (!userInput.isConfirmed) return;
+                Swal.fire({
+                  title: "Executed By",
+                  input: "text",
+                  inputPlaceholder: "Enter your name",
+                  inputAttributes: {
+                    autocapitalize: "off",
+                  },
+                  showCancelButton: true,
+                  confirmButtonText: "Continue",
+                  cancelButtonText: "Cancel",
+                  inputValidator: (value) => {
+                    if (!value) {
+                      return "Executed By is required!";
+                    }
+                  },
+                }).then((userInput) => {
+                  if (!userInput.isConfirmed) return;
 
-                // let executedBy = userInput.value;
-                let executedBy = "";
+                let executedBy = userInput.value;
+                // let executedBy = "";
 
                 // PRINT ONLY
                 // const groupByCategory = response.isConfirmed;
@@ -1561,7 +1558,7 @@ function loadBasket() {
                   );
                 };
                 openPrint();
-                // });
+                });
               }
             });
           });
@@ -1598,7 +1595,11 @@ function formattedDate() {
   const mm = String(today.getMonth() + 1).padStart(2, "0");
   const dd = String(today.getDate()).padStart(2, "0");
 
-  document.getElementById("date").value = `${yyyy}-${mm}-${dd}`;
+  const dateInput = document.getElementById("date");
+
+  if (dateInput) {
+      dateInput.value = `${yyyy}-${mm}-${dd}`;
+  }
 }
 
 // ARROW NAVIGATION
@@ -1713,7 +1714,7 @@ function encodeQty(picklistNum) {
               picklistEntry = item.DocEntry;
               index++;
               rows += `
-                <tr class="item-row" style="height: 50px; min-height: 50px" data-rows='${JSON.stringify(item.rows)}'>
+                <tr class="item-row" style="height: 50px; min-height: 50px" data-rows='${JSON.stringify(item.rows)}' data-total-qty="${JSON.stringify(item.totalQty)}">
                   <td class="align-middle text-center" style="background: #F7F7F7;">${index}</td>
                   <td class="align-middle ps-3 d-none" style="background: #F7F7F7;">${picklistEntry}</td>
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemBrand}</td>
@@ -1819,9 +1820,20 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
           let value = $(this).text().trim();
           let actual = Number(value);
 
-          let maxQty = Number(
-            $(this).closest("tr").find("td:nth-child(6)").text().trim(),
-          );
+          // let maxQty = Number(
+          //   $(this).closest("tr").find("td:nth-child(6)").text().trim(),
+          // );
+          // let maxQty = Number($(this).closest("tr").data("totalqty"));
+
+          let maxQty;
+
+          if ($(form).attr("id") === "encodeqty") {
+            // encodeQty table
+            maxQty = Number($(this).closest("tr").find("td:eq(5)").text().trim());
+          } else {
+            // editEncodedQty table
+            maxQty = Number($(this).closest("tr").find("td:eq(4)").text().trim());
+          }
 
           if (value === "") {
             hasEmpty = true;
@@ -1831,10 +1843,17 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
             hasExceeded = true;
             isValid = false;
             $(this).addClass("border border-danger");
-          } else {
+          } else if (value > maxQty) {
+            hasExceeded = true;
+            isValid = false;
+            $(this).addClass("border border-danger");
+          } 
+          else {
             $(this).removeClass("border border-danger");
           }
         });
+
+        console.log(`IS VALID ACTUAL QTY: ${isValid}`)
 
       if (!isValid) {
         let message = "";
@@ -1848,6 +1867,8 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
           message =
             "Actual quantity must not be greater than its corresponding total quantity.";
         }
+
+        console.log(`MESSAGE: ${message}`)
 
         Swal.fire({
           icon: "error",
@@ -1936,23 +1957,6 @@ function submitEncodedQty(PicklistEntry, picklistNum, srnMap = null) {
                 if (srnMap && srnMap.length === 1) {
                   addToBasket(PickListNum);
                 }
-
-                // const groupByCategory = false;
-                // const openPrint = () => {
-                //   window.open(
-                //     `pdf/requests.php?DocEntry=${DocEntry}` +
-                //       `&executedBy=${encodeURIComponent(executedBy)}` +
-                //       `&groupByCategory=${groupByCategory ? 1 : 0}`,
-                //     "_blank",
-                //   );
-                // };
-                // openPrint();
-                // Swal.close();
-
-                // ORIGINAL
-                // setTimeout(() => {
-                //   loadBasketContent();
-                // }, 300);
               } else {
                 Swal.fire({
                   icon: "error",
