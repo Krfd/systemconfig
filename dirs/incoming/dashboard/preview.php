@@ -19,6 +19,7 @@
                 <tr>
                     <th class="text-secondary"></th>
                     <th class="text-secondary">#</th>
+                    <th class="text-secondary">Branch</th>
                     <th class="text-secondary">Brand</th>
                     <th class="text-secondary">Model</th>
                     <th class="text-secondary">Category</th>

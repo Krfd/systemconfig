@@ -321,6 +321,16 @@ $(document).on("dblclick", "#receivingTable tbody tr", function (e) {
 //     };
 //   })();
 
+// $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
+//   return this.api()
+//     .column(col, { order: "index" })
+//     .nodes()
+//     .map(function (td) {
+//       if ($(td).text().trim() === "") return Infinity; // push empty rows to bottom
+//       return $(td).text();
+//     });
+// };
+
 // ORIGINAL
 function loadReceiving() {
   $.ajax({
@@ -363,7 +373,8 @@ function loadReceiving() {
           ]);
         });
 
-        if (rows.length < 8) {
+        // if (rows.length < 8) {
+        if (rows.length === 0) {
           for (let i = rows.length; i < 8; i++) {
             rows.push(["", "", "", "", ""]);
           }
@@ -371,7 +382,10 @@ function loadReceiving() {
 
         if ($.fn.DataTable.isDataTable("#receivingTable")) {
           $("#receivingTable").DataTable().clear().destroy();
+          $("#receivingTable tbody").empty();
         }
+
+        // console.log(`UPDATED RECEIVING SCRIPT`)
 
         $("#receivingTable").DataTable({
           data: rows,
@@ -392,6 +406,7 @@ function loadReceiving() {
           autoWidth: false,
           order: [[0, "desc"]],
           rowCallback: function (row, data) {
+            if ($(row).hasClass("empty-row")) return;
             $("td:not(.empty-row)", row).css({
               background: "#fcf7d4",
               padding: "3px",
@@ -449,6 +464,7 @@ function loadReceiving() {
             }
           },
         });
+        // console.log($("#receivingTable").DataTable().rows().count());
       }
     },
     error: function (xhr, status, error) {
@@ -1961,9 +1977,10 @@ function submitReceiving() {
                 title: "Items have been received",
               }).then(() => {
                 window.open(
-                  `pdf/receiving.php?batch=${formData.DeliveryNumber}`,
+                  `pdf/receiving.php?batch=${encodeURIComponent(formData.DeliveryNumber)}&receivingNumber=${encodeURIComponent(response.ReceivingNumber)}`,
                   "_blank",
                 );
+                receivingGroupedItems = {}
                 returnReceiving();
               });
 

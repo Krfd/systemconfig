@@ -3,10 +3,7 @@
     </div>
     <div class="card shadow-sm col p-3">
         <h3 class="fw-semibold">Recently added</h3>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">John Doe</li>
-            <li class="list-group-item">Jane Doe</li>
-            <li class="list-group-item">John Doe</li>
+        <ul class="list-group list-group-flush" id="recentlyAddedList">
         </ul>
     </div>
 </div>

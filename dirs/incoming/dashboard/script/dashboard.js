@@ -110,7 +110,7 @@ function loadIncoming() {
 
           rows.push([
             `<input type="checkbox" name="checkbox" id="${item.RowNum}" data-srnumber="${item.SR_Number}" data-docentry="${item.DocEntry}" data-docstatus="${item.DocStatus}"
-            class="form-check-input align-self-center mx-auto checkbox border border-primary" style="cursor: pointer" ${isDisabled}>`,
+            class="form-check-input align-self-center mx-auto checkbox border border-3 border-primary" style="cursor: pointer" ${isDisabled}>`,
             index++,
             item.SR_Number || "",
             item.BranchDestination || "",
@@ -395,6 +395,7 @@ function loadPreview(SRNumbers) {
     success: function (response) {
       if (response.isSuccess === "success") {
         let previewData = response.Data;
+        console.log(`PREVIEW DATA: ${JSON.stringify(previewData)}`)
         let row = "";
         $("#previewTableDisplay").data("srnumbers", SRNumbers);
         let previewBody = $("#previewTableDisplay tbody");
@@ -408,9 +409,10 @@ function loadPreview(SRNumbers) {
                 <tr style="cursor: pointer" data-docentry="${item.DocEntry}" data-picklisted="${item.PickedStatus}">
                   <td class="ps-5" style="width: 80px; max-width: 80px">
                     <input type="checkbox" name="checkbox" id="${item.DocEntry}" data-docentry="${item.DocEntry}"
-                    class="form-check-input align-self-center mx-auto checkbox border border-primary">
+                    class="form-check-input align-self-center mx-auto checkbox border border-3 border-primary">
                   </td>
                   <td class="align-middle ps-3" style="background: #fcf7d4">${index + 1}</td>
+                  <td class="align-middle ps-3" style="background: #fcf7d4">${item.BranchOrigin}</td>
                   <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemBrand}</td>
                   <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemName}</td>
                   <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemCategory}</td>

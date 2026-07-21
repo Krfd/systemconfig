@@ -12,6 +12,52 @@ $(document).ready(function () {
   });
 });
 
+function recentlyAdded() {
+  $.ajax({
+    url: "dirs/users/dashboard/actions/get_recentlyAdded.php",
+    type: "GET",
+    dataType: "json",
+    success: function (response) {
+      if (response.isSuccess === "success") {
+        let html = "";
+
+        response.Data.forEach(function(user) {
+          html += `
+            <li class="list-group-item d-flex align-items-center justify-content-between">
+              <div class="fw-bold">
+                ${user.Fullname}
+                <small class="text-muted">
+                  — ${user.User_Position} • ${user.Branch}
+                </small>
+              </div>
+              <div class="text-end">
+                <small class="text-end text-muted">${user.DocDate ?? "07/20/2026"}</small>
+              </div>
+            </li>
+          `
+        })
+
+        $("#recentlyAddedList").html(html);
+
+      } else {
+        $("#recentlyAddedList").html(`
+          <li class="list-group-item text-muted">
+            No recently added users.
+          </li>
+        `);
+      }
+    },
+    error: function(xhr, status, error) {
+      console.error(error);
+      $("#recentlyAddedList").html(`
+        <li class="list-group-item text-danger">
+          Failed to load recently added users.
+        </li>
+      `);
+    }
+  })
+}
+
 function loadDashboard() {
   $("#dashboard_content").html(spinner);
   $.post("dirs/users/dashboard/components/main.php", {}, function (data) {
@@ -22,6 +68,8 @@ function loadDashboard() {
         <td colspan="100%" class="text-center">${spinner}</td>
       </tr>
     `);
+
+    recentlyAdded();
 
     loadUsers(() => {
       $("#usersTableDisplay").DataTable({
@@ -160,9 +208,9 @@ function loadUsers() {
                 <i class="bi bi-three-dots"></i>
               </button>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">View Profile</a></li>
-                <li><a class="dropdown-item" href="#">Disable</a></li>
-                <li><a class="dropdown-item reset" href="#">Reset Password</a></li>
+                <li><a class="dropdown-item view" data-id="${userId}" data-user="${fullname}" href="#">View Profile</a></li>
+                <li><a class="dropdown-item disable" data-id="${userId}" data-user="${fullname}" href="#">Disable</a></li>
+                <li><a class="dropdown-item reset" data-id="${userId}" data-user="${fullname}" href="#">Reset Password</a></li>
               </ul>
             </div>
             `,
@@ -218,7 +266,7 @@ function loadUsers() {
 
           $(row).attr("data-id", userId);
           $(row).attr("data-user", username);
-          $(row).addClass("reset");
+          // $(row).addClass("reset");
           $(row).hover(
             function () {
               $(this).css("background", "#FFF4C2");
@@ -263,8 +311,63 @@ function loadUsers() {
   });
 }
 
-// RESET USER PASSWORD
-$("#usersTableDisplay tbody").on("click", ".reset", function (e) {
+function viewProfile() {
+  alert("Viewing Profile")
+}
+
+$(document).on("click", ".view", function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  let id = $(this).data("id");
+  let user = $(this).data("user");
+
+  viewProfile();
+});
+
+$(document).on("click", ".disable", function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  let id = $(this).data("id");
+  let user = $(this).data("user");
+
+  Swal.fire({
+    title: "Disable this user?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonColor: "#28a745",
+    confirmButtonText: "Disable",
+    cancelButtonColor: "#dc3545",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        type: "POST",
+        url: "dirs/users/dashboard/actions/disable_user.php",
+        data: { id: id },
+        dataType: "json",
+        success: function (response) {
+          if (response.isSuccess === "success") {
+            Swal.fire({
+              icon: "success",
+              title: "User has been disabled",
+              confirmButtonText: "OK"
+            }).then(() => {
+              loadUsers();
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Something went wrong!",
+            });
+          }
+        },
+      });
+    }
+  });
+});
+
+$(document).on("click", ".reset", function (e) {
   e.preventDefault();
   e.stopPropagation();
 
@@ -291,8 +394,7 @@ $("#usersTableDisplay tbody").on("click", ".reset", function (e) {
             Swal.fire({
               icon: "success",
               title: "Password has been reset",
-              timer: 2000,
-              showConfirmButton: false,
+              confirmButtonText: "OK"
             }).then(() => {
               loadUsers();
             });

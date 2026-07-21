@@ -45,11 +45,12 @@ $(document).ready(function () {
             setCookie("Password", Password, 7);
           }
 
-          var role = response.role;
+          var role = response.Role;
 
           if (role === "Admin") {
             window.location.assign("index.php");
-          } else {
+          } 
+          else {
             window.location.assign("login.php");
           }
         } else {

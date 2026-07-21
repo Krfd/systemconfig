@@ -1,20 +1,19 @@
-<?php
+<?php 
 require_once __DIR__ . "/../../../../../config/connection.php";
 
-$id = $_POST['id'];
-
 try {
+
     $conn->beginTransaction();
 
-    $newPassword = password_hash("Password", PASSWORD_DEFAULT);
-
-    $reset = $conn->prepare("EXEC [Reset_User_Password] ?, ?");
-    $reset->execute([$id, $newPassword]);
+    $stmt = $conn->prepare("EXEC dbo.Get_RecentlyAddedUsers");
+    $stmt->execute();
+    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $conn->commit();
 
     $response = array(
         "isSuccess" => "success",
+        "Data" => $users,
     );
 
     echo json_encode($response);
@@ -22,3 +21,5 @@ try {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollBack();
 }
+
+?>

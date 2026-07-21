@@ -6,10 +6,8 @@ $id = $_POST['id'];
 try {
     $conn->beginTransaction();
 
-    $newPassword = password_hash("Password", PASSWORD_DEFAULT);
-
-    $reset = $conn->prepare("EXEC [Reset_User_Password] ?, ?");
-    $reset->execute([$id, $newPassword]);
+    $reset = $conn->prepare("EXEC [Disable_User] ?");
+    $reset->execute([$id]);
 
     $conn->commit();
 

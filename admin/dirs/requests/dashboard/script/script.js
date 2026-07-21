@@ -12,7 +12,23 @@ $(document).ready(function () {
   });
 });
 
+function totalRequests () {
+  $.ajax({
+    url: "dirs/requests/dashboard/actions/getTotalRequests.php",
+    type: "GET",
+    dataType: "json",
+    success: function (response) {
+      if (response.isSuccess === "success") {
+        $("#totalRequests").text(response.Data.TotalRequests || "20");
+      } else {
+        console.log(`Something went wrong`)
+      }
+    } 
+  })
+}
+
 function loadDashboard() {
+  totalRequests()
   $("#dashboard_content").html(spinner);
   $.post("dirs/requests/dashboard/components/main.php", {}, function (data) {
     $("#dashboard_content").html(data);
@@ -77,8 +93,8 @@ function loadRequests() {
           let driver = detail.Driver || "N/A";
           let truckCategory = detail.TruckCategory || "N/A";
           let truckPlate = detail.TruckPlate || "N/A";
-          let reqDate = formatDate(item.EncodeDate);
-          let recDate = formatDate(item.RecDate);
+          let reqDate = formatDate(item.EncodeDate).replace(/-/g, "/");
+          let recDate = formatDate(item.RecDate).replace(/-/g, "/");
 
           let status = item.RequestStatus
             ? item.RequestStatus.toUpperCase()

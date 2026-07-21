@@ -15,9 +15,10 @@ session_start();
 $User = $_SESSION['Uid'];
 
 $batch = $_GET['batch'] ?? '';
+$receivingNumber = $_GET['receivingNumber'] ?? '';
 
-$stmt = $conn->prepare("EXEC dbo.[Print_Receiving_Items] ?, ?");
-$stmt->execute([$User, $batch]);
+$stmt = $conn->prepare("EXEC dbo.[Print_Receiving_Items] ?, ?, ?");
+$stmt->execute([$User, $batch, $receivingNumber]);
 $header = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $stmt->nextRowset();
 $itemData = $stmt->fetchAll(PDO::FETCH_ASSOC);

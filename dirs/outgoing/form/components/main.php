@@ -127,7 +127,7 @@
                                     <select name="purposeForm" id="purposeForm" class="form-select form-select-sm col" style="background: #fcf7d4; appearance: auto" required>
                                         <option value="" selected>Select purpose</option>
                                         <option value="Stock Refill">Stock Refill</option>
-                                        <option value="Customer's Order">Customer's Order</option>
+                                        <option value="With Customer">With Customer</option>
                                     </select>
                                 </div>
                                 <div class="d-flex align-items-baseline gap-3">
@@ -211,10 +211,10 @@
             if (response.status === "success") {
                 Swal.fire({
                     icon: "success",
-                    title: "Success",
-                    text: "Request submitted successfully",
+                    title: "Request successfully submitted",
+                    // text: "Request submitted successfully",
                     showConfirmButton: true,
-                    confirmButtonText: "OKAY"
+                    confirmButtonText: "OK"
                 }).then(() => {
                     $.post("./actions/log.php", {
                         Activity: "REQUESTED",

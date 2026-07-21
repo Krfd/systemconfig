@@ -1,20 +1,18 @@
-<?php
+<?php 
 require_once __DIR__ . "/../../../../../config/connection.php";
-
-$id = $_POST['id'];
 
 try {
     $conn->beginTransaction();
 
-    $newPassword = password_hash("Password", PASSWORD_DEFAULT);
-
-    $reset = $conn->prepare("EXEC [Reset_User_Password] ?, ?");
-    $reset->execute([$id, $newPassword]);
-
+    $stmt = $conn->prepare("EXEC dbo.Get_TotalRequests");
+    $stmt->execute();
+    $total = $stmt->fetch(PDO::FETCH_ASSOC);
+   
     $conn->commit();
 
     $response = array(
         "isSuccess" => "success",
+        "Data" => $total,
     );
 
     echo json_encode($response);
@@ -22,3 +20,5 @@ try {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());
     $conn->rollBack();
 }
+
+?>

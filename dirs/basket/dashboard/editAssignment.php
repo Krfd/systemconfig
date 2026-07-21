@@ -94,13 +94,13 @@
                             <div class="d-flex justify-content-between align-items-end mt-5">
                                 <div class="d-flex justify-content-start align-items-end gap-1 col-3">
                                     <div class="d-flex flex-column gap-3">
-                                        <div class="col">
-                                            <label for="remarks" class="form-label text-dark-emphasis"><small>Remarks:</small></label>
-                                            <textarea name="remarks" id="remarks" class="form-control form-control-sm" rows="4" style="background: #fcf7d4; height: auto; resize: horizontal" maxlength="100"></textarea>
-                                        </div>
                                         <div class="d-flex align-items-baseline col">
-                                            <label for="prepby" class="form-label text-dark-emphasis col-5"><small>Prepared by:</small></label>
+                                            <label for="prepby" class="form-label text-dark-emphasis col-4"><small>Prepared by:</small></label>
                                             <input type="text" name="prepby" id="prepby" class="form-control form-control-sm col" style="background: #f2f2f2" readonly required>
+                                        </div>
+                                        <div class="col d-flex align-items-baseline">
+                                            <label for="remarks" class="form-label text-dark-emphasis col-4"><small>Remarks:</small></label>
+                                            <textarea name="remarks" id="remarks" class="form-control form-control-sm col" rows="4" style="background: #fcf7d4; height: auto; resize: horizontal" maxlength="100"></textarea>
                                         </div>
                                     </div>
                                 </div>

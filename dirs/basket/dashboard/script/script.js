@@ -405,18 +405,69 @@ function loadDeliveryBasket(tableId, url, statusFilter = null) {
           ],
           createdRow: function (row, data, dataIndex) {
             let originalItem = Object.values(grouped)[dataIndex];
-            if (originalItem) {
-              let branches = Array.from(originalItem.Req_Branch).join(", ");
-              const branchList = (branches || "")
-                .split(",")
-                .map((b) => b.trim());
+            // console.log(`ORIGINAL ITEM: ${JSON.stringify(originalItem)}`)
+            // if (originalItem) {
+            //   // let branches = Array.from(originalItem.Req_Branch).join(", ");
+            //   let branches = Array.from(originalItem.Req_Branch || []);
+            //   let request = Array.from(originalItem.RequestItemQty || []);
+            //   // const branchList = (branches || "")
+            //   //   .split(",")
+            //   //   .map((b) => b.trim());
+            //   const branchList = branches.map((branch, index) => {
+            //     const qty = request[index] ?? 0;
+
+            //     return `${branch}: ${qty}`;
+            //   });
+
+            //   const branchText = branches.join(", ");
+              
+            //   $(row)
+            //     .attr("data-rownum", originalItem.DocEntry)
+            //     .attr("data-picklist", originalItem.PKList_Number)
+            //     // .attr("data-branches", branches)
+            //     .attr("data-branches", branchText)
+            //     .attr(
+            //       "data-bs-title",
+            //       `<div class="text-start">Branches: <br>${branchList.join("<br>") || "No Branch"}</div>`,
+            //     );
+            // }
+
+             if (originalItem) {
+
+              // Group items by branch
+              const branchQuantities = {};
+
+              originalItem.items.forEach(item => {
+                const branch = item.Req_Branch || "No Branch";
+                const qty = Number(item.RequestItemQty) || 0;
+
+                if (!branchQuantities[branch]) {
+                  branchQuantities[branch] = 0;
+                }
+
+                branchQuantities[branch] += qty;
+              });
+
+              // Convert to:
+              // STA. BARBARA: 4
+              // SHOWROOM: 8
+              const branchList = Object.entries(branchQuantities)
+                .map(([branch, quantity]) => {
+                  return `${branch}: ${quantity}`;
+                });
+
+              const branches = Object.keys(branchQuantities).join(", ");
+
               $(row)
                 .attr("data-rownum", originalItem.DocEntry)
                 .attr("data-picklist", originalItem.PKList_Number)
                 .attr("data-branches", branches)
                 .attr(
                   "data-bs-title",
-                  `<div class="text-start">Branches: <br>${branchList.join("<br>") || "No Branch"}</div>`,
+                  `<div class="text-start">
+                    Branches:<br>
+                    ${branchList.join("<br>") || "No Branch"}
+                  </div>`
                 );
             }
           },

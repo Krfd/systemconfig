@@ -198,8 +198,8 @@ try {
             $categoryRaw = $row->Req_ItemCategory ?? '';
             $quantity = (int)($row->Req_Item_Qty ?? 0);
             $actual = isset($row->Actual_Item_Qty) && $row->Actual_Item_Qty !== ''
-                ? $row->Actual_Item_Qty
-                : null;
+                // ? $row->Actual_Item_Qty : null;
+                ? $row->Actual_Item_Qty : 0;
 
             $key = $modelRaw . '|' . $brandRaw . '|' . $categoryRaw;
 
@@ -284,7 +284,8 @@ try {
             $pdf->MultiCell(
                 $headers['Actual Qty'],
                 $lineHeight,
-                ($row['Actual'] > 0) ? $row['Actual'] : '',
+                // ($row['Actual'] > 0) ? $row['Actual'] : '',
+                ($row['Actual'] > 0) ? $row['Actual'] : 0,
                 0,
                 'C'
             );

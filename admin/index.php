@@ -43,7 +43,7 @@ try {
     <link rel="stylesheet" href="../node_modules/uikit/dist/css/uikit.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/custom.css">
-    <link rel="icon" href="../../assets/image/logo/iap_icon.png">
+    <link rel="icon" href="assets/image/logo/iap_icon.png">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">

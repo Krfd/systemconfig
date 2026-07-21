@@ -201,7 +201,6 @@ try {
         $qtyValidation->closeCursor();
     }
 
-
     $updateDeliveryStatus = $conn->prepare("EXEC Get_SRN ?");
     $updateDeliveryStatus->execute([$DeliveryNumber]);
 
@@ -217,6 +216,7 @@ try {
 
     echo json_encode([
         "isSuccess" => 'success',
+        "ReceivingNumber" => $BatchNumberReceived,
     ]);
 } catch (Exception $e) {
     errorHandler(E_WARNING, $e->getMessage(), $e->getFile(), $e->getLine());

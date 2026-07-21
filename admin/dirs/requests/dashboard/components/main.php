@@ -1,4 +1,4 @@
-<h2 class="fw-bold">Total Requests <span class="text-muted">| 2,458</span></h2>
+<h2 class="fw-bold">Total Requests <span class="text-muted">| <span id="totalRequests"></span></span></h2>
 <p class="fw-semibold">vs. previous month <span class="text-muted">| 1,202</span> May 30, 2026</p>
 <div class="table-responsive overflow-auto overall-progress">
     <table class="table table-hover col border border-secondary-subtle" id="requestsTableDisplay">

@@ -158,8 +158,7 @@ function loadDelivery() {
                   day: "2-digit",
                   year: "numeric",
                 })
-              : // .replace(/\//g, "-")
-                "",
+              : "",
             statusBadge,
             '<div class="dropdown dropstart">' +
               '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
@@ -240,7 +239,7 @@ function loadDelivery() {
               $($emptyRow).css({
                 background: "#fcf7d4",
                 height: "40px",
-                cursor: "pointer",
+                "min-height": "40px",
               });
 
               $emptyRow.hover(

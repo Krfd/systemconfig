@@ -34,7 +34,7 @@ try {
     $origin = $routeData->BranchOrigin;
     $purpose = $srnData->PurposeRequest;
     $requestedBy = $srnData->RequestedBy;
-    $remarks = empty($srnData->Remarks) ? "N/A" : $srnData->Remarks;
+    $remarks = empty($srnData->Remarks) ? "" : $srnData->Remarks;
     $datetimeStr = $date . ' ' . $srnData->RequestTime;
     $timestamp = date("m/d/y h:i A", strtotime($datetimeStr));
     $textColor = [50, 50, 50];

@@ -1,0 +1,110 @@
+Array
+(
+    [RowNum] => 20
+    [Batch] => BAT10003
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 2.000
+    [TotalDeliverQty] => 2.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 20
+    [Batch] => BAT10003
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 2.000
+    [TotalDeliverQty] => 2.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 21
+    [Batch] => BAT10003
+    [Brand] => SAMSUNG
+    [Model] => AR18CYEAAWKNTC
+    [TotalReceivedQty] => 4.000
+    [TotalDeliverQty] => 4.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 21
+    [Batch] => BAT10003
+    [Brand] => SAMSUNG
+    [Model] => AR18CYEAAWKNTC
+    [TotalReceivedQty] => 4.000
+    [TotalDeliverQty] => 4.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 21
+    [Batch] => BAT10003
+    [Brand] => SAMSUNG
+    [Model] => AR18CYEAAWKNTC
+    [TotalReceivedQty] => 4.000
+    [TotalDeliverQty] => 4.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 21
+    [Batch] => BAT10003
+    [Brand] => SAMSUNG
+    [Model] => AR18CYEAAWKNTC
+    [TotalReceivedQty] => 4.000
+    [TotalDeliverQty] => 4.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 22
+    [Batch] => BAT10003
+    [Brand] => CONDURA
+    [Model] => CSS-564i
+    [TotalReceivedQty] => 2.000
+    [TotalDeliverQty] => 2.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 22
+    [Batch] => BAT10003
+    [Brand] => CONDURA
+    [Model] => CSS-564i
+    [TotalReceivedQty] => 2.000
+    [TotalDeliverQty] => 2.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 23
+    [Batch] => BAT10003
+    [Brand] => CONDURA
+    [Model] => CTD102MNi
+    [TotalReceivedQty] => 2.000
+    [TotalDeliverQty] => 2.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 23
+    [Batch] => BAT10003
+    [Brand] => CONDURA
+    [Model] => CTD102MNi
+    [TotalReceivedQty] => 2.000
+    [TotalDeliverQty] => 2.000
+    [Evaluation] => RECEIVED
+)
+
