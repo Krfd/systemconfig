@@ -1225,7 +1225,7 @@ function getOrders(reference) {
               data-serials="${serials.join(",")}"
               data-bs-toggle="tooltip"
               data-bs-html="true"
-              data-bs-title="Serials: <br>${serials.join("<br>")}"
+              data-bs-title="Serial(s): <br>${serials.join("<br>")}"
               style="height:40px; min-height:40px;">
                 <td class="text-center" style="background:#fcf7d4">${index + 1}</td>
                 <td style="background:#fcf7d4">${item.ItemBrand}</td>
@@ -1780,7 +1780,7 @@ function serialDeliveryInput() {
 
                   existingItem.attr(
                     "data-bs-title",
-                    "Serials:<br>" + serialArray.join("<br>"),
+                    "Serial(s):<br>" + serialArray.join("<br>"),
                   );
 
                   const tooltip = bootstrap.Tooltip.getInstance(
@@ -1790,7 +1790,7 @@ function serialDeliveryInput() {
                   if (tooltip) {
                     tooltip.setContent({
                       ".tooltip-inner":
-                        "Serials:<br>" + serialArray.join("<br>"),
+                        "Serial(s):<br>" + serialArray.join("<br>"),
                     });
                   }
                   return;
@@ -1807,7 +1807,7 @@ function serialDeliveryInput() {
                     data-serials="${item.ItemSerial}"
                     data-bs-toggle="tooltip"
                     data-bs-html="true"
-                    data-bs-title="${"Serials: " + item.ItemSerial}"
+                    data-bs-title="${"Serial(s): " + item.ItemSerial}"
                     style="height: 40px; min-height: 40px; cursor: pointer">
                       <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${counter}</td>
                       <td class="align-middle ps-3" style="background: #fcf7d4">${brand}</td>

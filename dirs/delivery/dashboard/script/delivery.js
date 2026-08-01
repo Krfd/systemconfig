@@ -11,7 +11,6 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
-  console.log(`UPDATED DELIVERY`);
   $("#delivery_content").html(spinner);
   $.post("dirs/delivery/dashboard/components/main.php", {}, function (data) {
     $("#delivery_content").html(data);
@@ -37,7 +36,8 @@ $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
 function returnDelivery() {
   $("#delivery_content").html(spinner);
   $.post("dirs/delivery/dashboard/delivery.php", {}, function (data) {
-    $("#main-content").hide().html(data).fadeIn(200);
+    // $("#main-content").hide().html(data).fadeIn(200);
+    $("#delivery_content").hide().html(data).fadeIn(200);
     $("#deliveryTableDisplay tbody").html(`
         <tr>
           <td colspan="100%" class="text-center">${spinner}</td>
@@ -633,9 +633,6 @@ function serialDeliveryInput(DeliveryNumber, PicklistDr, previousSerials) {
                         let $emptyRow = $(
                           "#summaryDeliveryTable tbody tr.empty-row",
                         ).first();
-                        console.log(
-                          `CATEGORY FOR SUMMARYDELIVERYTABLE: ${category}`,
-                        );
                         let newRow = $(`
                               <tr data-itemcode="${itemCode}" style="padding: 3px; height: 40px; min-height: 40px">
                                 <td style="background: #fcf7d4" class="text-center">${rowCount}</td>
@@ -1596,7 +1593,7 @@ $(document)
             <td colspan="100%" class="text-center">${spinner}</td>
           </tr>
         `);
-        console.log(`DELIVERY NUMBER: ${DeliveryNum}`);
+        // console.log(`DELIVERY NUMBER: ${DeliveryNum}`);
         openDeliveryForm(DeliveryNum);
       });
     },

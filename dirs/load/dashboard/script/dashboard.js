@@ -11,12 +11,18 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
+  $("#basket_content").html(spinner)
   $.post("dirs/load/dashboard/components/main.php", {}, function (data) {
     $("#basket_content").html(data);
-    $("#loadingBasketTableDisplay").DataTable({
-      pageLength: 50,
-      order: [0, "desc"],
-    });
+    // $("#loadingBasketTableDisplay").DataTable({
+    //   pageLength: 50,
+    //   order: [0, "desc"],
+    // });
+    $("#loadingBasketTableDisplay tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
     loadBasket();
   });
 }
@@ -46,20 +52,18 @@ $(document).on("click", ".dropdown .create-dr", function (e) {
   }, 200);
 });
 
-function loadingBasket() {
-  $("#main-content").html(spinner);
-  // setTimeout(function () {
-    $.post("dirs/load/dashboard/load.php", {}, function (data) {
-      $("#main-content").hide().html(data).fadeIn(200);
-      $("#loadingBasketTableDisplay tbody").html(`
-        <tr>
-          <td colspan="100%" class="text-center">${spinner}</td>
-        </tr>
-      `);
-      loadBasket();
-    });
-  // }, 200);
-}
+// function loadingBasket() {
+//   // $("#main-content").html(spinner);
+//     $.post("dirs/load/dashboard/load.php", {}, function (data) {
+//       $("#main-content").hide().html(data).fadeIn(200);
+//       $("#loadingBasketTableDisplay tbody").html(`
+//         <tr>
+//           <td colspan="100%" class="text-center">${spinner}</td>
+//         </tr>
+//       `);
+//       loadBasket();
+//     });
+// }
 
 $(document).on("click", ".print-dr", function () {
   let branches = $(this).data("branches");
@@ -184,7 +188,7 @@ function loadBasket() {
             $(row).attr("data-batch", batchNumber);
             $(row).attr(
               "data-bs-title",
-              `<div class="text-start">Picklists: <br>${picklists.join("<br>")} <br><br>Branches: <br>${branches.join("<br>")}</div>`,
+              `<div class="text-start">Picklist(s): <br>${picklists.join("<br>")} <br><br>Branch(es): <br>${branches.join("<br>")}</div>`,
             );
           },
           paging: true,
@@ -325,7 +329,7 @@ function getBatchItems(batch, tableSelector) {
       let batchTable = $(`${tableSelector} tbody`);
       batchTable.empty();
 
-      console.log(`HEADER : ${JSON.stringify(header)}`);
+      // console.log(`HEADER : ${JSON.stringify(header)}`);
       const formattedDate = header.DocDate.split(" ")[0];
 
       $("#formattedDate").val(formattedDate);
@@ -603,9 +607,8 @@ function submitDr() {
                 icon: "success",
                 title: "Processing items for delivery",
               }).then(() => {
-                // console.log(`DELIVERY HAS BEEN CREATED: ${response}`);
-                // loadBasket();
-                loadingBasket();
+                loadBasket();
+                // loadingBasket();
               });
             } else {
               Swal.fire({

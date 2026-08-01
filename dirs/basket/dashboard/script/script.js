@@ -3229,7 +3229,7 @@ function serialDeliveryInput(Picklists) {
                               "data-bs-title",
                               "Requested: " +
                                 totalActualPerModel +
-                                "<br><br>Serials:<br>" +
+                                "<br><br>Serial(s):<br>" +
                                 serialArray.join("<br>"),
                             );
 
@@ -3242,7 +3242,7 @@ function serialDeliveryInput(Picklists) {
                                 ".tooltip-inner":
                                   "Requested: " +
                                   totalActualPerModel +
-                                  "<br><br>Serials:<br>" +
+                                  "<br><br>Serial(s):<br>" +
                                   serialArray.join("<br>"),
                               });
                             }
@@ -3263,7 +3263,7 @@ function serialDeliveryInput(Picklists) {
                                   data-serials="${item.ItemSerial}" 
                                   data-bs-toggle="tooltip" 
                                   data-bs-html="true" 
-                                  data-bs-title="${"Serials: " + item.ItemSerial} <br>Requested: ${totalActualPerModel}" 
+                                  data-bs-title="${"Serial(s): " + item.ItemSerial} <br>Requested: ${totalActualPerModel}" 
                                   style="height: 40px; min-height: 40px; cursor: pointer">
                                   <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${counter}</td>
                                   <td class="align-middle ps-3" style="background: #fcf7d4">${brand}</td>
@@ -3852,11 +3852,11 @@ function submitLoadingBasket(Picklists) {
                   title: "Request Timeout",
                   text: "The server took too long to respond.",
                 });
-              } else if (res.errorType === "server") {
+              } else if (xhr.responseJSON && xhr.responseJSON.errorType === "server") {
                 Swal.fire({
                   icon: "error",
                   title: "Server Error",
-                  text: res.message,
+                  text: xhr.responseJSON.message,
                 });
               } else {
                 Swal.fire({

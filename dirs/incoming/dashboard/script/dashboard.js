@@ -406,19 +406,19 @@ function loadPreview(SRNumbers) {
           }
 
           row += `
-                <tr style="cursor: pointer" data-docentry="${item.DocEntry}" data-picklisted="${item.PickedStatus}">
-                  <td class="ps-5" style="width: 80px; max-width: 80px">
-                    <input type="checkbox" name="checkbox" id="${item.DocEntry}" data-docentry="${item.DocEntry}"
-                    class="form-check-input align-self-center mx-auto checkbox border border-3 border-primary">
-                  </td>
-                  <td class="align-middle ps-3" style="background: #fcf7d4">${index + 1}</td>
-                  <td class="align-middle ps-3" style="background: #fcf7d4">${item.BranchOrigin}</td>
-                  <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemBrand}</td>
-                  <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemName}</td>
-                  <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemCategory}</td>
-                  <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${item.Request_Qty}</td>
-                </tr>
-              `;
+            <tr style="cursor: pointer" data-docentry="${item.DocEntry}" data-picklisted="${item.PickedStatus}">
+              <td class="ps-5" style="width: 80px; max-width: 80px">
+                <input type="checkbox" name="checkbox" id="${item.DocEntry}" data-docentry="${item.DocEntry}"
+                class="form-check-input align-self-center mx-auto checkbox border border-3 border-primary">
+              </td>
+              <td class="align-middle ps-3" style="background: #fcf7d4">${index + 1}</td>
+              <td class="align-middle ps-3" style="background: #fcf7d4">${item.BranchOrigin}</td>
+              <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemBrand}</td>
+              <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemName}</td>
+              <td class="align-middle ps-3" style="background: #fcf7d4">${item.ItemCategory}</td>
+              <td class="align-middle ps-3 text-center" style="background: #fcf7d4">${item.Request_Qty}</td>
+            </tr>
+          `;
         });
 
         previewBody.html(row);
@@ -562,16 +562,16 @@ function togglePreview() {
         let executedBy = userInput.value;
 
         // const groupByCategory = response.isConfirmed;
-        const groupByCategory = false;
+        // const groupByCategory = false;
 
-        const openPrint = (DocEntry) => {
-          window.open(
-            `pdf/requests.php?DocEntry=${DocEntry}` +
-              `&executedBy=${encodeURIComponent(executedBy)}` +
-              `&groupByCategory=${groupByCategory ? 1 : 0}`,
-            "_blank",
-          );
-        };
+        // const openPrint = (DocEntry) => {
+        //   window.open(
+        //     `pdf/requests.php?DocEntry=${DocEntry}` +
+        //       `&executedBy=${encodeURIComponent(executedBy)}` +
+        //       `&groupByCategory=${groupByCategory ? 1 : 0}`,
+        //     "_blank",
+        //   );
+        // };
 
         $.ajax({
           url: "dirs/incoming/dashboard/actions/save_create_item_picklist.php",
@@ -588,7 +588,12 @@ function togglePreview() {
                 confirmButtonText: "OKAY",
               });
 
-              openPrint(response.DocEntry);
+              // openPrint(response.DocEntry);
+              window.open(
+                `pdf/requests.php?DocEntry=${response.DocEntry}` +
+                  `&executedBy=${encodeURIComponent(executedBy)}`,
+                "_blank",
+              );
 
               const SRNumbers = $("#previewTableDisplay").data("srnumbers");
 
@@ -1549,17 +1554,24 @@ function loadBasket() {
 
                 // PRINT ONLY
                 // const groupByCategory = response.isConfirmed;
-                const groupByCategory = false;
+                // const groupByCategory = false;
 
-                const openPrint = () => {
+                // const openPrint = () => {
+                //   window.open(
+                //     `pdf/requests.php?DocEntry=${DocEntry}` +
+                //       `&executedBy=${encodeURIComponent(executedBy)}` +
+                //       `&groupByCategory=${groupByCategory ? 1 : 0}`,
+                //     "_blank",
+                //   );
+                // };
+                // const openPrint = () => {
                   window.open(
                     `pdf/requests.php?DocEntry=${DocEntry}` +
-                      `&executedBy=${encodeURIComponent(executedBy)}` +
-                      `&groupByCategory=${groupByCategory ? 1 : 0}`,
+                      `&executedBy=${encodeURIComponent(executedBy)}`,
                     "_blank",
                   );
-                };
-                openPrint();
+                // };
+                // openPrint();
                 });
               }
             });
@@ -2079,6 +2091,7 @@ function editEncodedQty(picklistNum) {
               rows += `
                 <tr style="height: 50px; min-height: 50px" data-rows='${JSON.stringify(item.rows)}'>
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${index}</td>
+                  <td class="align-middle ps-3 d-none" style="background: #F7F7F7;">${picklistEntry}</td>
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemBrand}</td>
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemName}</td>
                   <td class="align-middle ps-3" style="background: #F7F7F7;">${item.Req_ItemCategory}</td>

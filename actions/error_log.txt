@@ -1,4 +1,0 @@
-[2026-07-19 19:28:26] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\ishiftdemo\actions\logout.php on line 4
-[2026-07-19 19:37:14] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [64].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-07-19 19:37:14] Error: [2] SQLSTATE[08001]: [Microsoft][ODBC Driver 17 for SQL Server]Named Pipes Provider: Could not open a connection to SQL Server [64].  in C:\xampp\htdocs\ishiftdemo\config\connection.php on line 18
-[2026-07-20 13:47:22] Error: [2] Undefined array key "Uid" in C:\xampp\htdocs\ishiftdemo\actions\logout.php on line 4
