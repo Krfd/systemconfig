@@ -23,49 +23,6 @@ function loadDashboard() {
   });
 }
 
-// function loadDashboard() {
-//   $("#receiving_content").html(spinner);
-
-//   $.post("dirs/receiving/dashboard/components/main.php", {}, function (data) {
-//     $("#receiving_content")
-//       .hide()
-//       .html(data)
-//       .fadeIn(200, function () {
-//         requestAnimationFrame(() => {
-//           TableManager.loadReceiving();
-//         });
-
-//         // $("#receiving_content").html(data);
-//         //
-//         // requestAnimationFrame(() => {
-//         //   requestAnimationFrame(() => {
-//         //     TableManager.loadReceiving();
-//         //   });
-//         // });
-
-//         $("#received-tab")
-//           .off("shown.bs.tab")
-//           .on("shown.bs.tab", function () {
-//             setTimeout(() => {
-//               if ($.fn.DataTable.isDataTable("#receivingTable")) {
-//                 $("#receivingTable").DataTable().columns.adjust().draw();
-//               }
-//             }, 100);
-//           });
-
-//         $("#drafts-tab")
-//           .off("shown.bs.tab")
-//           .on("shown.bs.tab", function () {
-//             setTimeout(() => {
-//               if ($.fn.DataTable.isDataTable("#draftsTable")) {
-//                 $("#draftsTable").DataTable().columns.adjust().draw();
-//               }
-//             }, 100);
-//           });
-//       });
-//   });
-// }
-
 function returnReceiving() {
   $("#receiving_content").html(spinner);
   $.post("dirs/receiving/dashboard/received.php", {}, function (data) {
@@ -82,254 +39,6 @@ $(document).on("dblclick", "#receivingTable tbody tr", function (e) {
 
   openReceivedForm(rcvdNumber);
 });
-
-// window.TableManager =
-//   window.TableManager ||
-//   (function () {
-//     const loadedTables = {};
-
-//     function loadTable({
-//       tableId,
-//       url,
-//       transform,
-//       columns,
-//       rowCallback,
-//       drawCallback,
-//     }) {
-//       // if (!$(tableId).length) {
-//       //   console.warn("Table not found:", tableId);
-//       //   return;
-//       // }
-//       if ($.fn.DataTable.isDataTable(tableId)) {
-//         console.warn("Already initialized:", tableId);
-//         return;
-//       }
-//       $.ajax({
-//         url,
-//         type: "POST",
-//         dataType: "json",
-
-//         success(response) {
-//           if (
-//             !response ||
-//             response.isSuccess !== "success" ||
-//             !Array.isArray(response.Data)
-//           ) {
-//             response = { isSuccess: "success", Data: [] };
-//           }
-
-//           const rows = transform(response.Data);
-
-//           // destroy if exists
-//           // if ($.fn.DataTable.isDataTable(tableId)) {
-//           //   $(tableId).DataTable().clear().destroy();
-//           // }
-
-//           // if (!$(tableId).length) {
-//           //   console.warn("Table not found:", tableId);
-//           //   return;
-//           // }
-
-//           // $(tableId).find("tbody").empty();
-
-//           $(tableId).DataTable({
-//             data: rows,
-//             columns,
-//             rowCallback,
-//             drawCallback,
-//             paging: true,
-//             searching: true,
-//             info: true,
-//             autoWidth: false,
-//             processing: false,
-//           });
-
-//           // const $table = $(tableId);
-
-//           // // console.log(`TABLE ID: ${tableId}`);
-
-//           // if (!$table.closest("body").length) {
-//           //   console.warn("Table not attached to DOM yet");
-//           //   return;
-//           // }
-
-//           // const dt = $table.DataTable({
-//           //   data: rows,
-//           //   columns,
-//           //   rowCallback,
-//           //   drawCallback,
-//           //   paging: true,
-//           //   searching: true,
-//           //   info: true,
-//           //   autoWidth: false,
-//           //   destroy: true,
-//           // });
-
-//           // setTimeout(() => {
-//           //   dt.columns.adjust().draw();
-//           // }, 100);
-
-//           // console.log(`UPDATED RECEIVING`);
-
-//           if (tableId === "#receivingTable") {
-//             loadedTables.receiving = true;
-//           }
-
-//           if (tableId === "#draftsTable") {
-//             loadedTables.drafts = true;
-//           }
-//         },
-
-//         error(err) {
-//           console.error("Table load error:", err);
-//         },
-//       });
-//       // loadedTables.receiving = true;
-//     }
-
-//     return {
-//       loadReceiving() {
-//         // if (loadedTables.receiving) return;
-
-//         loadTable({
-//           tableId: "#receivingTable",
-//           url: "dirs/receiving/dashboard/actions/get_received.php",
-//           transform(data) {
-//             console.log(`RECEIVED DATA: ${JSON.stringify(data)}`);
-
-//             return data.map((item, i) => {
-//               const date = new Date(item.ArrivalDate);
-
-//               const formattedTimestamp =
-//                 `${String(date.getMonth() + 1).padStart(2, "0")}-` +
-//                 `${String(date.getDate()).padStart(2, "0")}-` +
-//                 `${String(date.getFullYear()).slice(-2)} ` +
-//                 `${new Date().toLocaleTimeString()}`;
-
-//               return [
-//                 i + 1,
-//                 item.ReceivedNumber,
-//                 formattedTimestamp,
-//                 item.OriginBranch,
-//                 `<span class="badge bg-${
-//                   item.ReceivedStatus === "RECEIVED"
-//                     ? "success"
-//                     : item.ReceivedStatus === "PARTIAL"
-//                       ? "warning"
-//                       : "secondary"
-//                 }">${item.ReceivedStatus}</span>`,
-//               ];
-//             });
-//           },
-
-//           columns: [
-//             { title: "#", className: "text-center" },
-//             { title: "RR No." },
-//             { title: "Arrival Date" },
-//             { title: "Stock Origin" },
-//             { title: "Status" },
-//           ],
-//         });
-
-//         loadedTables.receiving = true;
-//       },
-
-//       loadDrafts() {
-//         if (loadedTables.drafts) return;
-
-//         loadTable({
-//           tableId: "#draftsTable",
-//           url: "dirs/receiving/dashboard/actions/get_drafts.php",
-
-//           transform(data) {
-//             console.log(`RAW: ${JSON.stringify(data)}`);
-//             // return data.map((item, i) => [
-//             //   i + 1,
-//             //   item.ReferenceNumber,
-//             //   item.StockOrigin,
-//             //   item.ReceivedBranch,
-//             //   `<div class="dropdown">
-//             //     <button class="btn btn-sm btn-light"
-//             //             data-bs-toggle="dropdown">
-//             //         <i class="bi bi-three-dots"></i>
-//             //     </button>
-
-//             //     <ul class="dropdown-menu">
-//             //         <li>
-//             //             <a class="dropdown-item open-draft"
-//             //                 data-ref="${item.ReferenceNumber}">
-//             //                 Open
-//             //             </a>
-//             //         </li>
-//             //     </ul>
-//             //   </div>`,
-//             // ]);
-
-//             const rows = data.map((item, i) => [
-//               i + 1,
-//               item.ReferenceNumber,
-//               item.OriginBranch,
-//               item.ReceivedBranch,
-//               `<div class="dropdown">
-//                 <button class="btn btn-sm btn-light"
-//                         data-bs-toggle="dropdown">
-//                     <i class="bi bi-three-dots"></i>
-//                 </button>
-
-//                 <ul class="dropdown-menu">
-//                     <li>
-//                         <a class="dropdown-item open-draft"
-//                             data-ref="${item.ReferenceNumber}">
-//                             Open
-//                         </a>
-//                     </li>
-//                 </ul>
-//               </div>`,
-//             ]);
-
-//             console.log("ROWS", rows);
-
-//             return rows;
-//           },
-
-//           columns: [
-//             // { title: "#", className: "text-center" },
-//             { title: "#" },
-//             { title: "Reference No." },
-//             { title: "Stock Origin" },
-//             { title: "Destination" },
-//             { title: "" },
-//           ],
-//         });
-
-//         // loadedTables.drafts = true;
-//       },
-
-//       // reload(tableName) {
-//       //   loadedTables[tableName] = false;
-
-//       //   if (tableName === "receiving") this.loadReceivingTable();
-//       //   if (tableName === "drafts") this.loadDraftsTable();
-//       // },
-//       reload(tableName) {
-//         loadedTables[tableName] = false;
-
-//         if (tableName === "receiving") this.loadReceiving();
-
-//         if (tableName === "drafts") this.loadDrafts();
-//       },
-//     };
-//   })();
-
-// $.fn.dataTable.ext.order["ignoreEmpty"] = function (settings, col) {
-//   return this.api()
-//     .column(col, { order: "index" })
-//     .nodes()
-//     .map(function (td) {
-//       if ($(td).text().trim() === "") return Infinity; // push empty rows to bottom
-//       return $(td).text();
-//     });
-// };
 
 // ORIGINAL
 function loadReceiving() {
@@ -817,7 +526,7 @@ function openReceivedForm(rcvdNumber) {
               itemType = '<span class="badge bg-danger">Non-serialize</span>';
             }
 
-            console.log(`RECEIVED ITEM: ${JSON.stringify(item)}`)
+            console.log(`RECEIVED ITEM: ${JSON.stringify(item)}`);
 
             rows += `
               <tr>
@@ -1422,10 +1131,10 @@ function addNonSerialize() {
   $(document).on("submit", "#frm-add-delivery", function (e) {
     e.preventDefault();
 
-    console.log(
-      `CURRENT REQUESTS INSIDE NON-SERIALIZED ITEMS`,
-      JSON.stringify(currentOrder.requests),
-    );
+    // console.log(
+    //   `CURRENT REQUESTS INSIDE NON-SERIALIZED ITEMS`,
+    //   JSON.stringify(currentOrder.requests),
+    // );
 
     let Brand = $("#newBrand").val();
     let Model = $("#newModel").val();
@@ -1522,7 +1231,7 @@ function addNonSerialize() {
                     <td class="align-middle ps-3" style="background: #fcf7d4">${brand}</td>
                     <td class="align-middle ps-3" style="background: #fcf7d4">${model}</td>
                     <td class="align-middle ps-3" style="background: #fcf7d4">${category}</td>
-                    <td class="align-middle ps-3" style="background: #fcf7d4">${Quantity}</td>
+                    <td class="align-middle text-center ps-3" style="background: #fcf7d4">${Quantity}</td>
                   </tr>`;
                     }
 
@@ -1980,14 +1689,9 @@ function submitReceiving() {
                   `pdf/receiving.php?batch=${encodeURIComponent(formData.DeliveryNumber)}&receivingNumber=${encodeURIComponent(response.ReceivingNumber)}`,
                   "_blank",
                 );
-                receivingGroupedItems = {}
+                receivingGroupedItems = {};
                 returnReceiving();
               });
-
-              // window.open(
-              //   `pdf/receiving.php?batch=${formData.DeliveryNumber}`,
-              //   "_blank",
-              // );
             } else {
               Swal.fire({
                 icon: "error",
@@ -2006,8 +1710,6 @@ function submitReceiving() {
           },
         });
       };
-
-      // console.log(`REQUESTED ITEMS : ${JSON.stringify(currentOrder.requests)}`);
 
       // IF UNMATCHED ITEMS EXIST
       if (uniqueUnmatched.length > 0) {
@@ -2082,7 +1784,7 @@ $(document)
       await autoSaveDraft();
       // returnReceiving();
       // loadDrafts();
-      drafts()
+      drafts();
     } catch (err) {
       draftBtn.prop("disabled", false).html("Save as Draft");
       submitBtn.prop("disabled", false);

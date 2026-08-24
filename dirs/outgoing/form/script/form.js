@@ -74,7 +74,7 @@ function loadDestinationWhscodes(BranchName) {
               value: warehousecode.WhsCode,
               text: warehousecode.WhsCode,
             }),
-            console.log(`WarehouseCode : ${warehousecode.WhsCode}`)
+            console.log(`WarehouseCode : ${warehousecode.WhsCode}`),
           );
         });
       } else {
@@ -208,7 +208,7 @@ async function loadOriginWhscodes(Branch) {
       Branch: Branch,
     },
     function (data) {
-      console.log(`ORIGIN WAREHOUSE CODE: ${JSON.stringify(data)}`)
+      console.log(`ORIGIN WAREHOUSE CODE: ${JSON.stringify(data)}`);
       const response = JSON.parse(data);
       if ($.trim(response.isSuccess) === "success") {
         const whscode = response.Data;
@@ -316,35 +316,13 @@ $("#newModel").on("change", function () {
 function loadItems() {
   // $("#form-content").html(spinner);
   $.ajax({
-    url: "dirs/outgoing/form/actions/get_prepitem.php", 
+    url: "dirs/outgoing/form/actions/get_prepitem.php",
     type: "POST",
     data: {},
     dataType: "json",
-    // beforeSend: function () {
-    //   let tbody = $("#outgoingTable tbody");
-    //   tbody.html(`
-    //         <tr>
-    //             <td colspan="6" class="text-center" style="background:#FFFBDF;">
-    //                 <span class="spinner-border spinner-border-sm text-secondary me-2"></span>
-    //                 Loading items...
-    //             </td>
-    //         </tr>
-    //     `);
-    // },
-    // beforeSend: function () {
-    // $("#outgoingTable tbody").html(`
-    //     <tr>
-    //         <td colspan="6" style="height:240px; background:#FFFBDF;" class="text-center align-middle">
-    //             <span class="spinner-border spinner-border-sm text-secondary me-2"></span>
-    //             Loading items...
-    //         </td>
-    //     </tr>
-    // `);
-    // },
-
     success: function (response) {
       let tbody = $("#outgoingTable tbody");
-      tbody.empty(); 
+      tbody.empty();
 
       if (response.isSuccess === "success" && response.Data.length > 0) {
         let rowCount = response.Data.length;
@@ -363,7 +341,7 @@ function loadItems() {
             let newQty = oldQty + quantity;
             $existingRow.find(".item-quantity").text(newQty);
           } else {
-                let row = `<tr class="item-row" style="height: 40px; max-height: 40px">
+            let row = `<tr class="item-row" style="height: 40px; max-height: 40px">
                      <td class="ps-2 align-middle d-none" name="temp-itemnum[]">${item.ItemNum}</td>
                     <td class="ps-2 align-middle text-center" style="background: #fcf7d4;">${item.DisplayRowNumber}</td>
                     <td class="ps-2 align-middle text-center item-brand" style="background: #fcf7d4;">${item.ItemBrand}</td>
@@ -383,22 +361,20 @@ function loadItems() {
                     </td>
                 </tr>`;
 
-                
-
-                // <td class="pe-4" style="background: #fcf7d4;">
-                //       <div class="d-flex gap-1 justify-content-end">
-                //         <button type="button" class="btn btn-sm border-danger bg-danger-subtle text-danger-emphasis remove-item-button" onclick="reduceItemQty('${item.ItemNum}')">
-                //             <i class="bi bi-dash"></i>
-                //         </button>
-                //         <button type="button" class="btn btn-sm border-primary bg-primary-subtle text-primary-emphasis add-item-button"  onclick="addItemQty('${item.ItemNum}')">
-                //             <i class="bi bi-plus"></i>
-                //         </button>
-                //       </div>
-                //     </td>
+            // <td class="pe-4" style="background: #fcf7d4;">
+            //       <div class="d-flex gap-1 justify-content-end">
+            //         <button type="button" class="btn btn-sm border-danger bg-danger-subtle text-danger-emphasis remove-item-button" onclick="reduceItemQty('${item.ItemNum}')">
+            //             <i class="bi bi-dash"></i>
+            //         </button>
+            //         <button type="button" class="btn btn-sm border-primary bg-primary-subtle text-primary-emphasis add-item-button"  onclick="addItemQty('${item.ItemNum}')">
+            //             <i class="bi bi-plus"></i>
+            //         </button>
+            //       </div>
+            //     </td>
 
             let $row = $(row);
             tbody.append($row);
-            existingItems[item.ItemCode] = $row; 
+            existingItems[item.ItemCode] = $row;
           }
         });
         if (rowCount < 6) {
@@ -419,8 +395,7 @@ function loadItems() {
           }
         }
         $("#totalQuantity").text(totalQty);
-      } 
-      else {
+      } else {
         for (let j = 0; j < 6; j++) {
           let emptyRow = `
             <tr class="item-row empty-row" style="height: 40px; max-height: 40px">
@@ -431,7 +406,7 @@ function loadItems() {
               <td style="background: #fcf7d4; padding: 0"></td>
               <td style="background: #fcf7d4; padding: 0"></td>
             </tr>
-          `
+          `;
           tbody.append(emptyRow);
         }
       }

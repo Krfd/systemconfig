@@ -7,10 +7,6 @@ $ItemSerial     = $_POST['ItemSerial'];
 $DeliveryNumber = $_POST['DeliveryNumber'];
 $response    = array();
 
-// $logEntry = "User: $User | ItemSerial: $ItemSerial | DeliveryNumber: $DeliveryNumber" . PHP_EOL;
-
-// file_put_contents("log.txt", $logEntry, FILE_APPEND);
-
 try {
     $conn->beginTransaction();
 

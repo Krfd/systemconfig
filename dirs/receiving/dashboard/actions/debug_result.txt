@@ -1,99 +1,44 @@
 Array
 (
-    [RowNum] => 10
-    [Batch] => BAT10002
+    [RowNum] => 3
+    [Batch] => BAT10001
     [Brand] => SHARP
     [Model] => 2T-C32EG1X
-    [TotalReceivedQty] => 5.000
-    [TotalDeliverQty] => 5.000
+    [TotalReceivedQty] => 1.000
+    [TotalDeliverQty] => 1.000
     [Evaluation] => RECEIVED
 )
 
 Array
 (
-    [RowNum] => 10
-    [Batch] => BAT10002
-    [Brand] => SHARP
-    [Model] => 2T-C32EG1X
-    [TotalReceivedQty] => 5.000
-    [TotalDeliverQty] => 5.000
+    [RowNum] => 1
+    [Batch] => BAT10001
+    [Brand] => CONDURA
+    [Model] => CSS-564i
+    [TotalReceivedQty] => 3.000
+    [TotalDeliverQty] => 3.000
     [Evaluation] => RECEIVED
 )
 
 Array
 (
-    [RowNum] => 10
-    [Batch] => BAT10002
-    [Brand] => SHARP
-    [Model] => 2T-C32EG1X
-    [TotalReceivedQty] => 5.000
-    [TotalDeliverQty] => 5.000
+    [RowNum] => 1
+    [Batch] => BAT10001
+    [Brand] => CONDURA
+    [Model] => CSS-564i
+    [TotalReceivedQty] => 3.000
+    [TotalDeliverQty] => 3.000
     [Evaluation] => RECEIVED
 )
 
 Array
 (
-    [RowNum] => 10
-    [Batch] => BAT10002
-    [Brand] => SHARP
-    [Model] => 2T-C32EG1X
-    [TotalReceivedQty] => 5.000
-    [TotalDeliverQty] => 5.000
-    [Evaluation] => RECEIVED
-)
-
-Array
-(
-    [RowNum] => 10
-    [Batch] => BAT10002
-    [Brand] => SHARP
-    [Model] => 2T-C32EG1X
-    [TotalReceivedQty] => 5.000
-    [TotalDeliverQty] => 5.000
-    [Evaluation] => RECEIVED
-)
-
-Array
-(
-    [RowNum] => 11
-    [Batch] => BAT10003
-    [Brand] => MIDEA
-    [Model] => 20TMG4G082
-    [TotalReceivedQty] => 4.000
-    [TotalDeliverQty] => 4.000
-    [Evaluation] => RECEIVED
-)
-
-Array
-(
-    [RowNum] => 11
-    [Batch] => BAT10003
-    [Brand] => MIDEA
-    [Model] => 20TMG4G082
-    [TotalReceivedQty] => 4.000
-    [TotalDeliverQty] => 4.000
-    [Evaluation] => RECEIVED
-)
-
-Array
-(
-    [RowNum] => 11
-    [Batch] => BAT10003
-    [Brand] => MIDEA
-    [Model] => 20TMG4G082
-    [TotalReceivedQty] => 4.000
-    [TotalDeliverQty] => 4.000
-    [Evaluation] => RECEIVED
-)
-
-Array
-(
-    [RowNum] => 11
-    [Batch] => BAT10003
-    [Brand] => MIDEA
-    [Model] => 20TMG4G082
-    [TotalReceivedQty] => 4.000
-    [TotalDeliverQty] => 4.000
+    [RowNum] => 1
+    [Batch] => BAT10001
+    [Brand] => CONDURA
+    [Model] => CSS-564i
+    [TotalReceivedQty] => 3.000
+    [TotalDeliverQty] => 3.000
     [Evaluation] => RECEIVED
 )
 
@@ -158,9 +103,9 @@ Array
     [Batch] => BAT10001
     [Brand] => CONDURA
     [Model] => CSS-564i
-    [TotalReceivedQty] => 3.000
+    [TotalReceivedQty] => 5.000
     [TotalDeliverQty] => 5.000
-    [Evaluation] => PARTIAL
+    [Evaluation] => RECEIVED
 )
 
 Array
@@ -169,20 +114,9 @@ Array
     [Batch] => BAT10001
     [Brand] => CONDURA
     [Model] => CSS-564i
-    [TotalReceivedQty] => 3.000
+    [TotalReceivedQty] => 5.000
     [TotalDeliverQty] => 5.000
-    [Evaluation] => PARTIAL
-)
-
-Array
-(
-    [RowNum] => 1
-    [Batch] => BAT10001
-    [Brand] => CONDURA
-    [Model] => CSS-564i
-    [TotalReceivedQty] => 3.000
-    [TotalDeliverQty] => 5.000
-    [Evaluation] => PARTIAL
+    [Evaluation] => RECEIVED
 )
 
 Array
@@ -209,21 +143,153 @@ Array
 
 Array
 (
-    [RowNum] => 3
+    [RowNum] => 1
     [Batch] => BAT10001
+    [Brand] => CONDURA
+    [Model] => CSS-564i
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 7
+    [Batch] => BAT10002
+    [Brand] => 
+    [Model] => 
+    [TotalReceivedQty] => 4.000
+    [TotalDeliverQty] => 
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 8
+    [Batch] => BAT10002
+    [Brand] => SAMSUNG
+    [Model] => AR18CYEAAWKNTC
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 8
+    [Batch] => BAT10002
+    [Brand] => SAMSUNG
+    [Model] => AR18CYEAAWKNTC
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 8
+    [Batch] => BAT10002
+    [Brand] => SAMSUNG
+    [Model] => AR18CYEAAWKNTC
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 8
+    [Batch] => BAT10002
+    [Brand] => SAMSUNG
+    [Model] => AR18CYEAAWKNTC
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 8
+    [Batch] => BAT10002
+    [Brand] => SAMSUNG
+    [Model] => AR18CYEAAWKNTC
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 9
+    [Batch] => BAT10002
+    [Brand] => 
+    [Model] => 
+    [TotalReceivedQty] => 3.000
+    [TotalDeliverQty] => 
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 10
+    [Batch] => BAT10002
     [Brand] => SHARP
     [Model] => 2T-C32EG1X
-    [TotalReceivedQty] => 1.000
-    [TotalDeliverQty] => 1.000
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
     [Evaluation] => RECEIVED
 )
 
 Array
 (
-    [RowNum] => 1
-    [Batch] => BAT10001
-    [Brand] => CONDURA
-    [Model] => CSS-564i
+    [RowNum] => 10
+    [Batch] => BAT10002
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 10
+    [Batch] => BAT10002
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 10
+    [Batch] => BAT10002
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 10
+    [Batch] => BAT10002
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 11
+    [Batch] => BAT10002
+    [Brand] => MIDEA
+    [Model] => 20TMG4G082
     [TotalReceivedQty] => 3.000
     [TotalDeliverQty] => 3.000
     [Evaluation] => RECEIVED
@@ -231,10 +297,10 @@ Array
 
 Array
 (
-    [RowNum] => 1
-    [Batch] => BAT10001
-    [Brand] => CONDURA
-    [Model] => CSS-564i
+    [RowNum] => 11
+    [Batch] => BAT10002
+    [Brand] => MIDEA
+    [Model] => 20TMG4G082
     [TotalReceivedQty] => 3.000
     [TotalDeliverQty] => 3.000
     [Evaluation] => RECEIVED
@@ -242,12 +308,199 @@ Array
 
 Array
 (
-    [RowNum] => 1
-    [Batch] => BAT10001
-    [Brand] => CONDURA
-    [Model] => CSS-564i
+    [RowNum] => 11
+    [Batch] => BAT10002
+    [Brand] => MIDEA
+    [Model] => 20TMG4G082
     [TotalReceivedQty] => 3.000
     [TotalDeliverQty] => 3.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 12
+    [Batch] => BAT10003
+    [Brand] => 
+    [Model] => 
+    [TotalReceivedQty] => 3.000
+    [TotalDeliverQty] => 
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 13
+    [Batch] => BAT10003
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 10.000
+    [TotalDeliverQty] => 10.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 13
+    [Batch] => BAT10003
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 10.000
+    [TotalDeliverQty] => 10.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 13
+    [Batch] => BAT10003
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 10.000
+    [TotalDeliverQty] => 10.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 13
+    [Batch] => BAT10003
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 10.000
+    [TotalDeliverQty] => 10.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 13
+    [Batch] => BAT10003
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 10.000
+    [TotalDeliverQty] => 10.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 13
+    [Batch] => BAT10003
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 10.000
+    [TotalDeliverQty] => 10.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 13
+    [Batch] => BAT10003
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 10.000
+    [TotalDeliverQty] => 10.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 13
+    [Batch] => BAT10003
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 10.000
+    [TotalDeliverQty] => 10.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 13
+    [Batch] => BAT10003
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 10.000
+    [TotalDeliverQty] => 10.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 13
+    [Batch] => BAT10003
+    [Brand] => SHARP
+    [Model] => 2T-C32EG1X
+    [TotalReceivedQty] => 10.000
+    [TotalDeliverQty] => 10.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 15
+    [Batch] => BAT10003
+    [Brand] => 
+    [Model] => 
+    [TotalReceivedQty] => 3.000
+    [TotalDeliverQty] => 
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 14
+    [Batch] => BAT10003
+    [Brand] => MIDEA
+    [Model] => 20TMG4G082
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 14
+    [Batch] => BAT10003
+    [Brand] => MIDEA
+    [Model] => 20TMG4G082
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 14
+    [Batch] => BAT10003
+    [Brand] => MIDEA
+    [Model] => 20TMG4G082
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 14
+    [Batch] => BAT10003
+    [Brand] => MIDEA
+    [Model] => 20TMG4G082
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
+    [Evaluation] => RECEIVED
+)
+
+Array
+(
+    [RowNum] => 14
+    [Batch] => BAT10003
+    [Brand] => MIDEA
+    [Model] => 20TMG4G082
+    [TotalReceivedQty] => 5.000
+    [TotalDeliverQty] => 5.000
     [Evaluation] => RECEIVED
 )
 

@@ -5,7 +5,8 @@
 
     .counter-box:hover {
 
-        transform: scale(1.12);
+        /* transform: scale(1.12); */
+        transform: scale(1.05);
     }
 </style>
 <div class="container-fluid px-4">

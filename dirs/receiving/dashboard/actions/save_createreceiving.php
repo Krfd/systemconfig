@@ -201,6 +201,7 @@ try {
         $qtyValidation->closeCursor();
     }
 
+    // REMOVE THE DEPENDENCE OF LOADING_BASKET_H TO SRN's
     $updateDeliveryStatus = $conn->prepare("EXEC Get_SRN ?");
     $updateDeliveryStatus->execute([$DeliveryNumber]);
 

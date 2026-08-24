@@ -11,7 +11,7 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
-  $("#basket_content").html(spinner)
+  $("#basket_content").html(spinner);
   $.post("dirs/load/dashboard/components/main.php", {}, function (data) {
     $("#basket_content").html(data);
     // $("#loadingBasketTableDisplay").DataTable({
@@ -52,18 +52,19 @@ $(document).on("click", ".dropdown .create-dr", function (e) {
   }, 200);
 });
 
-// function loadingBasket() {
-//   // $("#main-content").html(spinner);
-//     $.post("dirs/load/dashboard/load.php", {}, function (data) {
-//       $("#main-content").hide().html(data).fadeIn(200);
-//       $("#loadingBasketTableDisplay tbody").html(`
-//         <tr>
-//           <td colspan="100%" class="text-center">${spinner}</td>
-//         </tr>
-//       `);
-//       loadBasket();
-//     });
-// }
+function loadingBasket() {
+  console.log(`UPDATED LOADING BASKET`);
+  $("#main-content").html(spinner);
+  $.post("dirs/load/dashboard/load.php", {}, function (data) {
+    $("#main-content").hide().html(data).fadeIn(200);
+    $("#loadingBasketTableDisplay tbody").html(`
+        <tr>
+          <td colspan="100%" class="text-center">${spinner}</td>
+        </tr>
+      `);
+    loadBasket();
+  });
+}
 
 $(document).on("click", ".print-dr", function () {
   let branches = $(this).data("branches");
