@@ -11,7 +11,7 @@ set_error_handler("errorHandler");
 
 $Hostname   = '';
 $servername = "192.168.101.68";
-$database = "IAP_ISHIFT_DEMO";
+$database = "IAP_InfraHub";
 $username = "sa";
 $password = "SB1Admin";
 try {

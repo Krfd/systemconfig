@@ -6,7 +6,7 @@ $Username = $_POST['Username'];
 $Password = $_POST['Password'];
 
 try {
-    $stmt = $conn->prepare("EXEC LOGIN @mUsername = ?");
+    $stmt = $conn->prepare("EXEC AccountLogin @mUsername = ?");
     $stmt->execute([$Username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($user && password_verify($Password, $user['Password'])) {
@@ -19,11 +19,7 @@ try {
                 "Data" => $user,
                 "Role" => $_SESSION['Role'],
             ]);
-        } 
-        // else if ($_SESSION['Role'] === "Audit") {
-
-        // }
-        else if ($_SESSION['Role'] === "Administrator") {
+        } else if ($_SESSION['Role'] === "Administrator") {
             echo json_encode([
                 "isSuccess" => "OK",
                 "Data" => $user,

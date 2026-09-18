@@ -24,10 +24,10 @@
     <div class="container d-flex justify-content-center align-items-center" style="height: 90vh;">
       <div class="login-card p-4 shadow bg-white">
         <div class="d-flex justify-content-center">
-          <img src="assets/image/logo/iap_icon.png" alt="iShift" style="height: 100px; width: 150px;">
+          <img src="assets/image/logo/iap_icon.png" alt="iShift" style="height: 80px; width: 120px;">
         </div>
         <div class="text-center my-2">
-          <h4>iShift</h4>
+          <h4>Imperial System Configuration</h4>
         </div>
         <div class="form-floating mb-3">
           <input type="text" name="user-username" id="user-username" class="form-control rounded-3" placeholder="Username" required autocomplete="off">
@@ -37,7 +37,7 @@
           <input type="password" name="user-password" id="user-password" class="form-control rounded-3" placeholder="Password" required autocomplete="off">
           <label for="user-password">Password</label>
         </div>
-        <div class="form-check d-flex justify-content-end mb-3">
+        <div class="form-check d-flex justify-content-start mb-3">
           <input class="form-check-input" type="checkbox" id="toggle-show-password" onclick="togglePassword()">
           <label class="form-check-label text-muted ms-2" for="toggle-show-password">
             Show Password
