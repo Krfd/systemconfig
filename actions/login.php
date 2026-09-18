@@ -2,18 +2,20 @@
 session_start();
 require_once "../config/connection.php";
 
+$pcName = gethostname();
+$pcAddress = gethostbyname(gethostname());
 $Username = $_POST['Username'];
 $Password = $_POST['Password'];
 
 try {
-    $stmt = $conn->prepare("EXEC AccountLogin @mUsername = ?");
-    $stmt->execute([$Username]);
+    $stmt = $conn->prepare("EXEC AccountLogin ?, ?, ?, ?");
+    $stmt->execute([$pcName, $pcAddress, $Username, $Password]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($user && password_verify($Password, $user['Password'])) {
-        $_SESSION['Uid'] = $user['Uid'];
-        $_SESSION['Role'] = $user['UserRole'];
+        $_SESSION['Uid'] = $user['Sysid'];
+        $_SESSION['Role'] = $user['Role'];
 
-        if ($_SESSION['Role'] === "Admin") {
+        if ($_SESSION['Role'] === "SA") {
             echo json_encode([
                 "isSuccess" => "OK",
                 "Data" => $user,

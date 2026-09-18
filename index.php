@@ -72,59 +72,23 @@ try {
                 </a>
                 <small><?php echo isset($user['Username']) ? $user['Username'] : 'Bonjing!'; ?></small>
                 <br>
-                <span class="badge text-sm bg-primary" id="system-type"><?php echo (isset($user['UserRole']) ? $user['UserRole'] : '') . ' - ' . (isset($user['Branch']) ? $user['Branch'] : '') ?></span>
+                <span class="badge text-sm bg-primary" id="system-type"><?php echo (isset($user['JobPosition']) ? $user['JobPosition'] : '') ?></span>
             </p>
             <div class="sidebar">
                 <nav id="main-menu" class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <li class="nav-item">
-                            <a href="#" class="nav-link active" name="menu" menucode="outgoing">
-                                <i class="nav-icon bi bi-box-arrow-in-left"></i>
-                                <p>Outgoing</p>
+                            <a href="#" class="nav-link active" name="menu" menucode="dashboard">
+                                <i class="nav-icon bi bi-grid"></i>
+                                <p>Dashboard</p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a href="#" class="nav-link" name="menu" menucode="incoming">
                                 <i class="nav-icon bi bi-box-arrow-in-right"></i>
                                 <p>Incoming</p>
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="basket">
-                                <i class="bi bi-card-checklist"></i>
-                                <p>Branch Assignment</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="load">
-                                <i class="nav-icon bi bi-cart"></i>
-                                <p>Loading Basket</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="delivery">
-                                <i class="nav-icon bi bi-truck"></i>
-                                <p>Stock Delivery</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="receiving">
-                                <i class="nav-icon bi bi-box"></i>
-                                <p>Stock Receiving</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="monitoring">
-                                <i class="nav-icon bi bi-tv"></i>
-                                <p>Monitoring</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" name="menu" menucode="stocktransfer">
-                                <i class="nav-icon bi bi-boxes"></i>
-                                <p>Stock Transfer</p>
-                            </a>
-                        </li>
+                        </li> -->
                         <hr>
                         <li class="nav-item">
                             <a href="#" class="nav-link" onclick="logout()">
@@ -159,25 +123,6 @@ try {
         </div>
     </footer>
     </div>
-    <!-- RELOGIN -->
-    <div id="lockOverlay" class="lock-overlay">
-        <div class="lock-box">
-            <h2>Session Locked</h2>
-            <p>Please login again to continue</p>
-            <form id="relogin-frm" method="POST">
-                <input type="text" id="newUsername" class="form-control" placeholder="Username" required />
-                <input type="password" id="newPassword" class="form-control" placeholder="Password" required />
-                <div class="col form-check d-flex justify-content-start mt-2 ms-1">
-                    <input class="form-check-input" type="checkbox" id="toggle-show-password" onclick="togglePassword()">
-                    <label class="form-check-label text-muted ms-2" for="toggle-show-password">
-                        Show Password
-                    </label>
-                </div>
-                <button type="submit" onclick="unlockScreen()" class="btn btn-primary btn-sm">Login</button>
-                <p id="errorMsg" class="error"></p>
-            </form>
-        </div>
-    </div>
 
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/plugins/sweetalert2/sweetalert2.min.js"></script>
@@ -199,7 +144,6 @@ try {
     <script src="node_modules/uikit/dist/js/uikit.min.js"></script>
     <script src="node_modules/xlsx/dist/xlsx.full.min.js"></script>
     <script src="assets/js/script.js"></script>
-    <script src="assets/js/relogin.js"></script>
     <?php include 'modal.php'; ?>
     <script>
         $(document).ready(function() {

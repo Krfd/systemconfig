@@ -40,46 +40,31 @@ $("#main-menu")
     let $mainbreadcrumb = "";
 
     switch (menucode) {
-      case "outgoing":
+      case "dashboard":
         $maintitle = "";
-        $mainbreadcrumb = `<li class="breadcrumb-item active">Outgoing</li>`;
-        $file = "dirs/outgoing/dashboard/outgoing.php";
+        $mainbreadcrumb = `<li class="breadcrumb-item active">Dashboard</li>`;
+        $file = "dirs/dashboard/dashboard/dashboard.php";
         break;
       case "incoming":
         $maintitle = "";
         $mainbreadcrumb = `<li class="breadcrumb-item active">Incoming</li>`;
         $file = "dirs/incoming/dashboard/incoming.php";
         break;
-      case "basket":
-        $maintitle = "";
-        $mainbreadcrumb = `<li class="breadcrumb-item active">Branch Assignment</li>`;
-        $file = "dirs/basket/dashboard/basket.php";
-        break;
-      case "load":
-        $maintitle = "";
-        $mainbreadcrumb = `<li class="breadcrumb-item active">Loading Basket</li>`;
-        $file = "dirs/load/dashboard/load.php";
-        break;
-      case "delivery":
-        $maintitle = "";
-        $mainbreadcrumb = `<li class="breadcrumb-item active">Stock Delivery</li>`;
-        $file = "dirs/delivery/dashboard/delivery.php";
-        break;
-      case "receiving":
-        $maintitle = "";
-        $mainbreadcrumb = `<li class="breadcrumb-item active">Stock Receiving</li>`;
-        $file = "dirs/receiving/dashboard/received.php";
-        break;
-      case "monitoring":
-        $maintitle = "";
-        $mainbreadcrumb = `<li class="breadcrumb-item active">Monitoring</li>`;
-        $file = "dirs/monitoring/dashboard/monitoring.php";
-        break;
-      case "stocktransfer":
-        // $maintitle = "Stock Transfer";
-        $mainbreadcrumb = `<li class="breadcrumb-item active">Stock Transfer</li>`;
-        $file = "dirs/stock_transfer/dashboard/dashboard.php";
-        break;
+      // case "basket":
+      //   $maintitle = "";
+      //   $mainbreadcrumb = `<li class="breadcrumb-item active">Branch Assignment</li>`;
+      //   $file = "dirs/basket/dashboard/basket.php";
+      //   break;
+      // case "load":
+      //   $maintitle = "";
+      //   $mainbreadcrumb = `<li class="breadcrumb-item active">Loading Basket</li>`;
+      //   $file = "dirs/load/dashboard/load.php";
+      //   break;
+      // case "delivery":
+      //   $maintitle = "";
+      //   $mainbreadcrumb = `<li class="breadcrumb-item active">Stock Delivery</li>`;
+      //   $file = "dirs/delivery/dashboard/delivery.php";
+      //   break;
       // case "settings":
       //   $maintitle = "Account Settings";
       //   $mainbreadcrumb = `<li class="breadcrumb-item active">Settings</li>`;

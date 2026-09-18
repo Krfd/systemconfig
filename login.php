@@ -64,7 +64,7 @@
   <script src="assets/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
   <script src="assets/plugins/elevatezoom-plus-master/src/jquery.ez-plus.js"></script>
   <script src="assets/plugins/datepicker/jquery-ui.min.js"></script>
-  <script src="assets/js/global-scripts.js"></script>
+  <!-- <script src="assets/js/global-scripts.js"></script> -->
 </body>
 
 </html>
@@ -88,17 +88,18 @@
     }, function(data) {
 
       var response = JSON.parse(data);
-      // console.log(`USER ROLE: ${response.Role}`)
       if (response.isSuccess === "OK") {
         var sysRole = response.Role;
         console.log(`USER ROLE: ${sysRole}`)
-        if (sysRole === "cashier") {
+        if (sysRole === "SA") {
           window.location.assign("index.php");
         } else if (sysRole === "Admin") {
           window.location.assign("index.php");
-        } else if (sysRole === "Administrator") {
-          window.location.assign("admin/index.php");
-        } else {
+        } 
+        // else if (sysRole === "Administrator") {
+        //   window.location.assign("admin/index.php");
+        // } 
+        else {
           window.location.assign("index.php");
         }
       } else if (response.isSuccess === "Failed") {
