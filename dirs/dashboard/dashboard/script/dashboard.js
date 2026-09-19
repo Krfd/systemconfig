@@ -2,7 +2,7 @@ $(document).ready(function () {
   loadDashboard();
 });
 
-function greetings() {
+function counter() {
   // Function to animate the counter for each element
   function animateCounter(counterElement) {
     let count = 0;
@@ -55,15 +55,15 @@ $(document).ready(function () {
 });
 
 function loadDashboard() {
-  // $("#dashboard_content").html(spinner);
+  $("#dashboard_content").html(spinner);
   $.post("dirs/dashboard/dashboard/components/main.php", {}, function (data) {
     $("#dashboard_content").html(data);
 
-    // $("#outgoingTableDisplay tbody").html(`
-    //   <tr>
-    //     <td colspan="100%" class="text-center">${spinner}</td>
-    //   </tr>
-    // `);
+    $("#outgoingTableDisplay tbody").html(`
+      <tr>
+        <td colspan="100%" class="text-center">${spinner}</td>
+      </tr>
+    `);
 
     loadOutgoing(() => {
       $("#outgoingTableDisplay").DataTable({
@@ -71,6 +71,7 @@ function loadDashboard() {
         order: [0, "asc"],
       });
     });
+    updateUnit();
   });
 }
 
@@ -92,15 +93,12 @@ function loadOutgoing() {
     success: function (response) {
       let rows = [];
 
-      let data = JSON.stringify(response)
+      // let data = JSON.stringify(response)
 
-      console.log(`DATA: ${data}`)
+      // console.log(`DATA: ${data}`)
 
       if (response.isSuccess === "success" && Array.isArray(response.Data)) {
         let sortedData = response.Data
-        // .sort(
-        //   (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
-        // );
 
         sortedData.forEach((item, index) => {
 
@@ -135,11 +133,9 @@ function loadOutgoing() {
               '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
               '<i class="bi bi-three-dots"></i></button>' +
               '<ul class="dropdown-menu">' +
-              '<li><a class="dropdown-item open-item" href="#">Update</a></li>' +
+              '<li><a class="dropdown-item update-item" data-id="' + item.SysU_id + '" data-unit="' + item.SysUnit_Name + '" data-address="' + item.SysUnit_IpAddress + '" data-branch="' + item.Branch + '" data-bs-toggle="modal" data-bs-target="#updateServerModal" href="#">Update</a></li>' +
               (item.Server_Status?.toUpperCase() === "ONLINE"
-                ? '<li><a class="dropdown-item" data-srn="' +
-                  '" data-entry="' +
-                  '" href="#">Remove</a></li>'
+                ? '<li><a class="dropdown-item deactivate-item" data-id="' + item.SysU_id + '" href="#">Deactivate</a></li>'
                 : "") +
               "</ul></div>",
           ]);
@@ -160,13 +156,13 @@ function loadOutgoing() {
       $("#outgoingTableDisplay").DataTable({
         data: rows,
         columns: [
-          { title: "#", className: "text-center" },
-          { title: "BRANCH" },
-          { title: "IP ADDRESS" },
-          { title: "PC NAME" },
-          { title: "STATUS" },
-          { title: "DATE", className: "text-start" },
-          { title: "ACTION", orderable: false },
+          { title: "#", className: "text-center align-middle" },
+          { title: "BRANCH", className: "align-middle" },
+          { title: "IP ADDRESS", className: "align-middle" },
+          { title: "PC NAME", className: "align-middle" },
+          { title: "STATUS", className: "align-middle" },
+          { title: "MODIFIED", className: "text-start align-middle" },
+          { title: "ACTION",  className: "align-middle", orderable: false },
         ],
         pageLength: 8,
         paging: true,
@@ -185,8 +181,14 @@ function loadOutgoing() {
             "min-height": "40px",
             cursor: "pointer",
           });
-          let docEntry = data[0];
-          $(row).attr("data-docentry", docEntry);
+          let unitId = data[0];
+          let pcName = data[1];
+          let address = data[2];
+          let branch = data[3];
+          $(row).attr("data-id", unitId);
+          $(row).attr("data-unit", pcName);
+          $(row).attr("data-address", address);
+          $(row).attr("data-branch", branch);
           $("td:eq(0)", row).css("text-align", "center");
           $("td:eq(1)", row).addClass("text-primary");
           $("td:eq(5)", row).css("text-align", "start");
@@ -228,20 +230,13 @@ function loadOutgoing() {
           }
         },
       });
-      greetings()
+      counter()
     },
     error: function (xhr, status, error) {
       console.error("Error loading outgoing data: ", error);
     },
   });
 }
-
-function returnOutgoing() {
-  $.post("dirs/dashboard/dashboard/dashboard.php", {}, function (data) {
-    $("#main-content").html(data);
-  });
-}
-
 
 $("#add-unit-server").on("submit", function (e) {
   e.preventDefault();
@@ -279,3 +274,96 @@ $("#add-unit-server").on("submit", function (e) {
     },
   );
 });
+
+// UPDATE
+$("#updateServerModal").on("show.bs.modal", function (event) {
+  const button = $(event.relatedTarget);
+
+  const unitId = button.data("id");
+  const pcName = button.data("unit");
+  const ipAddress = button.data("address");
+  const branch = button.data("branch");
+
+  originalUnitName = pcName || "";
+  originalUnitAddress = ipAddress || "";
+
+  $("#unitServerId").val(unitId);
+  $("#updateUnitName").val(pcName);
+  $("#updateUnitAddress").val(ipAddress);
+  $("#updateBranch").val(branch);
+
+  $("#updateServerBtn").prop("disabled", true);
+});
+
+// $(document).on("click", ".update-item", function (e) {
+//   e.preventDefault();
+//   e.stopPropagation();
+
+//   const unitId = $(this).data("id");
+//   const pcName = $(this).data("unit");
+//   const ipAddress = $(this).data("address");
+//   const branch = $(this).data("branch");
+//   $("#unitServerId").val(unitId);
+//   $("#updateUnitName").val(pcName);
+//   $("#updateUnitAddress").val(ipAddress);
+//   $("#updateBranch").val(branch);
+
+//   console.log(`UNIT ID: ${unitId}`)
+//   console.log(`PC NAME: ${pcName}`)
+//   console.log(`IP ADDRESS: ${ipAddress}`)
+//   console.log(`BRANCH: ${branch}`)
+// });
+
+$("#updateUnitName, #updateUnitAddress").on("input", function () {
+  const currentUnitName = $("#updateUnitName").val();
+  const currentUnitAddress = $("#updateUnitAddress").val();
+
+  const hasChanged =
+    currentUnitName !== originalUnitName ||
+    currentUnitAddress !== originalUnitAddress;
+
+  $("#updateServerBtn").prop("disabled", !hasChanged);
+});
+
+
+function updateUnit() {
+  $("#update-unit-server").on("submit", function (e) {
+    e.preventDefault();
+
+    let unitId = $("#unitServerId").val();
+    let unitName = $("#updateUnitName").val();
+    let unitAddress = $("#updateUnitAddress").val();
+    let branch = $("#updateBranch").val();
+
+    $.post(
+      "dirs/dashboard/dashboard/actions/updateUnit.php",
+      {
+        unitId: unitId,
+        unitName: unitName,
+        unitAddress: unitAddress,
+        branch: branch,
+      },
+      function (data) {
+        let response = JSON.parse(data);
+
+        if (response.isSuccess === "success") {
+          Swal.fire({
+            icon: "success",
+            title: "Server has been updated",
+            showConfirmButton: true,
+            confirmButtonText: "OK",
+          }).then(() => {
+            $("#updateServerModal").modal("hide");
+            loadDashboard();
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Unit was not updated",
+            text: response.Data
+          });
+        }
+      },
+    );
+  });
+}

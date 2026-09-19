@@ -170,6 +170,8 @@ try {
         let receivingGroupedItems = {}
         let receivingObserver = null;
         const selectedRows = new Set();
+        let originalUnitName = "";
+        let originalUnitAddress = "";
 
         function togglePassword() {
             const passwordField = document.getElementById('newPassword');
