@@ -2,7 +2,8 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add Server</h5>
+                <h5 class="modal-title fw-bold">Add Server</h5>
+                <button class="btn btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form method="post" id="add-unit-server">

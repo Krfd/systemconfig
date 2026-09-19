@@ -2,7 +2,7 @@ $(document).ready(function () {
   loadDashboard();
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+function greetings() {
   // Function to animate the counter for each element
   function animateCounter(counterElement) {
     let count = 0;
@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 50); // You can adjust the speed by changing this value
   }
 
-  console.log(`COUNTER START`)
   // Set up the Intersection Observer
   const observer = new IntersectionObserver(
     (entries, observer) => {
@@ -43,8 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   counterElements.forEach((counterElement) => {
     observer.observe(counterElement); // Start observing each element
   });
-});
-
+}
 
 $(document).ready(function () {
   OverlayScrollbars(document.getElementById("dashboard-display"), {
@@ -96,170 +94,141 @@ function loadOutgoing() {
 
       let data = JSON.stringify(response)
 
-      // console.log(`DATA: ${data}`)
+      console.log(`DATA: ${data}`)
 
-      // if (response.isSuccess === "success" && Array.isArray(response.Data)) {
-      //   let sortedData = response.Data.sort(
-      //     (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
-      //   );
+      if (response.isSuccess === "success" && Array.isArray(response.Data)) {
+        let sortedData = response.Data
+        // .sort(
+        //   (a, b) => Number(b.RowNum || 0) - Number(a.RowNum || 0),
+        // );
 
-      //   sortedData.forEach((item, index) => {
+        sortedData.forEach((item, index) => {
 
-      //     let status = item.RequestStatus
-      //       ? item.RequestStatus.toUpperCase()
-      //       : "";
-      //     let statusClass = "";
+          let status = item.Server_Status
+            ? item.Server_Status.toUpperCase()
+            : "";
+          let statusClass = "";
 
-      //     if (status === "NEW") {
-      //       statusClass = "bg-primary";
-      //     } else if (
-      //       status === "CANCEL" ||
-      //       status === "CANCELLED" ||
-      //       status === "PARTIAL"
-      //     ) {
-      //       statusClass = "bg-warning";
-      //     } else if (status === "RECEIVED") {
-      //       statusClass = "bg-success";
-      //     } else if (status === "PARTIAL") {
-      //       statusClass = "bg-warning";
-      //     } else if (status === "IN TRANSIT") {
-      //       statusClass = "bg-primary";
-      //     } else if (status === "TERMINATED") {
-      //       statusClass = "bg-secondary";
-      //     } else if (status === "REJECTED") {
-      //       statusClass = "bg-danger";
-      //     } else if (status === "PROCESSING") {
-      //       statusClass = "bg-info";
-      //     }
+          if (status === "ONLINE") {
+            statusClass = "bg-success";
+          } else {
+            statusClass = "bg-danger";
+          }
 
-      //     let statusBadge = `<span class="badge ${statusClass}">${status || ""}</span>`;
+          let statusBadge = `<span class="badge ${statusClass}">${status || ""}</span>`;
 
-      //     rows.push([
-      //       item.DocEntry,
-      //       index + 1,
-      //       item.SR_Number || "",
-      //       item.BranchOrigin || "",
-      //       item.BranchDestination || "",
-      //       statusBadge,
-      //       item.EncodeDate
-      //         ? new Date(item.EncodeDate).toLocaleDateString("en-US", {
-      //             month: "2-digit",
-      //             day: "2-digit",
-      //             year: "numeric",
-      //           })
-      //         : "",
+          rows.push([
+            index + 1,
+            item.Branch || "",
+            item.SysUnit_IpAddress || "",
+            item.SysUnit_Name || "",
+            statusBadge,
+            item.DocDate
+              ? new Date(item.DocDate).toLocaleDateString("en-US", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  year: "numeric",
+                })
+              : "",
 
-      //       '<div class="dropdown">' +
-      //         '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
-      //         '<i class="bi bi-three-dots"></i></button>' +
-      //         '<ul class="dropdown-menu">' +
-      //         '<li><a class="dropdown-item open-item" href="#">Open</a></li>' +
-      //         (item.RequestStatus?.toUpperCase() === "NEW"
-      //           ? '<li><a class="dropdown-item" data-srn="' +
-      //             item.SR_Number +
-      //             '" data-entry="' +
-      //             item.DocEntry +
-      //             '" href="#">Cancel</a></li>'
-      //           : "") +
-      //         (item.RequestStatus?.toUpperCase() === "PARTIAL"
-      //           ? '<li><a class="dropdown-item terminate-item" data-srn="' +
-      //             item.SR_Number +
-      //             '" data-entry="' +
-      //             item.DocEntry +
-      //             '" href="#">Terminate</a></li>'
-      //           : "") +
-      //         '<li><a class="dropdown-item print-pdf" href="#" target="_blank" data-srn="' +
-      //         item.SR_Number +
-      //         '">Print</a></li>' +
-      //         '<li><a class="dropdown-item" href="#collaborators" role="button" data-bs-toggle="offcanvas" aria-controls="offcanvasScrolling">Collaborators</a></li>' +
-      //         "</ul></div>",
-      //     ]);
-      //   });
-      // }
+            '<div class="dropdown">' +
+              '<button class="btn btn-sm" type="button" data-bs-toggle="dropdown">' +
+              '<i class="bi bi-three-dots"></i></button>' +
+              '<ul class="dropdown-menu">' +
+              '<li><a class="dropdown-item open-item" href="#">Update</a></li>' +
+              (item.Server_Status?.toUpperCase() === "ONLINE"
+                ? '<li><a class="dropdown-item" data-srn="' +
+                  '" data-entry="' +
+                  '" href="#">Remove</a></li>'
+                : "") +
+              "</ul></div>",
+          ]);
+        });
+      }
 
-      // if (rows.length === 0) {
-      //   for (let i = 0; i < 8; i++) {
-      //     rows.push(["", "", "", "", "", "", "", ""]);
-      //   }
-      // }
+      if (rows.length === 0) {
+        for (let i = 0; i < 8; i++) {
+          rows.push(["", "", "", "", "", "", ""]);
+        }
+      }
 
-      // if ($.fn.DataTable.isDataTable("#outgoingTableDisplay")) {
-      //   $("#outgoingTableDisplay").DataTable().clear().destroy();
-      //   $("#outgoingTableDisplay tbody").empty();
-      // }
+      if ($.fn.DataTable.isDataTable("#outgoingTableDisplay")) {
+        $("#outgoingTableDisplay").DataTable().clear().destroy();
+        $("#outgoingTableDisplay tbody").empty();
+      }
 
-      // $("#outgoingTableDisplay").DataTable({
-      //   data: rows,
-      //   columns: [
-      //     { title: "DocEntry", visible: false },
-      //     { title: "#", className: "text-center" },
-      //     { title: "SRN" },
-      //     { title: "Stock Origin" },
-      //     { title: "Requested by" },
-      //     { title: "Status" },
-      //     { title: "Date", className: "text-start" },
-      //     { title: "Actions", orderable: false },
-      //   ],
-      //   pageLength: 8,
-      //   paging: true,
-      //   searching: true,
-      //   info: true,
-      //   processing: false,
-      //   autoWidth: false,
-      //   language: {
-      //     emptyTable: "",
-      //   },
-      //   rowCallback: function (row, data, index) {
-      //     $("td", row).css({
-      //       background: "#fcf7d4",
-      //       padding: "3px",
-      //       height: "40px",
-      //       "min-height": "40px",
-      //       cursor: "pointer",
-      //     });
-      //     let docEntry = data[0];
-      //     $(row).attr("data-docentry", docEntry);
-      //     $("td:eq(0)", row).css("text-align", "center");
-      //     $("td:eq(1)", row).addClass("text-primary");
-      //     $("td:eq(5)", row).css("text-align", "start");
+      $("#outgoingTableDisplay").DataTable({
+        data: rows,
+        columns: [
+          { title: "#", className: "text-center" },
+          { title: "BRANCH" },
+          { title: "IP ADDRESS" },
+          { title: "PC NAME" },
+          { title: "STATUS" },
+          { title: "DATE", className: "text-start" },
+          { title: "ACTION", orderable: false },
+        ],
+        pageLength: 8,
+        paging: true,
+        searching: true,
+        info: true,
+        processing: false,
+        autoWidth: false,
+        language: {
+          emptyTable: "",
+        },
+        rowCallback: function (row, data, index) {
+          $("td", row).css({
+            background: "#fcf7d4",
+            padding: "3px",
+            height: "40px",
+            "min-height": "40px",
+            cursor: "pointer",
+          });
+          let docEntry = data[0];
+          $(row).attr("data-docentry", docEntry);
+          $("td:eq(0)", row).css("text-align", "center");
+          $("td:eq(1)", row).addClass("text-primary");
+          $("td:eq(5)", row).css("text-align", "start");
 
-      //     $(row).hover(
-      //       function () {
-      //         $(this).css("background", "#FFF4C2");
-      //       },
-      //       function () {
-      //         $(this).css("background", "#fcf7d4");
-      //       },
-      //     );
-      //   },
-      //   drawCallback: function () {
-      //     let tableBody = $("#outgoingTableDisplay tbody");
-      //     let currentRows = tableBody.find("tr").length;
+          $(row).hover(
+            function () {
+              $(this).css("background", "#FFF4C2");
+            },
+            function () {
+              $(this).css("background", "#fcf7d4");
+            },
+          );
+        },
+        drawCallback: function () {
+          let tableBody = $("#outgoingTableDisplay tbody");
+          let currentRows = tableBody.find("tr").length;
 
-      //     for (let i = currentRows; i < 8; i++) {
-      //       let $emptyRow = $(`
-      //         <tr class="empty-row">
-      //           <td colspan="8" style="background: #fcf7d4">&nbsp;</td>
-      //         </tr>
-      //       `);
-      //       $emptyRow.css({
-      //         background: "#fcf7d4",
-      //         height: "40px",
-      //         "min-height": "40px",
-      //         cursor: "pointer",
-      //       });
-      //       $emptyRow.hover(
-      //         function () {
-      //           $(this).css("background", "#FFF4C2");
-      //         },
-      //         function () {
-      //           $(this).css("background", "#fcf7d4");
-      //         },
-      //       );
-      //       tableBody.append($emptyRow);
-      //     }
-      //   },
-      // });
+          for (let i = currentRows; i < 8; i++) {
+            let $emptyRow = $(`
+              <tr class="empty-row">
+                <td colspan="8" style="background: #fcf7d4">&nbsp;</td>
+              </tr>
+            `);
+            $emptyRow.css({
+              background: "#fcf7d4",
+              height: "40px",
+              "min-height": "40px",
+              cursor: "pointer",
+            });
+            $emptyRow.hover(
+              function () {
+                $(this).css("background", "#FFF4C2");
+              },
+              function () {
+                $(this).css("background", "#fcf7d4");
+              },
+            );
+            tableBody.append($emptyRow);
+          }
+        },
+      });
+      greetings()
     },
     error: function (xhr, status, error) {
       console.error("Error loading outgoing data: ", error);
